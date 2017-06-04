@@ -1,5 +1,5 @@
 {
-    "name": "bizley/podium/api",
+    "name": "bizley/podium-api",
     "type": "yii2-extension",
     "description": "Yii 2 Forum API.",
     "keywords": ["forum", "yii2", "extension", "podium", "module", "api", "bizley"],
