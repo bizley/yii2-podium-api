@@ -1,0 +1,27 @@
+{
+    "name": "bizley/podium/api",
+    "type": "yii2-extension",
+    "description": "Yii 2 Forum API.",
+    "keywords": ["forum", "yii2", "extension", "podium", "module", "api", "bizley"],
+    "license": "Apache License 2.0",
+    "support": {
+        "issues": "https://github.com/bizley/yii2-podium-api/issues",
+        "wiki": "https://github.com/bizley/yii2-podium-api/wiki",
+        "source": "https://github.com/bizley/yii2-podium-api"
+    },
+    "authors": [
+        {
+            "name": "Pawel Bizley Brzozowski",
+            "email": "pawel@positive.codes"
+        }
+    ],
+    "require": {
+        "php": ">=5.6.0",
+        "yiisoft/yii2": "^2.0.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "bizley\\podium\\api\\": ""
+        }
+    }
+}
