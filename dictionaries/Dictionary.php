@@ -4,7 +4,7 @@ namespace bizley\podium\api\dictionaries;
 
 /**
  * General Dictionary
- * Provides method to get single value based on a key.
+ * Provides method to get single value based on a key and to get range of keys.
  */
 abstract class Dictionary
 {
@@ -32,5 +32,14 @@ abstract class Dictionary
         }
 
         return null;
+    }
+
+    /**
+     * Returns all keys from dictionary.
+     * @return array
+     */
+    public static function range()
+    {
+        return array_keys(static::dictionary());
     }
 }

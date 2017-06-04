@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api\repositories;
 
+use bizley\podium\api\dictionaries\Status;
 use yii\db\ActiveRecord;
 
 /**
@@ -13,9 +14,7 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $username
  * @property string $slug
- * @property string $email
  * @property int $status
- * @property int $role
  * @property int $created_at
  * @property int $updated_at
  */
@@ -27,5 +26,14 @@ class Member extends ActiveRecord
     public static function tableName()
     {
         return '{{%podium_member}}';
+    }
+
+    public function rules()
+    {
+        return [
+            ['status', 'default', 'value' => Status::REGISTERED],
+            ['username', 'required'],
+            ['status', 'in', 'range' => Status::range()],
+        ];
     }
 }

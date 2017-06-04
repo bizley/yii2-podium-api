@@ -66,11 +66,7 @@ abstract class PodiumComponent extends \yii\base\Component
         if ($repository === null) {
             return null;
         }
-        foreach ($data as $attribute => $value) {
-            if ($repository->hasAttribute($attribute)) {
-                $repository->setAttribute($attribute, $value);
-            }
-        }
+        $repository->load($data, '');
         return $repository;
     }
 
