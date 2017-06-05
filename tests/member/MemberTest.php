@@ -1,42 +1,49 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
+namespace bizley\podium\api\tests\member;
+
+use bizley\podium\api\components\Member;
+use bizley\podium\api\tests\TestCase;
+use yii\db\Query;
 
 class MemberTest extends TestCase
 {
-    protected static $driverName = 'mysql';
-    protected static $database;
     /**
-     * @var Connection
+     * @return Member
      */
-    protected static $db;
-
-    protected function mockApplication($config = [], $appClass = '\yii\console\Application')
+    protected function api()
     {
-        new $appClass(\yii\helpers\ArrayHelper::merge([
-            'id' => 'testapp',
-            'basePath' => __DIR__,
-        ], $config));
+        return $this->podium()->member;
     }
 
-    protected function setUp()
+    protected function tableName()
     {
-        parent::setUp();
-        $this->mockApplication();
+        return \bizley\podium\api\repositories\Member::tableName();
     }
 
-    /**
-     * Clean up after test.
-     * By default the application created with [[mockApplication]] will be destroyed.
-     */
-    protected function tearDown()
+    public function testAddingMemberErroneous()
     {
-        parent::tearDown();
-        \Yii::$app = null;
+        $this->assertFalse($this->api()->add(['nonexisting' => 'test']));
+        $this->assertNotEmpty($this->api()->errors);
     }
 
-    public function testBindActionParams()
+    public function testAddingMemberSuccessful()
     {
+        $this->assertTrue($this->api()->add(['username' => 'test']));
+        $this->assertEmpty($this->api()->errors);
 
+        $member = (new Query())->select(['username', 'slug', 'status'])->from($this->tableName())->where(['username' => 'test'])->one(static::$db);
+        $this->assertEquals([
+            'username' => 'test',
+            'slug' => 'test',
+            'status' => 0,
+        ], $member);
+    }
+
+    public function testAddingMemberDuplicate()
+    {
+        $this->assertTrue($this->api()->add(['username' => 'test']));
+        $this->assertFalse($this->api()->add(['username' => 'test']));
+        $this->assertNotEmpty($this->api()->errors);
     }
 }
