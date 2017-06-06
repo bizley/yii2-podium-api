@@ -49,6 +49,7 @@ class PodiumApi extends Module
                 'as slug' => [
                     'class' => SluggableBehavior::class,
                     'attribute' => 'username',
+                    'ensureUnique' => true,
                 ],
             ],
         ],

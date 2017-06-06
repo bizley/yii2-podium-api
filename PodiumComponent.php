@@ -34,18 +34,19 @@ abstract class PodiumComponent extends \yii\base\Component
     /**
      * Returns single repository object based on its primary key.
      * @param mixed $id
-     * @return mixed
+     * @return BaseActiveRecord|null
      * @throws InvalidConfigException
      */
     public function get($id)
     {
         $repository = $this->prepare();
-        return $repository::findOne($id);
+        $this->repository = $repository::findOne($id);
+        return $this->repository;
     }
 
     /**
      * Prepares repository object.
-     * @return object
+     * @return BaseActiveRecord
      * @throws InvalidConfigException
      */
     public function prepare()
@@ -57,17 +58,15 @@ abstract class PodiumComponent extends \yii\base\Component
     /**
      * Loads data to the repository.
      * @param array $data array of pairs attribute's name => attribute's value
-     * @param null|BaseActiveRecord $repository
-     * @return null|BaseActiveRecord
+     * @return bool
      * @throws InvalidParamException
      */
-    protected function load($data, $repository = null)
+    protected function load($data)
     {
-        if ($repository === null) {
-            return null;
+        if ($this->repository === null) {
+            return false;
         }
-        $repository->load($data, '');
-        return $repository;
+        return $this->repository->load($data, '');
     }
 
     /**
@@ -83,11 +82,11 @@ abstract class PodiumComponent extends \yii\base\Component
      */
     public function add($data, $runValidation = true, $attributes = null)
     {
-        $loadedRepo = $this->load($data, $this->prepare());
-        if ($loadedRepo === null) {
+        $this->prepare();
+        if (!$this->load($data)) {
             return false;
         }
-        return $loadedRepo->insert($runValidation, $attributes);
+        return $this->repository->insert($runValidation, $attributes);
     }
 
     /**
@@ -106,11 +105,11 @@ abstract class PodiumComponent extends \yii\base\Component
      */
     public function update($id, $data, $runValidation = true, $attributes = null)
     {
-        $loadedRepo = $this->load($data, $this->get($id));
-        if ($loadedRepo === null) {
+        $this->get($id);
+        if (!$this->load($data)) {
             return false;
         }
-        return $loadedRepo->update($runValidation, $attributes);
+        return $this->repository->update($runValidation, $attributes);
     }
 
     /**
@@ -118,14 +117,16 @@ abstract class PodiumComponent extends \yii\base\Component
      * @param mixed $id
      * @return int|bool
      * @throws InvalidConfigException
+     * @throws \yii\db\Exception
+     * @throws \yii\db\StaleObjectException
      */
     public function delete($id)
     {
-        $loadedRepo = $this->get($id);
-        if ($loadedRepo === null) {
+        $this->get($id);
+        if ($this->repository === null) {
             return false;
         }
-        return $loadedRepo->delete();
+        return $this->repository ? $this->repository->delete() : false;
     }
 
     /**
@@ -134,7 +135,7 @@ abstract class PodiumComponent extends \yii\base\Component
      */
     public function getId()
     {
-        return $this->repository->getPrimaryKey();
+        return $this->repository ? $this->repository->getPrimaryKey() : null;
     }
 
     /**
@@ -145,6 +146,6 @@ abstract class PodiumComponent extends \yii\base\Component
      */
     public function getErrors($attribute = null)
     {
-        return $this->repository->getErrors($attribute);
+        return $this->repository ? $this->repository->getErrors($attribute) : [];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api\tests;
 
+use bizley\podium\api\tests\props\EchoMigrateController;
 use Yii;
 
 abstract class TestCase extends \PHPUnit\Framework\TestCase
@@ -19,19 +20,13 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected static $db;
 
-    public function setUp()
+    protected function setUp()
     {
-        $this->mockApplication();
-
-        $pdo_database = 'pdo_' . static::$driverName;
-        if (!extension_loaded('pdo') || !extension_loaded($pdo_database)) {
-            static::markTestSkipped('pdo and ' . $pdo_database . ' extension are required.');
-        }
-
+        static::mockApplication();
         static::runSilentMigration('migrate/up');
     }
 
-    protected function mockApplication($config = [], $appClass = '\yii\console\Application')
+    protected static function mockApplication($config = [], $appClass = '\yii\console\Application')
     {
         new $appClass(\yii\helpers\ArrayHelper::merge([
             'id' => 'PodiumApiTest',
@@ -68,9 +63,8 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         }
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
-        parent::tearDown();
         static::runSilentMigration('migrate/down');
         if (static::$db) {
             static::$db->close();

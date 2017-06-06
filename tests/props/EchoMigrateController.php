@@ -1,6 +1,6 @@
 <?php
 
-namespace bizley\podium\api\tests;
+namespace bizley\podium\api\tests\props;
 
 use yii\console\controllers\MigrateController;
 

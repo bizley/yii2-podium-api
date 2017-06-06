@@ -33,6 +33,7 @@ class Member extends ActiveRecord
         return [
             ['status', 'default', 'value' => Status::REGISTERED],
             ['username', 'required'],
+            ['username', 'unique'],
             ['status', 'in', 'range' => Status::range()],
         ];
     }
