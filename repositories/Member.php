@@ -3,7 +3,6 @@
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\dictionaries\Status;
-use bizley\podium\api\PodiumRepository;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 
@@ -19,7 +18,7 @@ use yii\behaviors\TimestampBehavior;
  * @property int $created_at
  * @property int $updated_at
  */
-class Member extends PodiumRepository
+class Member extends Repository
 {
     /**
      * @inheritdoc

@@ -16,7 +16,7 @@ use yii\di\Instance;
 abstract class Component extends \yii\base\Component
 {
     /**
-     * @var PodiumApi
+     * @var Podium
      */
     public $podium;
 

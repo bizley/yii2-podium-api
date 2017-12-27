@@ -1,13 +1,13 @@
 <?php
 
-namespace bizley\podium\api;
+namespace bizley\podium\api\repositories;
 
 use yii\db\ActiveRecordInterface;
 
 /**
  * Podium Repository Interface
  */
-interface PodiumRepositoryInterface extends ActiveRecordInterface
+interface RepositoryInterface extends ActiveRecordInterface
 {
     /**
      * Loads data into the repository.
@@ -31,6 +31,7 @@ interface PodiumRepositoryInterface extends ActiveRecordInterface
      * @param null|array $attributes list of attributes that need to be saved. Defaults to `null`, meaning all
      * attributes that are loaded will be saved.
      * @return bool whether the attributes are valid and the data is inserted successfully
+     * @throws \Exception
      */
     public function add($data, $runValidation = true, $attributes = null);
 
@@ -42,6 +43,7 @@ interface PodiumRepositoryInterface extends ActiveRecordInterface
      * @param null|array $attributes list of attributes that need to be saved. Defaults to `null`, meaning all
      * attributes that are loaded will be saved.
      * @return bool|int
+     * @throws \Exception
      * @throws \yii\db\Exception
      * @throws \yii\db\StaleObjectException
      */

@@ -11,8 +11,6 @@ use bizley\podium\api\components\Post;
 use bizley\podium\api\components\Thread;
 use bizley\podium\api\repositories\Member as MemberRepo;
 use yii\base\InvalidConfigException;
-use yii\behaviors\SluggableBehavior;
-use yii\behaviors\TimestampBehavior;
 use yii\di\ServiceLocator;
 use yii\helpers\ArrayHelper;
 
@@ -86,7 +84,7 @@ class Podium extends ServiceLocator
      */
     protected function customizeComponents()
     {
-        foreach ($this->getComponents(true) as $id => $component) {
+        foreach ($this->getComponents() as $id => $component) {
             if (\is_array($component) && isset(static::$podiumComponents[$id])) {
                 $this->set($id, ArrayHelper::merge(static::$podiumComponents[$id], $component, ['podium' => $this]));
             }
@@ -99,7 +97,7 @@ class Podium extends ServiceLocator
      */
     protected function completeComponents()
     {
-        $configuredComponents = $this->getComponents(true);
+        $configuredComponents = $this->getComponents();
         foreach (static::$podiumComponents as $id => $component) {
             if (!isset($configuredComponents[$id])) {
                 $this->set($id, ArrayHelper::merge($component, ['podium' => $this]));

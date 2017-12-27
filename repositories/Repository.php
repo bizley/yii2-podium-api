@@ -1,13 +1,13 @@
 <?php
 
-namespace bizley\podium\api;
+namespace bizley\podium\api\repositories;
 
 use yii\db\ActiveRecord;
 
 /**
  * General Podium Repository
  */
-abstract class PodiumRepository extends ActiveRecord implements PodiumRepositoryInterface
+abstract class Repository extends ActiveRecord implements RepositoryInterface
 {
     /**
      * @inheritdoc
@@ -23,7 +23,7 @@ abstract class PodiumRepository extends ActiveRecord implements PodiumRepository
     public function fetch($primaryKey)
     {
         $repoClass = get_class($this);
-        /* @var $repository PodiumRepository */
+        /* @var $repository Repository */
         $repository = $repoClass::findOne($primaryKey);
         if (null === $repository) {
             return false;
@@ -44,9 +44,7 @@ abstract class PodiumRepository extends ActiveRecord implements PodiumRepository
     }
 
     /**
-     * {@inheritdoc}
-     * @throws \yii\db\Exception
-     * @throws \yii\db\StaleObjectException
+     * @inheritdoc
      */
     public function revise($data, $runValidation = true, $attributes = null)
     {
