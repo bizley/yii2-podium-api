@@ -1,6 +1,6 @@
 <?php
 
-namespace bizley\podium\api;
+namespace bizley\podium\api\components;
 
 use yii\base\InvalidConfigException;
 use yii\base\InvalidParamException;
@@ -13,7 +13,7 @@ use yii\di\Instance;
  * @property string|array|null $id
  * @property array $errors
  */
-abstract class PodiumComponent extends \yii\base\Component
+abstract class Component extends \yii\base\Component
 {
     /**
      * @var PodiumApi

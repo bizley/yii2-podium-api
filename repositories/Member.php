@@ -9,7 +9,7 @@ use yii\db\ActiveRecord;
  * Member Active Record.
  *
  * @author Paweł Bizley Brzozowski <pawel@positive.codes>
- * @since 0.10.0
+ * @since 0.11.0
  *
  * @property int $id
  * @property string $username
@@ -28,6 +28,24 @@ class Member extends ActiveRecord
         return '{{%podium_member}}';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'timestamp' => TimestampBehavior::class,
+            'slug' => [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'username',
+                'ensureUnique' => true,
+            ],
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function rules()
     {
         return [

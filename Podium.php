@@ -2,17 +2,26 @@
 
 namespace bizley\podium\api;
 
+use bizley\podium\api\components\Category;
+use bizley\podium\api\components\Forum;
+use bizley\podium\api\components\Group;
+use bizley\podium\api\components\Member;
+use bizley\podium\api\components\Poll;
+use bizley\podium\api\components\Post;
+use bizley\podium\api\components\Thread;
+use bizley\podium\api\repositories\Member as MemberRepo;
 use yii\base\InvalidConfigException;
-use yii\base\Module;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\di\ServiceLocator;
+use yii\helpers\ArrayHelper;
 
 /**
  * Podium API
  * Yii 2 Forum Engine
  *
  * @author Paweł Bizley Brzozowski <pawel@positive.codes>
- * @version 0.10.0
+ * @version 0.11.0
  * @license Apache License 2.0
  *
  * https://github.com/bizley/yii2-podium-api
@@ -25,51 +34,38 @@ use yii\behaviors\TimestampBehavior;
  *
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
- *
  */
-class PodiumApi extends Module
+class Podium extends ServiceLocator
 {
-    /**
-     * @inheritdoc
-     */
-    protected function defaultVersion()
-    {
-        return '0.10.0';
-    }
+    protected $version = '0.11.0';
 
     /**
      * @var array Podium components
      */
     public static $podiumComponents = [
         'member' => [
-            'class' => \bizley\podium\api\components\Member::class,
+            'class' => Member::class,
             'repositoryConfig' => [
-                'class' => \bizley\podium\api\repositories\Member::class,
-                'as timestamp' => TimestampBehavior::class,
-                'as slug' => [
-                    'class' => SluggableBehavior::class,
-                    'attribute' => 'username',
-                    'ensureUnique' => true,
-                ],
+                'class' => MemberRepo::class,
             ],
         ],
         'group' => [
-            'class' => \bizley\podium\api\components\Group::class
+            'class' => Group::class
         ],
         'category' => [
-            'class' => \bizley\podium\api\components\Category::class
+            'class' => Category::class
         ],
         'forum' => [
-            'class' => \bizley\podium\api\components\Forum::class
+            'class' => Forum::class
         ],
         'thread' => [
-            'class' => \bizley\podium\api\components\Thread::class
+            'class' => Thread::class
         ],
         'post' => [
-            'class' => \bizley\podium\api\components\Post::class
+            'class' => Post::class
         ],
         'poll' => [
-            'class' => \bizley\podium\api\components\Poll::class
+            'class' => Poll::class
         ]
     ];
 
@@ -91,8 +87,8 @@ class PodiumApi extends Module
     protected function customizeComponents()
     {
         foreach ($this->getComponents(true) as $id => $component) {
-            if (is_array($component) && isset(static::$podiumComponents[$id])) {
-                $this->set($id, array_merge(static::$podiumComponents[$id], $component, ['podium' => $this]));
+            if (\is_array($component) && isset(static::$podiumComponents[$id])) {
+                $this->set($id, ArrayHelper::merge(static::$podiumComponents[$id], $component, ['podium' => $this]));
             }
         }
     }
@@ -106,7 +102,7 @@ class PodiumApi extends Module
         $configuredComponents = $this->getComponents(true);
         foreach (static::$podiumComponents as $id => $component) {
             if (!isset($configuredComponents[$id])) {
-                $this->set($id, array_merge($component, ['podium' => $this]));
+                $this->set($id, ArrayHelper::merge($component, ['podium' => $this]));
             }
         }
     }

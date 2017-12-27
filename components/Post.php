@@ -2,9 +2,7 @@
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\PodiumComponent;
-
-class Post extends PodiumComponent
+class Post extends Component
 {
 
 }
