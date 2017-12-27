@@ -3,13 +3,14 @@
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\dictionaries\Status;
-use yii\db\ActiveRecord;
+use bizley\podium\api\PodiumRepository;
+use yii\behaviors\SluggableBehavior;
+use yii\behaviors\TimestampBehavior;
 
 /**
  * Member Active Record.
  *
  * @author Paweł Bizley Brzozowski <pawel@positive.codes>
- * @since 0.11.0
  *
  * @property int $id
  * @property string $username
@@ -18,7 +19,7 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  */
-class Member extends ActiveRecord
+class Member extends PodiumRepository
 {
     /**
      * @inheritdoc
@@ -33,14 +34,14 @@ class Member extends ActiveRecord
      */
     public function behaviors()
     {
-        return [
+        return array_merge(parent::behaviors(), [
             'timestamp' => TimestampBehavior::class,
             'slug' => [
                 'class' => SluggableBehavior::class,
                 'attribute' => 'username',
                 'ensureUnique' => true,
             ],
-        ];
+        ]);
     }
 
     /**
