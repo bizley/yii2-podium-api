@@ -22,35 +22,25 @@ abstract class Repository extends ActiveRecord implements RepositoryInterface
      */
     public function fetch($primaryKey)
     {
-        $repoClass = get_class($this);
-        /* @var $repository Repository */
+        $repoClass = static::class;
+        /* @var $repository static */
         $repository = $repoClass::findOne($primaryKey);
         if (null === $repository) {
-            return false;
+            throw new RepoNotFoundException("$repoClass data has not been found");
         }
         $this->setAttributes($repository->getAttributes(), false);
-        return true;
+        $this->setIsNewRecord(false);
+        return $this;
     }
 
     /**
      * @inheritdoc
      */
-    public function add($data, $runValidation = true, $attributes = null)
+    public function store($data, $runValidation = true, $attributeNames = null)
     {
         if (!$this->loadData($data)) {
             return false;
         }
-        return $this->insert($runValidation, $attributes);
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function revise($data, $runValidation = true, $attributes = null)
-    {
-        if (!$this->loadData($data)) {
-            return false;
-        }
-        return $this->update($runValidation, $attributes);
+        return $this->save($runValidation, $attributeNames);
     }
 }

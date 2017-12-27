@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api\tests;
 
+use bizley\podium\api\repositories\RepoNotFoundException;
 use yii\db\Query;
 
 class TestComponent extends TestCase
@@ -17,14 +18,14 @@ class TestComponent extends TestCase
 
     public function testAddingRepoErroneous()
     {
-        $this->assertFalse($this->api()->add(static::$inputErrorData));
-        $this->assertNotEmpty($this->api()->errors);
+        $this->assertFalse($this->repo()->store(static::$inputErrorData));
+        $this->assertNotEmpty($this->repo()->errors);
     }
 
     public function testAddingRepoSuccessful()
     {
-        $this->assertTrue($this->api()->add(static::$inputSuccessData));
-        $this->assertEmpty($this->api()->errors);
+        $this->assertTrue($this->repo()->store(static::$inputSuccessData));
+        $this->assertEmpty($this->repo()->errors);
 
         $repo = (new Query())->select(static::$selectQuery)->from($this->tableName())->where(static::$insertCondition)->one(static::$db);
         $this->assertEquals(static::$addedRepo, $repo);
@@ -32,36 +33,37 @@ class TestComponent extends TestCase
 
     public function testAddingRepoDuplicate()
     {
-        $this->assertTrue($this->api()->add(static::$inputSuccessData));
-        $this->assertFalse($this->api()->add(static::$inputSuccessData));
-        $this->assertNotEmpty($this->api()->errors);
+        $this->assertTrue($this->repo()->store(static::$inputSuccessData));
+        $this->assertFalse($this->repo(true)->store(static::$inputSuccessData));
+        $this->assertNotEmpty($this->repo()->errors);
     }
 
-    public function testUpdatingRepoMissing()
+    public function testRepoMissing()
     {
-        $this->assertFalse($this->api()->update(-1, []));
+        $this->expectException(RepoNotFoundException::class);
+        $this->assertFalse($this->repo()->fetch(-1));
     }
 
     public function testUpdatingRepoErroneous()
     {
-        $this->assertTrue($this->api()->add(static::$inputSuccessData));
-        $repoClass = $this->api()->repository;
-        $repoId = (new Query())->select($repoClass::primaryKey())->from($this->tableName())->where(static::$insertCondition)->scalar(static::$db);
+        $repo = $this->repo();
+        $this->assertTrue($repo->store(static::$inputSuccessData));
+        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where(static::$insertCondition)->scalar(static::$db);
 
-        $this->assertEquals(0, $this->api()->update($repoId, static::$inputErrorData));
-        $this->assertNotEmpty($this->api()->errors);
+        $this->assertEquals(0, $repo->fetch($repoId)->store(static::$inputErrorData));
+        $this->assertNotEmpty($repo->errors);
     }
 
     public function testUpdatingRepoSuccessful()
     {
-        $this->assertTrue($this->api()->add(static::$inputSuccessData));
-        $repoClass = $this->api()->repository;
-        $repoId = (new Query())->select($repoClass::primaryKey())->from($this->tableName())->where(static::$insertCondition)->scalar(static::$db);
+        $repo = $this->repo();
+        $this->assertTrue($repo->store(static::$inputSuccessData));
+        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where(static::$insertCondition)->scalar(static::$db);
 
-        $this->assertEquals(1, $this->api()->update($repoId, static::$updateSuccessData));
-        $this->assertEmpty($this->api()->errors);
+        $this->assertEquals(1, $this->repo()->fetch($repoId)->store(static::$updateSuccessData));
+        $this->assertEmpty($this->repo()->errors);
 
-        $repo = (new Query())->select(static::$selectQuery)->from($this->tableName())->where(static::$updateCondition)->one(static::$db);
-        $this->assertEquals(static::$updatedRepo, $repo);
+        $repoTest = (new Query())->select(static::$selectQuery)->from($this->tableName())->where(static::$updateCondition)->one(static::$db);
+        $this->assertEquals(static::$updatedRepo, $repoTest);
     }
 }

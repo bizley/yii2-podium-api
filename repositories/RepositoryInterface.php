@@ -19,33 +19,20 @@ interface RepositoryInterface extends ActiveRecordInterface
     /**
      * Fetches single repository data based on its primary key value.
      * @param mixed $primaryKey
-     * @return bool whether fetch has been successful
+     * @return static
+     * @throws RepoNotFoundException if repository data has not been found
      */
     public function fetch($primaryKey);
 
     /**
-     * Adds new repository data.
+     * Save repository data.
      * @param array $data array of pairs attribute's name => attribute's value
      * @param bool $runValidation whether to perform repository validation before saving the record. Defaults to `true`.
      * If the validation fails, the record will not be saved to the database and this method will return `false`.
-     * @param null|array $attributes list of attributes that need to be saved. Defaults to `null`, meaning all
-     * attributes that are loaded will be saved.
+     * @param null|array $attributeNames list of attribute names that need to be saved. Defaults to null,
+     * meaning all attributes that are loaded from DB will be saved.
      * @return bool whether the attributes are valid and the data is inserted successfully
      * @throws \Exception
      */
-    public function add($data, $runValidation = true, $attributes = null);
-
-    /**
-     * Revises repository data.
-     * @param array $data array of pairs attribute's name => attribute's value
-     * @param bool $runValidation whether to perform repository validation before saving the record. Defaults to `true`.
-     * If the validation fails, the record will not be saved to the database and this method will return `false`.
-     * @param null|array $attributes list of attributes that need to be saved. Defaults to `null`, meaning all
-     * attributes that are loaded will be saved.
-     * @return bool|int
-     * @throws \Exception
-     * @throws \yii\db\Exception
-     * @throws \yii\db\StaleObjectException
-     */
-    public function revise($data, $runValidation = true, $attributes = null);
+    public function store($data, $runValidation = true, $attributeNames = null);
 }
