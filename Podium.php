@@ -47,24 +47,24 @@ class Podium extends ServiceLocator
                 'class' => MemberRepo::class,
             ],
         ],
-//        'group' => [
-//            'class' => Group::class
-//        ],
-//        'category' => [
-//            'class' => Category::class
-//        ],
-//        'forum' => [
-//            'class' => Forum::class
-//        ],
-//        'thread' => [
-//            'class' => Thread::class
-//        ],
-//        'post' => [
-//            'class' => Post::class
-//        ],
-//        'poll' => [
-//            'class' => Poll::class
-//        ]
+        'group' => [
+            'class' => Group::class
+        ],
+        'category' => [
+            'class' => Category::class
+        ],
+        'forum' => [
+            'class' => Forum::class
+        ],
+        'thread' => [
+            'class' => Thread::class
+        ],
+        'post' => [
+            'class' => Post::class
+        ],
+        'poll' => [
+            'class' => Poll::class
+        ]
     ];
 
     /**
