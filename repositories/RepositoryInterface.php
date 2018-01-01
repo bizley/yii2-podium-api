@@ -3,6 +3,7 @@
 namespace bizley\podium\api\repositories;
 
 use yii\db\ActiveRecordInterface;
+use yii\db\StaleObjectException;
 
 /**
  * Podium Repository Interface
@@ -35,4 +36,14 @@ interface RepositoryInterface extends ActiveRecordInterface
      * @throws \Exception
      */
     public function store($data, $runValidation = true, $attributeNames = null);
+
+    /**
+     * Deletes the repository data.
+     * @return int|false the number of rows deleted, or `false` if the deletion is unsuccessful for some reason.
+     * Note that it is possible the number of rows deleted is 0, even though the deletion execution is successful.
+     * @throws StaleObjectException if [[optimisticLock|optimistic locking]] is enabled and the data
+     * being deleted is outdated.
+     * @throws \Exception|\Throwable in case delete failed.
+     */
+    public function remove();
 }

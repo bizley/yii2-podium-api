@@ -49,7 +49,7 @@ class TestComponent extends TestCase
     public function testUpdatingRepoErroneous()
     {
         $repo = $this->repo();
-        $this->assertTrue($repo->store($this->data['inputSuccessData']));
+        $repo->store($this->data['inputSuccessData']);
         $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where($this->data['insertCondition'])->scalar(static::$db);
 
         $this->assertEquals(0, $repo->fetch($repoId)->store($this->data['inputErrorData']));
@@ -59,7 +59,7 @@ class TestComponent extends TestCase
     public function testUpdatingRepoSuccessful()
     {
         $repo = $this->repo();
-        $this->assertTrue($repo->store($this->data['inputSuccessData']));
+        $repo->store($this->data['inputSuccessData']);
         $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where($this->data['insertCondition'])->scalar(static::$db);
 
         $this->assertEquals(1, $this->repo()->fetch($repoId)->store($this->data['updateSuccessData']));
@@ -67,5 +67,14 @@ class TestComponent extends TestCase
 
         $repoTest = (new Query())->select($this->data['selectQuery'])->from($this->tableName())->where($this->data['updateCondition'])->one(static::$db);
         $this->assertEquals($this->data['updatedRepo'], $repoTest);
+    }
+
+    public function testDeletingRepoSuccessful()
+    {
+        $repo = $this->repo();
+        $repo->store($this->data['inputSuccessData']);
+        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where($this->data['insertCondition'])->scalar(static::$db);
+
+        $this->assertEquals(1, $this->repo()->fetch($repoId)->remove());
     }
 }

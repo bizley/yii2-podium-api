@@ -43,4 +43,12 @@ abstract class Repository extends ActiveRecord implements RepositoryInterface
         }
         return $this->save($runValidation, $attributeNames);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function remove()
+    {
+        return $this->delete();
+    }
 }
