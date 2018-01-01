@@ -11,7 +11,7 @@ use yii\di\Instance;
 /**
  * General Podium Component
  *
- * @property object|ActiveRecord $repo
+ * @property object|ActiveRecord|RepositoryInterface $repo
  */
 abstract class Component extends \yii\base\Component
 {
