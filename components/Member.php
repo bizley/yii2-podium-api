@@ -6,8 +6,8 @@ use bizley\podium\api\repositories\RepoEvent;
 
 class Member extends Component
 {
-    const EVENT_BEFORE_REGISTER = 'beforeRegister';
-    const EVENT_AFTER_REGISTER = 'afterRegister';
+    const EVENT_BEFORE_REGISTER = 'member.register.before';
+    const EVENT_AFTER_REGISTER = 'member.register.after';
 
     /**
      * @return bool
@@ -36,8 +36,66 @@ class Member extends Component
         return $result;
     }
 
+    /**
+     *
+     */
     public function afterRegister()
     {
         $this->trigger(self::EVENT_AFTER_REGISTER);
+    }
+
+    public function delete()
+    {
+
+    }
+
+    public function search($filter)
+    {
+
+    }
+
+    public function ignore()
+    {
+
+    }
+
+    public function unignore()
+    {
+
+    }
+
+    public function befriend()
+    {
+
+    }
+
+    public function unfriend()
+    {
+
+    }
+
+    public function view()
+    {
+
+    }
+
+    public function ban()
+    {
+
+    }
+
+    public function unban()
+    {
+
+    }
+
+    public function promote()
+    {
+
+    }
+
+    public function demote()
+    {
+
     }
 }

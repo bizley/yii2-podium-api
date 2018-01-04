@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api\repositories;
 
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -50,5 +51,13 @@ abstract class Repository extends ActiveRecord implements RepositoryInterface
     public function remove()
     {
         return $this->delete();
+    }
+
+    public function browse($filter)
+    {
+        $repoClass = static::class;
+        /* @var $query ActiveQuery */
+        $query = $repoClass::find();
+
     }
 }
