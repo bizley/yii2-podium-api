@@ -4,6 +4,12 @@ namespace bizley\podium\api\components;
 
 use bizley\podium\api\repositories\RepoEvent;
 
+/**
+ * Class Member
+ * @package bizley\podium\api\components
+ *
+ * @property \bizley\podium\api\repositories\Member memberRepo
+ */
 class Member extends Component
 {
     const EVENT_BEFORE_REGISTER = 'member.register.before';
@@ -30,7 +36,7 @@ class Member extends Component
         if (!$this->beforeRegister()) {
             return false;
         }
-        $result = $this->repo->store($data);
+        $result = $this->memberRepo->store($data);
 
         $this->afterRegister();
         return $result;

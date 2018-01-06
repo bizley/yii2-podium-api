@@ -92,6 +92,9 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
         return static::$db;
     }
 
+    /**
+     * @return Podium
+     */
     protected function podium()
     {
         return Yii::$app->podium;

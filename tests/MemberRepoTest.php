@@ -2,21 +2,44 @@
 
 namespace bizley\podium\api\tests;
 
+use bizley\podium\api\repositories\Member as MemberRepo;
 use bizley\podium\api\repositories\RepoNotFoundException;
 use yii\db\Query;
 
-class TestComponent extends TestCase
+class MemberRepoTest extends TestCase
 {
     public $data = [
-        'inputErrorData' => [],
-        'inputSuccessData' => [],
-        'updateSuccessData' => [],
-        'selectQuery' => [],
-        'insertCondition' => [],
-        'updateCondition' => [],
-        'addedRepo' => [],
-        'updatedRepo' => [],
+        'inputErrorData' => ['username' => null],
+        'inputSuccessData' => ['username' => 'test'],
+        'updateSuccessData' => ['username' => 'testUpdated'],
+        'selectQuery' => ['username', 'slug', 'status'],
+        'insertCondition' => ['username' => 'test'],
+        'updateCondition' => ['username' => 'testUpdated'],
+        'addedRepo' => [
+            'username' => 'test',
+            'slug' => 'test',
+            'status' => '0',
+        ],
+        'updatedRepo' => [
+            'username' => 'testUpdated',
+            'slug' => 'testupdated',
+            'status' => '0',
+        ],
     ];
+
+    /**
+     * @param bool $clear
+     * @return MemberRepo|bool
+     */
+    protected function repo($clear = false)
+    {
+        return $this->podium()->member->getRepo('member', $clear);
+    }
+
+    protected function tableName()
+    {
+        return MemberRepo::tableName();
+    }
 
     public function testAddingRepoErroneous()
     {

@@ -35,7 +35,7 @@ use yii\helpers\ArrayHelper;
  */
 class Podium extends ServiceLocator
 {
-    protected $version = '0.11.0';
+    protected $version = '1.0.0';
 
     /**
      * @var array Podium components
@@ -43,8 +43,10 @@ class Podium extends ServiceLocator
     public static $podiumComponents = [
         'member' => [
             'class' => Member::class,
-            'repositoryConfig' => [
-                'class' => MemberRepo::class,
+            'repositories' => [
+                'member' => [
+                    'class' => MemberRepo::class
+                ],
             ],
         ],
         'group' => [
