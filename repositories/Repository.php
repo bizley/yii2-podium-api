@@ -25,13 +25,23 @@ abstract class Repository extends ActiveRecord implements RepositoryInterface
     {
         $repoClass = static::class;
         /* @var $repository static */
-        $repository = $repoClass::findOne($primaryKey);
+        $repository = $repoClass::find()->where($primaryKey)->one();
         if (null === $repository) {
             throw new RepoNotFoundException("$repoClass data has not been found");
         }
         $this->setAttributes($repository->getAttributes(), false);
         $this->setIsNewRecord(false);
         return $this;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function check($primaryKey)
+    {
+        $repoClass = static::class;
+        /* @var $repository static */
+        return $repoClass::find()->where($primaryKey)->exists();
     }
 
     /**

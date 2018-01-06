@@ -8,7 +8,7 @@ namespace bizley\podium\api\dictionaries;
 abstract class AcquaintanceType extends Dictionary
 {
     const FRIEND = 1;
-    const IGNORE = 1;
+    const IGNORE = 2;
 
     /**
      * @inheritdoc

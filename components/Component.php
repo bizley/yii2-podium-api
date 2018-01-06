@@ -32,6 +32,9 @@ abstract class Component extends \yii\base\Component
      */
     public function getRepo($name, $clear = false)
     {
+        if (empty($this->repositories[$name])) {
+            throw new InvalidConfigException("Repository \"$name\" has not been configured!");
+        }
         if ($clear === true || empty($this->_repos[$name])) {
             $this->_repos[$name] = Instance::ensure($this->repositories[$name], RepositoryInterface::class, $this->podium);
         }
@@ -56,11 +59,31 @@ abstract class Component extends \yii\base\Component
         return parent::__get($name);
     }
 
-    public function loadRepo($entity, $repository)
+    /**
+     * Loads repository of given name or returns repository if already provided.
+     * @param array|int|RepositoryInterface $entity
+     * @param string $name
+     * @return RepositoryInterface
+     * @throws InvalidConfigException
+     * @throws \bizley\podium\api\repositories\RepoNotFoundException
+     */
+    public function loadRepo($entity, $name)
     {
+        if (empty($this->repositories[$name])) {
+            throw new InvalidConfigException("Repository \"$name\" has not been configured!");
+        }
+        if (is_array($this->repositories[$name])) {
+            if (!empty($this->repositories[$name]['class'])) {
+                $repository = $this->repositories[$name]['class'];
+            } else {
+                throw new InvalidConfigException("Missing \"class\" configuration for \"$name\" repository!");
+            }
+        } else {
+            $repository = $this->repositories[$name];
+        }
         if ($entity instanceof $repository) {
             return $entity;
         }
-        //TODO
+        return $this->getRepo($name, true)->fetch($entity);
     }
 }

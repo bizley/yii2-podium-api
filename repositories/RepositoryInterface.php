@@ -18,12 +18,19 @@ interface RepositoryInterface extends ActiveRecordInterface
     public function loadData($data);
 
     /**
-     * Fetches single repository data based on its primary key value.
+     * Fetches single repository data based on its primary key value or array of conditions.
      * @param mixed $primaryKey
      * @return static
      * @throws RepoNotFoundException if repository data has not been found
      */
     public function fetch($primaryKey);
+
+    /**
+     * Checks if repository data with given primary key or array of conditions exists.
+     * @param mixed $primaryKey
+     * @return bool
+     */
+    public function check($primaryKey);
 
     /**
      * Save repository data.
