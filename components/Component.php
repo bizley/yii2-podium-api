@@ -55,4 +55,12 @@ abstract class Component extends \yii\base\Component
         }
         return parent::__get($name);
     }
+
+    public function loadRepo($entity, $repository)
+    {
+        if ($entity instanceof $repository) {
+            return $entity;
+        }
+        //TODO
+    }
 }

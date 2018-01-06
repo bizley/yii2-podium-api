@@ -9,6 +9,7 @@ use bizley\podium\api\components\Member;
 use bizley\podium\api\components\Poll;
 use bizley\podium\api\components\Post;
 use bizley\podium\api\components\Thread;
+use bizley\podium\api\repositories\Acquaintance;
 use bizley\podium\api\repositories\Member as MemberRepo;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
@@ -46,6 +47,9 @@ class Podium extends ServiceLocator
             'repositories' => [
                 'member' => [
                     'class' => MemberRepo::class
+                ],
+                'acquaintance' => [
+                    'class' => Acquaintance::class
                 ],
             ],
         ],

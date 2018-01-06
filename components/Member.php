@@ -60,7 +60,15 @@ class Member extends Component
 
     }
 
-    public function ignore()
+    public function isIgnoring($member, $target)
+    {
+        $memberLoaded = $member;
+        if (!$memberLoaded instanceof \bizley\podium\api\repositories\Member) {
+
+        }
+    }
+
+    public function ignore($member, $target)
     {
 
     }
