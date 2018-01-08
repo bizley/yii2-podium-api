@@ -2,7 +2,7 @@
 
 namespace bizley\podium\api\repositories;
 
-use bizley\podium\api\dictionaries\AcquaintanceType;
+use bizley\podium\api\dictionaries\Acquaintance;
 use yii\behaviors\TimestampBehavior;
 
 /**
@@ -50,7 +50,7 @@ class Acquaintance extends Repository
         return [
             [['member_id', 'target_id', 'type'], 'required'],
             [['member_id', 'target_id'], 'exist', 'targetClass' => Member::class, 'targetAttribute' => 'id'],
-            ['type', 'in', 'range' => AcquaintanceType::range()],
+            ['type', 'in', 'range' => Acquaintance::range()],
         ];
     }
 

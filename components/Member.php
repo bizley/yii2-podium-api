@@ -2,7 +2,7 @@
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\dictionaries\AcquaintanceType;
+use bizley\podium\api\dictionaries\Acquaintance;
 use bizley\podium\api\repositories\RepoEvent;
 
 /**
@@ -70,7 +70,7 @@ class Member extends Component
      */
     public function isIgnoring($member, $target)
     {
-        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => AcquaintanceType::IGNORE]);
+        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::IGNORE]);
     }
 
     public function ignore($member, $target)
@@ -91,7 +91,7 @@ class Member extends Component
      */
     public function isFriendWith($member, $target)
     {
-        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => AcquaintanceType::FRIEND]);
+        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::FRIEND]);
     }
 
     public function befriend()
