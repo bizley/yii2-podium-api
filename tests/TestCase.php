@@ -24,7 +24,7 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
      */
     protected static $db;
 
-    protected function setUp()
+    public static function setUpBeforeClass()
     {
         static::mockApplication();
         static::runSilentMigration('migrate/up');
@@ -55,17 +55,16 @@ abstract class TestCase extends \PHPUnit\Framework\TestCase
     {
         ob_start();
         if (Yii::$app->runAction($route, $params) === Controller::EXIT_CODE_NORMAL) {
-            echo 'Migration OK.';
             ob_end_clean();
         } else {
-            echo 'Migration failed!';
+            fwrite(STDOUT, "\nMigration failed!\n");
             ob_end_flush();
         }
     }
 
-    protected function tearDown()
+    public static function tearDownAfterClass()
     {
-        static::runSilentMigration('migrate/down');
+        static::runSilentMigration('migrate/down', ['all']);
         if (static::$db) {
             static::$db->close();
         }

@@ -26,11 +26,11 @@ interface RepositoryInterface extends ActiveRecordInterface
     public function fetch($primaryKey);
 
     /**
-     * Checks if repository data with given primary key or array of conditions exists.
-     * @param mixed $primaryKey
+     * Checks if repository data with given array of conditions exists.
+     * @param array $conditions
      * @return bool
      */
-    public function check($primaryKey);
+    public function check($conditions);
 
     /**
      * Save repository data.
