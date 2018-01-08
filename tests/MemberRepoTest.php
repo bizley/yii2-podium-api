@@ -58,19 +58,22 @@ class MemberRepoTest extends TestCase
     {
         $repo = $this->repo(true);
         $repo->store(['username' => 'test3']);
-        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where(['username' => 'test3'])->scalar(static::$db);
+        $repoId = $repo->id;
 
         $this->assertEquals(0, $repo->fetch($repoId)->store(['username' => null]));
         $this->assertNotEmpty($repo->errors);
+
+        $repoTest = (new Query())->select('username')->from($this->tableName())->where(['username' => 'test3'])->one(static::$db);
+        $this->assertEquals(['username' => 'test3'], $repoTest);
     }
 
     public function testUpdatingRepoSuccessful()
     {
         $repo = $this->repo(true);
         $repo->store(['username' => 'test4']);
-        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where(['username' => 'test4'])->scalar(static::$db);
+        $repoId = $repo->id;
 
-        $this->assertEquals(1, $this->repo()->fetch($repoId)->store(['username' => 'testUpdated']));
+        $this->assertEquals(1, $this->repo(true)->fetch($repoId)->store(['username' => 'testUpdated']));
         $this->assertEmpty($this->repo()->errors);
 
         $repoTest = (new Query())->select(['username', 'slug', 'status'])->from($this->tableName())->where(['username' => 'testUpdated'])->one(static::$db);
@@ -79,6 +82,8 @@ class MemberRepoTest extends TestCase
             'slug' => 'testupdated',
             'status' => '0',
         ], $repoTest);
+        $repoGone = (new Query())->select(['username', 'slug', 'status'])->from($this->tableName())->where(['username' => 'test4'])->one(static::$db);
+        $this->assertEmpty($repoGone);
     }
 
     public function testCheckingRepoExists()
@@ -89,12 +94,18 @@ class MemberRepoTest extends TestCase
         $this->assertTrue($repo->check(['id' => $repo->id]));
     }
 
+    public function testCheckingRepoNonExists()
+    {
+        $repo = $this->repo(true);
+        $this->assertFalse($repo->check(['id' => -1]));
+    }
+
     public function testDeletingRepoSuccessful()
     {
         $repo = $this->repo(true);
         $repo->store(['username' => 'test6']);
-        $repoId = (new Query())->select($repo::primaryKey())->from($this->tableName())->where(['username' => 'test6'])->scalar(static::$db);
+        $repoId = $repo->id;
 
-        $this->assertEquals(1, $this->repo()->fetch($repoId)->remove());
+        $this->assertEquals(1, $this->repo(true)->fetch($repoId)->remove());
     }
 }
