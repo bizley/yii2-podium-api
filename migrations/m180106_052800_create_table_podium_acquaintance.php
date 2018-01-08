@@ -21,6 +21,7 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
             'created_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
+        $this->createIndex('idx-podium_acquaintance-unique', '{{%podium_acquaintance}}', ['member_id', 'target_id', 'type'], true);
         $this->addForeignKey('fk-podium_acquaintance-member_id', '{{%podium_acquaintance}}', 'member_id', '{{%podium_member}}', 'id');
         $this->addForeignKey('fk-podium_acquaintance-target_id', '{{%podium_acquaintance}}', 'target_id', '{{%podium_member}}', 'id');
     }
