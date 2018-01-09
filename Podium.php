@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api;
 
+use bizley\podium\api\components\Admin;
 use bizley\podium\api\components\Category;
 use bizley\podium\api\components\Forum;
 use bizley\podium\api\components\Group;
@@ -52,6 +53,9 @@ class Podium extends ServiceLocator
                     'class' => Acquaintance::class
                 ],
             ],
+        ],
+        'admin' => [
+            'class' => Admin::class
         ],
         'group' => [
             'class' => Group::class
