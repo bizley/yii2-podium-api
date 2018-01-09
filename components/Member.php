@@ -3,7 +3,6 @@
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\dictionaries\Acquaintance;
-use bizley\podium\api\repositories\RepoEvent;
 
 /**
  * Class Member
@@ -22,7 +21,7 @@ class Member extends Component
      */
     public function beforeRegister()
     {
-        $event = new RepoEvent();
+        $event = new PodiumEvent();
         $this->trigger(self::EVENT_BEFORE_REGISTER, $event);
         return $event->isValid;
     }
