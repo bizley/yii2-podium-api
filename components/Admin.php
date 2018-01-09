@@ -9,7 +9,7 @@ namespace bizley\podium\api\components;
  * @property \bizley\podium\api\repositories\Member $memberRepo
  * @property \bizley\podium\api\repositories\Acquaintance $acquaintanceRepo
  */
-class Admin extends Component
+class Admin extends Member
 {
     public function ban()
     {
