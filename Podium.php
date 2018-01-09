@@ -2,6 +2,7 @@
 
 namespace bizley\podium\api;
 
+use bizley\podium\api\components\Access;
 use bizley\podium\api\components\Admin;
 use bizley\podium\api\components\Category;
 use bizley\podium\api\components\Forum;
@@ -12,6 +13,7 @@ use bizley\podium\api\components\Post;
 use bizley\podium\api\components\Thread;
 use bizley\podium\api\repositories\Acquaintance;
 use bizley\podium\api\repositories\Member as MemberRepo;
+use bizley\podium\api\repositories\Permission;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\helpers\ArrayHelper;
@@ -34,6 +36,10 @@ use yii\helpers\ArrayHelper;
  *
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
+ *
+ * @property Member $member
+ * @property Admin $admin
+ * @property Access $access
  */
 class Podium extends ServiceLocator
 {
@@ -43,38 +49,46 @@ class Podium extends ServiceLocator
      * @var array Podium components
      */
     public static $podiumComponents = [
+        'access' => [
+            'class' => Access::class,
+            'repositories' => [
+                'permission' => [
+                    'class' => Permission::class,
+                ],
+            ],
+        ],
         'member' => [
             'class' => Member::class,
             'repositories' => [
                 'member' => [
-                    'class' => MemberRepo::class
+                    'class' => MemberRepo::class,
                 ],
                 'acquaintance' => [
-                    'class' => Acquaintance::class
+                    'class' => Acquaintance::class,
                 ],
             ],
         ],
         'admin' => [
-            'class' => Admin::class
+            'class' => Admin::class,
         ],
         'group' => [
-            'class' => Group::class
+            'class' => Group::class,
         ],
         'category' => [
-            'class' => Category::class
+            'class' => Category::class,
         ],
         'forum' => [
-            'class' => Forum::class
+            'class' => Forum::class,
         ],
         'thread' => [
-            'class' => Thread::class
+            'class' => Thread::class,
         ],
         'post' => [
-            'class' => Post::class
+            'class' => Post::class,
         ],
         'poll' => [
-            'class' => Poll::class
-        ]
+            'class' => Poll::class,
+        ],
     ];
 
     /**

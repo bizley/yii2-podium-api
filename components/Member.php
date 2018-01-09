@@ -3,6 +3,7 @@
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\dictionaries\Acquaintance;
+use bizley\podium\api\dictionaries\Permission;
 
 /**
  * Class Member
@@ -15,6 +16,8 @@ class Member extends Component
 {
     const EVENT_BEFORE_REGISTER = 'member.register.before';
     const EVENT_AFTER_REGISTER = 'member.register.after';
+    const EVENT_BEFORE_IGNORE = 'member.ignore.before';
+    const EVENT_AFTER_IGNORE = 'member.ignore.after';
 
     /**
      * @return bool
@@ -72,9 +75,46 @@ class Member extends Component
         return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::IGNORE]);
     }
 
+    /**
+     * @return bool
+     */
+    public function beforeIgnore()
+    {
+        $event = new PodiumEvent();
+        $this->trigger(self::EVENT_BEFORE_IGNORE, $event);
+        return $event->isValid;
+    }
+
+    /**
+     * Adds information that member ignores target.
+     * @param int $member
+     * @param int $target
+     * @return bool
+     * @throws \Exception
+     */
     public function ignore($member, $target)
     {
+        if (!$this->beforeIgnore() || $this->isIgnoring($member, $target)) {
+            return false;
+        }
+        $this->podium->access->check($member, Permission::MEMBER_ACQUAINTANCE);
 
+        $result = $this->acquaintanceRepo->store([
+            'member_id' => $member,
+            'target_id' => $target,
+            'type' => Acquaintance::IGNORE
+        ]);
+
+        $this->afterIgnore();
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function afterIgnore()
+    {
+        $this->trigger(self::EVENT_AFTER_IGNORE);
     }
 
     public function unignore()
