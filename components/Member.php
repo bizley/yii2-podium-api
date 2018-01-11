@@ -18,6 +18,8 @@ class Member extends Component
     const EVENT_AFTER_REGISTER = 'member.register.after';
     const EVENT_BEFORE_IGNORE = 'member.ignore.before';
     const EVENT_AFTER_IGNORE = 'member.ignore.after';
+    const EVENT_BEFORE_FRIEND = 'member.friend.before';
+    const EVENT_AFTER_FRIEND = 'member.friend.after';
 
     /**
      * @return bool
@@ -86,7 +88,7 @@ class Member extends Component
     }
 
     /**
-     * Adds information that member ignores target.
+     * Changes ignoring status between member and his target.
      * @param int $member
      * @param int $target
      * @return bool
@@ -94,16 +96,21 @@ class Member extends Component
      */
     public function ignore($member, $target)
     {
-        if (!$this->beforeIgnore() || $this->isIgnoring($member, $target)) {
+        if (!$this->beforeIgnore()) {
             return false;
         }
         $this->podium->access->check($member, Permission::MEMBER_ACQUAINTANCE);
 
-        $result = $this->acquaintanceRepo->store([
+        $conditions = [
             'member_id' => $member,
             'target_id' => $target,
             'type' => Acquaintance::IGNORE
-        ]);
+        ];
+        if ($this->isIgnoring($member, $target)) {
+            $result = $this->acquaintanceRepo->fetch($conditions)->remove();
+        } else {
+            $result = $this->acquaintanceRepo->store($conditions);
+        }
 
         $this->afterIgnore();
         return $result;
@@ -117,11 +124,6 @@ class Member extends Component
         $this->trigger(self::EVENT_AFTER_IGNORE);
     }
 
-    public function unignore()
-    {
-
-    }
-
     /**
      * Checks whether member of given ID is friend with target member of given ID.
      * @param int $member
@@ -133,14 +135,51 @@ class Member extends Component
         return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::FRIEND]);
     }
 
-    public function befriend()
+    /**
+     * @return bool
+     */
+    public function beforeFriend()
     {
-
+        $event = new PodiumEvent();
+        $this->trigger(self::EVENT_BEFORE_FRIEND, $event);
+        return $event->isValid;
     }
 
-    public function unfriend()
+    /**
+     * Changes friend status between member and his target.
+     * @param int $member
+     * @param int $target
+     * @return bool
+     * @throws \Exception
+     */
+    public function friend($member, $target)
     {
+        if (!$this->beforeFriend()) {
+            return false;
+        }
+        $this->podium->access->check($member, Permission::MEMBER_ACQUAINTANCE);
 
+        $conditions = [
+            'member_id' => $member,
+            'target_id' => $target,
+            'type' => Acquaintance::FRIEND
+        ];
+        if ($this->isFriendWith($member, $target)) {
+            $result = $this->acquaintanceRepo->fetch($conditions)->remove();
+        } else {
+            $result = $this->acquaintanceRepo->store($conditions);
+        }
+
+        $this->afterFriend();
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function afterFriend()
+    {
+        $this->trigger(self::EVENT_AFTER_FRIEND);
     }
 
     public function view()
