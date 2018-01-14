@@ -5,9 +5,6 @@ namespace bizley\podium\api\components;
 /**
  * Class Admin
  * @package bizley\podium\api\components
- *
- * @property \bizley\podium\api\repositories\Member $memberRepo
- * @property \bizley\podium\api\repositories\Acquaintance $acquaintanceRepo
  */
 class Admin extends Member
 {

@@ -56,9 +56,16 @@ class Member extends Component
         $this->trigger(self::EVENT_AFTER_REGISTER);
     }
 
-    public function delete()
+    /**
+     * Deletes member.
+     * @param $memberId
+     * @return false|int
+     * @throws \Exception
+     * @throws \bizley\podium\api\repositories\RepoNotFoundException
+     */
+    public function delete($memberId)
     {
-
+        return $this->memberRepo->fetch($memberId)->remove();
     }
 
     public function search($filter)
@@ -68,13 +75,13 @@ class Member extends Component
 
     /**
      * Checks whether member of given ID ignores target member of given ID.
-     * @param int $member
-     * @param int $target
+     * @param int $memberId
+     * @param int $targetId
      * @return bool
      */
-    public function isIgnoring($member, $target)
+    public function isIgnoring($memberId, $targetId)
     {
-        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::IGNORE]);
+        return $this->acquaintanceRepo->check(['member_id' => $memberId, 'target_id' => $targetId, 'type' => Acquaintance::IGNORE]);
     }
 
     /**
@@ -89,24 +96,24 @@ class Member extends Component
 
     /**
      * Changes ignoring status between member and his target.
-     * @param int $member
-     * @param int $target
+     * @param int $memberId
+     * @param int $targetId
      * @return bool
      * @throws \Exception
      */
-    public function ignore($member, $target)
+    public function ignore($memberId, $targetId)
     {
         if (!$this->beforeIgnore()) {
             return false;
         }
-        $this->podium->access->check($member, Permission::MEMBER_ACQUAINTANCE);
+        $this->podium->access->check($memberId, Permission::MEMBER_ACQUAINTANCE);
 
         $conditions = [
-            'member_id' => $member,
-            'target_id' => $target,
+            'member_id' => $memberId,
+            'target_id' => $targetId,
             'type' => Acquaintance::IGNORE
         ];
-        if ($this->isIgnoring($member, $target)) {
+        if ($this->isIgnoring($memberId, $targetId)) {
             $result = $this->acquaintanceRepo->fetch($conditions)->remove();
         } else {
             $result = $this->acquaintanceRepo->store($conditions);
@@ -126,13 +133,13 @@ class Member extends Component
 
     /**
      * Checks whether member of given ID is friend with target member of given ID.
-     * @param int $member
-     * @param int $target
+     * @param int $memberId
+     * @param int $targetId
      * @return bool
      */
-    public function isFriendWith($member, $target)
+    public function isFriendWith($memberId, $targetId)
     {
-        return $this->acquaintanceRepo->check(['member_id' => $member, 'target_id' => $target, 'type' => Acquaintance::FRIEND]);
+        return $this->acquaintanceRepo->check(['member_id' => $memberId, 'target_id' => $targetId, 'type' => Acquaintance::FRIEND]);
     }
 
     /**
@@ -147,24 +154,24 @@ class Member extends Component
 
     /**
      * Changes friend status between member and his target.
-     * @param int $member
-     * @param int $target
+     * @param int $memberId
+     * @param int $targetId
      * @return bool
      * @throws \Exception
      */
-    public function friend($member, $target)
+    public function friend($memberId, $targetId)
     {
         if (!$this->beforeFriend()) {
             return false;
         }
-        $this->podium->access->check($member, Permission::MEMBER_ACQUAINTANCE);
+        $this->podium->access->check($memberId, Permission::MEMBER_ACQUAINTANCE);
 
         $conditions = [
-            'member_id' => $member,
-            'target_id' => $target,
+            'member_id' => $memberId,
+            'target_id' => $targetId,
             'type' => Acquaintance::FRIEND
         ];
-        if ($this->isFriendWith($member, $target)) {
+        if ($this->isFriendWith($memberId, $targetId)) {
             $result = $this->acquaintanceRepo->fetch($conditions)->remove();
         } else {
             $result = $this->acquaintanceRepo->store($conditions);
@@ -182,27 +189,7 @@ class Member extends Component
         $this->trigger(self::EVENT_AFTER_FRIEND);
     }
 
-    public function view()
-    {
-
-    }
-
-    public function ban()
-    {
-
-    }
-
-    public function unban()
-    {
-
-    }
-
-    public function promote()
-    {
-
-    }
-
-    public function demote()
+    public function view($memberId)
     {
 
     }
