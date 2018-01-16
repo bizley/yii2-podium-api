@@ -16,6 +16,8 @@ class Member extends Component
 {
     const EVENT_BEFORE_REGISTER = 'member.register.before';
     const EVENT_AFTER_REGISTER = 'member.register.after';
+    const EVENT_BEFORE_DELETE = 'member.delete.before';
+    const EVENT_AFTER_DELETE = 'member.delete.after';
     const EVENT_BEFORE_IGNORE = 'member.ignore.before';
     const EVENT_AFTER_IGNORE = 'member.ignore.after';
     const EVENT_BEFORE_FRIEND = 'member.friend.before';
@@ -57,6 +59,16 @@ class Member extends Component
     }
 
     /**
+     * @return bool
+     */
+    public function beforeDelete()
+    {
+        $event = new PodiumEvent();
+        $this->trigger(self::EVENT_BEFORE_DELETE, $event);
+        return $event->isValid;
+    }
+
+    /**
      * Deletes member.
      * @param $memberId
      * @return false|int
@@ -65,7 +77,21 @@ class Member extends Component
      */
     public function delete($memberId)
     {
-        return $this->memberRepo->fetch($memberId)->remove();
+        if (!$this->beforeDelete()) {
+            return false;
+        }
+        $result = $this->memberRepo->fetch($memberId)->remove();
+
+        $this->afterDelete();
+        return $result;
+    }
+
+    /**
+     *
+     */
+    public function afterDelete()
+    {
+        $this->trigger(self::EVENT_AFTER_DELETE);
     }
 
     public function search($filter)

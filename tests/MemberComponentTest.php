@@ -9,6 +9,11 @@ class MemberComponentTest extends TestCase
 {
     public $eventsRaised = [];
 
+    protected function setUp()
+    {
+        Event::offAll();
+    }
+
     /**
      * @return \bizley\podium\api\components\Member
      */
@@ -38,11 +43,39 @@ class MemberComponentTest extends TestCase
         $this->assertFalse($this->component()->register(['username' => 'test2']));
     }
 
-    // broken
     public function testDelete()
     {
+        Event::on(Member::class, Member::EVENT_BEFORE_DELETE, function () {
+            $this->eventsRaised[Member::EVENT_BEFORE_DELETE] = true;
+        });
+        Event::on(Member::class, Member::EVENT_AFTER_DELETE, function () {
+            $this->eventsRaised[Member::EVENT_AFTER_DELETE] = true;
+        });
         $this->component()->register(['username' => 'test3']);
-        var_dump($this->component()->memberRepo->errors);
         $this->assertEquals(1, $this->component()->delete(['username' => 'test3']));
+        $this->assertTrue($this->eventsRaised[Member::EVENT_BEFORE_DELETE]);
+        $this->assertTrue($this->eventsRaised[Member::EVENT_AFTER_DELETE]);
+    }
+
+    public function testDeleteBeforeInvalid()
+    {
+        Event::on(Member::class, Member::EVENT_BEFORE_DELETE, function ($event) {
+            $event->isValid = false;
+        });
+        $this->component()->register(['username' => 'test4']);
+        $this->assertFalse($this->component()->delete(['username' => 'test4']));
+    }
+
+    public function testIgnore()
+    {
+        Event::on(Member::class, Member::EVENT_BEFORE_IGNORE, function () {
+            $this->eventsRaised[Member::EVENT_BEFORE_IGNORE] = true;
+        });
+        Event::on(Member::class, Member::EVENT_AFTER_IGNORE, function () {
+            $this->eventsRaised[Member::EVENT_AFTER_IGNORE] = true;
+        });
+        // todo
+        $this->assertTrue($this->eventsRaised[Member::EVENT_BEFORE_IGNORE]);
+        $this->assertTrue($this->eventsRaised[Member::EVENT_AFTER_IGNORE]);
     }
 }
