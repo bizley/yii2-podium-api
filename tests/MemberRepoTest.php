@@ -96,8 +96,7 @@ class MemberRepoTest extends TestCase
 
     public function testCheckingRepoNonExists()
     {
-        $repo = $this->repo(true);
-        $this->assertFalse($repo->check(['id' => -1]));
+        $this->assertFalse($this->repo(true)->check(['id' => -1]));
     }
 
     public function testDeletingRepoSuccessful()

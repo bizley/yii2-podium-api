@@ -128,8 +128,7 @@ class AcquaintanceRepoTest extends TestCase
 
     public function testCheckingRepoNonExists()
     {
-        $repo = $this->acqRepo(true);
-        $this->assertFalse($this->acqRepo()->check(['id' => -1]));
+        $this->assertFalse($this->acqRepo(true)->check(['id' => -1]));
     }
 
     public function testDeletingRepoSuccessful()
