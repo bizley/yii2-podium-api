@@ -23,6 +23,7 @@ abstract class DbTestCase extends TestCase
         'dsn' => 'mysql:host=127.0.0.1;dbname=podiumtest',
         'username' => 'root',
         'password' => '',
+        'charset' => 'utf8',
     ];
 
     /**
@@ -98,6 +99,7 @@ abstract class DbTestCase extends TestCase
         if (static::$db === null) {
             $db = new Connection();
             $db->dsn = static::$database['dsn'];
+            $db->charset = static::$database['charset'];
             if (isset(static::$database['username'])) {
                 $db->username = static::$database['username'];
                 $db->password = static::$database['password'];
