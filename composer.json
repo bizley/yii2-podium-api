@@ -3,7 +3,7 @@
   "type": "yii2-extension",
   "description": "Yii 2 Forum API.",
   "keywords": ["forum", "yii2", "extension", "podium", "module", "api", "bizley"],
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "support": {
     "issues": "https://github.com/bizley/yii2-podium-api/issues",
     "wiki": "https://github.com/bizley/yii2-podium-api/wiki",
