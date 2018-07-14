@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\tests;
 
 use bizley\podium\api\Podium;
@@ -28,12 +30,20 @@ abstract class DbTestCase extends TestCase
      */
     protected static $db;
 
+    /**
+     * @throws \yii\db\Exception
+     */
     public static function setUpBeforeClass(): void
     {
         static::mockApplication();
         static::runSilentMigration('migrate/up');
     }
 
+    /**
+     * @param array $config
+     * @param string $appClass
+     * @throws \yii\db\Exception
+     */
     protected static function mockApplication(array $config = [], string $appClass = Application::class): void
     {
         new $appClass(ArrayHelper::merge([
@@ -55,6 +65,10 @@ abstract class DbTestCase extends TestCase
         ], $config));
     }
 
+    /**
+     * @param string $route
+     * @param array $params
+     */
     protected static function runSilentMigration(string $route, array $params = []): void
     {
         ob_start();

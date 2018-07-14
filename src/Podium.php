@@ -4,16 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api;
 
-use bizley\podium\api\base\Access;
-use bizley\podium\api\base\Admin;
-use bizley\podium\api\base\Category;
-use bizley\podium\api\base\Forum;
-use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Membership;
-use bizley\podium\api\base\Poll;
-use bizley\podium\api\base\Post;
-use bizley\podium\api\base\Thread;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 

@@ -1,10 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\tests\enums;
 
 use bizley\podium\api\enums\BaseEnum;
 use bizley\podium\tests\TestCase;
 
+/**
+ * Class BaseEnumTest
+ * @package bizley\podium\tests\enums
+ */
 class BaseEnumTest extends TestCase
 {
     private $_enum;
