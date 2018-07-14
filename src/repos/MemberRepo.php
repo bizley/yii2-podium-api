@@ -10,9 +10,10 @@ use yii\db\ActiveRecord;
  * @author Paweł Bizley Brzozowski <pawel@positive.codes>
  *
  * @property int $id
+ * @property string $user_id
  * @property string $username
  * @property string $slug
- * @property int $status
+ * @property string $status_id
  * @property int $created_at
  * @property int $updated_at
  */

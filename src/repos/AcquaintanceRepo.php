@@ -12,7 +12,7 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property int $member_id
  * @property int $target_id
- * @property int $type
+ * @property string $type_id
  * @property int $created_at
  */
 class AcquaintanceRepo extends ActiveRecord
