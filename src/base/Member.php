@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\FriendshipInterface;
+use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\models\Friendship;
-use bizley\podium\api\models\FriendshipInterface;
 use bizley\podium\api\models\Ignoring;
-use bizley\podium\api\models\IgnoringInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;

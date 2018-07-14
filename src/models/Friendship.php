@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models;
 
 use bizley\podium\api\enums\AcquaintanceType;
+use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\events\AcquaintanceEvent;
 use Yii;

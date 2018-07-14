@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\models\Member;
 use yii\base\Component;
 use yii\base\InvalidConfigException;

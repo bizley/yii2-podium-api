@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models;
+namespace bizley\podium\api\interfaces;
 
 /**
  * Interface IgnoringInterface

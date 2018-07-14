@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models;
 
-use bizley\podium\api\base\MembershipInterface;
+use bizley\podium\api\interfaces\MemberInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\MemberRepo;
 
 /**
