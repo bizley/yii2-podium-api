@@ -8,6 +8,7 @@ use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Membership;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
+use yii\i18n\PhpMessageSource;
 
 /**
  * Podium API
@@ -54,6 +55,20 @@ class Podium extends ServiceLocator
             }
         }
         parent::__construct($config);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function init(): void
+    {
+        parent::init();
+        $this->get('i18n')->translations['podium.*'] = [
+            'class' => PhpMessageSource::class,
+            'sourceLanguage' => 'en',
+            'forceTranslation' => true,
+            'basePath' => __DIR__ . '/messages',
+        ];
     }
 
     /**
