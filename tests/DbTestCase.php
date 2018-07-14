@@ -50,12 +50,11 @@ abstract class DbTestCase extends TestCase
         new $appClass(ArrayHelper::merge([
             'id' => 'PodiumApiTest',
             'basePath' => __DIR__,
-            'vendorPath' => __DIR__ . '/../',
+            'vendorPath' => __DIR__ . '/../vendor/',
             'controllerMap' => [
                 'migrate' => [
                     'class' => EchoMigrateController::class,
-                    'migrationNamespaces' => ['bizley\podium\api\migrations'],
-                    'migrationPath' => null,
+                    'migrationPath' => __DIR__ . '/../migrations/',
                     'interactive' => false
                 ],
             ],

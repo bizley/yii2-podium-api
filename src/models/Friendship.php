@@ -23,7 +23,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     public function init(): void
     {
         parent::init();
-        $this->type = AcquaintanceType::FRIEND;
+        $this->type_id = AcquaintanceType::FRIEND;
     }
 
     /**
@@ -77,7 +77,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-                'type' => $this->type
+                'type_id' => $this->type_id,
             ])->exists()) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.befriended'));
             return false;
@@ -119,7 +119,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         $friendship = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
-            'type' => $this->type
+            'type_id' => $this->type_id,
         ])->one();
         if ($friendship === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.befriended'));
@@ -152,7 +152,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         return static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-                'type' => $this->type
+                'type_id' => $this->type_id,
             ])->exists();
     }
 }

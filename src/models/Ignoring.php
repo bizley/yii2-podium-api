@@ -23,7 +23,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     public function init(): void
     {
         parent::init();
-        $this->type = AcquaintanceType::IGNORE;
+        $this->type_id = AcquaintanceType::IGNORE;
     }
 
     /**
@@ -77,7 +77,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-                'type' => $this->type
+                'type_id' => $this->type_id,
             ])->exists()) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.ignored'));
             return false;
@@ -119,7 +119,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         $ignoring = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
-            'type' => $this->type
+            'type_id' => $this->type_id,
         ])->one();
         if ($ignoring === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.ignored'));
@@ -152,7 +152,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         return static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
-            'type' => $this->type
+            'type_id' => $this->type_id,
         ])->exists();
     }
 }
