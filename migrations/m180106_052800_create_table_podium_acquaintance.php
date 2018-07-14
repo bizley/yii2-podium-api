@@ -1,12 +1,12 @@
 <?php
 
-namespace bizley\podium\api\migrations;
+declare(strict_types=1);
 
 use yii\db\Migration;
 
 class m180106_052800_create_table_podium_acquaintance extends Migration
 {
-    public function up()
+    public function up(): void
     {
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
@@ -26,7 +26,7 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
         $this->addForeignKey('fk-podium_acquaintance-target_id', '{{%podium_acquaintance}}', 'target_id', '{{%podium_member}}', 'id');
     }
 
-    public function down()
+    public function down(): void
     {
         $this->dropTable('{{%podium_acquaintance}}');
     }

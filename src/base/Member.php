@@ -1,6 +1,6 @@
 <?php
 
-namespace bizley\podium\api\components;
+namespace bizley\podium\api\base;
 
 use bizley\podium\api\dictionaries\Acquaintance;
 use bizley\podium\api\dictionaries\Permission;

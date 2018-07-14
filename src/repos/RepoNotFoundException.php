@@ -1,10 +1,10 @@
 <?php
 
-namespace bizley\podium\api\repositories;
+namespace bizley\podium\api\repos;
 
 /**
  * Class RepoNotFoundException
- * @package bizley\podium\api\repositories
+ * @package bizley\podium\api\repos
  */
 class RepoNotFoundException extends \yii\base\Exception
 {

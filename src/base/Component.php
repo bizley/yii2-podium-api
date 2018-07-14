@@ -1,6 +1,6 @@
 <?php
 
-namespace bizley\podium\api\components;
+namespace bizley\podium\api\base;
 
 use bizley\podium\api\Podium;
 use bizley\podium\api\repositories\RepositoryInterface;

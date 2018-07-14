@@ -6,7 +6,7 @@
          convertWarningsToExceptions="true"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Test Suite">
+        <testsuite name="Podium Test Suite">
             <directory>./tests</directory>
         </testsuite>
     </testsuites>

@@ -1,10 +1,10 @@
 <?php
 
-namespace bizley\podium\api\components;
+namespace bizley\podium\api\base;
 
 /**
  * Class Access
- * @package bizley\podium\api\components
+ * @package bizley\podium\api\base
  *
  * @property \bizley\podium\api\repositories\Permission $permissionRepo
  */

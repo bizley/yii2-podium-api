@@ -1,6 +1,6 @@
 <?php
 
-namespace bizley\podium\api\components;
+namespace bizley\podium\api\base;
 
 class Group extends Component
 {

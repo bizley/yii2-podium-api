@@ -1,12 +1,12 @@
 <?php
 
-namespace bizley\podium\api\migrations;
+declare(strict_types=1);
 
 use yii\db\Migration;
 
 class m170604_094100_create_table_podium_member extends Migration
 {
-    public function up()
+    public function up(): void
     {
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
@@ -23,7 +23,7 @@ class m170604_094100_create_table_podium_member extends Migration
         ], $tableOptions);
     }
 
-    public function down()
+    public function down(): void
     {
         $this->dropTable('{{%podium_member}}');
     }
