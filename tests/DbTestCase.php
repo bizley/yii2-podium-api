@@ -20,7 +20,7 @@ abstract class DbTestCase extends TestCase
 {
     protected static $driverName = 'mysql';
     protected static $database = [
-        'dsn' => 'mysql:host=127.0.0.1;dbname=podiumtest',
+        'dsn' => 'mysql:host=127.0.0.1;dbname=podium_test',
         'username' => 'root',
         'password' => '',
         'charset' => 'utf8',
@@ -60,6 +60,12 @@ abstract class DbTestCase extends TestCase
             ],
             'components' => [
                 'db' => static::getConnection(),
+                'log' => [
+                    'traceLevel' => 3,
+                    'targets' => [
+                        \yii\log\FileTarget::class,
+                    ],
+                ],
                 'podium' => Podium::class
             ],
         ], $config));

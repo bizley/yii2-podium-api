@@ -41,6 +41,7 @@ class Member extends PodiumComponent implements MemberComponentInterface
     public function init()
     {
         parent::init();
+
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);

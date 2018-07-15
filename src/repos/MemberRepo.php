@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\api\repos;
 
 use yii\db\ActiveRecord;
 
 /**
  * Member Active Record.
- *
- * @author Paweł Bizley Brzozowski <pawel@positive.codes>
  *
  * @property int $id
  * @property string $user_id
@@ -19,9 +19,9 @@ use yii\db\ActiveRecord;
 class MemberRepo extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%podium_member}}';
     }

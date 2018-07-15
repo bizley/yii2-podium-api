@@ -1,13 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\api\repos;
 
 use yii\db\ActiveRecord;
 
 /**
  * Acquaintance Active Record.
- *
- * @author Paweł Bizley Brzozowski <pawel@positive.codes>
  *
  * @property int $id
  * @property int $member_id
@@ -18,9 +18,9 @@ use yii\db\ActiveRecord;
 class AcquaintanceRepo extends ActiveRecord
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return '{{%podium_acquaintance}}';
     }

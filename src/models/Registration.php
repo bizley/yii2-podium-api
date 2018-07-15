@@ -49,7 +49,7 @@ class Registration extends MemberRepo implements RegistrationInterface
     /**
      * @return array
      */
-    public function attributes(): array
+    public function attributeLabels(): array
     {
         return [
             'user_id' => Yii::t('podium.label', 'registration.user.id'),
@@ -78,13 +78,12 @@ class Registration extends MemberRepo implements RegistrationInterface
     }
 
     /**
-     * @param array|null $data
-     * @param string|null $scope
      * @return bool
      */
     public function register(): bool
     {
         if (!$this->validate() || !$this->beforeRegister()) {
+            Yii::error(['register.validate', $this->errors], 'podium');
             return false;
         }
         if (!$this->save(false)) {

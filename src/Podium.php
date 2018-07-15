@@ -12,6 +12,7 @@ use bizley\podium\api\models\Member as MemberModel;
 use bizley\podium\api\models\Registration;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
+use yii\i18n\I18N;
 use yii\i18n\PhpMessageSource;
 
 /**
@@ -61,6 +62,13 @@ class Podium extends ServiceLocator
         parent::__construct($config);
     }
 
+    public function init(): void
+    {
+        parent::init();
+        $this->prepareTranslations();
+        $this->completeComponents();
+    }
+
     /**
      * Returns the configuration of core Podium components.
      */
@@ -100,22 +108,9 @@ class Podium extends ServiceLocator
         return $this->get('account');
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
-    public function init(): void
-    {
-        parent::init();
-        $this->prepareTranslations();
-        $this->completeComponents();
-    }
-
-    /**
-     * @throws InvalidConfigException
-     */
     public function prepareTranslations(): void
     {
-        $this->get('i18n')->translations['podium.*'] = [
+        \Yii::$app->getI18n()->translations['podium.*'] = [
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
@@ -130,7 +125,7 @@ class Podium extends ServiceLocator
     public function completeComponents(): void
     {
         $components = $this->getComponents();
-        foreach ($components as &$component) {
+        foreach ($components as $id => &$component) {
             $component['podium'] = $this;
         }
     }
