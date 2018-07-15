@@ -6,6 +6,7 @@ namespace bizley\podium\api\models;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\interfaces\IgnoringInterface;
+use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\events\AcquaintanceEvent;
 use Yii;
@@ -17,6 +18,11 @@ use yii\behaviors\TimestampBehavior;
  */
 class Ignoring extends AcquaintanceRepo implements IgnoringInterface
 {
+    public const EVENT_BEFORE_IGNORING = 'podium.acquaintance.ignoring.before';
+    public const EVENT_AFTER_IGNORING = 'podium.acquaintance.ignoring.after';
+    public const EVENT_BEFORE_UNIGNORING = 'podium.acquaintance.unignoring.before';
+    public const EVENT_AFTER_UNIGNORING = 'podium.acquaintance.unignoring.after';
+
     /**
      * Sets acquaintance type.
      */
@@ -40,19 +46,19 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     }
 
     /**
-     * @param int $memberId
+     * @param MemberModelInterface $member
      */
-    public function setMember(int $memberId): void
+    public function setMember(MemberModelInterface $member): void
     {
-        $this->member_id = $memberId;
+        $this->member_id = $member->getId();
     }
 
     /**
-     * @param int $targetId
+     * @param MemberModelInterface $target
      */
-    public function setTarget(int $targetId): void
+    public function setTarget(MemberModelInterface $target): void
     {
-        $this->target_id = $targetId;
+        $this->target_id = $target->getId();
     }
 
     /**
@@ -61,7 +67,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     public function beforeIgnore(): bool
     {
         $event = new AcquaintanceEvent();
-        $this->trigger(IgnoringInterface::EVENT_BEFORE_IGNORING, $event);
+        $this->trigger(self::EVENT_BEFORE_IGNORING, $event);
 
         return $event->canIgnore;
     }
@@ -92,7 +98,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
 
     public function afterIgnore(): void
     {
-        $this->trigger(IgnoringInterface::EVENT_AFTER_IGNORING, new AcquaintanceEvent([
+        $this->trigger(self::EVENT_AFTER_IGNORING, new AcquaintanceEvent([
             'acquaintance' => $this
         ]));
     }
@@ -103,7 +109,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     public function beforeUnignore(): bool
     {
         $event = new AcquaintanceEvent();
-        $this->trigger(IgnoringInterface::EVENT_BEFORE_UNIGNORING, $event);
+        $this->trigger(self::EVENT_BEFORE_UNIGNORING, $event);
 
         return $event->canUnignore;
     }
@@ -141,7 +147,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
 
     public function afterUnignore(): void
     {
-        $this->trigger(IgnoringInterface::EVENT_AFTER_UNIGNORING);
+        $this->trigger(self::EVENT_AFTER_UNIGNORING);
     }
 
     /**

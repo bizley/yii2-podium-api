@@ -12,7 +12,6 @@ use yii\db\ActiveRecord;
  * @property int $id
  * @property string $user_id
  * @property string $username
- * @property string $slug
  * @property string $status_id
  * @property int $created_at
  * @property int $updated_at

@@ -6,9 +6,9 @@ namespace bizley\podium\api\interfaces;
 
 /**
  * Interface MembershipInterface
- * @package bizley\podium\api\models
+ * @package bizley\podium\api\interfaces
  */
-interface MembershipInterface
+interface MembershipInterface extends MemberModelInterface
 {
     /**
      * Finds a membership by the given user ID.
@@ -16,10 +16,4 @@ interface MembershipInterface
      * @return MembershipInterface the membership object that matches the given user ID
      */
     public static function findMembership($userId): MembershipInterface;
-
-    /**
-     * Returns an ID that can uniquely identify a member membership.
-     * @return int
-     */
-    public function getId(): int;
 }

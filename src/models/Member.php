@@ -9,7 +9,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\MemberRepo;
 
 /**
- * Class Membership
+ * Class Member
  * @package bizley\podium\api\models
  */
 class Member extends MemberRepo implements MembershipInterface, MemberInterface

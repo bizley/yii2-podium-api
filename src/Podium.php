@@ -5,7 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\api;
 
 use bizley\podium\api\base\Member;
-use bizley\podium\api\base\Membership;
+use bizley\podium\api\base\Account;
+use bizley\podium\api\models\Friendship;
+use bizley\podium\api\models\Ignoring;
+use bizley\podium\api\models\Member as MemberModel;
+use bizley\podium\api\models\Registration;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\i18n\PhpMessageSource;
@@ -29,8 +33,8 @@ use yii\i18n\PhpMessageSource;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
+ * @property null|Account $account
  * @property null|Member $member
- * @property null|Membership $membership
  * @property string $version
  */
 class Podium extends ServiceLocator
@@ -58,11 +62,59 @@ class Podium extends ServiceLocator
     }
 
     /**
+     * Returns the configuration of core Podium components.
+     */
+    public function coreComponents(): array
+    {
+        return [
+            'account' => [
+                'class' => Account::class,
+                'membershipHandler' => MemberModel::class,
+            ],
+            'member' => [
+                'class' => Member::class,
+                'registrationHandler' => Registration::class,
+                'friendshipHandler' => Friendship::class,
+                'ignoringHandler' => Ignoring::class,
+            ],
+        ];
+    }
+
+    /**
+     * Returns member component.
+     * @return Member|null|object
+     * @throws InvalidConfigException
+     */
+    public function getMember()
+    {
+        return $this->get('member');
+    }
+
+    /**
+     * Returns membership component.
+     * @return Account|null|object
+     * @throws InvalidConfigException
+     */
+    public function getAccount()
+    {
+        return $this->get('account');
+    }
+
+    /**
      * @throws InvalidConfigException
      */
     public function init(): void
     {
         parent::init();
+        $this->prepareTranslations();
+        $this->completeComponents();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function prepareTranslations(): void
+    {
         $this->get('i18n')->translations['podium.*'] = [
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
@@ -72,33 +124,14 @@ class Podium extends ServiceLocator
     }
 
     /**
-     * Returns the configuration of core Podium components.
+     * Sets Podium reference for custom components.
+     * Custom component should be child of PodiumComponent class.
      */
-    public function coreComponents(): array
+    public function completeComponents(): void
     {
-        return [
-            'member' => ['class' => Member::class],
-            'membership' => ['class' => Membership::class],
-        ];
-    }
-
-    /**
-     * Returns member component.
-     * @return Member|null|object
-     * @throws InvalidConfigException
-     */
-    public function getMember() // BC declaration
-    {
-        return $this->get('member');
-    }
-
-    /**
-     * Returns membership component.
-     * @return Membership|null|object
-     * @throws InvalidConfigException
-     */
-    public function getMembership() // BC declaration
-    {
-        return $this->get('membership');
+        $components = $this->getComponents();
+        foreach ($components as &$component) {
+            $component['podium'] = $this;
+        }
     }
 }

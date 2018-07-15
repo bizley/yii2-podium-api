@@ -6,6 +6,7 @@ namespace bizley\podium\api\models;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\interfaces\FriendshipInterface;
+use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\events\AcquaintanceEvent;
 use Yii;
@@ -17,6 +18,11 @@ use yii\behaviors\TimestampBehavior;
  */
 class Friendship extends AcquaintanceRepo implements FriendshipInterface
 {
+    public const EVENT_BEFORE_BEFRIENDING = 'podium.acquaintance.befriending.before';
+    public const EVENT_AFTER_BEFRIENDING = 'podium.acquaintance.befriending.after';
+    public const EVENT_BEFORE_UNFRIENDING = 'podium.acquaintance.unfriending.before';
+    public const EVENT_AFTER_UNFRIENDING = 'podium.acquaintance.unfriending.after';
+
     /**
      * Sets acquaintance type.
      */
@@ -40,19 +46,19 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     }
 
     /**
-     * @param int $memberId
+     * @param MemberModelInterface $member
      */
-    public function setMember(int $memberId): void
+    public function setMember(MemberModelInterface $member): void
     {
-        $this->member_id = $memberId;
+        $this->member_id = $member->getId();
     }
 
     /**
-     * @param int $targetId
+     * @param MemberModelInterface $target
      */
-    public function setTarget(int $targetId): void
+    public function setTarget(MemberModelInterface $target): void
     {
-        $this->target_id = $targetId;
+        $this->target_id = $target->getId();
     }
 
     /**
@@ -61,7 +67,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     public function beforeBefriend(): bool
     {
         $event = new AcquaintanceEvent();
-        $this->trigger(FriendshipInterface::EVENT_BEFORE_BEFRIENDING, $event);
+        $this->trigger(self::EVENT_BEFORE_BEFRIENDING, $event);
 
         return $event->canBeFriends;
     }
@@ -92,7 +98,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
 
     public function afterBefriend(): void
     {
-        $this->trigger(FriendshipInterface::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent([
+        $this->trigger(self::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent([
             'acquaintance' => $this
         ]));
     }
@@ -103,7 +109,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     public function beforeUnfriend(): bool
     {
         $event = new AcquaintanceEvent();
-        $this->trigger(FriendshipInterface::EVENT_BEFORE_UNFRIENDING, $event);
+        $this->trigger(self::EVENT_BEFORE_UNFRIENDING, $event);
 
         return $event->canUnfriend;
     }
@@ -141,7 +147,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
 
     public function afterUnfriend(): void
     {
-        $this->trigger(FriendshipInterface::EVENT_AFTER_UNFRIENDING);
+        $this->trigger(self::EVENT_AFTER_UNFRIENDING);
     }
 
     /**
