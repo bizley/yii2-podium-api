@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace bizley\podium\api;
 
-use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Account;
+use bizley\podium\api\base\Member;
 use bizley\podium\api\models\Friendship;
 use bizley\podium\api\models\Ignoring;
 use bizley\podium\api\models\Member as MemberModel;
 use bizley\podium\api\models\Registration;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
-use yii\i18n\I18N;
 use yii\i18n\PhpMessageSource;
 
 /**

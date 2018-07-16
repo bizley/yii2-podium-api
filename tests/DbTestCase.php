@@ -60,12 +60,6 @@ abstract class DbTestCase extends TestCase
             ],
             'components' => [
                 'db' => static::getConnection(),
-                'log' => [
-                    'traceLevel' => 3,
-                    'targets' => [
-                        \yii\log\FileTarget::class,
-                    ],
-                ],
                 'podium' => Podium::class
             ],
         ], $config));

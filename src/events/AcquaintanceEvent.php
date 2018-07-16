@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\events;
+namespace bizley\podium\api\events;
 
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;

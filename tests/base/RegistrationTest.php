@@ -15,8 +15,10 @@ class RegistrationTest extends DbTestCase
 {
     public function testRegister(): void
     {
+        //var_dump(\Yii::$app->getRuntimePath());die;
+
         $data = [
-            'user_id' => 100,
+            'user_id' => '100',
             'username' => 'testname',
         ];
         $this->assertTrue($this->podium()->member->register($data));

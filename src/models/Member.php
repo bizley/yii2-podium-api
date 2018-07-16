@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models;
 
-use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\MemberRepo;
 
@@ -12,7 +11,7 @@ use bizley\podium\api\repos\MemberRepo;
  * Class Member
  * @package bizley\podium\api\models
  */
-class Member extends MemberRepo implements MembershipInterface, MemberInterface
+class Member extends MemberRepo implements MembershipInterface
 {
     /**
      * @param int|string $userId

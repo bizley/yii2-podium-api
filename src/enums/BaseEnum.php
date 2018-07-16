@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\enums;
 
-use Yii;
-
 /**
  * Class BaseEnum
  * @package bizley\podium\api\enums

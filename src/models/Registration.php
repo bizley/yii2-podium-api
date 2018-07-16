@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\models;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\events\RegistrationEvent;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\repos\MemberRepo;
-use bizley\podium\events\RegistrationEvent;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
