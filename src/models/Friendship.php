@@ -15,6 +15,9 @@ use yii\behaviors\TimestampBehavior;
 /**
  * Class Friendship
  * @package bizley\podium\api\models
+ *
+ * @property MemberModelInterface $member
+ * @property MemberModelInterface $target
  */
 class Friendship extends AcquaintanceRepo implements FriendshipInterface
 {

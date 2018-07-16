@@ -18,7 +18,19 @@ use yii\helpers\ArrayHelper;
  */
 abstract class DbTestCase extends TestCase
 {
+    /**
+     * @var array [table => [row1 columns => values], [row2 columns => values], ...]
+     */
+    public $fixtures = [];
+
+    /**
+     * @var string
+     */
     protected static $driverName = 'mysql';
+
+    /**
+     * @var array
+     */
     protected static $database = [
         'dsn' => 'mysql:host=127.0.0.1;dbname=podium_test',
         'username' => 'root',
@@ -48,19 +60,19 @@ abstract class DbTestCase extends TestCase
     protected static function mockApplication(array $config = [], string $appClass = Application::class): void
     {
         new $appClass(ArrayHelper::merge([
-            'id' => 'PodiumApiTest',
+            'id' => 'PodiumAPITest',
             'basePath' => __DIR__,
             'vendorPath' => __DIR__ . '/../vendor/',
             'controllerMap' => [
                 'migrate' => [
                     'class' => EchoMigrateController::class,
                     'migrationPath' => __DIR__ . '/../migrations/',
-                    'interactive' => false
+                    'interactive' => false,
                 ],
             ],
             'components' => [
                 'db' => static::getConnection(),
-                'podium' => Podium::class
+                'podium' => Podium::class,
             ],
         ], $config));
     }
@@ -120,5 +132,28 @@ abstract class DbTestCase extends TestCase
     protected function podium(): Podium
     {
         return Yii::$app->podium;
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    public function fixturesUp(): void
+    {
+        foreach ($this->fixtures as $table => $data) {
+            foreach ($data as $row) {
+                static::$db->createCommand()->insert($table, $row)->execute();
+            }
+        }
+    }
+    /**
+     * @throws \yii\db\Exception
+     */
+    public function fixturesDown(): void
+    {
+        static::$db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
+        foreach ($this->fixtures as $table => $data) {
+            static::$db->createCommand()->truncateTable($table)->execute();
+        }
+        static::$db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
     }
 }
