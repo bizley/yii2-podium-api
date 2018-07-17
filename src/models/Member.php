@@ -15,9 +15,9 @@ class Member extends MemberRepo implements MembershipInterface
 {
     /**
      * @param int|string $userId
-     * @return MembershipInterface
+     * @return MembershipInterface|null
      */
-    public static function findMembership($userId): MembershipInterface
+    public static function findMembership($userId): ?MembershipInterface
     {
         return static::findOne(['user_id' => $userId]);
     }

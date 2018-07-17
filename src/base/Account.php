@@ -40,14 +40,14 @@ class Account extends PodiumComponent implements AccountInterface
         $this->userHandler = Instance::ensure($this->userHandler, User::class);
     }
 
-    private $_membership = false;
+    private $_membership;
 
     /**
      * @return MembershipInterface|null
      */
     public function getMembership(): ?MembershipInterface
     {
-        if ($this->_membership === false) {
+        if ($this->_membership === null) {
             /* @var $class MembershipInterface */
             $class = $this->membershipHandler;
             $this->_membership = $class::findMembership($this->userHandler->id);
@@ -60,7 +60,11 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function getId(): ?int
     {
-        return $this->getMembership()->getId() ?? null;
+        $membership = $this->getMembership();
+        if ($membership === null) {
+            return null;
+        }
+        return $membership->getId() ?? null;
     }
 
     /**

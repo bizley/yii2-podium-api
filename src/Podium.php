@@ -61,6 +61,9 @@ class Podium extends ServiceLocator
         parent::__construct($config);
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function init(): void
     {
         parent::init();
@@ -120,12 +123,14 @@ class Podium extends ServiceLocator
     /**
      * Sets Podium reference for custom components.
      * Custom component should be child of PodiumComponent class.
+     * @throws InvalidConfigException
      */
     public function completeComponents(): void
     {
         $components = $this->getComponents();
-        foreach ($components as $id => &$component) {
+        foreach ($components as $id => $component) {
             $component['podium'] = $this;
+            $this->set($id, $component);
         }
     }
 }

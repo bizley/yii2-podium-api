@@ -13,7 +13,7 @@ interface MembershipInterface extends MemberModelInterface
     /**
      * Finds a membership by the given user ID.
      * @param int|string $userId
-     * @return MembershipInterface the membership object that matches the given user ID
+     * @return MembershipInterface|null the membership object that matches the given user ID
      */
-    public static function findMembership($userId): MembershipInterface;
+    public static function findMembership($userId): ?MembershipInterface;
 }
