@@ -26,7 +26,7 @@ class MemberFriendshipTest extends DbTestCase
             [
                 'id' => 100,
                 'user_id' => '100',
-                'username' => 'member',
+                'username' => 'member1',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -34,13 +34,29 @@ class MemberFriendshipTest extends DbTestCase
             [
                 'id' => 101,
                 'user_id' => '101',
-                'username' => 'target',
+                'username' => 'member2',
+                'status_id' => MemberStatus::ACTIVE,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 102,
+                'user_id' => '102',
+                'username' => 'member3',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
         ],
-        'podium_acquaintance' => [],
+        'podium_acquaintance' => [
+            [
+                'id' => 100,
+                'member_id' => 101,
+                'target_id' => 102,
+                'type_id' => AcquaintanceType::FRIEND,
+                'created_at' => 1,
+            ],
+        ],
     ];
 
     /**
@@ -69,10 +85,21 @@ class MemberFriendshipTest extends DbTestCase
     /**
      * @throws \yii\db\Exception
      */
-    public function testBefriend(): void
+    protected function setUp(): void
     {
         $this->fixturesUp();
+    }
 
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function tearDown(): void
+    {
+        $this->fixturesDown();
+    }
+
+    public function testBefriend(): void
+    {
         $this->assertTrue($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101)));
 
         $acq = AcquaintanceRepo::findOne([
@@ -84,17 +111,10 @@ class MemberFriendshipTest extends DbTestCase
 
         $this->assertArrayHasKey(Friendship::EVENT_BEFORE_BEFRIENDING, static::$eventsRaised);
         $this->assertArrayHasKey(Friendship::EVENT_AFTER_BEFRIENDING, static::$eventsRaised);
-
-        $this->fixturesDown();
     }
 
-    /**
-     * @throws \yii\db\Exception
-     */
     public function testBefriendEventPreventing(): void
     {
-        $this->fixturesUp();
-
         $handler = function ($event) {
             $event->canBeFriends = false;
         };
@@ -110,7 +130,49 @@ class MemberFriendshipTest extends DbTestCase
         $this->assertEmpty($acq);
 
         Event::off(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
+    }
 
-        $this->fixturesDown();
+    public function testBefriendAgain(): void
+    {
+        $this->assertFalse($this->podium()->member->befriend(Member::findOne(101), Member::findOne(102)));
+    }
+
+    public function testUnfriend(): void
+    {
+        $this->assertTrue($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102)));
+
+        $acq = AcquaintanceRepo::findOne([
+            'member_id' => 101,
+            'target_id' => 102,
+            'type_id' => AcquaintanceType::FRIEND,
+        ]);
+        $this->assertEmpty($acq);
+
+        $this->assertArrayHasKey(Friendship::EVENT_BEFORE_UNFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(Friendship::EVENT_AFTER_UNFRIENDING, static::$eventsRaised);
+    }
+
+    public function testUnfriendEventPreventing(): void
+    {
+        $handler = function ($event) {
+            $event->canUnfriend = false;
+        };
+        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+
+        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102)));
+
+        $acq = AcquaintanceRepo::findOne([
+            'member_id' => 101,
+            'target_id' => 102,
+            'type_id' => AcquaintanceType::FRIEND,
+        ]);
+        $this->assertNotEmpty($acq);
+
+        Event::off(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+    }
+
+    public function testUnfriendAgain(): void
+    {
+        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(100), Member::findOne(101)));
     }
 }

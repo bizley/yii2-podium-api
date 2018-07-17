@@ -19,7 +19,22 @@ class RegistrationTest extends DbTestCase
     /**
      * @var array
      */
+    public $fixtures = [
+        'podium_member' => [],
+    ];
+
+    /**
+     * @var array
+     */
     protected $eventsRaised = [];
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function tearDown(): void
+    {
+        $this->fixturesDown();
+    }
 
     public function testRegister(): void
     {
@@ -47,5 +62,24 @@ class RegistrationTest extends DbTestCase
 
         $this->assertArrayHasKey(Registration::EVENT_BEFORE_REGISTERING, $this->eventsRaised);
         $this->assertArrayHasKey(Registration::EVENT_AFTER_REGISTERING, $this->eventsRaised);
+    }
+
+    public function testRegisterEventPreventing(): void
+    {
+        $handler = function ($event) {
+            $event->canRegister = false;
+        };
+        Event::on(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
+
+        $data = [
+            'user_id' => '101',
+            'username' => 'notestname',
+        ];
+        $this->assertFalse($this->podium()->member->register($data));
+
+        $member = MemberRepo::findOne(['username' => 'notestname']);
+        $this->assertEmpty($member);
+
+        Event::off(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
     }
 }
