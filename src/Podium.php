@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api;
 
+use bizley\podium\api\base\Access;
 use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\models\Friendship;
@@ -86,6 +87,9 @@ class Podium extends ServiceLocator
                 'registrationHandler' => Registration::class,
                 'friendshipHandler' => Friendship::class,
                 'ignoringHandler' => Ignoring::class,
+            ],
+            'access' => [
+                'class' => Access::class,
             ],
         ];
     }
