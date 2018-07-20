@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\Podium;
 use yii\rbac\DbManager;
 
@@ -37,4 +38,25 @@ class Access extends DbManager
      * @var string the name of the table storing rules. Defaults to "podium_auth_rule".
      */
     public $ruleTable = '{{%podium_auth_rule}}';
+
+    private $_access = [];
+
+    /**
+     * @param MemberModelInterface $member
+     * @param string $permissionName
+     * @param array $params
+     * @return bool
+     */
+    public function check(MemberModelInterface $member, string $permissionName, array $params = []): bool
+    {
+        if (empty($params) && isset($this->_access[$permissionName])) {
+            return $this->_access[$permissionName];
+        }
+        $access = $this->checkAccess($member->getId(), $permissionName, $params);
+        if (empty($params)) {
+            $this->_access[$permissionName] = $access;
+        }
+
+        return $access;
+    }
 }

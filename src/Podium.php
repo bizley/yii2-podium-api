@@ -34,6 +34,7 @@ use yii\i18n\PhpMessageSource;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
+ * @property null|Access $access
  * @property null|Account $account
  * @property null|Member $member
  * @property string $version
@@ -112,6 +113,16 @@ class Podium extends ServiceLocator
     public function getAccount()
     {
         return $this->get('account');
+    }
+
+    /**
+     * Returns membership component.
+     * @return Account|null|object
+     * @throws InvalidConfigException
+     */
+    public function getAccess()
+    {
+        return $this->get('access');
     }
 
     public function prepareTranslations(): void
