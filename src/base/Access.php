@@ -6,6 +6,7 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\Podium;
+use bizley\podium\api\rbac\RbacSetup;
 use yii\rbac\DbManager;
 
 /**
@@ -58,5 +59,14 @@ class Access extends DbManager
         }
 
         return $access;
+    }
+
+    /**
+     * Creates default roles with default permissions.
+     * @return bool
+     */
+    public function setDefault(): bool
+    {
+        return (new RbacSetup($this))->run();
     }
 }

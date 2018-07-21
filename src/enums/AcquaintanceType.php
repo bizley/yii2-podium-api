@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\api\enums;
 
 use Yii;
 
 /**
- * Acquaintance Type ENUM
+ * Class AcquaintanceType
+ * @package bizley\podium\api\enums
  */
 final class AcquaintanceType extends BaseEnum
 {

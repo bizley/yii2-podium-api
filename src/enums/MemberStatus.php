@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace bizley\podium\api\enums;
 
 use Yii;
 
 /**
- * Member Status Dictionary
+ * Class MemberStatus
+ * @package bizley\podium\api\enums
  */
 final class MemberStatus extends BaseEnum
 {
