@@ -38,6 +38,11 @@ final class Permission extends BaseEnum
     public const POST_DELETE = 'post.delete';
     public const POST_MOVE = 'post.move';
 
+    public const POLL_VOTE = 'poll.vote';
+    public const POLL_CREATE = 'poll.create';
+    public const POLL_UPDATE = 'poll.update';
+    public const POLL_DELETE = 'poll.delete';
+
     public const GROUP_VIEW = 'group.view';
     public const GROUP_CREATE = 'group.create';
     public const GROUP_UPDATE = 'group.update';
@@ -79,6 +84,10 @@ final class Permission extends BaseEnum
             self::POST_UPDATE => Yii::t('podium.enum', 'permission.post.update'),
             self::POST_DELETE => Yii::t('podium.enum', 'permission.post.delete'),
             self::POST_MOVE => Yii::t('podium.enum', 'permission.post.move'),
+            self::POLL_VOTE => Yii::t('podium.enum', 'permission.poll.vote'),
+            self::POLL_CREATE => Yii::t('podium.enum', 'permission.poll.create'),
+            self::POLL_UPDATE => Yii::t('podium.enum', 'permission.poll.update'),
+            self::POLL_DELETE => Yii::t('podium.enum', 'permission.poll.delete'),
             self::GROUP_VIEW => Yii::t('podium.enum', 'permission.group.view'),
             self::GROUP_CREATE => Yii::t('podium.enum', 'permission.group.create'),
             self::GROUP_UPDATE => Yii::t('podium.enum', 'permission.group.update'),

@@ -111,12 +111,13 @@ class RbacSetup extends Component
                         Permission::POST_DELETE,
                         Permission::POST_UPDATE,
                         Permission::POST_MOVE,
-                        Permission::THREAD_CREATE,
                         Permission::THREAD_UPDATE,
                         Permission::THREAD_DELETE,
                         Permission::THREAD_LOCK,
                         Permission::THREAD_MOVE,
-                        Permission::THREAD_PIN
+                        Permission::THREAD_PIN,
+                        Permission::POLL_UPDATE,
+                        Permission::POLL_DELETE,
                     ], true)) {
                     $this->_permissions[$permission]->ruleName = $this->_rules['modify']->name;
                 } elseif (\in_array($permission, [
@@ -171,6 +172,10 @@ class RbacSetup extends Component
                     Permission::POST_CREATE,
                     Permission::POST_UPDATE,
                     Permission::POST_DELETE,
+                    Permission::POLL_VOTE,
+                    Permission::POLL_CREATE,
+                    Permission::POLL_UPDATE,
+                    Permission::POLL_DELETE,
                     Permission::MEMBER_BEFRIEND,
                 ] as $permission) {
                 $this->getManager()->addChild($member, $this->_permissions[$permission]);
