@@ -6,6 +6,7 @@ namespace bizley\podium\api;
 
 use bizley\podium\api\base\Access;
 use bizley\podium\api\base\Account;
+use bizley\podium\api\base\Config;
 use bizley\podium\api\base\Member;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
@@ -32,6 +33,7 @@ use yii\i18n\PhpMessageSource;
  *
  * @property null|Access $access
  * @property null|Account $account
+ * @property null|Config $config
  * @property null|Member $member
  * @property string $version
  */
@@ -75,15 +77,10 @@ class Podium extends ServiceLocator
     public function coreComponents(): array
     {
         return [
-            'account' => [
-                'class' => Account::class,
-            ],
-            'member' => [
-                'class' => Member::class,
-            ],
-            'access' => [
-                'class' => Access::class,
-            ],
+            'account' => ['class' => Account::class],
+            'member' => ['class' => Member::class],
+            'access' => ['class' => Access::class],
+            'config' => ['class' => Config::class],
         ];
     }
 
@@ -98,7 +95,7 @@ class Podium extends ServiceLocator
     }
 
     /**
-     * Returns membership component.
+     * Returns account component.
      * @return Account|null|object
      * @throws InvalidConfigException
      */
@@ -108,13 +105,23 @@ class Podium extends ServiceLocator
     }
 
     /**
-     * Returns membership component.
-     * @return Account|null|object
+     * Returns access component.
+     * @return Access|null|object
      * @throws InvalidConfigException
      */
     public function getAccess()
     {
         return $this->get('access');
+    }
+
+    /**
+     * Returns config component.
+     * @return Config|null|object
+     * @throws InvalidConfigException
+     */
+    public function getConfig()
+    {
+        return $this->get('config');
     }
 
     public function prepareTranslations(): void
