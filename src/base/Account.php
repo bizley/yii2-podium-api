@@ -22,11 +22,13 @@ class Account extends PodiumComponent implements AccountInterface
 {
     /**
      * @var string|array|MembershipInterface
+     * Component ID, class, configuration array, or instance of MembershipInterface.
      */
-    public $membershipHandler;
+    public $membershipHandler = \bizley\podium\api\models\Member::class;
 
     /**
      * @var string|array|User user component handler
+     * Component ID, class, configuration array, or instance of User.
      */
     public $userHandler = 'user';
 

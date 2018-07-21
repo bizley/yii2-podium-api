@@ -7,10 +7,6 @@ namespace bizley\podium\api;
 use bizley\podium\api\base\Access;
 use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Member;
-use bizley\podium\api\models\Friendship;
-use bizley\podium\api\models\Ignoring;
-use bizley\podium\api\models\Member as MemberModel;
-use bizley\podium\api\models\Registration;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\i18n\PhpMessageSource;
@@ -81,13 +77,9 @@ class Podium extends ServiceLocator
         return [
             'account' => [
                 'class' => Account::class,
-                'membershipHandler' => MemberModel::class,
             ],
             'member' => [
                 'class' => Member::class,
-                'registrationHandler' => Registration::class,
-                'friendshipHandler' => Friendship::class,
-                'ignoringHandler' => Ignoring::class,
             ],
             'access' => [
                 'class' => Access::class,

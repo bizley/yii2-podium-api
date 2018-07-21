@@ -10,6 +10,10 @@ use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberComponentInterface;
 use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
+use bizley\podium\api\models\Friendship;
+use bizley\podium\api\models\Ignoring;
+use bizley\podium\api\models\Registration;
+use bizley\podium\api\rbac\Assigning;
 use yii\di\Instance;
 use yii\rbac\DbManager;
 use yii\rbac\Permission;
@@ -27,23 +31,27 @@ class Member extends PodiumComponent implements MemberComponentInterface
 {
     /**
      * @var string|array|RegistrationInterface
+     * Component ID, class, configuration array, or instance of RegistrationInterface.
      */
-    public $registrationHandler;
+    public $registrationHandler = Registration::class;
 
     /**
      * @var string|array|FriendshipInterface
+     * Component ID, class, configuration array, or instance of FriendshipInterface.
      */
-    public $friendshipHandler;
+    public $friendshipHandler = Friendship::class;
 
     /**
      * @var string|array|IgnoringInterface
+     * Component ID, class, configuration array, or instance of IgnoringInterface.
      */
-    public $ignoringHandler;
+    public $ignoringHandler = Ignoring::class;
 
     /**
      * @var string|array|AssigningInterface
+     * Component ID, class, configuration array, or instance of AssigningInterface.
      */
-    public $assigningHandler;
+    public $assigningHandler = Assigning::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
