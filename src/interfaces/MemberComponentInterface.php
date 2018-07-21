@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use yii\rbac\DbManager;
+use yii\rbac\Permission;
+use yii\rbac\Role;
+
 /**
  * Interface MemberComponentInterface
  * @package bizley\podium\api\interfaces
@@ -66,4 +70,18 @@ interface MemberComponentInterface
      * @return bool
      */
     public function unignore(MemberModelInterface $member, MemberModelInterface $target): bool;
+
+    /**
+     * Returns assigning handler.
+     * @param DbManager $manager
+     * @return AssigningInterface
+     */
+    public function getAssigning(DbManager $manager): AssigningInterface;
+
+    /**
+     * @param MemberModelInterface $member
+     * @param Role|Permission $role
+     * @return bool
+     */
+    public function assign(MemberModelInterface $member, $role): bool;
 }

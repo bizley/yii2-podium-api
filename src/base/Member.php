@@ -4,18 +4,23 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\AssigningInterface;
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberComponentInterface;
 use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use yii\di\Instance;
+use yii\rbac\DbManager;
+use yii\rbac\Permission;
+use yii\rbac\Role;
 
 /**
  * Class Member
  * @package bizley\podium\api\base
  *
  * @property FriendshipInterface $friendship
+ * @property RegistrationInterface $registration
  * @property IgnoringInterface $ignoring
  */
 class Member extends PodiumComponent implements MemberComponentInterface
@@ -36,6 +41,11 @@ class Member extends PodiumComponent implements MemberComponentInterface
     public $ignoringHandler;
 
     /**
+     * @var string|array|AssigningInterface
+     */
+    public $assigningHandler;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -45,6 +55,7 @@ class Member extends PodiumComponent implements MemberComponentInterface
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
+        $this->assigningHandler = Instance::ensure($this->assigningHandler, AssigningInterface::class);
     }
 
     /**
@@ -69,6 +80,15 @@ class Member extends PodiumComponent implements MemberComponentInterface
     public function getIgnoring(): IgnoringInterface
     {
         return $this->ignoringHandler;
+    }
+
+    /**
+     * @param DbManager $manager
+     * @return AssigningInterface
+     */
+    public function getAssigning(DbManager $manager): AssigningInterface
+    {
+        return $this->assigningHandler;
     }
 
     /**
@@ -134,5 +154,18 @@ class Member extends PodiumComponent implements MemberComponentInterface
             return false;
         }
         return $registration->register();
+    }
+
+    /**
+     * @param MemberModelInterface $member
+     * @param Role|Permission $role
+     * @return bool
+     */
+    public function assign(MemberModelInterface $member, $role): bool
+    {
+        $assigning = $this->getAssigning($this->podium->access);
+        $assigning->setMember($member);
+        $assigning->setRole($role);
+        return $assigning->switch();
     }
 }
