@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\base\FixedSettingException;
+use bizley\podium\api\enums\Setting;
 use bizley\podium\api\Podium;
 use bizley\podium\tests\DbTestCase;
 use yii\db\Exception;
@@ -65,6 +66,19 @@ class ConfigTest extends DbTestCase
         $this->fixturesDown();
     }
 
+    public function testDefaultValues(): void
+    {
+        $this->assertEquals([
+            Setting::NAME => 'Podium',
+            Setting::MAINTENANCE_MODE => '0',
+            Setting::MEMBERS_VISIBLE => '1',
+            Setting::POLLS_ALLOWED => '1',
+            Setting::MIN_POSTS_FOR_HOT => '20',
+            Setting::MERGE_POSTS => '1',
+            Setting::REGISTRATION_ALLOWED => '1',
+        ], $this->podium()->config->getDefaultValues());
+    }
+
     /**
      * @throws FixedSettingException
      */
@@ -85,6 +99,11 @@ class ConfigTest extends DbTestCase
     {
         $this->expectException(FixedSettingException::class);
         $this->podium()->config->setValue('name', 'not-set');
+    }
+
+    public function testGettingFixedValue(): void
+    {
+        $this->assertEquals('PodiumTest', $this->podium()->config->getValue('name'));
     }
 
     public function testGettingDefaultValue(): void
