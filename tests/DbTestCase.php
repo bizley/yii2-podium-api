@@ -72,7 +72,9 @@ abstract class DbTestCase extends TestCase
             ],
             'components' => [
                 'db' => static::getConnection(),
-                'podium' => Podium::class,
+                'podium' => [
+                    'class' => Podium::class
+                ],
             ],
         ], $config));
     }

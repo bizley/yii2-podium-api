@@ -82,7 +82,7 @@ class Config extends PodiumComponent implements ConfigInterface
         if (array_key_exists($param, $this->settings)) {
             return (string) $this->settings[$param];
         }
-        return $this->retrieveValue($param);
+        return $this->retrieveValue($param, $default);
     }
 
     /**
@@ -106,11 +106,12 @@ class Config extends PodiumComponent implements ConfigInterface
 
     /**
      * @param string $param
+     * @param string|null $default
      * @return null|string
      */
-    protected function retrieveValue(string $param): ?string
+    protected function retrieveValue(string $param, ?string $default = null): ?string
     {
         $setting = ConfigRepo::findOne(['param' => $param]);
-        return $setting !== null ? $setting->value : null;
+        return $setting !== null ? $setting->value : $default;
     }
 }
