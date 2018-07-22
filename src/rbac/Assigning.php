@@ -24,16 +24,17 @@ class Assigning extends Component implements AssigningInterface
     public const EVENT_BEFORE_SWITCH = 'podium.assigning.switch.before';
     public const EVENT_AFTER_SWITCH = 'podium.assigning.switch.after';
 
+    /**
+     * @var DbManager
+     */
     private $_manager;
 
     /**
      * @param DbManager $manager
-     * @param array $config
      */
-    public function __construct(DbManager $manager, array $config = [])
+    public function setManager(DbManager $manager): void
     {
         $this->_manager = $manager;
-        parent::__construct($config);
     }
 
     private $_memberId;

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use yii\rbac\DbManager;
 use yii\rbac\Permission;
 use yii\rbac\Role;
 
@@ -13,6 +14,11 @@ use yii\rbac\Role;
  */
 interface AssigningInterface
 {
+    /**
+     * @param DbManager $manager
+     */
+    public function setManager(DbManager $manager): void;
+
     /**
      * @param MemberModelInterface $member
      */

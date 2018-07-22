@@ -15,7 +15,6 @@ use bizley\podium\api\models\Ignoring;
 use bizley\podium\api\models\Registration;
 use bizley\podium\api\rbac\Assigning;
 use yii\di\Instance;
-use yii\rbac\DbManager;
 use yii\rbac\Permission;
 use yii\rbac\Role;
 
@@ -91,10 +90,9 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param DbManager $manager
      * @return AssigningInterface
      */
-    public function getAssigning(DbManager $manager): AssigningInterface
+    public function getAssigning(): AssigningInterface
     {
         return $this->assigningHandler;
     }
@@ -171,7 +169,8 @@ class Member extends PodiumComponent implements MemberComponentInterface
      */
     public function assign(MemberModelInterface $member, $role): bool
     {
-        $assigning = $this->getAssigning($this->podium->access);
+        $assigning = $this->getAssigning();
+        $assigning->setManager($this->podium->access);
         $assigning->setMember($member);
         $assigning->setRole($role);
         return $assigning->switch();
