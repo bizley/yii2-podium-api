@@ -14,6 +14,15 @@ use bizley\podium\api\repos\MemberRepo;
 class Member extends MemberRepo implements MembershipInterface
 {
     /**
+     * @param int $memberId
+     * @return MembershipInterface|null
+     */
+    public static function findMemberById(int $memberId): ?MembershipInterface
+    {
+        return static::findOne(['id' => $memberId]);
+    }
+
+    /**
      * @param int|string $userId
      * @return MembershipInterface|null
      */

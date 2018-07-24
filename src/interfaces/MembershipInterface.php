@@ -11,6 +11,12 @@ namespace bizley\podium\api\interfaces;
 interface MembershipInterface
 {
     /**
+     * @param int $memberId
+     * @return MembershipInterface|null
+     */
+    public static function findMemberById(int $memberId): ?MembershipInterface;
+
+    /**
      * Finds a membership by the given user ID.
      * @param int|string $userId
      * @return MembershipInterface|null the membership object that matches the given user ID

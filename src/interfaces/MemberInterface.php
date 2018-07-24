@@ -17,7 +17,19 @@ interface MemberInterface
      * Returns member handler.
      * @return MembershipInterface
      */
-    public function getMember(): MembershipInterface;
+    public function getMembership(): MembershipInterface;
+
+    /**
+     * @param int $id
+     * @return MembershipInterface|null
+     */
+    public function getMemberById(int $id): ?MembershipInterface;
+
+    /**
+     * @param int|string $id
+     * @return MembershipInterface|null
+     */
+    public function getMemberByUserId($id): ?MembershipInterface;
 
     /**
      * Returns registration handler.
