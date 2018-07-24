@@ -10,6 +10,8 @@ use yii\db\Migration;
  * Original authors:
  * @author Alexander Kochetov <creocoder@gmail.com>
  * @author Ivan Buttinoni <ivan.buttinoni@cibi.it>
+ *
+ * TODO: move to Podium client
  */
 class m180718_212500_rbac_init extends Migration
 {

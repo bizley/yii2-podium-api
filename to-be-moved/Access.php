@@ -12,6 +12,8 @@ use yii\rbac\DbManager;
 /**
  * Class Access
  * @package bizley\podium\api\base
+ *
+ * TODO: move to Podium client
  */
 class Access extends DbManager
 {

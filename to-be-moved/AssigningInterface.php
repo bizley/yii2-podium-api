@@ -11,6 +11,8 @@ use yii\rbac\Role;
 /**
  * Interface AssigningInterface
  * @package bizley\podium\api\interfaces
+ *
+ * TODO: move to Podium client
  */
 interface AssigningInterface
 {

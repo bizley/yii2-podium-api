@@ -10,6 +10,8 @@ use yii\rbac\Rule;
 /**
  * Class ModifyRule
  * @package bizley\podium\api\rbac
+ *
+ * TODO: move to Podium client
  */
 class ModifyRule extends Rule
 {

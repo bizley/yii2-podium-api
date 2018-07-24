@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\AssigningInterface;
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberInterface;
@@ -13,10 +12,7 @@ use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\Friendship;
 use bizley\podium\api\models\Ignoring;
 use bizley\podium\api\models\Registration;
-use bizley\podium\api\rbac\Assigning;
 use yii\di\Instance;
-use yii\rbac\Permission;
-use yii\rbac\Role;
 
 /**
  * Class Member
@@ -53,12 +49,6 @@ class Member extends PodiumComponent implements MemberInterface
     public $ignoringHandler = Ignoring::class;
 
     /**
-     * @var string|array|AssigningInterface
-     * Component ID, class, configuration array, or instance of AssigningInterface.
-     */
-    public $assigningHandler = Assigning::class;
-
-    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -69,7 +59,6 @@ class Member extends PodiumComponent implements MemberInterface
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
-        $this->assigningHandler = Instance::ensure($this->assigningHandler, AssigningInterface::class);
     }
 
     /**
@@ -102,14 +91,6 @@ class Member extends PodiumComponent implements MemberInterface
     public function getIgnoring(): IgnoringInterface
     {
         return $this->ignoringHandler;
-    }
-
-    /**
-     * @return AssigningInterface
-     */
-    public function getAssigning(): AssigningInterface
-    {
-        return $this->assigningHandler;
     }
 
     /**
@@ -175,20 +156,6 @@ class Member extends PodiumComponent implements MemberInterface
             return false;
         }
         return $registration->register();
-    }
-
-    /**
-     * @param MembershipInterface $member
-     * @param Role|Permission $role
-     * @return bool
-     */
-    public function assign(MembershipInterface $member, $role): bool
-    {
-        $assigning = $this->getAssigning();
-        $assigning->setManager($this->podium->access);
-        $assigning->setMember($member);
-        $assigning->setRole($role);
-        return $assigning->switch();
     }
 
     /**

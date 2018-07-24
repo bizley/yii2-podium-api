@@ -9,6 +9,8 @@ use Yii;
 /**
  * Class Role
  * @package bizley\podium\api\enums
+ *
+ * TODO: move to Podium client
  */
 final class Role extends BaseEnum
 {

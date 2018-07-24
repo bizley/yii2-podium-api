@@ -9,6 +9,8 @@ use yii\base\Exception;
 /**
  * Class RoleRevokeException
  * @package bizley\podium\api\rbac
+ *
+ * TODO: move to Podium client
  */
 class RoleRevokeException extends Exception
 {

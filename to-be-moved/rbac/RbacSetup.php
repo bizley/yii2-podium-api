@@ -14,6 +14,8 @@ use yii\rbac\DbManager;
  * Class RbacSetup
  * @package bizley\podium\api\rbac
  *
+ * TODO: move to Podium client
+ *
  * @property DbManager $manager
  */
 class RbacSetup extends Component

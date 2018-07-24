@@ -18,6 +18,8 @@ use yii\rbac\Role;
 /**
  * Class Assigning
  * @package bizley\podium\api\rbac
+ *
+ * TODO: move to Podium client
  */
 class Assigning extends Component implements AssigningInterface
 {

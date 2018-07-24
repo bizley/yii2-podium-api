@@ -9,6 +9,8 @@ use Yii;
 /**
  * Class Permission
  * @package bizley\podium\api\enums
+ *
+ * TODO: move to Podium client
  */
 final class Permission extends BaseEnum
 {

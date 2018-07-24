@@ -103,14 +103,4 @@ class Account extends PodiumComponent implements AccountInterface
     {
         return $this->podium->member->unignore($this->membership, $target);
     }
-
-    /**
-     * @param string $permissionName
-     * @param array $params
-     * @return bool
-     */
-    public function can(string $permissionName, array $params = []): bool
-    {
-        return $this->podium->access->check($this->membership, $permissionName, $params);
-    }
 }
