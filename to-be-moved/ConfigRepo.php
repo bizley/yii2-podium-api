@@ -11,6 +11,8 @@ use yii\db\ActiveRecord;
  *
  * @property string $param
  * @property string $value
+ *
+ * TODO: move to Podium client
  */
 class ConfigRepo extends ActiveRecord
 {

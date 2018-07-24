@@ -7,6 +7,8 @@ namespace bizley\podium\api\interfaces;
 /**
  * Interface ConfigInterface
  * @package bizley\podium\api\interfaces
+ *
+ * TODO: move to Podium client
  */
 interface ConfigInterface
 {

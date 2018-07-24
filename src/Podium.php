@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api;
 
 use bizley\podium\api\base\Account;
-use bizley\podium\api\base\Config;
 use bizley\podium\api\base\Member;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
@@ -31,7 +30,6 @@ use yii\i18n\PhpMessageSource;
  * https://github.com/bizley/yii2-podium-api/wiki
  *
  * @property null|Account $account
- * @property null|Config $config
  * @property null|Member $member
  * @property string $version
  */
@@ -77,7 +75,6 @@ class Podium extends ServiceLocator
         return [
             'account' => ['class' => Account::class],
             'member' => ['class' => Member::class],
-            'config' => ['class' => Config::class],
         ];
     }
 
@@ -99,16 +96,6 @@ class Podium extends ServiceLocator
     public function getAccount()
     {
         return $this->get('account');
-    }
-
-    /**
-     * Returns config component.
-     * @return Config|null|object
-     * @throws InvalidConfigException
-     */
-    public function getConfig()
-    {
-        return $this->get('config');
     }
 
     public function prepareTranslations(): void

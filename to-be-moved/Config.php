@@ -13,6 +13,8 @@ use yii\base\InvalidConfigException;
  * Class Config
  * @package bizley\podium\api\base
  *
+ * TODO: move to Podium client
+ *
  * @property array $defaultValues
  */
 class Config extends PodiumComponent implements ConfigInterface

@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use yii\db\Migration;
-
+// TODO: move to Podium client
 class m180721_173600_create_table_podium_config extends Migration
 {
     public function up(): void
