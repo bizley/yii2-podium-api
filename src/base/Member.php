@@ -7,7 +7,7 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\AssigningInterface;
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
-use bizley\podium\api\interfaces\MemberComponentInterface;
+use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\Friendship;
@@ -26,7 +26,7 @@ use yii\rbac\Role;
  * @property RegistrationInterface $registration
  * @property IgnoringInterface $ignoring
  */
-class Member extends PodiumComponent implements MemberComponentInterface
+class Member extends PodiumComponent implements MemberInterface
 {
     /**
      * @var string|array|MembershipInterface

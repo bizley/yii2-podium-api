@@ -11,7 +11,7 @@ use yii\rbac\Role;
  * Interface MemberComponentInterface
  * @package bizley\podium\api\interfaces
  */
-interface MemberComponentInterface
+interface MemberInterface
 {
     /**
      * Returns member handler.
