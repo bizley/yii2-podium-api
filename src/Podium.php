@@ -5,7 +5,14 @@ declare(strict_types=1);
 namespace bizley\podium\api;
 
 use bizley\podium\api\base\Account;
+use bizley\podium\api\base\Category;
+use bizley\podium\api\base\Forum;
+use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
+use bizley\podium\api\base\Poll;
+use bizley\podium\api\base\Post;
+use bizley\podium\api\base\Subscription;
+use bizley\podium\api\base\Thread;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\i18n\PhpMessageSource;
@@ -29,8 +36,16 @@ use yii\i18n\PhpMessageSource;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
- * @property null|Account $account
- * @property null|Member $member
+ * @property Account $account
+ * @property Category $category
+ * @property Forum $forum
+ * @property Group $group
+ * @property Member $member
+ * @property Poll $poll
+ * @property Post $post
+ * @property Subscription $subscription
+ * @property Thread $thread
+ *
  * @property string $version
  */
 class Podium extends ServiceLocator
@@ -74,8 +89,55 @@ class Podium extends ServiceLocator
     {
         return [
             'account' => ['class' => Account::class],
+            'category' => ['class' => Category::class],
+            'forum' => ['class' => Forum::class],
+            'group' => ['class' => Group::class],
             'member' => ['class' => Member::class],
+            'poll' => ['class' => Poll::class],
+            'post' => ['class' => Post::class],
+            'subscription' => ['class' => Subscription::class],
+            'thread' => ['class' => Thread::class],
         ];
+    }
+
+    /**
+     * Returns account component.
+     * @return Account|null|object
+     * @throws InvalidConfigException
+     */
+    public function getAccount()
+    {
+        return $this->get('account');
+    }
+
+    /**
+     * Returns category component.
+     * @return Category|null|object
+     * @throws InvalidConfigException
+     */
+    public function getCategory()
+    {
+        return $this->get('category');
+    }
+
+    /**
+     * Returns forum component.
+     * @return Forum|null|object
+     * @throws InvalidConfigException
+     */
+    public function getForum()
+    {
+        return $this->get('forum');
+    }
+
+    /**
+     * Returns group component.
+     * @return Group|null|object
+     * @throws InvalidConfigException
+     */
+    public function getGroup()
+    {
+        return $this->get('group');
     }
 
     /**
@@ -89,13 +151,43 @@ class Podium extends ServiceLocator
     }
 
     /**
-     * Returns account component.
-     * @return Account|null|object
+     * Returns poll component.
+     * @return Poll|null|object
      * @throws InvalidConfigException
      */
-    public function getAccount()
+    public function getPoll()
     {
-        return $this->get('account');
+        return $this->get('poll');
+    }
+
+    /**
+     * Returns post component.
+     * @return Post|null|object
+     * @throws InvalidConfigException
+     */
+    public function getPost()
+    {
+        return $this->get('post');
+    }
+
+    /**
+     * Returns subscription component.
+     * @return Subscription|null|object
+     * @throws InvalidConfigException
+     */
+    public function getSubscription()
+    {
+        return $this->get('subscription');
+    }
+
+    /**
+     * Returns thread component.
+     * @return Thread|null|object
+     * @throws InvalidConfigException
+     */
+    public function getThread()
+    {
+        return $this->get('thread');
     }
 
     public function prepareTranslations(): void
