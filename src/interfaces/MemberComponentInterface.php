@@ -14,6 +14,12 @@ use yii\rbac\Role;
 interface MemberComponentInterface
 {
     /**
+     * Returns member handler.
+     * @return MembershipInterface
+     */
+    public function getMember(): MembershipInterface;
+
+    /**
      * Returns registration handler.
      * @return RegistrationInterface
      */
@@ -34,19 +40,19 @@ interface MemberComponentInterface
 
     /**
      * Makes target friend of member.
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function befriend(MemberModelInterface $member, MemberModelInterface $target): bool;
+    public function befriend(MembershipInterface $member, MembershipInterface $target): bool;
 
     /**
      * Makes target member friend no more.
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unfriend(MemberModelInterface $member, MemberModelInterface $target): bool;
+    public function unfriend(MembershipInterface $member, MembershipInterface $target): bool;
 
     /**
      * Returns ignoring handler.
@@ -56,19 +62,19 @@ interface MemberComponentInterface
 
     /**
      * Sets target as ignored by member.
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function ignore(MemberModelInterface $member, MemberModelInterface $target): bool;
+    public function ignore(MembershipInterface $member, MembershipInterface $target): bool;
 
     /**
      * Sets target as unignored by member.
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unignore(MemberModelInterface $member, MemberModelInterface $target): bool;
+    public function unignore(MembershipInterface $member, MembershipInterface $target): bool;
 
     /**
      * Returns assigning handler.
@@ -77,9 +83,9 @@ interface MemberComponentInterface
     public function getAssigning(): AssigningInterface;
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      * @param Role|Permission $role
      * @return bool
      */
-    public function assign(MemberModelInterface $member, $role): bool;
+    public function assign(MembershipInterface $member, $role): bool;
 }

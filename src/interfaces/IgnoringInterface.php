@@ -12,15 +12,15 @@ interface IgnoringInterface
 {
     /**
      * Initiator of ignoring.
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      */
-    public function setMember(MemberModelInterface $member): void;
+    public function setMember(MembershipInterface $member): void;
 
     /**
      * Target of ignoring.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      */
-    public function setTarget(MemberModelInterface $target): void;
+    public function setTarget(MembershipInterface $target): void;
 
     /**
      * Handles ignoring process.

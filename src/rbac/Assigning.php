@@ -6,7 +6,7 @@ namespace bizley\podium\api\rbac;
 
 use bizley\podium\api\events\RoleEvent;
 use bizley\podium\api\interfaces\AssigningInterface;
-use bizley\podium\api\interfaces\MemberModelInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
@@ -40,9 +40,9 @@ class Assigning extends Component implements AssigningInterface
     private $_memberId;
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      */
-    public function setMember(MemberModelInterface $member): void
+    public function setMember(MembershipInterface $member): void
     {
         $this->_memberId = $member->getId();
     }

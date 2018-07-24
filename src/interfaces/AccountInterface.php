@@ -12,29 +12,29 @@ interface AccountInterface
 {
     /**
      * Makes target a friend.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function befriend(MemberModelInterface $target): bool;
+    public function befriend(MembershipInterface $target): bool;
 
     /**
      * Makes target a friend no more.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unfriend(MemberModelInterface $target): bool;
+    public function unfriend(MembershipInterface $target): bool;
 
     /**
      * Sets target as ignored.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function ignore(MemberModelInterface $target): bool;
+    public function ignore(MembershipInterface $target): bool;
 
     /**
      * Sets target as unignored.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unignore(MemberModelInterface $target): bool;
+    public function unignore(MembershipInterface $target): bool;
 }

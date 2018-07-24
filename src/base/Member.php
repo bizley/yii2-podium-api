@@ -8,7 +8,7 @@ use bizley\podium\api\interfaces\AssigningInterface;
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberComponentInterface;
-use bizley\podium\api\interfaces\MemberModelInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\Friendship;
 use bizley\podium\api\models\Ignoring;
@@ -28,6 +28,12 @@ use yii\rbac\Role;
  */
 class Member extends PodiumComponent implements MemberComponentInterface
 {
+    /**
+     * @var string|array|MembershipInterface
+     * Component ID, class, configuration array, or instance of MembershipInterface.
+     */
+    public $memberHandler = \bizley\podium\api\models\Member::class;
+
     /**
      * @var string|array|RegistrationInterface
      * Component ID, class, configuration array, or instance of RegistrationInterface.
@@ -59,10 +65,19 @@ class Member extends PodiumComponent implements MemberComponentInterface
     {
         parent::init();
 
+        $this->memberHandler = Instance::ensure($this->memberHandler, MembershipInterface::class);
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
         $this->assigningHandler = Instance::ensure($this->assigningHandler, AssigningInterface::class);
+    }
+
+    /**
+     * @return MembershipInterface
+     */
+    public function getMember(): MembershipInterface
+    {
+        return $this->memberHandler;
     }
 
     /**
@@ -98,11 +113,11 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function befriend(MemberModelInterface $member, MemberModelInterface $target): bool
+    public function befriend(MembershipInterface $member, MembershipInterface $target): bool
     {
         $friendship = $this->getFriendship();
         $friendship->setMember($member);
@@ -111,11 +126,11 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unfriend(MemberModelInterface $member, MemberModelInterface $target): bool
+    public function unfriend(MembershipInterface $member, MembershipInterface $target): bool
     {
         $friendship = $this->getFriendship();
         $friendship->setMember($member);
@@ -124,11 +139,11 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function ignore(MemberModelInterface $member, MemberModelInterface $target): bool
+    public function ignore(MembershipInterface $member, MembershipInterface $target): bool
     {
         $ignoring = $this->getIgnoring();
         $ignoring->setMember($member);
@@ -137,11 +152,11 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param MemberModelInterface $member
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $member
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unignore(MemberModelInterface $member, MemberModelInterface $target): bool
+    public function unignore(MembershipInterface $member, MembershipInterface $target): bool
     {
         $ignoring = $this->getIgnoring();
         $ignoring->setMember($member);
@@ -163,16 +178,21 @@ class Member extends PodiumComponent implements MemberComponentInterface
     }
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      * @param Role|Permission $role
      * @return bool
      */
-    public function assign(MemberModelInterface $member, $role): bool
+    public function assign(MembershipInterface $member, $role): bool
     {
         $assigning = $this->getAssigning();
         $assigning->setManager($this->podium->access);
         $assigning->setMember($member);
         $assigning->setRole($role);
         return $assigning->switch();
+    }
+
+    public function getMemberById(int $id): MembershipInterface
+    {
+        return $this->getMember();
     }
 }

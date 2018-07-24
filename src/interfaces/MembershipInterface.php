@@ -8,12 +8,17 @@ namespace bizley\podium\api\interfaces;
  * Interface MembershipInterface
  * @package bizley\podium\api\interfaces
  */
-interface MembershipInterface extends MemberModelInterface
+interface MembershipInterface
 {
     /**
      * Finds a membership by the given user ID.
      * @param int|string $userId
      * @return MembershipInterface|null the membership object that matches the given user ID
      */
-    public static function findMembership($userId): ?MembershipInterface;
+    public static function findMemberByUserId($userId): ?MembershipInterface;
+
+    /**
+     * @return int
+     */
+    public function getId(): int;
 }

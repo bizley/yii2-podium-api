@@ -20,9 +20,9 @@ interface AssigningInterface
     public function setManager(DbManager $manager): void;
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      */
-    public function setMember(MemberModelInterface $member): void;
+    public function setMember(MembershipInterface $member): void;
 
     /**
      * @param Role|Permission $role

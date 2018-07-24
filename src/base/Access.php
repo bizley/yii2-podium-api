@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\MemberModelInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\Podium;
 use bizley\podium\api\rbac\RbacSetup;
 use yii\rbac\DbManager;
@@ -43,12 +43,12 @@ class Access extends DbManager
     private $_access = [];
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      * @param string $permissionName
      * @param array $params
      * @return bool
      */
-    public function check(MemberModelInterface $member, string $permissionName, array $params = []): bool
+    public function check(MembershipInterface $member, string $permissionName, array $params = []): bool
     {
         if (empty($params) && isset($this->_access[$permissionName])) {
             return $this->_access[$permissionName];

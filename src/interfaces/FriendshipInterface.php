@@ -12,15 +12,15 @@ interface FriendshipInterface
 {
     /**
      * Initiator of friendship.
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      */
-    public function setMember(MemberModelInterface $member): void;
+    public function setMember(MembershipInterface $member): void;
 
     /**
      * Target of friendship.
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      */
-    public function setTarget(MemberModelInterface $target): void;
+    public function setTarget(MembershipInterface $target): void;
 
     /**
      * Handles befriending process.

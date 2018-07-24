@@ -7,7 +7,7 @@ namespace bizley\podium\api\models;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
 use bizley\podium\api\interfaces\IgnoringInterface;
-use bizley\podium\api\interfaces\MemberModelInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -46,17 +46,17 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     }
 
     /**
-     * @param MemberModelInterface $member
+     * @param MembershipInterface $member
      */
-    public function setMember(MemberModelInterface $member): void
+    public function setMember(MembershipInterface $member): void
     {
         $this->member_id = $member->getId();
     }
 
     /**
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      */
-    public function setTarget(MemberModelInterface $target): void
+    public function setTarget(MembershipInterface $target): void
     {
         $this->target_id = $target->getId();
     }

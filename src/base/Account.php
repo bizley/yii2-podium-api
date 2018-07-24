@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\AccountInterface;
-use bizley\podium\api\interfaces\MemberModelInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
@@ -52,7 +51,7 @@ class Account extends PodiumComponent implements AccountInterface
         if ($this->_membership === null) {
             /* @var $class MembershipInterface */
             $class = $this->membershipHandler;
-            $this->_membership = $class::findMembership($this->userHandler->id);
+            $this->_membership = $class::findMemberByUserId($this->userHandler->id);
         }
         return $this->_membership;
     }
@@ -70,37 +69,37 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function befriend(MemberModelInterface $target): bool
+    public function befriend(MembershipInterface $target): bool
     {
         return $this->podium->member->befriend($this->membership, $target);
     }
 
     /**
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unfriend(MemberModelInterface $target): bool
+    public function unfriend(MembershipInterface $target): bool
     {
         return $this->podium->member->unfriend($this->membership, $target);
     }
 
     /**
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function ignore(MemberModelInterface $target): bool
+    public function ignore(MembershipInterface $target): bool
     {
         return $this->podium->member->ignore($this->membership, $target);
     }
 
     /**
-     * @param MemberModelInterface $target
+     * @param MembershipInterface $target
      * @return bool
      */
-    public function unignore(MemberModelInterface $target): bool
+    public function unignore(MembershipInterface $target): bool
     {
         return $this->podium->member->unignore($this->membership, $target);
     }
