@@ -6,6 +6,11 @@ namespace bizley\podium\api\models;
 
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\MemberRepo;
+use yii\data\ActiveDataProvider;
+use yii\data\DataFilter;
+use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\data\Sort;
 
 /**
  * Class Member
@@ -37,5 +42,29 @@ class Member extends MemberRepo implements MembershipInterface
     public function getId(): int
     {
         return $this->id;
+    }
+
+    /**
+     * @param DataFilter|null $filter
+     * @param Sort|array|bool|null $sort
+     * @param Pagination|array|bool|null $pagination
+     * @return ActiveDataProvider
+     */
+    public function findMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    {
+        $query = static::find();
+
+        if ($filter !== null) {
+            $filterConditions = $filter->build();
+            if ($filterConditions !== false) {
+                $query->andWhere($filterConditions);
+            }
+        }
+
+        return new ActiveDataProvider([
+            'query' => $query,
+            'sort' => $sort,
+            'pagination' => $pagination,
+        ]);
     }
 }
