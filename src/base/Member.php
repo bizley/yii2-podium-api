@@ -12,6 +12,8 @@ use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\Friendship;
 use bizley\podium\api\models\Ignoring;
 use bizley\podium\api\models\Registration;
+use yii\data\DataFilter;
+use yii\data\DataProviderInterface;
 use yii\di\Instance;
 
 /**
@@ -174,5 +176,16 @@ class Member extends PodiumComponent implements MemberInterface
     public function getMemberByUserId($id): ?MembershipInterface
     {
         return $this->getMembership()->findMemberByUserId($id);
+    }
+
+    /**
+     * @param null|DataFilter $filter
+     * @param null $sort
+     * @param null $pagination
+     * @return DataProviderInterface
+     */
+    public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    {
+        return $this->getMembership()->findMembers($filter, $sort, $pagination);
     }
 }
