@@ -9,7 +9,7 @@ use yii\base\Event;
 
 /**
  * Class RegistrationEvent
- * @package bizley\podium\events
+ * @package bizley\podium\api\events
  */
 class RegistrationEvent extends Event
 {

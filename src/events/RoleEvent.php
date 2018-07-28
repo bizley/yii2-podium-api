@@ -9,7 +9,7 @@ use yii\rbac\Assignment;
 
 /**
  * Class RoleEvent
- * @package bizley\podium\events
+ * @package bizley\podium\api\events
  */
 class RoleEvent extends Event
 {

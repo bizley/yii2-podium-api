@@ -10,7 +10,7 @@ use yii\base\Event;
 
 /**
  * Class AcquaintanceEvent
- * @package bizley\podium\events
+ * @package bizley\podium\api\events
  */
 class AcquaintanceEvent extends Event
 {
