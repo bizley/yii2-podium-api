@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ThreadModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -23,7 +24,7 @@ class Thread extends PodiumComponent
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -44,7 +45,8 @@ class Thread extends PodiumComponent
      */
     public function getThreadById(int $id): ?ThreadModelInterface
     {
-        return $this->getThreadModel()->findThreadById($id);
+        $threadModel = $this->getThreadModel();
+        return $threadModel::findThreadById($id);
     }
 
     /**
@@ -55,6 +57,7 @@ class Thread extends PodiumComponent
      */
     public function getThreads(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        return $this->getThreadModel()->findThreads($filter, $sort, $pagination);
+        $threadModel = $this->getThreadModel();
+        return $threadModel::findThreads($filter, $sort, $pagination);
     }
 }

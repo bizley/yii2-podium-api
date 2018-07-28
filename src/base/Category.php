@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\CategoryModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -44,7 +45,8 @@ class Category extends PodiumComponent
      */
     public function getCategoryById(int $id): ?CategoryModelInterface
     {
-        return $this->getCategoryModel()->findCategoryById($id);
+        $categoryModel = $this->getCategoryModel();
+        return $categoryModel::findCategoryById($id);
     }
 
     /**
@@ -55,6 +57,7 @@ class Category extends PodiumComponent
      */
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        return $this->getCategoryModel()->findCategories($filter, $sort, $pagination);
+        $categoryModel = $this->getCategoryModel();
+        return $categoryModel::findCategories($filter, $sort, $pagination);
     }
 }

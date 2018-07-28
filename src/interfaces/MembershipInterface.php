@@ -39,5 +39,5 @@ interface MembershipInterface
      * @param Pagination|array|bool|null $pagination
      * @return DataProviderInterface
      */
-    public function findMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public static function findMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 }

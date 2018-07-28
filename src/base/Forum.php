@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ForumModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -44,7 +45,8 @@ class Forum extends PodiumComponent
      */
     public function getForumById(int $id): ?ForumModelInterface
     {
-        return $this->getForumModel()->findForumById($id);
+        $forumModel = $this->getForumModel();
+        return $forumModel::findForumById($id);
     }
 
     /**
@@ -55,6 +57,7 @@ class Forum extends PodiumComponent
      */
     public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        return $this->getForumModel()->findForums($filter, $sort, $pagination);
+        $forumModel = $this->getForumModel();
+        return $forumModel::findForums($filter, $sort, $pagination);
     }
 }

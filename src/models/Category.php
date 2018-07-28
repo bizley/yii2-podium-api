@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models;
 
+use bizley\podium\api\interfaces\CategoryModelInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\MemberRepo;
 use yii\data\ActiveDataProvider;
@@ -13,10 +14,10 @@ use yii\data\Pagination;
 use yii\data\Sort;
 
 /**
- * Class Member
+ * Class Category
  * @package bizley\podium\api\models
  */
-class Member extends MemberRepo implements MembershipInterface
+class Category extends CategoryRepo implements CategoryModelInterface
 {
     /**
      * @param int $memberId
@@ -25,15 +26,6 @@ class Member extends MemberRepo implements MembershipInterface
     public static function findMemberById(int $memberId): ?MembershipInterface
     {
         return static::findOne(['id' => $memberId]);
-    }
-
-    /**
-     * @param int|string $userId
-     * @return MembershipInterface|null
-     */
-    public static function findMemberByUserId($userId): ?MembershipInterface
-    {
-        return static::findOne(['user_id' => $userId]);
     }
 
     /**

@@ -166,7 +166,8 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMemberById(int $id): ?MembershipInterface
     {
-        return $this->getMembership()->findMemberById($id);
+        $membership = $this->getMembership();
+        return $membership::findMemberById($id);
     }
 
     /**
@@ -175,7 +176,8 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMemberByUserId($id): ?MembershipInterface
     {
-        return $this->getMembership()->findMemberByUserId($id);
+        $membership = $this->getMembership();
+        return $membership::findMemberByUserId($id);
     }
 
     /**
@@ -186,6 +188,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        return $this->getMembership()->findMembers($filter, $sort, $pagination);
+        $membership = $this->getMembership();
+        return $membership::findMembers($filter, $sort, $pagination);
     }
 }

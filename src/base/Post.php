@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\PostModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -44,7 +45,8 @@ class Post extends PodiumComponent
      */
     public function getPostById(int $id): ?PostModelInterface
     {
-        return $this->getPostModel()->findPostById($id);
+        $postModel = $this->getPostModel();
+        return $postModel::findPostById($id);
     }
 
     /**
@@ -55,6 +57,7 @@ class Post extends PodiumComponent
      */
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        return $this->getPostModel()->findPosts($filter, $sort, $pagination);
+        $postModel = $this->getPostModel();
+        return $postModel::findPosts($filter, $sort, $pagination);
     }
 }
