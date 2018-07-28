@@ -51,7 +51,7 @@ class Account extends PodiumComponent implements AccountInterface
         if ($this->_membership === null) {
             /* @var $class MembershipInterface */
             $class = $this->membershipHandler;
-            $this->_membership = $class::findMemberByUserId($this->userHandler->id);
+            $this->_membership = $class::findByUserId($this->userHandler->id);
         }
         return $this->_membership;
     }

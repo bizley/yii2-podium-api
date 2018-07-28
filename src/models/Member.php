@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models;
 
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\repos\MemberRepo;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
@@ -20,9 +21,9 @@ class Member extends MemberRepo implements MembershipInterface
 {
     /**
      * @param int $memberId
-     * @return MembershipInterface|null
+     * @return ModelInterface|null
      */
-    public static function findMemberById(int $memberId): ?MembershipInterface
+    public static function findById(int $memberId): ?ModelInterface
     {
         return static::findOne(['id' => $memberId]);
     }
@@ -31,7 +32,7 @@ class Member extends MemberRepo implements MembershipInterface
      * @param int|string $userId
      * @return MembershipInterface|null
      */
-    public static function findMemberByUserId($userId): ?MembershipInterface
+    public static function findByUserId($userId): ?MembershipInterface
     {
         return static::findOne(['user_id' => $userId]);
     }
@@ -50,7 +51,7 @@ class Member extends MemberRepo implements MembershipInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $query = static::find();
 

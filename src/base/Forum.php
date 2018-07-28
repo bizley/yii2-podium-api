@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\ForumModelInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -16,8 +16,8 @@ use yii\di\Instance;
 class Forum extends PodiumComponent
 {
     /**
-     * @var string|array|ForumModelInterface
-     * Component ID, class, configuration array, or instance of ForumModelInterface.
+     * @var string|array|ModelInterface
+     * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $forumHandler = \bizley\podium\api\models\Forum::class;
 
@@ -28,25 +28,25 @@ class Forum extends PodiumComponent
     {
         parent::init();
 
-        $this->forumHandler = Instance::ensure($this->forumHandler, ForumModelInterface::class);
+        $this->forumHandler = Instance::ensure($this->forumHandler, ModelInterface::class);
     }
 
     /**
-     * @return ForumModelInterface
+     * @return ModelInterface
      */
-    public function getForumModel(): ForumModelInterface
+    public function getForumModel(): ModelInterface
     {
         return $this->forumHandler;
     }
 
     /**
      * @param int $id
-     * @return ForumModelInterface|null
+     * @return ModelInterface|null
      */
-    public function getForumById(int $id): ?ForumModelInterface
+    public function getForumById(int $id): ?ModelInterface
     {
         $forumModel = $this->getForumModel();
-        return $forumModel::findForumById($id);
+        return $forumModel::findById($id);
     }
 
     /**
@@ -58,6 +58,6 @@ class Forum extends PodiumComponent
     public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $forumModel = $this->getForumModel();
-        return $forumModel::findForums($filter, $sort, $pagination);
+        return $forumModel::findByFilter($filter, $sort, $pagination);
     }
 }

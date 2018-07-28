@@ -8,6 +8,7 @@ use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\Friendship;
 use bizley\podium\api\models\Ignoring;
@@ -162,12 +163,12 @@ class Member extends PodiumComponent implements MemberInterface
 
     /**
      * @param int $id
-     * @return MembershipInterface|null
+     * @return MembershipInterface|ModelInterface|null
      */
     public function getMemberById(int $id): ?MembershipInterface
     {
         $membership = $this->getMembership();
-        return $membership::findMemberById($id);
+        return $membership::findById($id);
     }
 
     /**
@@ -177,7 +178,7 @@ class Member extends PodiumComponent implements MemberInterface
     public function getMemberByUserId($id): ?MembershipInterface
     {
         $membership = $this->getMembership();
-        return $membership::findMemberByUserId($id);
+        return $membership::findByUserId($id);
     }
 
     /**
@@ -189,6 +190,6 @@ class Member extends PodiumComponent implements MemberInterface
     public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $membership = $this->getMembership();
-        return $membership::findMembers($filter, $sort, $pagination);
+        return $membership::findByFilter($filter, $sort, $pagination);
     }
 }

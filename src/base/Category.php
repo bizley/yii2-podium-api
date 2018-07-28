@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\CategoryModelInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -16,8 +16,8 @@ use yii\di\Instance;
 class Category extends PodiumComponent
 {
     /**
-     * @var string|array|CategoryModelInterface
-     * Component ID, class, configuration array, or instance of CategoryModelInterface.
+     * @var string|array|ModelInterface
+     * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $categoryHandler = \bizley\podium\api\models\Category::class;
 
@@ -28,25 +28,25 @@ class Category extends PodiumComponent
     {
         parent::init();
 
-        $this->categoryHandler = Instance::ensure($this->categoryHandler, CategoryModelInterface::class);
+        $this->categoryHandler = Instance::ensure($this->categoryHandler, ModelInterface::class);
     }
 
     /**
-     * @return CategoryModelInterface
+     * @return ModelInterface
      */
-    public function getCategoryModel(): CategoryModelInterface
+    public function getCategoryModel(): ModelInterface
     {
         return $this->categoryHandler;
     }
 
     /**
      * @param int $id
-     * @return CategoryModelInterface|null
+     * @return ModelInterface|null
      */
-    public function getCategoryById(int $id): ?CategoryModelInterface
+    public function getCategoryById(int $id): ?ModelInterface
     {
         $categoryModel = $this->getCategoryModel();
-        return $categoryModel::findCategoryById($id);
+        return $categoryModel::findById($id);
     }
 
     /**
@@ -58,6 +58,6 @@ class Category extends PodiumComponent
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $categoryModel = $this->getCategoryModel();
-        return $categoryModel::findCategories($filter, $sort, $pagination);
+        return $categoryModel::findByFilter($filter, $sort, $pagination);
     }
 }

@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models;
 
-use bizley\podium\api\interfaces\CategoryModelInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\repos\MemberRepo;
+use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\repos\CategoryRepo;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -17,15 +16,15 @@ use yii\data\Sort;
  * Class Category
  * @package bizley\podium\api\models
  */
-class Category extends CategoryRepo implements CategoryModelInterface
+class Category extends CategoryRepo implements ModelInterface
 {
     /**
-     * @param int $memberId
-     * @return MembershipInterface|null
+     * @param int $id
+     * @return ModelInterface|null
      */
-    public static function findMemberById(int $memberId): ?MembershipInterface
+    public static function findById(int $id): ?ModelInterface
     {
-        return static::findOne(['id' => $memberId]);
+        return static::findOne(['id' => $id]);
     }
 
     /**
@@ -42,7 +41,7 @@ class Category extends CategoryRepo implements CategoryModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $query = static::find();
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\PostModelInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
@@ -16,8 +16,8 @@ use yii\di\Instance;
 class Post extends PodiumComponent
 {
     /**
-     * @var string|array|PostModelInterface
-     * Component ID, class, configuration array, or instance of PostModelInterface.
+     * @var string|array|ModelInterface
+     * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $postHandler = \bizley\podium\api\models\Post::class;
 
@@ -28,25 +28,25 @@ class Post extends PodiumComponent
     {
         parent::init();
 
-        $this->postHandler = Instance::ensure($this->postHandler, PostModelInterface::class);
+        $this->postHandler = Instance::ensure($this->postHandler, ModelInterface::class);
     }
 
     /**
-     * @return PostModelInterface
+     * @return ModelInterface
      */
-    public function getPostModel(): PostModelInterface
+    public function getPostModel(): ModelInterface
     {
         return $this->postHandler;
     }
 
     /**
      * @param int $id
-     * @return PostModelInterface|null
+     * @return ModelInterface|null
      */
-    public function getPostById(int $id): ?PostModelInterface
+    public function getPostById(int $id): ?ModelInterface
     {
         $postModel = $this->getPostModel();
-        return $postModel::findPostById($id);
+        return $postModel::findById($id);
     }
 
     /**
@@ -58,6 +58,6 @@ class Post extends PodiumComponent
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $postModel = $this->getPostModel();
-        return $postModel::findPosts($filter, $sort, $pagination);
+        return $postModel::findByFilter($filter, $sort, $pagination);
     }
 }

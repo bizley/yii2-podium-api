@@ -10,16 +10,16 @@ use yii\data\Pagination;
 use yii\data\Sort;
 
 /**
- * Interface ThreadModelInterface
+ * Interface ModelInterface
  * @package bizley\podium\api\interfaces
  */
-interface ThreadModelInterface
+interface ModelInterface
 {
     /**
-     * @param int $threadId
-     * @return ThreadModelInterface|null
+     * @param int $modelId
+     * @return ModelInterface|null
      */
-    public static function findThreadById(int $threadId): ?ThreadModelInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
      * @return int
@@ -32,5 +32,5 @@ interface ThreadModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return DataProviderInterface
      */
-    public static function findThreads(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 }
