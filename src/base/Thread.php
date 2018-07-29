@@ -19,7 +19,7 @@ class Thread extends PodiumComponent
      * @var string|array|ModelInterface
      * Component ID, class, configuration array, or instance of ThreadModelInterface.
      */
-    public $threadHandler = \bizley\podium\api\models\Thread::class;
+    public $threadHandler = \bizley\podium\api\models\thread\Thread::class;
 
     /**
      * @throws \yii\base\InvalidConfigException

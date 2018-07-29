@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models;
+namespace bizley\podium\api\models\category;
 
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\repos\CategoryRepo;
 
 /**

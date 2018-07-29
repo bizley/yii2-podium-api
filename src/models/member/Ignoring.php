@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models;
+namespace bizley\podium\api\models\member;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;

@@ -21,7 +21,7 @@ class Category extends PodiumComponent
      * @var string|array|ModelInterface
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $categoryHandler = \bizley\podium\api\models\Category::class;
+    public $categoryHandler = \bizley\podium\api\models\category\Category::class;
 
     /**
      * @throws \yii\base\InvalidConfigException

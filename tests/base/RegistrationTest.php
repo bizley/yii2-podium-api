@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\Registration;
+use bizley\podium\api\models\member\Registration;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;

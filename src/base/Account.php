@@ -23,7 +23,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @var string|array|MembershipInterface
      * Component ID, class, configuration array, or instance of MembershipInterface.
      */
-    public $membershipHandler = \bizley\podium\api\models\Member::class;
+    public $membershipHandler = \bizley\podium\api\models\member\Member::class;
 
     /**
      * @var string|array|User user component handler

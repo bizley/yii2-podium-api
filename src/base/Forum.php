@@ -19,7 +19,7 @@ class Forum extends PodiumComponent
      * @var string|array|ModelInterface
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $forumHandler = \bizley\podium\api\models\Forum::class;
+    public $forumHandler = \bizley\podium\api\models\forum\Forum::class;
 
     /**
      * @throws \yii\base\InvalidConfigException

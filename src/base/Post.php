@@ -19,7 +19,7 @@ class Post extends PodiumComponent
      * @var string|array|ModelInterface
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $postHandler = \bizley\podium\api\models\Post::class;
+    public $postHandler = \bizley\podium\api\models\post\Post::class;
 
     /**
      * @throws \yii\base\InvalidConfigException

@@ -10,9 +10,9 @@ use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
-use bizley\podium\api\models\Friendship;
-use bizley\podium\api\models\Ignoring;
-use bizley\podium\api\models\Registration;
+use bizley\podium\api\models\member\Friendship;
+use bizley\podium\api\models\member\Ignoring;
+use bizley\podium\api\models\member\Registration;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -33,7 +33,7 @@ class Member extends PodiumComponent implements MemberInterface
      * @var string|array|MembershipInterface
      * Component ID, class, configuration array, or instance of MembershipInterface.
      */
-    public $memberHandler = \bizley\podium\api\models\Member::class;
+    public $memberHandler = \bizley\podium\api\models\member\Member::class;
 
     /**
      * @var string|array|RegistrationInterface

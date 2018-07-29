@@ -6,8 +6,8 @@ namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\Friendship;
-use bizley\podium\api\models\Member;
+use bizley\podium\api\models\member\Friendship;
+use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
