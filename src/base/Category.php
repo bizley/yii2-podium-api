@@ -7,6 +7,8 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\ModelInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 /**
@@ -51,8 +53,8 @@ class Category extends PodiumComponent
 
     /**
      * @param null|DataFilter $filter
-     * @param null $sort
-     * @param null $pagination
+     * @param null|bool|array|Sort $sort
+     * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
