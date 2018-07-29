@@ -10,7 +10,7 @@ use bizley\podium\api\repos\CategoryRepo;
 
 /**
  * Class Category
- * @package bizley\podium\api\models
+ * @package bizley\podium\api\models\category
  */
 class Category extends CategoryRepo implements ModelInterface
 {

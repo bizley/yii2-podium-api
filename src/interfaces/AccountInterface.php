@@ -11,6 +11,11 @@ namespace bizley\podium\api\interfaces;
 interface AccountInterface
 {
     /**
+     * @return int|null
+     */
+    public function getId(): ?int;
+
+    /**
      * Makes target a friend.
      * @param MembershipInterface $target
      * @return bool

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\interfaces;
 
 /**
- * Interface AccountInterface
+ * Interface RegistrationInterface
  * @package bizley\podium\api\interfaces
  */
 interface RegistrationInterface

@@ -77,8 +77,7 @@ class RegistrationTest extends DbTestCase
         ];
         $this->assertFalse($this->podium()->member->register($data));
 
-        $member = MemberRepo::findOne(['username' => 'notestname']);
-        $this->assertEmpty($member);
+        $this->assertEmpty( MemberRepo::findOne(['username' => 'notestname']));
 
         Event::off(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
     }

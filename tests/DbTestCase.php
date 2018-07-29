@@ -44,6 +44,8 @@ abstract class DbTestCase extends TestCase
     protected static $db;
 
     /**
+     * @throws \yii\base\InvalidRouteException
+     * @throws \yii\console\Exception
      * @throws \yii\db\Exception
      */
     public static function setUpBeforeClass(): void
@@ -82,6 +84,8 @@ abstract class DbTestCase extends TestCase
     /**
      * @param string $route
      * @param array $params
+     * @throws \yii\base\InvalidRouteException
+     * @throws \yii\console\Exception
      */
     protected static function runSilentMigration(string $route, array $params = []): void
     {
@@ -94,6 +98,10 @@ abstract class DbTestCase extends TestCase
         }
     }
 
+    /**
+     * @throws \yii\base\InvalidRouteException
+     * @throws \yii\console\Exception
+     */
     public static function tearDownAfterClass(): void
     {
         static::runSilentMigration('migrate/down', ['all']);

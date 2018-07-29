@@ -14,7 +14,7 @@ use yii\behaviors\TimestampBehavior;
 
 /**
  * Class Ignore
- * @package bizley\podium\api\models
+ * @package bizley\podium\api\models\member
  */
 class Ignoring extends AcquaintanceRepo implements IgnoringInterface
 {

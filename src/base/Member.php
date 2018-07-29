@@ -25,6 +25,7 @@ use yii\di\Instance;
  *
  * @property FriendshipInterface $friendship
  * @property RegistrationInterface $registration
+ * @property MembershipInterface $membership
  * @property IgnoringInterface $ignoring
  */
 class Member extends PodiumComponent implements MemberInterface

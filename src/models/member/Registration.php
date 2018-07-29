@@ -13,7 +13,7 @@ use yii\behaviors\TimestampBehavior;
 
 /**
  * Class Registration
- * @package bizley\podium\api\models
+ * @package bizley\podium\api\models\member
  */
 class Registration extends MemberRepo implements RegistrationInterface
 {
@@ -82,7 +82,10 @@ class Registration extends MemberRepo implements RegistrationInterface
      */
     public function register(): bool
     {
-        if (!$this->validate() || !$this->beforeRegister()) {
+        if (!$this->beforeRegister()) {
+            return false;
+        }
+        if (!$this->validate()) {
             Yii::error(['register.validate', $this->errors], 'podium');
             return false;
         }

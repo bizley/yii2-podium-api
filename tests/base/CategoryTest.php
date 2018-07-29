@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\base;
 
+use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\DbTestCase;
 use yii\data\ActiveDataFilter;
 
@@ -17,6 +18,16 @@ class CategoryTest extends DbTestCase
      * @var array
      */
     public $fixtures = [
+        'podium_member' => [
+            [
+                'id' => 1,
+                'user_id' => '1',
+                'username' => 'member',
+                'status_id' => MemberStatus::ACTIVE,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
         'podium_category' => [
             [
                 'id' => 1,

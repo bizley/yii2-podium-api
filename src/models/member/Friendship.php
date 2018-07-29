@@ -14,7 +14,7 @@ use yii\behaviors\TimestampBehavior;
 
 /**
  * Class Friendship
- * @package bizley\podium\api\models
+ * @package bizley\podium\api\models\member
  *
  * @property MembershipInterface $member
  * @property MembershipInterface $target
