@@ -11,7 +11,7 @@ class m170604_094100_create_table_podium_member extends Migration
         $tableOptions = null;
         $statusId = $this->string(45)->notNull();
         if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $statusId = 'ENUM("registered","active","banned") NOT NULL';
         }
 

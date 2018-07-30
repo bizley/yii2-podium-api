@@ -11,7 +11,7 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
         $tableOptions = null;
         $typeId = $this->string(45)->notNull();
         if ($this->db->driverName === 'mysql') {
-            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+            $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $typeId = 'ENUM("friend","ignore") NOT NULL';
         }
 
