@@ -7,7 +7,7 @@ COMPONENTS:
 - [x] Account
 - [x] Member
 - [ ] Poll
-- [ ] Category
+- [x] Category
 - [ ] Forum
 - [ ] Thread
 - [ ] Post
@@ -20,12 +20,13 @@ ACTIONS:
 - [x] befriend member
 - [x] ignore member
 - [x] view member
-- [ ] list members
+- [x] list members
 - [ ] update member
 - [ ] delete member
 - [ ] ban member
-- [ ] view category
-- [ ] list categories
-- [ ] create category
-- [ ] update category
+- [x] view category
+- [x] list categories
+- [x] create category
+- [x] update category
 - [ ] delete category
+- [x] sort categories

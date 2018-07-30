@@ -43,4 +43,16 @@ interface CategoryInterface
      * @return bool
      */
     public function edit(CategoryFormInterface $categoryForm, array $data): bool;
+
+    /**
+     * @return SortableInterface
+     */
+    public function getCategorySorter(): SortableInterface;
+
+    /**
+     * Sorts categories.
+     * @param array $data
+     * @return bool
+     */
+    public function sort(array $data = []): bool;
 }

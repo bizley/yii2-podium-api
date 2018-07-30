@@ -8,6 +8,7 @@ use bizley\podium\api\interfaces\CategoryFormInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -36,6 +37,12 @@ class Category extends PodiumComponent implements CategoryInterface
     public $categoryFormHandler = \bizley\podium\api\models\category\CategoryForm::class;
 
     /**
+     * @var string|array|SortableInterface
+     * Component ID, class, configuration array, or instance of SortableInterface.
+     */
+    public $categorySorterHandler = \bizley\podium\api\models\category\CategorySorter::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -44,6 +51,7 @@ class Category extends PodiumComponent implements CategoryInterface
 
         $this->categoryHandler = Instance::ensure($this->categoryHandler, ModelInterface::class);
         $this->categoryFormHandler = Instance::ensure($this->categoryFormHandler, CategoryFormInterface::class);
+        $this->categorySorterHandler = Instance::ensure($this->categorySorterHandler, SortableInterface::class);
     }
 
     /**
@@ -111,5 +119,27 @@ class Category extends PodiumComponent implements CategoryInterface
             return false;
         }
         return $categoryForm->edit();
+    }
+
+    /**
+     * @return SortableInterface
+     */
+    public function getCategorySorter(): SortableInterface
+    {
+        return $this->categorySorterHandler;
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    public function sort(array $data = []): bool
+    {
+        $categorySorter = $this->getCategorySorter();
+
+        if (!$categorySorter->loadData($data)) {
+            return false;
+        }
+        return $categorySorter->sort();
     }
 }
