@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\member\Member;
 use bizley\podium\tests\DbTestCase;
 use yii\data\ActiveDataFilter;
 
@@ -89,5 +90,11 @@ class MemberTest extends DbTestCase
         $members = $this->podium()->member->getMembers($filter);
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
+    }
+
+    public function testDeleteMember(): void
+    {
+        $this->assertEquals(1, $this->podium()->category->delete(Member::findOne(2)));
+        $this->assertEmpty($this->podium()->member->getMemberById(2));
     }
 }

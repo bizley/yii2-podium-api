@@ -42,6 +42,12 @@ interface MemberInterface
     public function register(array $data): bool;
 
     /**
+     * @param ModelInterface $member
+     * @return int|false
+     */
+    public function delete(ModelInterface $member);
+
+    /**
      * Returns friendship handler.
      * @return FriendshipInterface
      */

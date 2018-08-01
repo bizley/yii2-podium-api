@@ -165,6 +165,15 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * @param ModelInterface $member
+     * @return int|false
+     */
+    public function delete(ModelInterface $member)
+    {
+        return $member->delete();
+    }
+
+    /**
      * @param int $id
      * @return MembershipInterface|ModelInterface|null
      */

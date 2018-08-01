@@ -22,11 +22,11 @@ ACTIONS:
 - [x] view member
 - [x] list members
 - [ ] update member
-- [ ] delete member
+- [x] delete member
 - [ ] ban member
 - [x] view category
 - [x] list categories
 - [x] create category
 - [x] update category
-- [ ] delete category
+- [x] delete category
 - [x] sort categories

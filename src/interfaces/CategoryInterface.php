@@ -45,6 +45,12 @@ interface CategoryInterface
     public function edit(CategoryFormInterface $categoryForm, array $data): bool;
 
     /**
+     * @param ModelInterface $category
+     * @return int|false
+     */
+    public function delete(ModelInterface $category);
+
+    /**
      * @return SortableInterface
      */
     public function getCategorySorter(): SortableInterface;

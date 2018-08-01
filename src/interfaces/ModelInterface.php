@@ -33,4 +33,9 @@ interface ModelInterface
      * @return DataProviderInterface
      */
     public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+
+    /**
+     * @return int|false
+     */
+    public function delete();
 }

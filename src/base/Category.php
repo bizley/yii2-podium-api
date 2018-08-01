@@ -122,6 +122,15 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * @param ModelInterface $category
+     * @return int|false
+     */
+    public function delete(ModelInterface $category)
+    {
+        return $category->delete();
+    }
+
+    /**
      * @return SortableInterface
      */
     public function getCategorySorter(): SortableInterface
