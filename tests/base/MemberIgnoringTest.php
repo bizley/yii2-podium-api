@@ -64,24 +64,6 @@ class MemberIgnoringTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_BEFORE_IGNORING] = true;
-        });
-        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_IGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_AFTER_IGNORING] = true;
-        });
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_BEFORE_UNIGNORING] = true;
-        });
-        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_UNIGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_AFTER_UNIGNORING] = true;
-        });
-    }
-
     /**
      * @throws \yii\db\Exception
      */
@@ -100,6 +82,13 @@ class MemberIgnoringTest extends DbTestCase
 
     public function testIgnore(): void
     {
+        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, function () {
+            static::$eventsRaised[Ignoring::EVENT_BEFORE_IGNORING] = true;
+        });
+        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_IGNORING, function () {
+            static::$eventsRaised[Ignoring::EVENT_AFTER_IGNORING] = true;
+        });
+
         $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101)));
 
         $acq = AcquaintanceRepo::findOne([
@@ -139,6 +128,13 @@ class MemberIgnoringTest extends DbTestCase
 
     public function testUnignore(): void
     {
+        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, function () {
+            static::$eventsRaised[Ignoring::EVENT_BEFORE_UNIGNORING] = true;
+        });
+        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_UNIGNORING, function () {
+            static::$eventsRaised[Ignoring::EVENT_AFTER_UNIGNORING] = true;
+        });
+
         $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102)));
 
         $acq = AcquaintanceRepo::findOne([

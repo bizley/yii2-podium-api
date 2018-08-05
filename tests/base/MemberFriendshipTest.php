@@ -64,24 +64,6 @@ class MemberFriendshipTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
-    public static function setUpBeforeClass(): void
-    {
-        parent::setUpBeforeClass();
-
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_BEFRIENDING] = true;
-        });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_BEFRIENDING] = true;
-        });
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_UNFRIENDING] = true;
-        });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_UNFRIENDING] = true;
-        });
-    }
-
     /**
      * @throws \yii\db\Exception
      */
@@ -100,6 +82,13 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testBefriend(): void
     {
+        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, function () {
+            static::$eventsRaised[Friendship::EVENT_BEFORE_BEFRIENDING] = true;
+        });
+        Event::on(Friendship::class, Friendship::EVENT_AFTER_BEFRIENDING, function () {
+            static::$eventsRaised[Friendship::EVENT_AFTER_BEFRIENDING] = true;
+        });
+
         $this->assertTrue($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101)));
 
         $acq = AcquaintanceRepo::findOne([
@@ -139,6 +128,13 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testUnfriend(): void
     {
+        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, function () {
+            static::$eventsRaised[Friendship::EVENT_BEFORE_UNFRIENDING] = true;
+        });
+        Event::on(Friendship::class, Friendship::EVENT_AFTER_UNFRIENDING, function () {
+            static::$eventsRaised[Friendship::EVENT_AFTER_UNFRIENDING] = true;
+        });
+
         $this->assertTrue($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102)));
 
         $acq = AcquaintanceRepo::findOne([

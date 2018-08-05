@@ -1,8 +1,8 @@
 # yii2-podium-api
 
-Yii 2 Podium API
+## Yii 2 Podium API
 
-COMPONENTS:
+### COMPONENTS:
 
 - [x] Account
 - [x] Member
@@ -14,7 +14,7 @@ COMPONENTS:
 - [ ] Subscription
 
 
-ACTIONS:
+### ACTIONS:
 
 - [x] register
 - [x] befriend member
@@ -23,10 +23,14 @@ ACTIONS:
 - [x] list members
 - [x] update member
 - [x] delete member
-- [ ] ban member
+- [x] ban member
 - [x] view category
 - [x] list categories
 - [x] create category
 - [x] update category
 - [x] delete category
 - [x] sort categories
+
+### NOTES:
+
+- When method operates on model not fetched from DB use handler.

@@ -48,6 +48,13 @@ interface MemberInterface
     public function delete(ModelInterface $member);
 
     /**
+     * @param ModelFormInterface $member
+     * @param array $data
+     * @return bool
+     */
+    public function edit(ModelFormInterface $member, array $data): bool;
+
+    /**
      * Returns friendship handler.
      * @return FriendshipInterface
      */
@@ -90,4 +97,16 @@ interface MemberInterface
      * @return bool
      */
     public function unignore(MembershipInterface $member, MembershipInterface $target): bool;
+
+    /**
+     * @param BanInterface $member
+     * @return bool
+     */
+    public function ban(BanInterface $member): bool;
+
+    /**
+     * @param BanInterface $member
+     * @return bool
+     */
+    public function unban(BanInterface $member): bool;
 }

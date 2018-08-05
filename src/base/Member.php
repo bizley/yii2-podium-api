@@ -6,6 +6,7 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
+use bizley\podium\api\interfaces\BanInterface;
 use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
@@ -217,5 +218,23 @@ class Member extends PodiumComponent implements MemberInterface
             return false;
         }
         return $memberForm->edit();
+    }
+
+    /**
+     * @param BanInterface $member
+     * @return bool
+     */
+    public function ban(BanInterface $member): bool
+    {
+        return $member->ban();
+    }
+
+    /**
+     * @param BanInterface $member
+     * @return bool
+     */
+    public function unban(BanInterface $member): bool
+    {
+        return $member->unban();
     }
 }
