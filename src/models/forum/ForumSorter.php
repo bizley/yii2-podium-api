@@ -2,25 +2,33 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models\category;
+namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
-use bizley\podium\api\repos\CategoryRepo;
+use bizley\podium\api\repos\ForumRepo;
 use Yii;
 use yii\base\NotSupportedException;
 
 /**
- * Class CategorySorter
- * @package bizley\podium\api\models\category
+ * Class ForumSorter
+ * @package bizley\podium\api\models\forum
  */
-class CategorySorter extends CategoryRepo implements SortableInterface
+class ForumSorter extends ForumRepo implements SortableInterface
 {
-    public const EVENT_BEFORE_SORTING = 'podium.category.sorting.before';
-    public const EVENT_AFTER_SORTING = 'podium.category.sorting.after';
+    public const EVENT_BEFORE_SORTING = 'podium.forum.sorting.before';
+    public const EVENT_AFTER_SORTING = 'podium.forum.sorting.after';
 
     public $sortOrder;
+
+    /**
+     * @param ModelInterface $category
+     */
+    public function setCategory(ModelInterface $category): void
+    {
+        $this->category_id = $category->getId();
+    }
 
     /**
      * @return array
@@ -40,7 +48,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
     public function attributeLabels(): array
     {
         return [
-            'sortOrder' => Yii::t('podium.label', 'category.sort.order'),
+            'sortOrder' => Yii::t('podium.label', 'forum.sort.order'),
         ];
     }
 
@@ -73,17 +81,17 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             return false;
         }
         if (!$this->validate()) {
-            Yii::error(['category.sort.validate', $this->errors], 'podium');
+            Yii::error(['forum.sort.validate', $this->errors], 'podium');
             return false;
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $nextOrder = 0;
-            foreach ($this->sortOrder as $categoryId) {
+            foreach ($this->sortOrder as $forumId) {
                 $result = static::updateAll([
                     'sort' => $nextOrder,
                     'updated_at' => time(),
-                ], ['id' => $categoryId]);
+                ], ['id' => $forumId, 'category_id' => $this->category_id]);
                 if ($result > 0) {
                     $nextOrder++;
                 }
@@ -92,11 +100,11 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             $this->afterSort();
             return true;
         } catch (\Throwable $exc) {
-            Yii::error(['category.sort', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['forum.sort', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['category.sort.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['forum.sort.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
             return false;
         }
@@ -108,21 +116,12 @@ class CategorySorter extends CategoryRepo implements SortableInterface
     }
 
     /**
-     * @param ModelInterface $category
-     * @throws NotSupportedException
-     */
-    public function setCategory(ModelInterface $category): void
-    {
-        throw new NotSupportedException('Category can not be sorted in Category.');
-    }
-
-    /**
      * @param ModelInterface $forum
      * @throws NotSupportedException
      */
     public function setForum(ModelInterface $forum): void
     {
-        throw new NotSupportedException('Category can not be sorted in Forum.');
+        throw new NotSupportedException('Forum can not be sorted in Forum.');
     }
 
     /**
@@ -131,6 +130,6 @@ class CategorySorter extends CategoryRepo implements SortableInterface
      */
     public function setThread(ModelInterface $thread): void
     {
-        throw new NotSupportedException('Category can not be sorted in Thread.');
+        throw new NotSupportedException('Forum can not be sorted in Thread.');
     }
 }

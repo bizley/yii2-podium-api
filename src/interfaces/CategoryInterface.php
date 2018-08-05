@@ -24,9 +24,9 @@ interface CategoryInterface
 
     /**
      * Returns category form handler.
-     * @return CategoryFormInterface
+     * @return AuthoredFormInterface
      */
-    public function getCategoryForm(): CategoryFormInterface;
+    public function getCategoryForm(): AuthoredFormInterface;
 
     /**
      * Creates category.
@@ -38,11 +38,11 @@ interface CategoryInterface
 
     /**
      * Updates category.
-     * @param CategoryFormInterface $categoryForm
+     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return bool
      */
-    public function edit(CategoryFormInterface $categoryForm, array $data): bool;
+    public function edit(ModelFormInterface $categoryForm, array $data): bool;
 
     /**
      * @param ModelInterface $category

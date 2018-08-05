@@ -8,7 +8,7 @@
 - [x] Member
 - [ ] Poll
 - [x] Category
-- [ ] Forum
+- [x] Forum
 - [ ] Thread
 - [ ] Post
 - [ ] Subscription
@@ -30,6 +30,13 @@
 - [x] update category
 - [x] delete category
 - [x] sort categories
+- [x] view forum
+- [x] list forums
+- [x] create forum
+- [x] update forum
+- [x] delete forum
+- [x] sort forums
+- [ ] move forum
 
 ### NOTES:
 

@@ -8,7 +8,7 @@ namespace bizley\podium\api\interfaces;
  * Interface CategoryFormInterface
  * @package bizley\podium\api\interfaces
  */
-interface CategoryFormInterface extends ModelFormInterface
+interface AuthoredFormInterface extends ModelFormInterface
 {
     /**
      * @param MembershipInterface $author

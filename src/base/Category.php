@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\CategoryFormInterface;
+use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
@@ -19,7 +20,7 @@ use yii\di\Instance;
  * Class Category
  * @package bizley\podium\api\base
  *
- * @property CategoryFormInterface $categoryForm
+ * @property AuthoredFormInterface $categoryForm
  * @property ModelInterface $categoryModel
  */
 class Category extends PodiumComponent implements CategoryInterface
@@ -31,8 +32,8 @@ class Category extends PodiumComponent implements CategoryInterface
     public $categoryHandler = \bizley\podium\api\models\category\Category::class;
 
     /**
-     * @var string|array|CategoryFormInterface
-     * Component ID, class, configuration array, or instance of CategoryFormInterface.
+     * @var string|array|AuthoredFormInterface
+     * Component ID, class, configuration array, or instance of AuthoredFormInterface.
      */
     public $categoryFormHandler = \bizley\podium\api\models\category\CategoryForm::class;
 
@@ -50,7 +51,7 @@ class Category extends PodiumComponent implements CategoryInterface
         parent::init();
 
         $this->categoryHandler = Instance::ensure($this->categoryHandler, ModelInterface::class);
-        $this->categoryFormHandler = Instance::ensure($this->categoryFormHandler, CategoryFormInterface::class);
+        $this->categoryFormHandler = Instance::ensure($this->categoryFormHandler, AuthoredFormInterface::class);
         $this->categorySorterHandler = Instance::ensure($this->categorySorterHandler, SortableInterface::class);
     }
 
@@ -85,9 +86,9 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
-     * @return CategoryFormInterface
+     * @return AuthoredFormInterface
      */
-    public function getCategoryForm(): CategoryFormInterface
+    public function getCategoryForm(): AuthoredFormInterface
     {
         return $this->categoryFormHandler;
     }
@@ -109,11 +110,11 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
-     * @param CategoryFormInterface $categoryForm
+     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return bool
      */
-    public function edit(CategoryFormInterface $categoryForm, array $data): bool
+    public function edit(ModelFormInterface $categoryForm, array $data): bool
     {
         if (!$categoryForm->loadData($data)) {
             return false;

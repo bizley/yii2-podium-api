@@ -2,26 +2,28 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models\category;
+namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\events\ModelEvent;
-use bizley\podium\api\interfaces\AuthoredFormInterface;
+use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\repos\CategoryRepo;
+use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\repos\ForumRepo;
 use Yii;
+use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * Class CategoryForm
- * @package bizley\podium\api\models\category
+ * Class ForumForm
+ * @package bizley\podium\api\models\forum
  */
-class CategoryForm extends CategoryRepo implements AuthoredFormInterface
+class ForumForm extends ForumRepo implements CategorisedFormInterface
 {
-    public const EVENT_BEFORE_CREATING = 'podium.category.creating.before';
-    public const EVENT_AFTER_CREATING = 'podium.category.creating.after';
-    public const EVENT_BEFORE_EDITING = 'podium.category.editing.before';
-    public const EVENT_AFTER_EDITING = 'podium.category.editing.after';
+    public const EVENT_BEFORE_CREATING = 'podium.forum.creating.before';
+    public const EVENT_AFTER_CREATING = 'podium.forum.creating.after';
+    public const EVENT_BEFORE_EDITING = 'podium.forum.editing.before';
+    public const EVENT_AFTER_EDITING = 'podium.forum.editing.after';
 
     /**
      * @param MembershipInterface $author
@@ -29,6 +31,14 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     public function setAuthor(MembershipInterface $author): void
     {
         $this->author_id = $author->getId();
+    }
+
+    /**
+     * @param ModelInterface $category
+     */
+    public function setCategory(ModelInterface $category): void
+    {
+        $this->category_id = $category->getId();
     }
 
     /**
@@ -66,9 +76,9 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     public function attributeLabels(): array
     {
         return [
-            'name' => Yii::t('podium.label', 'category.name'),
-            'visible' => Yii::t('podium.label', 'category.visible'),
-            'sort' => Yii::t('podium.label', 'category.sort'),
+            'name' => Yii::t('podium.label', 'forum.name'),
+            'visible' => Yii::t('podium.label', 'forum.visible'),
+            'sort' => Yii::t('podium.label', 'forum.sort'),
         ];
     }
 
@@ -101,11 +111,11 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
             return false;
         }
         if (!$this->validate()) {
-            Yii::error(['category.validate', $this->errors], 'podium');
+            Yii::error(['forum.validate', $this->errors], 'podium');
             return false;
         }
         if (!$this->save(false)) {
-            Yii::error(['category.create', $this->errors], 'podium');
+            Yii::error(['forum.create', $this->errors], 'podium');
             return false;
         }
         $this->afterCreate();
@@ -139,11 +149,11 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
             return false;
         }
         if (!$this->validate()) {
-            Yii::error(['category.validate', $this->errors], 'podium');
+            Yii::error(['forum.validate', $this->errors], 'podium');
             return false;
         }
         if (!$this->save(false)) {
-            Yii::error(['category.edit', $this->errors], 'podium');
+            Yii::error(['forum.edit', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();
@@ -155,5 +165,23 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
             'model' => $this
         ]));
+    }
+
+    /**
+     * @param ModelInterface $forum
+     * @throws NotSupportedException
+     */
+    public function setForum(ModelInterface $forum): void
+    {
+        throw new NotSupportedException('Forum can not be a child of Forum.');
+    }
+
+    /**
+     * @param ModelInterface $thread
+     * @throws NotSupportedException
+     */
+    public function setThread(ModelInterface $thread): void
+    {
+        throw new NotSupportedException('Forum can not be a child of Thread.');
     }
 }
