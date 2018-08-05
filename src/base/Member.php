@@ -8,6 +8,7 @@ use bizley\podium\api\interfaces\FriendshipInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\models\member\Friendship;
@@ -203,5 +204,18 @@ class Member extends PodiumComponent implements MemberInterface
     {
         $membership = $this->getMembership();
         return $membership::findByFilter($filter, $sort, $pagination);
+    }
+
+    /**
+     * @param ModelFormInterface $memberForm
+     * @param array $data
+     * @return bool
+     */
+    public function edit(ModelFormInterface $memberForm, array $data): bool
+    {
+        if (!$memberForm->loadData($data)) {
+            return false;
+        }
+        return $memberForm->edit();
     }
 }

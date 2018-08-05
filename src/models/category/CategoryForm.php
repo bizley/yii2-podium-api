@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\category;
 
-use bizley\podium\api\events\CategoryEvent;
+use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategoryFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\CategoryRepo;
@@ -86,7 +86,7 @@ class CategoryForm extends CategoryRepo implements CategoryFormInterface
      */
     public function beforeCreate(): bool
     {
-        $event = new CategoryEvent();
+        $event = new ModelEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -114,8 +114,8 @@ class CategoryForm extends CategoryRepo implements CategoryFormInterface
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new CategoryEvent([
-            'category' => $this
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
+            'model' => $this
         ]));
     }
 
@@ -124,7 +124,7 @@ class CategoryForm extends CategoryRepo implements CategoryFormInterface
      */
     public function beforeEdit(): bool
     {
-        $event = new CategoryEvent();
+        $event = new ModelEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -152,8 +152,8 @@ class CategoryForm extends CategoryRepo implements CategoryFormInterface
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new CategoryEvent([
-            'category' => $this
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
+            'model' => $this
         ]));
     }
 }

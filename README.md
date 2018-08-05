@@ -21,7 +21,7 @@ ACTIONS:
 - [x] ignore member
 - [x] view member
 - [x] list members
-- [ ] update member
+- [x] update member
 - [x] delete member
 - [ ] ban member
 - [x] view category
