@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -45,6 +46,12 @@ class Forum extends PodiumComponent implements ForumInterface
     public $forumSorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
 
     /**
+     * @var string|array|MovableInterface
+     * Component ID, class, configuration array, or instance of MovableInterface.
+     */
+    public $forumMoverHandler = \bizley\podium\api\models\forum\ForumMover::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -54,6 +61,7 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->forumHandler = Instance::ensure($this->forumHandler, ModelInterface::class);
         $this->forumFormHandler = Instance::ensure($this->forumFormHandler, CategorisedFormInterface::class);
         $this->forumSorterHandler = Instance::ensure($this->forumSorterHandler, SortableInterface::class);
+        $this->forumMoverHandler = Instance::ensure($this->forumMoverHandler, MovableInterface::class);
     }
 
     /**
@@ -156,5 +164,23 @@ class Forum extends PodiumComponent implements ForumInterface
             return false;
         }
         return $forumSorter->sort();
+    }
+
+    /**
+     * @return SortableInterface
+     */
+    public function getForumMover(): MovableInterface
+    {
+        return $this->forumMoverHandler;
+    }
+
+    /**
+     * @param MovableInterface $forumMove
+     * @param ModelInterface $category
+     * @return bool
+     */
+    public function move(MovableInterface $forumMove, ModelInterface $category): bool
+    {
+        return $forumMove->move($category);
     }
 }
