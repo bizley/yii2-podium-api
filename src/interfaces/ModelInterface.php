@@ -38,4 +38,16 @@ interface ModelInterface
      * @return int|false
      */
     public function delete();
+
+    /**
+     * @return ModelInterface
+     */
+    public function getParent(): ModelInterface;
+
+    /**
+     * @param array $counters the counters to be updated (attribute name => increment value)
+     * Use negative values if you want to decrement the counters.
+     * @return bool whether the saving is successful
+     */
+    public function updateCounters($counters); // BC declaration
 }

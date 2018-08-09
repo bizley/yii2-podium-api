@@ -92,7 +92,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             $this->afterSort();
             return true;
         } catch (\Throwable $exc) {
-            Yii::error(['category.sort', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['category.sort.exception', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {

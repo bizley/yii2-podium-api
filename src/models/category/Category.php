@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\category;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\repos\CategoryRepo;
+use yii\base\NotSupportedException;
 
 /**
  * Class Category
@@ -15,4 +16,13 @@ use bizley\podium\api\repos\CategoryRepo;
 class Category extends CategoryRepo implements ModelInterface
 {
     use ModelTrait;
+
+    /**
+     * @return ModelInterface
+     * @throws NotSupportedException
+     */
+    public function getParent(): ModelInterface
+    {
+        throw new NotSupportedException('Category has not got a parent.');
+    }
 }

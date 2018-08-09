@@ -24,6 +24,7 @@ use yii\di\Instance;
  * @property CategorisedFormInterface $forumForm
  * @property SortableInterface $forumSorter
  * @property ModelInterface $forumModel
+ * @property MovableInterface $forumMover
  */
 class Forum extends PodiumComponent implements ForumInterface
 {

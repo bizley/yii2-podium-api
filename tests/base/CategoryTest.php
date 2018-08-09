@@ -87,7 +87,7 @@ class CategoryTest extends DbTestCase
     {
         $filter = new ActiveDataFilter([
             'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id' => null]))->addRule('id', 'integer');
+                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');

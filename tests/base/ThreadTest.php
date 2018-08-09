@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\forum\Forum;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\tests\DbTestCase;
 use yii\data\ActiveDataFilter;
 
 /**
- * Class ForumTest
+ * Class ThreadTest
  * @package bizley\podium\tests\base
  */
-class ForumTest extends DbTestCase
+class ThreadTest extends DbTestCase
 {
     /**
      * @var array
@@ -50,13 +50,25 @@ class ForumTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+        ],
+        'podium_thread' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread1',
+                'slug' => 'thread1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
             [
                 'id' => 2,
                 'category_id' => 1,
+                'forum_id' => 1,
                 'author_id' => 1,
-                'name' => 'forum2',
-                'slug' => 'forum2',
-                'sort' => 4,
+                'name' => 'thread2',
+                'slug' => 'thread2',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -79,25 +91,25 @@ class ForumTest extends DbTestCase
         $this->fixturesDown();
     }
 
-    public function testGetForumById(): void
+    public function testGetThreadById(): void
     {
-        $forum = $this->podium()->forum->getForumById(1);
-        $this->assertEquals(1, $forum->getId());
+        $thread = $this->podium()->thread->getThreadById(1);
+        $this->assertEquals(1, $thread->getId());
     }
 
-    public function testNonExistingForum(): void
+    public function testNonExistingThread(): void
     {
-        $this->assertEmpty($this->podium()->forum->getForumById(999));
+        $this->assertEmpty($this->podium()->thread->getThreadById(999));
     }
 
-    public function testGetForumsByFilterEmpty(): void
+    public function testGetThreadsByFilterEmpty(): void
     {
-        $forums = $this->podium()->forum->getForums();
-        $this->assertEquals(2, $forums->getTotalCount());
-        $this->assertEquals([1, 2], $forums->getKeys());
+        $threads = $this->podium()->thread->getThreads();
+        $this->assertEquals(2, $threads->getTotalCount());
+        $this->assertEquals([1, 2], $threads->getKeys());
     }
 
-    public function testGetForumsByFilter(): void
+    public function testGetThreadsByFilter(): void
     {
         $filter = new ActiveDataFilter([
             'searchModel' => function () {
@@ -105,14 +117,14 @@ class ForumTest extends DbTestCase
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $forums = $this->podium()->forum->getForums($filter);
-        $this->assertEquals(1, $forums->getTotalCount());
-        $this->assertEquals([2], $forums->getKeys());
+        $threads = $this->podium()->thread->getThreads($filter);
+        $this->assertEquals(1, $threads->getTotalCount());
+        $this->assertEquals([2], $threads->getKeys());
     }
 
-    public function testDeleteForum(): void
+    public function testDeleteThread(): void
     {
-        $this->assertEquals(1, $this->podium()->forum->delete(Forum::findOne(1)));
-        $this->assertEmpty($this->podium()->forum->getForumById(1));
+        $this->assertEquals(1, $this->podium()->thread->delete(Thread::findOne(1)));
+        $this->assertEmpty($this->podium()->thread->getThreadById(1));
     }
 }

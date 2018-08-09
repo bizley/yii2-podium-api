@@ -5,39 +5,49 @@
 ### COMPONENTS:
 
 - [x] Account
+  - [x] register
+  - [x] befriend member
+  - [x] ignore member
 - [x] Member
-- [ ] Poll
+  - [x] befriend member
+  - [x] ignore member
+  - [x] view member
+  - [x] list members
+  - [x] update member
+  - [x] delete member
+  - [x] ban member
 - [x] Category
+  - [x] view category
+  - [x] list categories
+  - [x] create category
+  - [x] update category
+  - [x] delete category
+  - [x] sort categories
 - [x] Forum
-- [ ] Thread
+  - [x] view forum
+  - [x] list forums
+  - [x] create forum
+  - [x] update forum
+  - [x] delete forum
+  - [x] sort forums
+  - [x] move forum
+- [x] Thread
+  - [x] view thread
+  - [x] list threads
+  - [x] create thread
+  - [x] update thread
+  - [x] delete thread
+  - [x] move thread
+  - [ ] pin thread
+  - [ ] lock thread
 - [ ] Post
 - [ ] Subscription
-
-
-### ACTIONS:
-
-- [x] register
-- [x] befriend member
-- [x] ignore member
-- [x] view member
-- [x] list members
-- [x] update member
-- [x] delete member
-- [x] ban member
-- [x] view category
-- [x] list categories
-- [x] create category
-- [x] update category
-- [x] delete category
-- [x] sort categories
-- [x] view forum
-- [x] list forums
-- [x] create forum
-- [x] update forum
-- [x] delete forum
-- [x] sort forums
-- [ ] move forum
+- [ ] Poll
 
 ### NOTES:
 
 - When method operates on model not fetched from DB use handler.
+
+### TODO:
+
+- Unify all error log names.

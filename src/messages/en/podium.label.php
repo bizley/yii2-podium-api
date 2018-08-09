@@ -12,4 +12,5 @@ return [
     'member.username' => 'Username',
     'registration.user.id' => 'User ID',
     'registration.username' => 'Username',
+    'thread.name' => 'Thread Name',
 ];
