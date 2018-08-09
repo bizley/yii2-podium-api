@@ -71,9 +71,9 @@ interface ForumInterface
 
     /**
      * Moves forum to different category.
-     * @param MovableInterface $forumMove
+     * @param MovableInterface $forumMover
      * @param ModelInterface $category
      * @return bool
      */
-    public function move(MovableInterface $forumMove, ModelInterface $category): bool;
+    public function move(MovableInterface $forumMover, ModelInterface $category): bool;
 }

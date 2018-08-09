@@ -57,11 +57,10 @@ class ForumMover extends ForumRepo implements MovableInterface
         if (!$this->beforeMove()) {
             return false;
         }
-
-//        if (!$this->save(false)) {
-//            Yii::error(['forum.create', $this->errors], 'podium');
-//            return false;
-//        }
+        if (!$this->save(false)) {
+            \Yii::error(['forum.move', $this->errors], 'podium');
+            return false;
+        }
         $this->afterMove();
         return true;
     }

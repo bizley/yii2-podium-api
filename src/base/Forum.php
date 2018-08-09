@@ -167,7 +167,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * @return SortableInterface
+     * @return MovableInterface
      */
     public function getForumMover(): MovableInterface
     {
@@ -175,12 +175,14 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * @param MovableInterface $forumMove
+     * @param MovableInterface $forumMover
      * @param ModelInterface $category
      * @return bool
      */
-    public function move(MovableInterface $forumMove, ModelInterface $category): bool
+    public function move(MovableInterface $forumMover, ModelInterface $category): bool
     {
-        return $forumMove->move($category);
+        $forumMover->setCategory($category);
+
+        return $forumMover->move();
     }
 }
