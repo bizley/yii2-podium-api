@@ -20,6 +20,8 @@ class m180809_200700_create_table_podium_thread extends Migration
             'author_id' => $this->integer()->notNull(),
             'name' => $this->string(255)->notNull()->unique(),
             'slug' => $this->string(255)->notNull()->unique(),
+            'pinned' => $this->boolean()->notNull()->defaultValue(false),
+            'locked' => $this->boolean()->notNull()->defaultValue(false),
             'posts_count' => $this->integer()->notNull()->defaultValue(0),
             'views_count' => $this->integer()->notNull()->defaultValue(0),
             'created_post_at' => $this->integer(),

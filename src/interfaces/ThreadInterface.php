@@ -58,4 +58,16 @@ interface ThreadInterface
      * @return bool
      */
     public function move(MovableInterface $threadMover, ModelInterface $forum): bool;
+
+    /**
+     * @param PinnableInterface $threadPinner
+     * @return bool
+     */
+    public function pin(PinnableInterface $threadPinner): bool;
+
+    /**
+     * @param PinnableInterface $threadPinner
+     * @return bool
+     */
+    public function unpin(PinnableInterface $threadPinner): bool;
 }

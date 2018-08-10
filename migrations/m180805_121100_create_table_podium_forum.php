@@ -20,7 +20,7 @@ class m180805_121100_create_table_podium_forum extends Migration
             'name' => $this->string(255)->notNull()->unique(),
             'slug' => $this->string(255)->notNull()->unique(),
             'description' => $this->text(),
-            'visible' => $this->boolean()->defaultValue(true),
+            'visible' => $this->boolean()->notNull()->defaultValue(true),
             'sort' => $this->smallInteger()->notNull()->defaultValue(0),
             'threads_count' => $this->integer()->notNull()->defaultValue(0),
             'posts_count' => $this->integer()->notNull()->defaultValue(0),

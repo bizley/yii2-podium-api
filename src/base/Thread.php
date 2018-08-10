@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\PinnableInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -135,5 +136,23 @@ class Thread extends PodiumComponent implements ThreadInterface
         $threadMover->setForum($forum);
 
         return $threadMover->move();
+    }
+
+    /**
+     * @param PinnableInterface $threadPinner
+     * @return bool
+     */
+    public function pin(PinnableInterface $threadPinner): bool
+    {
+        return $threadPinner->pin();
+    }
+
+    /**
+     * @param PinnableInterface $threadPinner
+     * @return bool
+     */
+    public function unpin(PinnableInterface $threadPinner): bool
+    {
+        return $threadPinner->unpin();
     }
 }
