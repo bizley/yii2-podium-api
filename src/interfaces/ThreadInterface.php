@@ -52,11 +52,6 @@ interface ThreadInterface
     public function delete(ModelInterface $thread);
 
     /**
-     * @return MovableInterface
-     */
-    public function getThreadMover(): MovableInterface;
-
-    /**
      * Moves thread to different forum.
      * @param MovableInterface $threadMover
      * @param ModelInterface $forum

@@ -47,12 +47,6 @@ class Forum extends PodiumComponent implements ForumInterface
     public $forumSorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
 
     /**
-     * @var string|array|MovableInterface
-     * Component ID, class, configuration array, or instance of MovableInterface.
-     */
-    public $forumMoverHandler = \bizley\podium\api\models\forum\ForumMover::class;
-
-    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -62,7 +56,6 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->forumHandler = Instance::ensure($this->forumHandler, ModelInterface::class);
         $this->forumFormHandler = Instance::ensure($this->forumFormHandler, CategorisedFormInterface::class);
         $this->forumSorterHandler = Instance::ensure($this->forumSorterHandler, SortableInterface::class);
-        $this->forumMoverHandler = Instance::ensure($this->forumMoverHandler, MovableInterface::class);
     }
 
     /**
@@ -165,14 +158,6 @@ class Forum extends PodiumComponent implements ForumInterface
             return false;
         }
         return $forumSorter->sort();
-    }
-
-    /**
-     * @return MovableInterface
-     */
-    public function getForumMover(): MovableInterface
-    {
-        return $this->forumMoverHandler;
     }
 
     /**

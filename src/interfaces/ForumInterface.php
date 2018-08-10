@@ -65,11 +65,6 @@ interface ForumInterface
     public function sort(ModelInterface $category, array $data = []): bool;
 
     /**
-     * @return MovableInterface
-     */
-    public function getForumMover(): MovableInterface;
-
-    /**
      * Moves forum to different category.
      * @param MovableInterface $forumMover
      * @param ModelInterface $category

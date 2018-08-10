@@ -37,12 +37,6 @@ class Thread extends PodiumComponent implements ThreadInterface
     public $threadFormHandler = \bizley\podium\api\models\thread\ThreadForm::class;
 
     /**
-     * @var string|array|MovableInterface
-     * Component ID, class, configuration array, or instance of MovableInterface.
-     */
-    public $threadMoverHandler = \bizley\podium\api\models\thread\ThreadMover::class;
-
-    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init(): void
@@ -51,7 +45,6 @@ class Thread extends PodiumComponent implements ThreadInterface
 
         $this->threadHandler = Instance::ensure($this->threadHandler, ModelInterface::class);
         $this->threadFormHandler = Instance::ensure($this->threadFormHandler, CategorisedFormInterface::class);
-        $this->threadMoverHandler = Instance::ensure($this->threadMoverHandler, MovableInterface::class);
     }
 
     /**
@@ -130,14 +123,6 @@ class Thread extends PodiumComponent implements ThreadInterface
     public function delete(ModelInterface $thread)
     {
         return $thread->delete();
-    }
-
-    /**
-     * @return MovableInterface
-     */
-    public function getThreadMover(): MovableInterface
-    {
-        return $this->threadMoverHandler;
     }
 
     /**
