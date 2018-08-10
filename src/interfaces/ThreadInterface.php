@@ -70,4 +70,16 @@ interface ThreadInterface
      * @return bool
      */
     public function unpin(PinnableInterface $threadPinner): bool;
+
+    /**
+     * @param LockableInterface $threadLocker
+     * @return bool
+     */
+    public function lock(LockableInterface $threadLocker): bool;
+
+    /**
+     * @param LockableInterface $threadLocker
+     * @return bool
+     */
+    public function unlock(LockableInterface $threadLocker): bool;
 }

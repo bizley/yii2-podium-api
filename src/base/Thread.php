@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\CategorisedFormInterface;
+use bizley\podium\api\interfaces\LockableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -154,5 +155,23 @@ class Thread extends PodiumComponent implements ThreadInterface
     public function unpin(PinnableInterface $threadPinner): bool
     {
         return $threadPinner->unpin();
+    }
+
+    /**
+     * @param LockableInterface $threadLocker
+     * @return bool
+     */
+    public function lock(LockableInterface $threadLocker): bool
+    {
+        return $threadLocker->lock();
+    }
+
+    /**
+     * @param LockableInterface $threadLocker
+     * @return bool
+     */
+    public function unlock(LockableInterface $threadLocker): bool
+    {
+        return $threadLocker->unlock();
     }
 }

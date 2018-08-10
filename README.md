@@ -38,8 +38,8 @@
   - [x] update thread
   - [x] delete thread
   - [x] move thread
-  - [ ] pin thread
-  - [ ] lock thread
+  - [x] pin thread
+  - [x] lock thread
 - [ ] Post
 - [ ] Subscription
 - [ ] Poll
