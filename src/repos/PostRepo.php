@@ -14,17 +14,13 @@ use yii\db\ActiveRecord;
  * @property int $category_id
  * @property int $forum_id
  * @property int $thread_id
- * @property string $name
- * @property string $slug
- * @property string $description
- * @property bool $pinned
- * @property bool $locked
- * @property int $posts_count
- * @property int $views_count
- * @property int $created_post_at
- * @property int $updated_post_at
+ * @property string $content
+ * @property bool $edited
+ * @property int $likes
+ * @property int $dislikes
  * @property int $created_at
  * @property int $updated_at
+ * @property int $edited_at
  */
 class PostRepo extends ActiveRecord
 {

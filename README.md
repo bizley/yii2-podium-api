@@ -41,6 +41,12 @@
   - [x] pin thread
   - [x] lock thread
 - [ ] Post
+  - [ ] view post
+  - [ ] list posts
+  - [ ] create post
+  - [ ] update post
+  - [ ] delete post
+  - [ ] move post
 - [ ] Subscription
 - [ ] Poll
 
