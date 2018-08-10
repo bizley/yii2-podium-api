@@ -82,22 +82,6 @@ class ThreadLockerTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testLock(): void
     {
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, function () {

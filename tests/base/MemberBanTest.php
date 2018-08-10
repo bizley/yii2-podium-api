@@ -45,22 +45,6 @@ class MemberBanTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testBan(): void
     {
         Event::on(MemberBan::class, MemberBan::EVENT_BEFORE_BANNING, function () {

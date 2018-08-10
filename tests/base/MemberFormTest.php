@@ -37,22 +37,6 @@ class MemberFormTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testUpdate(): void
     {
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, function () {

@@ -80,22 +80,6 @@ class ThreadMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testMove(): void
     {
         Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, function () {

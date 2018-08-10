@@ -100,22 +100,6 @@ class ForumSorterTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testSort(): void
     {
         Event::on(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, function () {

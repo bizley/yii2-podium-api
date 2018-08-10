@@ -166,4 +166,20 @@ abstract class DbTestCase extends TestCase
         }
         static::$db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
     }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function setUp(): void
+    {
+        $this->fixturesUp();
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function tearDown(): void
+    {
+        $this->fixturesDown();
+    }
 }

@@ -75,22 +75,6 @@ class ThreadTest extends DbTestCase
         ],
     ];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testGetThreadById(): void
     {
         $thread = $this->podium()->thread->getThreadById(1);

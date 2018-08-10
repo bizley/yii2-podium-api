@@ -60,22 +60,6 @@ class ForumFormTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testCreate(): void
     {
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_CREATING, function () {

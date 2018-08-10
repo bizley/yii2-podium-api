@@ -63,22 +63,6 @@ class ForumTest extends DbTestCase
         ],
     ];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testGetForumById(): void
     {
         $forum = $this->podium()->forum->getForumById(1);

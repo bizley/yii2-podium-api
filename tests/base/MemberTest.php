@@ -39,22 +39,6 @@ class MemberTest extends DbTestCase
         ],
     ];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testGetMemberById(): void
     {
         $member = $this->podium()->member->getMemberById(2);

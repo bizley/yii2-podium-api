@@ -67,22 +67,6 @@ class ForumMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testMove(): void
     {
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, function () {

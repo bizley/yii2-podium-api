@@ -64,22 +64,6 @@ class MemberIgnoringTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testIgnore(): void
     {
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, function () {

@@ -64,22 +64,6 @@ class MemberFriendshipTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testBefriend(): void
     {
         Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, function () {

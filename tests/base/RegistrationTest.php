@@ -28,14 +28,6 @@ class RegistrationTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testRegister(): void
     {
         Event::on(Registration::class, Registration::EVENT_BEFORE_REGISTERING, function () {

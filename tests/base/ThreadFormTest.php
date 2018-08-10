@@ -72,22 +72,6 @@ class ThreadFormTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function setUp(): void
-    {
-        $this->fixturesUp();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-    protected function tearDown(): void
-    {
-        $this->fixturesDown();
-    }
-
     public function testCreate(): void
     {
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, function () {
