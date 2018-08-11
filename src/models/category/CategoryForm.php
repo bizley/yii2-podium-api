@@ -54,7 +54,6 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         return [
             [['name', 'visible', 'sort'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique'],
             [['visible'], 'boolean'],
             [['sort'], 'integer'],
         ];

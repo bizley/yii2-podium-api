@@ -9,6 +9,7 @@ use bizley\podium\api\events\RegistrationEvent;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\repos\MemberRepo;
 use Yii;
+use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 
 /**
@@ -31,7 +32,14 @@ class Registration extends MemberRepo implements RegistrationInterface
      */
     public function behaviors(): array
     {
-        return ['timestamp' => TimestampBehavior::class];
+        return [
+            'timestamp' => TimestampBehavior::class,
+            'slug' => [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'username',
+                'ensureUnique' => true,
+            ],
+        ];
     }
 
     /**

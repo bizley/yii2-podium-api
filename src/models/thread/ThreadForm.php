@@ -65,7 +65,6 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         return [
             [['name'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique'],
         ];
     }
 

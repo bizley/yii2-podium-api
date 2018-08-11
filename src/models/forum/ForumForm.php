@@ -64,7 +64,6 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
         return [
             [['name', 'visible', 'sort'], 'required'],
             [['name'], 'string', 'max' => 255],
-            [['name'], 'unique'],
             [['visible'], 'boolean'],
             [['sort'], 'integer'],
         ];

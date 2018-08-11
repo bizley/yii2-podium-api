@@ -46,10 +46,12 @@ class RegistrationTest extends DbTestCase
         $member = MemberRepo::findOne(['username' => 'testname']);
         $this->assertEquals(array_merge($data, [
             'status_id' => MemberStatus::REGISTERED,
+            'slug' => 'testname',
         ]), [
             'user_id' => $member->user_id,
             'username' => $member->username,
             'status_id' => $member->status_id,
+            'slug' => $member->slug,
         ]);
 
         $this->assertArrayHasKey(Registration::EVENT_BEFORE_REGISTERING, $this->eventsRaised);

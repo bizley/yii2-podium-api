@@ -19,6 +19,7 @@ class m170604_094100_create_table_podium_member extends Migration
             'id' => $this->primaryKey(),
             'user_id' => $this->string(255)->notNull()->unique(),
             'username' => $this->string(255)->notNull()->unique(),
+            'slug' => $this->string(255)->notNull()->unique(),
             'status_id' => $statusId,
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),

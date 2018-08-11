@@ -26,6 +26,7 @@ class ThreadMoverTest extends DbTestCase
                 'id' => 1,
                 'user_id' => '1',
                 'username' => 'member',
+                'slug' => 'member',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,

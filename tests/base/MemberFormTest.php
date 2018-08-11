@@ -25,6 +25,7 @@ class MemberFormTest extends DbTestCase
                 'id' => 1,
                 'user_id' => '1',
                 'username' => 'member',
+                'slug' => 'member',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -48,7 +49,9 @@ class MemberFormTest extends DbTestCase
 
         $this->assertTrue($this->podium()->member->edit(MemberForm::findOne(1),  ['username' => 'username-updated']));
 
-        $this->assertNotEmpty(MemberRepo::findOne(['username' => 'username-updated']));
+        $member = MemberRepo::findOne(['username' => 'username-updated']);
+        $this->assertNotEmpty($member);
+        $this->assertEquals('username-updated', $member->slug);
         $this->assertEmpty(MemberRepo::findOne(['username' => 'member']));
 
         $this->assertArrayHasKey(MemberForm::EVENT_BEFORE_EDITING, $this->eventsRaised);

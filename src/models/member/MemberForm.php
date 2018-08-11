@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\repos\MemberRepo;
 use Yii;
 use yii\base\NotSupportedException;
+use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 
 /**
@@ -27,6 +28,11 @@ class MemberForm extends MemberRepo implements ModelFormInterface
     {
         return [
             'timestamp' => TimestampBehavior::class,
+            'slug' => [
+                'class' => SluggableBehavior::class,
+                'attribute' => 'username',
+                'ensureUnique' => true,
+            ],
         ];
     }
 

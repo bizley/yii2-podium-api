@@ -24,6 +24,7 @@ class AccountTest extends AccountTestCase
                 'id' => 10,
                 'user_id' => '10',
                 'username' => 'member',
+                'slug' => 'member',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,
