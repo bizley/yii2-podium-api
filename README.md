@@ -40,13 +40,13 @@
   - [x] move thread
   - [x] pin thread
   - [x] lock thread
-- [ ] Post
-  - [ ] view post
-  - [ ] list posts
-  - [ ] create post
-  - [ ] update post
-  - [ ] delete post
-  - [ ] move post
+- [x] Post
+  - [x] view post
+  - [x] list posts
+  - [x] create post
+  - [x] update post
+  - [x] delete post
+  - [x] move post
 - [ ] Subscription
 - [ ] Poll
 
@@ -57,3 +57,6 @@
 ### TODO:
 
 - Unify all error log names.
+- Deleting post and thread must update counters.
+- Creating post and thread must update counters.
+- Remove uniqueness of names.

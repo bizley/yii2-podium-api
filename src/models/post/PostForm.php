@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models\thread;
+namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
@@ -15,7 +15,7 @@ use yii\behaviors\TimestampBehavior;
 
 /**
  * Class PostForm
- * @package bizley\podium\api\models\thread
+ * @package bizley\podium\api\models\post
  */
 class PostForm extends PostRepo implements CategorisedFormInterface
 {
@@ -144,6 +144,8 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             Yii::error(['post.validate', $this->errors], 'podium');
             return false;
         }
+        $this->edited = true;
+        $this->edited_at = time();
         if (!$this->save(false)) {
             Yii::error(['post.edit', $this->errors], 'podium');
             return false;

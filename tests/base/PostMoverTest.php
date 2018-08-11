@@ -5,17 +5,17 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\forum\Forum;
-use bizley\podium\api\models\thread\ThreadMover;
-use bizley\podium\api\repos\ThreadRepo;
+use bizley\podium\api\models\post\PostMover;
+use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\repos\PostRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
 /**
- * Class ThreadMoverTest
+ * Class PostMoverTest
  * @package bizley\podium\tests\base
  */
-class ThreadMoverTest extends DbTestCase
+class PostMoverTest extends DbTestCase
 {
     /**
      * @var array
@@ -51,15 +51,6 @@ class ThreadMoverTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'author_id' => 1,
-                'name' => 'forum2',
-                'slug' => 'forum2',
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
         ],
         'podium_thread' => [
             [
@@ -69,6 +60,28 @@ class ThreadMoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread1',
                 'slug' => 'thread1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_post' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post1',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -82,20 +95,21 @@ class ThreadMoverTest extends DbTestCase
 
     public function testMove(): void
     {
-        Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, function () {
-            $this->eventsRaised[ThreadMover::EVENT_BEFORE_MOVING] = true;
+        Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, function () {
+            $this->eventsRaised[PostMover::EVENT_BEFORE_MOVING] = true;
         });
-        Event::on(ThreadMover::class, ThreadMover::EVENT_AFTER_MOVING, function () {
-            $this->eventsRaised[ThreadMover::EVENT_AFTER_MOVING] = true;
+        Event::on(PostMover::class, PostMover::EVENT_AFTER_MOVING, function () {
+            $this->eventsRaised[PostMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->move(ThreadMover::findOne(1), Forum::findOne(2)));
-        $thread = ThreadRepo::findOne(1);
-        $this->assertEquals(1, $thread->category_id);
-        $this->assertEquals(2, $thread->forum_id);
+        $this->assertTrue($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2)));
+        $post = PostRepo::findOne(1);
+        $this->assertEquals(1, $post->category_id);
+        $this->assertEquals(1, $post->forum_id);
+        $this->assertEquals(2, $post->thread_id);
 
-        $this->assertArrayHasKey(ThreadMover::EVENT_BEFORE_MOVING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadMover::EVENT_AFTER_MOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostMover::EVENT_BEFORE_MOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostMover::EVENT_AFTER_MOVING, $this->eventsRaised);
     }
 
     public function testMoveEventPreventing(): void
@@ -103,11 +117,11 @@ class ThreadMoverTest extends DbTestCase
         $handler = function ($event) {
             $event->canMove = false;
         };
-        Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);
+        Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->move(ThreadMover::findOne(1), Forum::findOne(2)));
-        $this->assertEquals(1, ThreadRepo::findOne(1)->forum_id);
+        $this->assertFalse($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2)));
+        $this->assertEquals(1, PostRepo::findOne(1)->thread_id);
 
-        Event::off(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);
+        Event::off(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
     }
 }

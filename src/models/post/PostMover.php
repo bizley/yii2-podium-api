@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models\thread;
+namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -15,7 +16,7 @@ use yii\db\Exception;
 
 /**
  * Class PostMover
- * @package bizley\podium\api\models\thread
+ * @package bizley\podium\api\models\post
  */
 class PostMover extends PostRepo implements MovableInterface
 {
