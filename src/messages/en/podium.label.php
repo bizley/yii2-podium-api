@@ -10,6 +10,7 @@ return [
     'forum.sort.order' => 'Forum Sort Order',
     'forum.visible' => 'Forum Visible For Guests',
     'member.username' => 'Username',
+    'post.content' => 'Post Content',
     'registration.user.id' => 'User ID',
     'registration.username' => 'Username',
     'thread.name' => 'Thread Name',
