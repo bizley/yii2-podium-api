@@ -133,8 +133,8 @@ class PostMover extends PostRepo implements MovableInterface
                 throw new Exception('Error while updating new forum counters!');
             }
 
-            if (!$this->save(false)) {
-                Yii::error(['post.move', $this->errors], 'podium');
+            if (!$this->save()) {
+                Yii::error(['Error while moving post', $this->errors], 'podium');
                 throw new Exception('Error while moving post!');
             }
 
@@ -144,11 +144,11 @@ class PostMover extends PostRepo implements MovableInterface
             return true;
 
         } catch (\Throwable $exc) {
-            Yii::error(['post.move.exception', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while moving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['post.move.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['Exception while post moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
         return false;

@@ -52,8 +52,8 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
         }
 
         $this->pinned = true;
-        if (!$this->save(false)) {
-            Yii::error(['thread.pin', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while pinning thread', $this->errors], 'podium');
             return false;
         }
 
@@ -89,8 +89,8 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
         }
 
         $this->pinned = false;
-        if (!$this->save(false)) {
-            Yii::error(['thread.unpin', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while unpinning thread', $this->errors], 'podium');
             return false;
         }
 

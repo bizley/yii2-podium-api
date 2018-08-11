@@ -89,7 +89,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
             return false;
         }
         if (!$this->save()) {
-            Yii::error(['ignore.save', $this->errors], 'podium');
+            Yii::error(['Error while ignoring member', $this->errors], 'podium');
             return false;
         }
         $this->afterIgnore();
@@ -133,11 +133,11 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         }
         try {
             if (!$ignoring->delete()) {
-                Yii::error('unignore.delete', 'podium');
+                Yii::error('Error while unignoring member', 'podium');
                 return false;
             }
         } catch (\Throwable $exc) {
-            Yii::error(['unignore.delete', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return false;
         }
 

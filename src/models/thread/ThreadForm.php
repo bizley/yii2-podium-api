@@ -107,12 +107,8 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['thread.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['thread.create', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while creating thread', $this->errors], 'podium');
             return false;
         }
         $this->afterCreate();
@@ -145,12 +141,8 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['thread.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['thread.edit', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while editing thread', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();

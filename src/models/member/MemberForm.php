@@ -80,12 +80,8 @@ class MemberForm extends MemberRepo implements ModelFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['member.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['member.edit', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while editing member', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();

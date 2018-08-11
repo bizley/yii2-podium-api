@@ -100,12 +100,8 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['category.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['category.create', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while creating category', $this->errors], 'podium');
             return false;
         }
         $this->afterCreate();
@@ -138,12 +134,8 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['category.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['category.edit', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while editing category', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();

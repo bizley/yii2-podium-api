@@ -114,7 +114,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             }
 
             if (!$this->save(false)) {
-                Yii::error(['thread.move', $this->errors], 'podium');
+                Yii::error(['Error while moving thread', $this->errors], 'podium');
                 throw new Exception('Error while moving thread!');
             }
 
@@ -124,11 +124,11 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             return true;
 
         } catch (\Throwable $exc) {
-            Yii::error(['thread.move.exception', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['thread.move.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['Exception while thread moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
         return false;

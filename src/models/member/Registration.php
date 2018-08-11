@@ -85,12 +85,8 @@ class Registration extends MemberRepo implements RegistrationInterface
         if (!$this->beforeRegister()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['register.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['register.save', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while registering member', $this->errors], 'podium');
             return false;
         }
         $this->afterRegister();

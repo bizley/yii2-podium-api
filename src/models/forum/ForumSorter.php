@@ -81,7 +81,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
             return false;
         }
         if (!$this->validate()) {
-            Yii::error(['forum.sort.validate', $this->errors], 'podium');
+            Yii::warning(['Forums sort validation failed', $this->errors], 'podium');
             return false;
         }
         $transaction = Yii::$app->db->beginTransaction();
@@ -100,11 +100,11 @@ class ForumSorter extends ForumRepo implements SortableInterface
             $this->afterSort();
             return true;
         } catch (\Throwable $exc) {
-            Yii::error(['forum.sort', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['forum.sort.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['Exception while forums sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
             return false;
         }

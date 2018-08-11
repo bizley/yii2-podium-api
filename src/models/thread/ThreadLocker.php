@@ -52,8 +52,8 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
         }
 
         $this->locked = true;
-        if (!$this->save(false)) {
-            Yii::error(['thread.lock', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while locking thread', $this->errors], 'podium');
             return false;
         }
 
@@ -89,8 +89,8 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
         }
 
         $this->locked = false;
-        if (!$this->save(false)) {
-            Yii::error(['thread.unlock', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while unlocking thread', $this->errors], 'podium');
             return false;
         }
 

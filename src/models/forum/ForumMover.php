@@ -8,6 +8,7 @@ use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\repos\ForumRepo;
+use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 
@@ -57,8 +58,8 @@ class ForumMover extends ForumRepo implements MovableInterface
         if (!$this->beforeMove()) {
             return false;
         }
-        if (!$this->save(false)) {
-            \Yii::error(['forum.move', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while moving forum', $this->errors], 'podium');
             return false;
         }
         $this->afterMove();

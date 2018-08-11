@@ -102,12 +102,8 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['post.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['post.create', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while creating post', $this->errors], 'podium');
             return false;
         }
         $this->afterCreate();
@@ -140,14 +136,10 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['post.validate', $this->errors], 'podium');
-            return false;
-        }
         $this->edited = true;
         $this->edited_at = time();
-        if (!$this->save(false)) {
-            Yii::error(['post.edit', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while editing post', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();

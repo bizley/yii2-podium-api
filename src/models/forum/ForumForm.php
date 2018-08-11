@@ -110,12 +110,8 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['forum.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['forum.create', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while creating forum', $this->errors], 'podium');
             return false;
         }
         $this->afterCreate();
@@ -148,12 +144,8 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        if (!$this->validate()) {
-            Yii::error(['forum.validate', $this->errors], 'podium');
-            return false;
-        }
-        if (!$this->save(false)) {
-            Yii::error(['forum.edit', $this->errors], 'podium');
+        if (!$this->save()) {
+            Yii::error(['Error while editing forum', $this->errors], 'podium');
             return false;
         }
         $this->afterEdit();

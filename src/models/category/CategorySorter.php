@@ -73,7 +73,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             return false;
         }
         if (!$this->validate()) {
-            Yii::error(['category.sort.validate', $this->errors], 'podium');
+            Yii::warning(['Categories sort validation failed', $this->errors], 'podium');
             return false;
         }
         $transaction = Yii::$app->db->beginTransaction();
@@ -92,11 +92,11 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             $this->afterSort();
             return true;
         } catch (\Throwable $exc) {
-            Yii::error(['category.sort.exception', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while sorting categories', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['category.sort.rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['Exception while categories sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
             return false;
         }

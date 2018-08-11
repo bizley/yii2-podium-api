@@ -92,7 +92,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
             return false;
         }
         if (!$this->save()) {
-            Yii::error(['befriend.save', $this->errors], 'podium');
+            Yii::error(['Error while befriending member', $this->errors], 'podium');
             return false;
         }
         $this->afterBefriend();
@@ -136,11 +136,11 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         }
         try {
             if (!$friendship->delete()) {
-                Yii::error('unfriend.delete', 'podium');
+                Yii::error('Error while unfriending member', 'podium');
                 return false;
             }
         } catch (\Throwable $exc) {
-            Yii::error(['unfriend.delete', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while unfriending member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return false;
         }
 
