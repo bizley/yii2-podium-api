@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
+use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\models\member\Friendship;
 use bizley\podium\api\models\member\Ignoring;
 use bizley\podium\api\models\member\Registration;
@@ -167,12 +168,12 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
-     * @param ModelInterface $member
-     * @return int|false
+     * @param RemovableInterface $memberRemover
+     * @return bool
      */
-    public function delete(ModelInterface $member)
+    public function remove(RemovableInterface $memberRemover): bool
     {
-        return $member->delete();
+        return $memberRemover->remove();
     }
 
     /**

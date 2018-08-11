@@ -42,10 +42,10 @@ interface MemberInterface
     public function register(array $data): bool;
 
     /**
-     * @param ModelInterface $member
-     * @return int|false
+     * @param RemovableInterface $memberRemover
+     * @return bool
      */
-    public function delete(ModelInterface $member);
+    public function remove(RemovableInterface $memberRemover): bool;
 
     /**
      * @param ModelFormInterface $member

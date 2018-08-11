@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\category\Category;
 use bizley\podium\tests\DbTestCase;
 use yii\data\ActiveDataFilter;
 
@@ -79,11 +78,5 @@ class CategoryTest extends DbTestCase
         $categories = $this->podium()->category->getCategories($filter);
         $this->assertEquals(1, $categories->getTotalCount());
         $this->assertEquals([2], $categories->getKeys());
-    }
-
-    public function testDeleteCategory(): void
-    {
-        $this->assertEquals(1, $this->podium()->category->delete(Category::findOne(1)));
-        $this->assertEmpty($this->podium()->category->getCategoryById(1));
     }
 }

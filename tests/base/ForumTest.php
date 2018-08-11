@@ -94,10 +94,4 @@ class ForumTest extends DbTestCase
         $this->assertEquals(1, $forums->getTotalCount());
         $this->assertEquals([2], $forums->getKeys());
     }
-
-    public function testDeleteForum(): void
-    {
-        $this->assertEquals(1, $this->podium()->forum->delete(Forum::findOne(1)));
-        $this->assertEmpty($this->podium()->forum->getForumById(1));
-    }
 }

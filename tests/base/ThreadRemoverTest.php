@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadRemover;
+use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
-use yii\data\ActiveDataFilter;
+use yii\base\Event;
 
 /**
- * Class ThreadTest
+ * Class ThreadRemoverTest
  * @package bizley\podium\tests\base
  */
-class ThreadTest extends DbTestCase
+class ThreadRemoverTest extends DbTestCase
 {
     /**
      * @var array
@@ -63,47 +64,42 @@ class ThreadTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'author_id' => 1,
-                'name' => 'thread2',
-                'slug' => 'thread2',
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
         ],
     ];
 
-    public function testGetThreadById(): void
+    /**
+     * @var array
+     */
+    protected static $eventsRaised = [];
+
+    public function testRemove(): void
     {
-        $thread = $this->podium()->thread->getThreadById(1);
-        $this->assertEquals(1, $thread->getId());
+        Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, function () {
+            static::$eventsRaised[ThreadRemover::EVENT_BEFORE_REMOVING] = true;
+        });
+        Event::on(ThreadRemover::class, ThreadRemover::EVENT_AFTER_REMOVING, function () {
+            static::$eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
+        });
+
+        $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1)));
+
+        $this->assertEmpty(ThreadRepo::findOne(1));
+
+        $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
     }
 
-    public function testNonExistingThread(): void
+    public function testRemoveEventPreventing(): void
     {
-        $this->assertEmpty($this->podium()->thread->getThreadById(999));
-    }
+        $handler = function ($event) {
+            $event->canRemove = false;
+        };
+        Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
 
-    public function testGetThreadsByFilterEmpty(): void
-    {
-        $threads = $this->podium()->thread->getThreads();
-        $this->assertEquals(2, $threads->getTotalCount());
-        $this->assertEquals([1, 2], $threads->getKeys());
-    }
+        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(1)));
 
-    public function testGetThreadsByFilter(): void
-    {
-        $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
-            }
-        ]);
-        $filter->load(['filter' => ['id' => 2]], '');
-        $threads = $this->podium()->thread->getThreads($filter);
-        $this->assertEquals(1, $threads->getTotalCount());
-        $this->assertEquals([2], $threads->getKeys());
+        $this->assertNotEmpty(ThreadRepo::findOne(1));
+
+        Event::off(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 }

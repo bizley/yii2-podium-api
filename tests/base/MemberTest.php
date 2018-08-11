@@ -77,10 +77,4 @@ class MemberTest extends DbTestCase
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
     }
-
-    public function testDeleteMember(): void
-    {
-        $this->assertEquals(1, $this->podium()->category->delete(Member::findOne(2)));
-        $this->assertEmpty($this->podium()->member->getMemberById(2));
-    }
 }

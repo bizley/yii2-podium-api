@@ -5,15 +5,16 @@ declare(strict_types=1);
 namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\post\Post;
+use bizley\podium\api\models\post\PostRemover;
+use bizley\podium\api\repos\PostRepo;
 use bizley\podium\tests\DbTestCase;
-use yii\data\ActiveDataFilter;
+use yii\base\Event;
 
 /**
- * Class PostTest
+ * Class PostRemoverTest
  * @package bizley\podium\tests\base
  */
-class PostTest extends DbTestCase
+class PostRemoverTest extends DbTestCase
 {
     /**
      * @var array
@@ -75,47 +76,42 @@ class PostTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post2',
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
         ],
     ];
 
-    public function testGetPostById(): void
+    /**
+     * @var array
+     */
+    protected static $eventsRaised = [];
+
+    public function testRemove(): void
     {
-        $post = $this->podium()->post->getPostById(1);
-        $this->assertEquals(1, $post->getId());
+        Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, function () {
+            static::$eventsRaised[PostRemover::EVENT_BEFORE_REMOVING] = true;
+        });
+        Event::on(PostRemover::class, PostRemover::EVENT_AFTER_REMOVING, function () {
+            static::$eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
+        });
+
+        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1)));
+
+        $this->assertEmpty(PostRepo::findOne(1));
+
+        $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
     }
 
-    public function testNonExistingPost(): void
+    public function testRemoveEventPreventing(): void
     {
-        $this->assertEmpty($this->podium()->post->getPostById(999));
-    }
+        $handler = function ($event) {
+            $event->canRemove = false;
+        };
+        Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
 
-    public function testGetPostsByFilterEmpty(): void
-    {
-        $posts = $this->podium()->post->getPosts();
-        $this->assertEquals(2, $posts->getTotalCount());
-        $this->assertEquals([1, 2], $posts->getKeys());
-    }
+        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(1)));
 
-    public function testGetPostsByFilter(): void
-    {
-        $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
-            }
-        ]);
-        $filter->load(['filter' => ['id' => 2]], '');
-        $posts = $this->podium()->post->getPosts($filter);
-        $this->assertEquals(1, $posts->getTotalCount());
-        $this->assertEquals([2], $posts->getKeys());
+        $this->assertNotEmpty(PostRepo::findOne(1));
+
+        Event::off(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 }
