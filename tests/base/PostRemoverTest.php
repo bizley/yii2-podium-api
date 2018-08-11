@@ -6,7 +6,9 @@ namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\PostRemover;
+use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\PostRepo;
+use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
@@ -48,7 +50,8 @@ class PostRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
-                'sort' => 8,
+                'threads_count' => 8,
+                'posts_count' => 39,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -61,6 +64,7 @@ class PostRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread1',
                 'slug' => 'thread1',
+                'posts_count' => 16,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -96,6 +100,10 @@ class PostRemoverTest extends DbTestCase
         $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1)));
 
         $this->assertEmpty(PostRepo::findOne(1));
+
+        $this->assertEquals(15, ThreadRepo::findOne(1)->posts_count);
+
+        $this->assertEquals(38, ForumRepo::findOne(1)->posts_count);
 
         $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);

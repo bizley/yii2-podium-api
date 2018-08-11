@@ -6,6 +6,7 @@ namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadRemover;
+use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
@@ -48,7 +49,8 @@ class ThreadRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
-                'sort' => 8,
+                'threads_count' => 5,
+                'posts_count' => 67,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -61,6 +63,7 @@ class ThreadRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread1',
                 'slug' => 'thread1',
+                'posts_count' => 21,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -84,6 +87,10 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1)));
 
         $this->assertEmpty(ThreadRepo::findOne(1));
+
+        $forum = ForumRepo::findOne(1);
+        $this->assertEquals(4, $forum->threads_count);
+        $this->assertEquals(46, $forum->posts_count);
 
         $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
