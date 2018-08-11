@@ -68,6 +68,17 @@ class PostRemoverTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'posts_count' => 1,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
         ],
         'podium_post' => [
             [
@@ -77,6 +88,16 @@ class PostRemoverTest extends DbTestCase
                 'thread_id' => 1,
                 'author_id' => 1,
                 'content' => 'post1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 2,
+                'author_id' => 1,
+                'content' => 'post2',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -121,5 +142,17 @@ class PostRemoverTest extends DbTestCase
         $this->assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
+    }
+
+    public function testRemoveLastOne(): void
+    {
+        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(2)));
+
+        $this->assertEmpty(PostRepo::findOne(2));
+        $this->assertEmpty(ThreadRepo::findOne(2));
+
+        $forum = ForumRepo::findOne(1);
+        $this->assertEquals(38, $forum->posts_count);
+        $this->assertEquals(7, $forum->threads_count);
     }
 }

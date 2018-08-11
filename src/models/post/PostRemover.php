@@ -61,18 +61,11 @@ class PostRemover extends PostRepo implements RemovableInterface
             if (!$thread->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if ($thread->posts_count === 0) { // last post in thread
-                if (!$thread->convert(ThreadRemover::class)->remove()) {
-                    throw new Exception('Error while removing empty thread!');
-                }
-                if (!$thread->getParent()->updateCounters([
-                    'posts_count' => -1,
-                    'threads_count' => -1,
-                ])) {
-                    throw new Exception('Error while updating forum counters!');
-                }
-            } elseif (!$thread->getParent()->updateCounters(['posts_count' => -1])) {
+            if (!$thread->getParent()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating forum counters!');
+            }
+            if ($thread->posts_count === 0 && !$thread->convert(ThreadRemover::class)->remove()) {
+                throw new Exception('Error while removing empty thread!');
             }
 
             $this->afterRemove();

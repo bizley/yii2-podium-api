@@ -56,5 +56,4 @@
 
 ### TODO:
 
-- Deleting post and thread must update counters.
 - Creating post and thread must update counters.
