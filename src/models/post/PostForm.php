@@ -12,6 +12,7 @@ use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 
 /**
  * Class PostForm
@@ -37,10 +38,48 @@ class PostForm extends PostRepo implements CategorisedFormInterface
      */
     public function setThread(ModelInterface $thread): void
     {
+        $this->setThreadModel($thread);
+        $this->setForumModel($thread->getParent());
+
         $this->thread_id = $thread->getId();
-        $forum = $thread->getParent();
-        $this->forum_id = $forum->getId();
-        $this->category_id = $forum->getParent()->getId();
+        $this->forum_id = $this->getForumModel()->getId();
+        $this->category_id = $this->getForumModel()->getParent()->getId();
+    }
+
+    private $_thread;
+
+    /**
+     * @param ModelInterface $thread
+     */
+    public function setThreadModel(ModelInterface $thread): void
+    {
+        $this->_thread = $thread;
+    }
+
+    /**
+     * @return ModelInterface
+     */
+    public function getThreadModel(): ModelInterface
+    {
+        return $this->_thread;
+    }
+
+    private $_forum;
+
+    /**
+     * @param ModelInterface $forum
+     */
+    public function setForumModel(ModelInterface $forum): void
+    {
+        $this->_forum = $forum;
+    }
+
+    /**
+     * @return ModelInterface
+     */
+    public function getForumModel(): ModelInterface
+    {
+        return $this->_forum;
     }
 
     /**
@@ -102,12 +141,33 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->save()) {
-            Yii::error(['Error while creating post', $this->errors], 'podium');
-            return false;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$this->getThreadModel()->updateCounters(['posts_count' => 1])) {
+                throw new Exception('Error while updating thread counters!');
+            }
+            if (!$this->getForumModel()->updateCounters(['posts_count' => 1])) {
+                throw new Exception('Error while updating forum counters!');
+            }
+
+            if (!$this->save()) {
+                Yii::error(['Error while creating post', $this->errors], 'podium');
+                return false;
+            }
+            $this->afterCreate();
+
+            $transaction->commit();
+            return true;
+
+        } catch (\Throwable $exc) {
+            Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            try {
+                $transaction->rollBack();
+            } catch (\Throwable $excTrans) {
+                Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+            }
         }
-        $this->afterCreate();
-        return true;
+        return false;
     }
 
     public function afterCreate(): void

@@ -8,6 +8,7 @@ use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\db\Exception;
@@ -50,32 +51,28 @@ class PostRemover extends PostRepo implements RemovableInterface
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            if ($this->delete() === false) {
+                Yii::error('Error while deleting post', 'podium');
+                throw new Exception('Error while deleting post!');
+            }
+
             $thread = $this->getThreadModel();
 
-            if (!$thread->updateCounters([
-                'posts_count' => -1,
-            ])) {
+            if (!$thread->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if ($thread->posts_count === 1) { // last post in thread
+            if ($thread->posts_count === 0) { // last post in thread
+                if (!$thread->convert(ThreadRemover::class)->remove()) {
+                    throw new Exception('Error while removing empty thread!');
+                }
                 if (!$thread->getParent()->updateCounters([
                     'posts_count' => -1,
                     'threads_count' => -1,
                 ])) {
                     throw new Exception('Error while updating forum counters!');
                 }
-                if (!$thread->remove()) {
-                    throw new Exception('Error while removing empty thread!');
-                }
-            } elseif (!$thread->getParent()->updateCounters([
-                'posts_count' => -1,
-            ])) {
+            } elseif (!$thread->getParent()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating forum counters!');
-            }
-
-            if ($this->delete() === false) {
-                Yii::error('Error while deleting post', 'podium');
-                throw new Exception('Error while deleting post!');
             }
 
             $this->afterRemove();

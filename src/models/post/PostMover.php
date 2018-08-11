@@ -8,6 +8,7 @@ use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -101,41 +102,26 @@ class PostMover extends PostRepo implements MovableInterface
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->getOldThreadModel()->updateCounters([
-                'posts_count' => -1,
-            ])) {
-                throw new Exception('Error while updating old thread counters!');
-            }
-            if ($this->getOldThreadModel()->posts_count === 1) { // last post in thread
-                if (!$this->getOldThreadModel()->delete()) {
-                    throw new Exception('Error while deleting old empty thread!');
-                }
-                if (!$this->getOldThreadModel()->getParent()->updateCounters([
-                    'posts_count' => -1,
-                    'threads_count' => -1,
-                ])) {
-                    throw new Exception('Error while updating old forum counters!');
-                }
-            } elseif (!$this->getOldThreadModel()->getParent()->updateCounters([
-                'posts_count' => -1,
-            ])) {
-                throw new Exception('Error while updating old forum counters!');
-            }
-
-            if (!$this->getNewThreadModel()->updateCounters([
-                'posts_count' => 1,
-            ])) {
-                throw new Exception('Error while updating new thread counters!');
-            }
-            if (!$this->getNewThreadModel()->getParent()->updateCounters([
-                'posts_count' => 1,
-            ])) {
-                throw new Exception('Error while updating new forum counters!');
-            }
-
             if (!$this->save()) {
                 Yii::error(['Error while moving post', $this->errors], 'podium');
                 throw new Exception('Error while moving post!');
+            }
+
+            if (!$this->getOldThreadModel()->updateCounters(['posts_count' => -1])) {
+                throw new Exception('Error while updating old thread counters!');
+            }
+            if (!$this->getOldThreadModel()->getParent()->updateCounters(['posts_count' => -1])) {
+                throw new Exception('Error while updating old forum counters!');
+            }
+            if ($this->getOldThreadModel()->posts_count === 0 && !$this->getOldThreadModel()->convert(ThreadRemover::class)->remove()) {
+                throw new Exception('Error while deleting old empty thread!');
+            }
+
+            if (!$this->getNewThreadModel()->updateCounters(['posts_count' => 1])) {
+                throw new Exception('Error while updating new thread counters!');
+            }
+            if (!$this->getNewThreadModel()->getParent()->updateCounters(['posts_count' => 1])) {
+                throw new Exception('Error while updating new forum counters!');
             }
 
             $this->afterMove();

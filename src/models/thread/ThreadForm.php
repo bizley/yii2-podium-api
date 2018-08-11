@@ -13,6 +13,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 
 /**
  * Class ThreadForm
@@ -38,8 +39,28 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
      */
     public function setForum(ModelInterface $forum): void
     {
+        $this->setForumModel($forum);
+
         $this->forum_id = $forum->getId();
         $this->category_id = $forum->getParent()->getId();
+    }
+
+    private $_forum;
+
+    /**
+     * @param ModelInterface $forum
+     */
+    public function setForumModel(ModelInterface $forum): void
+    {
+        $this->_forum = $forum;
+    }
+
+    /**
+     * @return ModelInterface
+     */
+    public function getForumModel(): ModelInterface
+    {
+        return $this->_forum;
     }
 
     /**
@@ -106,12 +127,30 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return false;
         }
-        if (!$this->save()) {
-            Yii::error(['Error while creating thread', $this->errors], 'podium');
-            return false;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$this->getForumModel()->updateCounters(['posts_count' => 1])) {
+                throw new Exception('Error while updating forum counters!');
+            }
+
+            if (!$this->save()) {
+                Yii::error(['Error while creating thread', $this->errors], 'podium');
+                return false;
+            }
+            $this->afterCreate();
+
+            $transaction->commit();
+            return true;
+
+        } catch (\Throwable $exc) {
+            Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            try {
+                $transaction->rollBack();
+            } catch (\Throwable $excTrans) {
+                Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+            }
         }
-        $this->afterCreate();
-        return true;
+        return false;
     }
 
     public function afterCreate(): void

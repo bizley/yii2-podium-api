@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models;
 
 use bizley\podium\api\interfaces\ModelInterface;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -61,5 +62,24 @@ trait ModelTrait
         }
 
         return $dataProvider;
+    }
+
+    /**
+     * @param string $targetClass
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function convert(string $targetClass)
+    {
+        $targetModel = new $targetClass;
+
+        if (static::tableName() !== $targetModel::tableName()) {
+            throw new InvalidConfigException('You can only convert object extending the same repository.');
+        }
+
+        static::populateRecord($targetModel, $this->getOldAttributes());
+        $targetModel->afterFind();
+
+        return $targetModel;
     }
 }

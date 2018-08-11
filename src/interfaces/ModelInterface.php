@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -35,11 +36,6 @@ interface ModelInterface
     public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * @return int|false
-     */
-    public function delete();
-
-    /**
      * @return ModelInterface
      */
     public function getParent(): ModelInterface;
@@ -50,4 +46,11 @@ interface ModelInterface
      * @return bool whether the saving is successful
      */
     public function updateCounters($counters); // BC declaration
+
+    /**
+     * @param string $targetClass
+     * @return mixed
+     * @throws InvalidConfigException
+     */
+    public function convert(string $targetClass);
 }
