@@ -45,10 +45,10 @@ interface CategoryInterface
     public function edit(ModelFormInterface $categoryForm, array $data): bool;
 
     /**
-     * @param ModelInterface $category
-     * @return int|false
+     * @param RemovableInterface $categoryRemover
+     * @return bool
      */
-    public function delete(ModelInterface $category);
+    public function remove(RemovableInterface $categoryRemover): bool;
 
     /**
      * @return SortableInterface

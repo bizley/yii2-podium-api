@@ -46,10 +46,10 @@ interface PostInterface
     public function edit(ModelFormInterface $postForm, array $data): bool;
 
     /**
-     * @param ModelInterface $post
-     * @return int|false
+     * @param RemovableInterface $postRemover
+     * @return bool
      */
-    public function delete(ModelInterface $post);
+    public function remove(RemovableInterface $postRemover): bool;
 
     /**
      * Moves post to different thread.

@@ -46,10 +46,10 @@ interface ForumInterface
     public function edit(ModelFormInterface $forumForm, array $data): bool;
 
     /**
-     * @param ModelInterface $forum
-     * @return int|false
+     * @param RemovableInterface $forumRemover
+     * @return bool
      */
-    public function delete(ModelInterface $forum);
+    public function remove(RemovableInterface $forumRemover): bool;
 
     /**
      * @return SortableInterface

@@ -10,6 +10,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -128,12 +129,12 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * @param ModelInterface $forum
-     * @return int|false
+     * @param RemovableInterface $forumRemover
+     * @return bool
      */
-    public function delete(ModelInterface $forum)
+    public function remove(RemovableInterface $forumRemover): bool
     {
-        return $forum->delete();
+        return $forumRemover->remove();
     }
 
     /**

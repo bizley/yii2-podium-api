@@ -11,6 +11,7 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\PinnableInterface;
+use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -119,12 +120,12 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
-     * @param ModelInterface $thread
-     * @return int|false
+     * @param RemovableInterface $threadRemover
+     * @return bool
      */
-    public function delete(ModelInterface $thread)
+    public function remove(RemovableInterface $threadRemover): bool
     {
-        return $thread->delete();
+        return $threadRemover->remove();
     }
 
     /**

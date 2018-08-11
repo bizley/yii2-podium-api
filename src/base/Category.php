@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -123,12 +124,12 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
-     * @param ModelInterface $category
-     * @return int|false
+     * @param RemovableInterface $categoryRemover
+     * @return bool
      */
-    public function delete(ModelInterface $category)
+    public function remove(RemovableInterface $categoryRemover): bool
     {
-        return $category->delete();
+        return $categoryRemover->remove();
     }
 
     /**

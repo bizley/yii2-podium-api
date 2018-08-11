@@ -14,7 +14,7 @@ use yii\base\Event;
 class MoveEvent extends Event
 {
     /**
-     * @var bool whether models can be sorted
+     * @var bool whether model can be moved
      */
     public $canMove = true;
 

@@ -46,10 +46,10 @@ interface ThreadInterface
     public function edit(ModelFormInterface $threadForm, array $data): bool;
 
     /**
-     * @param ModelInterface $thread
-     * @return int|false
+     * @param RemovableInterface $threadRemover
+     * @return bool
      */
-    public function delete(ModelInterface $thread);
+    public function remove(RemovableInterface $threadRemover): bool;
 
     /**
      * Moves thread to different forum.
