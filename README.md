@@ -24,6 +24,7 @@
   - [x] update category
   - [x] delete category
   - [x] sort categories
+  - [ ] archive category
 - [x] Forum
   - [x] view forum
   - [x] list forums
@@ -32,6 +33,7 @@
   - [x] delete forum
   - [x] sort forums
   - [x] move forum
+  - [ ] archive forum
 - [x] Thread
   - [x] view thread
   - [x] list threads
@@ -43,6 +45,7 @@
   - [x] lock thread
   - [ ] thread viewer
   - [ ] subscribe thread
+  - [ ] archive thread
 - [x] Post
   - [x] view post
   - [x] list posts
@@ -51,6 +54,7 @@
   - [x] delete post
   - [x] move post
   - [ ] like post
+  - [ ] archive post
 - [ ] Subscription
 - [ ] Poll
 - [ ] Message

@@ -23,6 +23,7 @@ use yii\db\ActiveRecord;
  * @property int $updated_post_at
  * @property int $created_at
  * @property int $updated_at
+ * @property bool $archived
  */
 class ThreadRepo extends ActiveRecord
 {

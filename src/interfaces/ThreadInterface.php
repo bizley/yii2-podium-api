@@ -82,4 +82,16 @@ interface ThreadInterface
      * @return bool
      */
     public function unlock(LockableInterface $threadLocker): bool;
+
+    /**
+     * @param ArchivableInterface $threadArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $threadArchiver): bool;
+
+    /**
+     * @param ArchivableInterface $threadArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $threadArchiver): bool;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LockableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -174,5 +175,23 @@ class Thread extends PodiumComponent implements ThreadInterface
     public function unlock(LockableInterface $threadLocker): bool
     {
         return $threadLocker->unlock();
+    }
+
+    /**
+     * @param ArchivableInterface $threadArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $threadArchiver): bool
+    {
+        return $threadArchiver->archive();
+    }
+
+    /**
+     * @param ArchivableInterface $threadArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $threadArchiver): bool
+    {
+        return $threadArchiver->revive();
     }
 }

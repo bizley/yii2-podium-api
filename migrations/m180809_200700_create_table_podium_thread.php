@@ -28,6 +28,7 @@ class m180809_200700_create_table_podium_thread extends Migration
             'updated_post_at' => $this->integer(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
+            'archived' => $this->boolean()->notNull()->defaultValue(false),
         ], $tableOptions);
 
         $this->addForeignKey(
