@@ -8,6 +8,7 @@ use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
@@ -113,8 +114,16 @@ class PostMover extends PostRepo implements MovableInterface
             if (!$this->getOldThreadModel()->getParent()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating old forum counters!');
             }
-            if ($this->getOldThreadModel()->posts_count === 0 && !$this->getOldThreadModel()->convert(ThreadRemover::class)->remove()) {
-                throw new Exception('Error while deleting old empty thread!');
+            if ($this->getOldThreadModel()->posts_count === 0) {
+                $threadArchiver = $this->getOldThreadModel()->convert(ThreadArchiver::class);
+                if (!$threadArchiver->archive()) {
+                    throw new Exception('Error while archiving old empty thread!');
+                }
+                $threadRemover = $this->getOldThreadModel()->convert(ThreadRemover::class);
+                $threadRemover->archived = true;
+                if (!$threadRemover->remove()) {
+                    throw new Exception('Error while deleting old empty thread!');
+                }
             }
 
             if (!$this->getNewThreadModel()->updateCounters(['posts_count' => 1])) {

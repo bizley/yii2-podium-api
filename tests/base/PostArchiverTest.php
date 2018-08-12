@@ -68,6 +68,17 @@ class PostArchiverTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'posts_count' => 1,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
         ],
         'podium_post' => [
             [
@@ -91,6 +102,17 @@ class PostArchiverTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
                 'archived' => true,
+            ],
+            [
+                'id' => 3,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 2,
+                'author_id' => 1,
+                'content' => 'post3',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => false,
             ],
         ],
     ];
@@ -140,6 +162,14 @@ class PostArchiverTest extends DbTestCase
     public function testAlreadyArchived(): void
     {
         $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(2)));
+    }
+
+    public function testArchiveLastOne(): void
+    {
+        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(3)));
+
+        $this->assertEquals(true, PostRepo::findOne(3)->archived);
+        $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
     }
 
     public function testRevive(): void

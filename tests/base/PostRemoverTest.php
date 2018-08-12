@@ -6,7 +6,6 @@ namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\PostRemover;
-use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
@@ -75,9 +74,10 @@ class PostRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread2',
                 'slug' => 'thread2',
-                'posts_count' => 1,
+                'posts_count' => 0,
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
             ],
         ],
         'podium_post' => [
@@ -90,16 +90,29 @@ class PostRemoverTest extends DbTestCase
                 'content' => 'post1',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
             ],
             [
                 'id' => 2,
                 'category_id' => 1,
                 'forum_id' => 1,
-                'thread_id' => 2,
+                'thread_id' => 1,
                 'author_id' => 1,
                 'content' => 'post2',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => false,
+            ],
+            [
+                'id' => 3,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 2,
+                'author_id' => 1,
+                'content' => 'post3',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => true,
             ],
         ],
     ];
@@ -122,10 +135,6 @@ class PostRemoverTest extends DbTestCase
 
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertEquals(15, ThreadRepo::findOne(1)->posts_count);
-
-        $this->assertEquals(38, ForumRepo::findOne(1)->posts_count);
-
         $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
     }
@@ -146,13 +155,9 @@ class PostRemoverTest extends DbTestCase
 
     public function testRemoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(2)));
+        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(3)));
 
-        $this->assertEmpty(PostRepo::findOne(2));
+        $this->assertEmpty(PostRepo::findOne(3));
         $this->assertEmpty(ThreadRepo::findOne(2));
-
-        $forum = ForumRepo::findOne(1);
-        $this->assertEquals(38, $forum->posts_count);
-        $this->assertEquals(7, $forum->threads_count);
     }
 }
