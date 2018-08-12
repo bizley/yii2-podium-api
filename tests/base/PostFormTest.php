@@ -185,7 +185,7 @@ class PostFormTest extends DbTestCase
 
         $this->assertEquals(2, ThreadRepo::findOne(1)->posts_count);
         $this->assertEquals(3, ForumRepo::findOne(1)->posts_count);
-        
+
         $this->assertArrayHasKey(PostForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
         $this->assertArrayHasKey(PostForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }

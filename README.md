@@ -16,6 +16,7 @@
   - [x] update member
   - [x] delete member
   - [x] ban member
+  - [ ] member profile
 - [x] Category
   - [x] view category
   - [x] list categories
@@ -40,6 +41,8 @@
   - [x] move thread
   - [x] pin thread
   - [x] lock thread
+  - [ ] thread viewer
+  - [ ] subscribe thread
 - [x] Post
   - [x] view post
   - [x] list posts
@@ -47,8 +50,13 @@
   - [x] update post
   - [x] delete post
   - [x] move post
+  - [ ] like post
 - [ ] Subscription
 - [ ] Poll
+- [ ] Message
+- [ ] Activity
+- [ ] Rank
+- [ ] Group
 
 ### NOTES:
 
@@ -56,4 +64,3 @@
 
 ### TODO:
 
-- Creating post and thread must update counters.

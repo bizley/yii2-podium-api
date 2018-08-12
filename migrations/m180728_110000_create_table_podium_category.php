@@ -25,7 +25,11 @@ class m180728_110000_create_table_podium_category extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
-        $this->addForeignKey('fk-podium_category-author_id', '{{%podium_category}}', 'author_id', '{{%podium_member}}', 'id', 'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_category-author_id',
+            '{{%podium_category}}', 'author_id',
+            '{{%podium_member}}', 'id',
+            'NO ACTION', 'CASCADE');
     }
 
     public function down(): void

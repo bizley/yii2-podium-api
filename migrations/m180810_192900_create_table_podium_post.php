@@ -28,10 +28,26 @@ class m180810_192900_create_table_podium_post extends Migration
             'edited_at' => $this->integer(),
         ], $tableOptions);
 
-        $this->addForeignKey('fk-podium_post-author_id', '{{%podium_post}}', 'author_id', '{{%podium_member}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_post-category_id', '{{%podium_post}}', 'category_id', '{{%podium_category}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_post-forum_id', '{{%podium_post}}', 'forum_id', '{{%podium_forum}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_post-thread_id', '{{%podium_post}}', 'thread_id', '{{%podium_thread}}', 'id', 'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_post-author_id',
+            '{{%podium_post}}', 'author_id',
+            '{{%podium_member}}', 'id',
+            'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_post-category_id',
+            '{{%podium_post}}', 'category_id',
+            '{{%podium_category}}', 'id',
+            'CASCADE', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_post-forum_id',
+            '{{%podium_post}}', 'forum_id',
+            '{{%podium_forum}}', 'id',
+            'CASCADE', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_post-thread_id',
+            '{{%podium_post}}', 'thread_id',
+            '{{%podium_thread}}', 'id',
+            'CASCADE', 'CASCADE');
     }
 
     public function down(): void

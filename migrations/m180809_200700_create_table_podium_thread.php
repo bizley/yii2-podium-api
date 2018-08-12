@@ -30,9 +30,21 @@ class m180809_200700_create_table_podium_thread extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
-        $this->addForeignKey('fk-podium_thread-author_id', '{{%podium_thread}}', 'author_id', '{{%podium_member}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_thread-category_id', '{{%podium_thread}}', 'category_id', '{{%podium_category}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_thread-forum_id', '{{%podium_thread}}', 'forum_id', '{{%podium_forum}}', 'id', 'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_thread-author_id',
+            '{{%podium_thread}}', 'author_id',
+            '{{%podium_member}}', 'id',
+            'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_thread-category_id',
+            '{{%podium_thread}}', 'category_id',
+            '{{%podium_category}}', 'id',
+            'CASCADE', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_thread-forum_id',
+            '{{%podium_thread}}', 'forum_id',
+            '{{%podium_forum}}', 'id',
+            'CASCADE', 'CASCADE');
     }
 
     public function down(): void

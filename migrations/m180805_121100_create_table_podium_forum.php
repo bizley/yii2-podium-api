@@ -28,8 +28,16 @@ class m180805_121100_create_table_podium_forum extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
-        $this->addForeignKey('fk-podium_forum-author_id', '{{%podium_forum}}', 'author_id', '{{%podium_member}}', 'id', 'NO ACTION', 'CASCADE');
-        $this->addForeignKey('fk-podium_forum-category_id', '{{%podium_forum}}', 'category_id', '{{%podium_category}}', 'id', 'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_forum-author_id',
+            '{{%podium_forum}}', 'author_id',
+            '{{%podium_member}}', 'id',
+            'NO ACTION', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_forum-category_id',
+            '{{%podium_forum}}', 'category_id',
+            '{{%podium_category}}', 'id',
+            'CASCADE', 'CASCADE');
     }
 
     public function down(): void
