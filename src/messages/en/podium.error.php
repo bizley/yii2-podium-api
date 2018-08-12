@@ -8,5 +8,6 @@ return [
     'target.not.befriended' => 'Target is not befriended.',
     'target.not.ignored' => 'Target is not ignored.',
     'thread.already.archived' => 'Thread is already archived.',
+    'thread.must.be.archived' => 'Thread must be archived first.',
     'thread.not.archived' => 'Thread is not archived.',
 ];

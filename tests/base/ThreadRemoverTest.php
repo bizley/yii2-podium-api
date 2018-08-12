@@ -6,7 +6,7 @@ namespace bizley\podium\tests\base;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadRemover;
-use bizley\podium\api\repos\ForumRepo;
+use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
@@ -49,8 +49,6 @@ class ThreadRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
-                'threads_count' => 5,
-                'posts_count' => 67,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -63,7 +61,30 @@ class ThreadRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread1',
                 'slug' => 'thread1',
-                'posts_count' => 21,
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => true,
+            ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => false,
+            ],
+        ],
+        'podium_post' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post1',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -87,10 +108,7 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1)));
 
         $this->assertEmpty(ThreadRepo::findOne(1));
-
-        $forum = ForumRepo::findOne(1);
-        $this->assertEquals(4, $forum->threads_count);
-        $this->assertEquals(46, $forum->posts_count);
+        $this->assertEmpty(PostRepo::findOne(1));
 
         $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
@@ -106,7 +124,14 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(1)));
 
         $this->assertNotEmpty(ThreadRepo::findOne(1));
+        $this->assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
+    }
+
+    public function testNonArchived(): void
+    {
+        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(2)));
+        $this->assertNotEmpty(ThreadRepo::findOne(2));
     }
 }
