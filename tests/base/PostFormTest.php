@@ -8,7 +8,9 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\post\PostForm;
 use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\PostRepo;
+use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
@@ -50,6 +52,7 @@ class PostFormTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
+                'posts_count' => 3,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -62,6 +65,7 @@ class PostFormTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'thread1',
                 'slug' => 'thread1',
+                'posts_count' => 2,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -119,6 +123,9 @@ class PostFormTest extends DbTestCase
             'edited_at' => $post->edited_at,
         ]);
 
+        $this->assertEquals(3, ThreadRepo::findOne(1)->posts_count);
+        $this->assertEquals(4, ForumRepo::findOne(1)->posts_count);
+
         $this->assertArrayHasKey(PostForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
         $this->assertArrayHasKey(PostForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
@@ -134,6 +141,9 @@ class PostFormTest extends DbTestCase
         $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
 
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-new']));
+
+        $this->assertEquals(2, ThreadRepo::findOne(1)->posts_count);
+        $this->assertEquals(3, ForumRepo::findOne(1)->posts_count);
 
         Event::off(PostForm::class, PostForm::EVENT_BEFORE_CREATING, $handler);
     }
@@ -173,6 +183,9 @@ class PostFormTest extends DbTestCase
         ]);
         $this->assertEmpty(PostRepo::findOne(['content' => 'post1']));
 
+        $this->assertEquals(2, ThreadRepo::findOne(1)->posts_count);
+        $this->assertEquals(3, ForumRepo::findOne(1)->posts_count);
+        
         $this->assertArrayHasKey(PostForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
         $this->assertArrayHasKey(PostForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }

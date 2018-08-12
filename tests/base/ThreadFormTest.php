@@ -8,6 +8,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\thread\ThreadForm;
+use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
@@ -50,6 +51,7 @@ class ThreadFormTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
+                'threads_count' => 5,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -103,6 +105,8 @@ class ThreadFormTest extends DbTestCase
             'posts_count' => $thread->posts_count,
         ]);
 
+        $this->assertEquals(6, ForumRepo::findOne(1)->threads_count);
+
         $this->assertArrayHasKey(ThreadForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
@@ -118,6 +122,8 @@ class ThreadFormTest extends DbTestCase
         $this->assertFalse($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1)));
 
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-new']));
+
+        $this->assertEquals(5, ForumRepo::findOne(1)->threads_count);
 
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
     }
@@ -152,6 +158,8 @@ class ThreadFormTest extends DbTestCase
             'posts_count' => $thread->posts_count,
         ]);
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread1']));
+
+        $this->assertEquals(5, ForumRepo::findOne(1)->threads_count);
 
         $this->assertArrayHasKey(ThreadForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_EDITING, $this->eventsRaised);

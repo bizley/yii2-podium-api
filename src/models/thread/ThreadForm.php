@@ -129,7 +129,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->getForumModel()->updateCounters(['posts_count' => 1])) {
+            if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
                 throw new Exception('Error while updating forum counters!');
             }
 
