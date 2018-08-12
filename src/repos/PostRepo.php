@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  * @property int $edited_at
+ * @property bool $archived
  */
 class PostRepo extends ActiveRecord
 {

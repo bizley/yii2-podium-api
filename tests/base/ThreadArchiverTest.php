@@ -142,7 +142,7 @@ class ThreadArchiverTest extends DbTestCase
 
         $this->assertTrue($this->podium()->thread->revive(ThreadArchiver::findOne(2)));
 
-        $this->assertEquals(false, ThreadRepo::findOne(1)->archived);
+        $this->assertEquals(false, ThreadRepo::findOne(2)->archived);
 
         $forum = ForumRepo::findOne(1);
         $this->assertEquals(6, $forum->threads_count);

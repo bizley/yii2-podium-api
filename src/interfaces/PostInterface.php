@@ -58,4 +58,16 @@ interface PostInterface
      * @return bool
      */
     public function move(MovableInterface $postMover, ModelInterface $thread): bool;
+
+    /**
+     * @param ArchivableInterface $postArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $postArchiver): bool;
+
+    /**
+     * @param ArchivableInterface $postArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $postArchiver): bool;
 }

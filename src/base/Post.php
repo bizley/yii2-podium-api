@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
@@ -132,5 +133,23 @@ class Post extends PodiumComponent implements PostInterface
         $postMover->setThread($thread);
 
         return $postMover->move();
+    }
+
+    /**
+     * @param ArchivableInterface $postArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $postArchiver): bool
+    {
+        return $postArchiver->archive();
+    }
+
+    /**
+     * @param ArchivableInterface $postArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $postArchiver): bool
+    {
+        return $postArchiver->revive();
     }
 }

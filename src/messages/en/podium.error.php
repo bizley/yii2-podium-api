@@ -3,6 +3,8 @@
 return [
     'member.already.active' => 'Member is already active.',
     'member.already.banned' => 'Member is already banned.',
+    'post.already.archived' => 'Post is already archived.',
+    'post.not.archived' => 'Post is not archived.',
     'target.already.befriended' => 'Target is already befriended.',
     'target.already.ignored' => 'Target is already ignored.',
     'target.not.befriended' => 'Target is not befriended.',
