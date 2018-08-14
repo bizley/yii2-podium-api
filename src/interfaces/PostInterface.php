@@ -70,4 +70,30 @@ interface PostInterface
      * @return bool
      */
     public function revive(ArchivableInterface $postArchiver): bool;
+
+    /**
+     * @return LikingInterface
+     */
+    public function getLiking(): LikingInterface;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbUp(MembershipInterface $member, ModelInterface $post): bool;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbDown(MembershipInterface $member, ModelInterface $post): bool;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbReset(MembershipInterface $member, ModelInterface $post): bool;
 }

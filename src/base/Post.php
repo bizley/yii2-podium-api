@@ -6,6 +6,7 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
+use bizley\podium\api\interfaces\LikingInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -35,6 +36,12 @@ class Post extends PodiumComponent implements PostInterface
     public $postFormHandler = \bizley\podium\api\models\post\PostForm::class;
 
     /**
+     * @var string|array|LikingInterface
+     * Component ID, class, configuration array, or instance of LikingInterface.
+     */
+    public $likingHandler = Liking::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init()
@@ -43,6 +50,7 @@ class Post extends PodiumComponent implements PostInterface
 
         $this->postHandler = Instance::ensure($this->postHandler, ModelInterface::class);
         $this->postFormHandler = Instance::ensure($this->postFormHandler, CategorisedFormInterface::class);
+        $this->likingHandler = Instance::ensure($this->likingHandler, LikingInterface::class);
     }
 
     /**
@@ -151,5 +159,52 @@ class Post extends PodiumComponent implements PostInterface
     public function revive(ArchivableInterface $postArchiver): bool
     {
         return $postArchiver->revive();
+    }
+
+    /**
+     * @return LikingInterface
+     */
+    public function getLiking(): LikingInterface
+    {
+        return $this->likingHandler;
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbUp(MembershipInterface $member, ModelInterface $post): bool
+    {
+        $liking = $this->getLiking();
+        $liking->setMember($member);
+        $liking->setPost($post);
+        return $liking->thumbUp();
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbDown(MembershipInterface $member, ModelInterface $post): bool
+    {
+        $liking = $this->getLiking();
+        $liking->setMember($member);
+        $liking->setPost($post);
+        return $liking->thumbDown();
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbReset(MembershipInterface $member, ModelInterface $post): bool
+    {
+        $liking = $this->getLiking();
+        $liking->setMember($member);
+        $liking->setPost($post);
+        return $liking->thumbReset();
     }
 }
