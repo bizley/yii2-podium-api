@@ -18,6 +18,7 @@ use yii\db\ActiveRecord;
  * @property int $sort
  * @property int $created_at
  * @property int $updated_at
+ * @property bool $archived
  */
 class CategoryRepo extends ActiveRecord
 {

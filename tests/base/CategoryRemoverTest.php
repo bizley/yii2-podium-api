@@ -7,6 +7,9 @@ namespace bizley\podium\tests\base;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\CategoryRemover;
 use bizley\podium\api\repos\CategoryRepo;
+use bizley\podium\api\repos\ForumRepo;
+use bizley\podium\api\repos\PostRepo;
+use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
@@ -39,6 +42,51 @@ class CategoryRemoverTest extends DbTestCase
                 'slug' => 'category1',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
+            ],
+            [
+                'id' => 2,
+                'author_id' => 1,
+                'name' => 'category2',
+                'slug' => 'category2',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => false,
+            ],
+        ],
+        'podium_forum' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'author_id' => 1,
+                'name' => 'forum1',
+                'slug' => 'forum1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_thread' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread1',
+                'slug' => 'thread1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_post' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post1',
+                'created_at' => 1,
+                'updated_at' => 1,
             ],
         ],
     ];
@@ -60,6 +108,9 @@ class CategoryRemoverTest extends DbTestCase
         $this->assertTrue($this->podium()->category->remove(CategoryRemover::findOne(1)));
 
         $this->assertEmpty(CategoryRepo::findOne(1));
+        $this->assertEmpty(ForumRepo::findOne(1));
+        $this->assertEmpty(ThreadRepo::findOne(1));
+        $this->assertEmpty(PostRepo::findOne(1));
 
         $this->assertArrayHasKey(CategoryRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(CategoryRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
@@ -75,7 +126,16 @@ class CategoryRemoverTest extends DbTestCase
         $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(1)));
 
         $this->assertNotEmpty(CategoryRepo::findOne(1));
+        $this->assertNotEmpty(ForumRepo::findOne(1));
+        $this->assertNotEmpty(ThreadRepo::findOne(1));
+        $this->assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
+    }
+
+    public function testNonArchived(): void
+    {
+        $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(2)));
+        $this->assertNotEmpty(CategoryRepo::findOne(2));
     }
 }

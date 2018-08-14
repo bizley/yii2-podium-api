@@ -37,6 +37,11 @@ class CategoryRemover extends CategoryRepo implements RemovableInterface
         if (!$this->beforeRemove()) {
             return false;
         }
+        if (!$this->archived) {
+            $this->addError('archived', Yii::t('podium.error', 'category.must.be.archived'));
+            return false;
+        }
+
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting category', 'podium');

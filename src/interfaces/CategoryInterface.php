@@ -61,4 +61,16 @@ interface CategoryInterface
      * @return bool
      */
     public function sort(array $data = []): bool;
+
+    /**
+     * @param ArchivableInterface $categoryArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $categoryArchiver): bool;
+
+    /**
+     * @param ArchivableInterface $categoryArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $categoryArchiver): bool;
 }

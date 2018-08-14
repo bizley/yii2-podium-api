@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -152,5 +153,23 @@ class Category extends PodiumComponent implements CategoryInterface
             return false;
         }
         return $categorySorter->sort();
+    }
+
+    /**
+     * @param ArchivableInterface $categoryArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $categoryArchiver): bool
+    {
+        return $categoryArchiver->archive();
+    }
+
+    /**
+     * @param ArchivableInterface $categoryArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $categoryArchiver): bool
+    {
+        return $categoryArchiver->revive();
     }
 }

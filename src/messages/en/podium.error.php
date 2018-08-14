@@ -1,6 +1,9 @@
 <?php
 
 return [
+    'category.already.archived' => 'Category is already archived.',
+    'category.not.archived' => 'Category is not archived.',
+    'category.must.be.archived' => 'Category must be archived first.',
     'forum.already.archived' => 'Forum is already archived.',
     'forum.must.be.archived' => 'Forum must be archived first.',
     'forum.not.archived' => 'Forum is not archived.',

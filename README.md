@@ -24,7 +24,7 @@
   - [x] update category
   - [x] delete category
   - [x] sort categories
-  - [ ] archive category
+  - [x] archive category
 - [x] Forum
   - [x] view forum
   - [x] list forums
