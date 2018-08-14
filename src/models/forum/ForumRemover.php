@@ -37,6 +37,11 @@ class ForumRemover extends ForumRepo implements RemovableInterface
         if (!$this->beforeRemove()) {
             return false;
         }
+        if (!$this->archived) {
+            $this->addError('archived', Yii::t('podium.error', 'forum.must.be.archived'));
+            return false;
+        }
+
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting forum', 'podium');

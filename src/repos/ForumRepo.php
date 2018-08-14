@@ -21,6 +21,7 @@ use yii\db\ActiveRecord;
  * @property int $posts_count
  * @property int $created_at
  * @property int $updated_at
+ * @property bool $archived
  */
 class ForumRepo extends ActiveRecord
 {

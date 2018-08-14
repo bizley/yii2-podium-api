@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -171,5 +172,23 @@ class Forum extends PodiumComponent implements ForumInterface
         $forumMover->setCategory($category);
 
         return $forumMover->move();
+    }
+
+    /**
+     * @param ArchivableInterface $forumArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $forumArchiver): bool
+    {
+        return $forumArchiver->archive();
+    }
+
+    /**
+     * @param ArchivableInterface $forumArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $forumArchiver): bool
+    {
+        return $forumArchiver->revive();
     }
 }

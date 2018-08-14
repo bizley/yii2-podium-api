@@ -71,4 +71,16 @@ interface ForumInterface
      * @return bool
      */
     public function move(MovableInterface $forumMover, ModelInterface $category): bool;
+
+    /**
+     * @param ArchivableInterface $forumArchiver
+     * @return bool
+     */
+    public function archive(ArchivableInterface $forumArchiver): bool;
+
+    /**
+     * @param ArchivableInterface $forumArchiver
+     * @return bool
+     */
+    public function revive(ArchivableInterface $forumArchiver): bool;
 }

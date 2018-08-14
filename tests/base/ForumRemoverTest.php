@@ -7,6 +7,8 @@ namespace bizley\podium\tests\base;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\forum\ForumRemover;
 use bizley\podium\api\repos\ForumRepo;
+use bizley\podium\api\repos\PostRepo;
+use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
@@ -48,7 +50,41 @@ class ForumRemoverTest extends DbTestCase
                 'author_id' => 1,
                 'name' => 'forum1',
                 'slug' => 'forum1',
-                'sort' => 8,
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => true,
+            ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'author_id' => 1,
+                'name' => 'forum2',
+                'slug' => 'forum2',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'archived' => false,
+            ],
+        ],
+        'podium_thread' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread1',
+                'slug' => 'thread1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_post' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post1',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -72,6 +108,8 @@ class ForumRemoverTest extends DbTestCase
         $this->assertTrue($this->podium()->forum->remove(ForumRemover::findOne(1)));
 
         $this->assertEmpty(ForumRepo::findOne(1));
+        $this->assertEmpty(ThreadRepo::findOne(1));
+        $this->assertEmpty(PostRepo::findOne(1));
 
         $this->assertArrayHasKey(ForumRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
         $this->assertArrayHasKey(ForumRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
@@ -87,7 +125,15 @@ class ForumRemoverTest extends DbTestCase
         $this->assertFalse($this->podium()->forum->remove(ForumRemover::findOne(1)));
 
         $this->assertNotEmpty(ForumRepo::findOne(1));
+        $this->assertNotEmpty(ThreadRepo::findOne(1));
+        $this->assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(ForumRemover::class, ForumRemover::EVENT_BEFORE_REMOVING, $handler);
+    }
+
+    public function testNonArchived(): void
+    {
+        $this->assertFalse($this->podium()->forum->remove(ForumRemover::findOne(2)));
+        $this->assertNotEmpty(ForumRepo::findOne(2));
     }
 }

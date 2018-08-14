@@ -26,6 +26,7 @@ class m180805_121100_create_table_podium_forum extends Migration
             'posts_count' => $this->integer()->notNull()->defaultValue(0),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
+            'archived' => $this->boolean()->notNull()->defaultValue(false),
         ], $tableOptions);
 
         $this->addForeignKey(
