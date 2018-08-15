@@ -94,4 +94,23 @@ interface ThreadInterface
      * @return bool
      */
     public function revive(ArchivableInterface $threadArchiver): bool;
+
+    /**
+     * @return SubscribingInterface
+     */
+    public function getSubscribing(): SubscribingInterface;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): bool;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): bool;
 }

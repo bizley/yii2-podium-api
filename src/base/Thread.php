@@ -13,6 +13,7 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\PinnableInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\SubscribingInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -41,6 +42,12 @@ class Thread extends PodiumComponent implements ThreadInterface
     public $threadFormHandler = \bizley\podium\api\models\thread\ThreadForm::class;
 
     /**
+     * @var string|array|SubscribingInterface
+     * Component ID, class, configuration array, or instance of SubscribingInterface.
+     */
+    public $subscribingHandler = \bizley\podium\api\models\thread\Subscribing::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init(): void
@@ -49,6 +56,7 @@ class Thread extends PodiumComponent implements ThreadInterface
 
         $this->threadHandler = Instance::ensure($this->threadHandler, ModelInterface::class);
         $this->threadFormHandler = Instance::ensure($this->threadFormHandler, CategorisedFormInterface::class);
+        $this->subscribingHandler = Instance::ensure($this->subscribingHandler, SubscribingInterface::class);
     }
 
     /**
@@ -193,5 +201,41 @@ class Thread extends PodiumComponent implements ThreadInterface
     public function revive(ArchivableInterface $threadArchiver): bool
     {
         return $threadArchiver->revive();
+    }
+
+    /**
+     * @return SubscribingInterface
+     */
+    public function getSubscribing(): SubscribingInterface
+    {
+        return new $this->subscribingHandler;
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): bool
+    {
+        $subscribing = $this->getSubscribing();
+        $subscribing->setMember($member);
+        $subscribing->setThread($thread);
+
+        return $subscribing->subscribe();
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): bool
+    {
+        $subscribing = $this->getSubscribing();
+        $subscribing->setMember($member);
+        $subscribing->setThread($thread);
+
+        return $subscribing->unsubscribe();
     }
 }

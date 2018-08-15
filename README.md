@@ -1,13 +1,12 @@
-# yii2-podium-api
+# Yii 2 Podium API
 
-## Yii 2 Podium API
-
-### COMPONENTS:
+## COMPONENTS:
 
 - [x] Account
   - [x] register
   - [x] befriend member
   - [x] ignore member
+  - [x] like post
 - [x] Member
   - [x] befriend member
   - [x] ignore member
@@ -44,7 +43,7 @@
   - [x] pin thread
   - [x] lock thread
   - [ ] thread viewer
-  - [ ] subscribe thread
+  - [x] subscribe thread
   - [x] archive thread
 - [x] Post
   - [x] view post
@@ -53,18 +52,17 @@
   - [x] update post
   - [x] delete post
   - [x] move post
-  - [ ] like post
+  - [x] like post
   - [x] archive post
-- [ ] Subscription
 - [ ] Poll
 - [ ] Message
 - [ ] Activity
 - [ ] Rank
 - [ ] Group
 
-### NOTES:
+## NOTES:
 
 - When method operates on model not fetched from DB use handler.
 
-### TODO:
+## TODO:
 
