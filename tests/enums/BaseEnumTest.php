@@ -36,6 +36,9 @@ class BaseEnumTest extends TestCase
         return $this->_enum;
     }
 
+    /**
+     * @covers BaseEnum::data
+     */
     public function testData(): void
     {
         $this->assertEquals([
