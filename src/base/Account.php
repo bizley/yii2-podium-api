@@ -131,4 +131,22 @@ class Account extends PodiumComponent implements AccountInterface
     {
         return $this->podium->post->thumbReset($this->membership, $post);
     }
+
+    /**
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function subscribe(ModelInterface $thread): bool
+    {
+        return $this->podium->thread->subscribe($this->membership, $thread);
+    }
+
+    /**
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function unsubscribe(ModelInterface $thread): bool
+    {
+        return $this->podium->thread->unsubscribe($this->membership, $thread);
+    }
 }

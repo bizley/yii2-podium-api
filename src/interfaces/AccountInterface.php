@@ -60,4 +60,16 @@ interface AccountInterface
      * @return bool
      */
     public function thumbReset(ModelInterface $post): bool;
+
+    /**
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function subscribe(ModelInterface $thread): bool;
+
+    /**
+     * @param ModelInterface $thread
+     * @return bool
+     */
+    public function unsubscribe(ModelInterface $thread): bool;
 }
