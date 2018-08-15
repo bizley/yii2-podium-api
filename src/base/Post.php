@@ -39,7 +39,7 @@ class Post extends PodiumComponent implements PostInterface
      * @var string|array|LikingInterface
      * Component ID, class, configuration array, or instance of LikingInterface.
      */
-    public $likingHandler = Liking::class;
+    public $likingHandler = \bizley\podium\api\models\post\Liking::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -58,7 +58,7 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function getPostModel(): ModelInterface
     {
-        return $this->postHandler;
+        return new $this->postHandler;
     }
 
     /**
@@ -88,7 +88,7 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function getPostForm(): CategorisedFormInterface
     {
-        return $this->postFormHandler;
+        return new $this->postFormHandler;
     }
 
     /**
@@ -166,7 +166,7 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function getLiking(): LikingInterface
     {
-        return $this->likingHandler;
+        return new $this->likingHandler;
     }
 
     /**
