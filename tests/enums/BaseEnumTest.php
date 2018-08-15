@@ -37,7 +37,7 @@ class BaseEnumTest extends TestCase
     }
 
     /**
-     * @covers BaseEnum::data
+     * @covers \bizley\podium\api\enums\BaseEnum::data
      */
     public function testData(): void
     {
