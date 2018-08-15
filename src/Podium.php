@@ -11,7 +11,6 @@ use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
-use bizley\podium\api\base\Subscription;
 use bizley\podium\api\base\Thread;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
@@ -43,7 +42,6 @@ use yii\i18n\PhpMessageSource;
  * @property Member $member
  * @property Poll $poll
  * @property Post $post
- * @property Subscription $subscription
  * @property Thread $thread
  *
  * @property string $version
@@ -95,7 +93,6 @@ class Podium extends ServiceLocator
             'member' => ['class' => Member::class],
             'poll' => ['class' => Poll::class],
             'post' => ['class' => Post::class],
-            'subscription' => ['class' => Subscription::class],
             'thread' => ['class' => Thread::class],
         ];
     }
@@ -168,16 +165,6 @@ class Podium extends ServiceLocator
     public function getPost()
     {
         return $this->get('post');
-    }
-
-    /**
-     * Returns subscription component.
-     * @return Subscription|null|object
-     * @throws InvalidConfigException
-     */
-    public function getSubscription()
-    {
-        return $this->get('subscription');
     }
 
     /**

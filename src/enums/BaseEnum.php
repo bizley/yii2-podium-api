@@ -14,6 +14,7 @@ abstract class BaseEnum
      * Source of ENUM.
      * Returns array with keys being the ENUMs and values being the ENUMs description.
      * @return array
+     * @codeCoverageIgnore
      */
     public static function data(): array
     {
