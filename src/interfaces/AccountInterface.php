@@ -42,4 +42,22 @@ interface AccountInterface
      * @return bool
      */
     public function unignore(MembershipInterface $target): bool;
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbUp(ModelInterface $post): bool;
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbDown(ModelInterface $post): bool;
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbReset(ModelInterface $post): bool;
 }

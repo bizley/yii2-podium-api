@@ -2,22 +2,22 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\post;
+namespace bizley\podium\tests\account;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\post\Liking;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThumbRepo;
-use bizley\podium\tests\DbTestCase;
+use bizley\podium\tests\AccountTestCase;
+use bizley\podium\tests\props\UserIdentity;
 use yii\base\Event;
 
 /**
- * Class PostLikerTest
- * @package bizley\podium\tests\post
+ * Class AccountLikingTest
+ * @package bizley\podium\tests\account
  */
-class PostLikerTest extends DbTestCase
+class AccountLikingTest extends AccountTestCase
 {
     /**
      * @var array
@@ -29,24 +29,6 @@ class PostLikerTest extends DbTestCase
                 'user_id' => '1',
                 'username' => 'member1',
                 'slug' => 'member1',
-                'status_id' => MemberStatus::ACTIVE,
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
-            [
-                'id' => 2,
-                'user_id' => '2',
-                'username' => 'member2',
-                'slug' => 'member2',
-                'status_id' => MemberStatus::ACTIVE,
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
-            [
-                'id' => 3,
-                'user_id' => '3',
-                'username' => 'member3',
-                'slug' => 'member3',
                 'status_id' => MemberStatus::ACTIVE,
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -101,20 +83,44 @@ class PostLikerTest extends DbTestCase
                 'likes' => 15,
                 'dislikes' => 15,
             ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post2',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'likes' => 15,
+                'dislikes' => 15,
+            ],
+            [
+                'id' => 3,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post3',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'likes' => 15,
+                'dislikes' => 15,
+            ],
         ],
         'podium_thumb' => [
             [
                 'id' => 1,
-                'member_id' => 2,
-                'post_id' => 1,
+                'member_id' => 1,
+                'post_id' => 2,
                 'thumb' => 1,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
             [
                 'id' => 2,
-                'member_id' => 3,
-                'post_id' => 1,
+                'member_id' => 1,
+                'post_id' => 3,
                 'thumb' => -1,
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -127,6 +133,24 @@ class PostLikerTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function setUp(): void
+    {
+        $this->fixturesUp();
+        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function tearDown(): void
+    {
+        $this->fixturesDown();
+        parent::tearDown();
+    }
+
     public function testThumbUp(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, function () {
@@ -136,7 +160,7 @@ class PostLikerTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_UP] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbUp(Post::findOne(1)));
 
         $this->assertEquals(1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -158,7 +182,7 @@ class PostLikerTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbUp(Post::findOne(1)));
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -174,19 +198,19 @@ class PostLikerTest extends DbTestCase
 
     public function testAlreadyThumbedUp(): void
     {
-        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(2), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbUp(Post::findOne(2)));
     }
 
     public function testChangeToThumbUp(): void
     {
-        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(3), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbUp(Post::findOne(3)));
 
         $this->assertEquals(1, ThumbRepo::findOne([
-            'member_id' => 3,
-            'post_id' => 1,
+            'member_id' => 1,
+            'post_id' => 3,
         ])->thumb);
 
-        $post = PostRepo::findOne(1);
+        $post = PostRepo::findOne(3);
         $this->assertEquals(16, $post->likes);
         $this->assertEquals(14, $post->dislikes);
     }
@@ -200,7 +224,7 @@ class PostLikerTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_DOWN] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbDown(Post::findOne(1)));
 
         $this->assertEquals(-1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -222,7 +246,7 @@ class PostLikerTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbDown(Post::findOne(1)));
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -238,19 +262,19 @@ class PostLikerTest extends DbTestCase
 
     public function testAlreadyThumbedDown(): void
     {
-        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(3), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbDown(Post::findOne(3)));
     }
 
     public function testChangeToThumbDown(): void
     {
-        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(2), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbDown(Post::findOne(2)));
 
         $this->assertEquals(-1, ThumbRepo::findOne([
-            'member_id' => 3,
-            'post_id' => 1,
+            'member_id' => 1,
+            'post_id' => 2,
         ])->thumb);
 
-        $post = PostRepo::findOne(1);
+        $post = PostRepo::findOne(2);
         $this->assertEquals(14, $post->likes);
         $this->assertEquals(16, $post->dislikes);
     }
@@ -264,14 +288,14 @@ class PostLikerTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_RESET] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbReset(Post::findOne(2)));
 
         $this->assertEmpty(ThumbRepo::findOne([
-            'member_id' => 2,
-            'post_id' => 1,
+            'member_id' => 1,
+            'post_id' => 2,
         ]));
 
-        $post = PostRepo::findOne(1);
+        $post = PostRepo::findOne(2);
         $this->assertEquals(14, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
@@ -286,14 +310,14 @@ class PostLikerTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbReset(Post::findOne(2)));
 
         $this->assertNotEmpty(ThumbRepo::findOne([
-            'member_id' => 2,
-            'post_id' => 1,
+            'member_id' => 1,
+            'post_id' => 2,
         ]));
 
-        $post = PostRepo::findOne(1);
+        $post = PostRepo::findOne(2);
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
@@ -302,19 +326,19 @@ class PostLikerTest extends DbTestCase
 
     public function testNoThumbToReset(): void
     {
-        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->account->thumbReset(Post::findOne(1)));
     }
 
     public function testThumbResetFromDown(): void
     {
-        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(3), Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->thumbReset(Post::findOne(3)));
 
         $this->assertEmpty(ThumbRepo::findOne([
-            'member_id' => 3,
-            'post_id' => 1,
+            'member_id' => 1,
+            'post_id' => 3,
         ]));
 
-        $post = PostRepo::findOne(1);
+        $post = PostRepo::findOne(3);
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(14, $post->dislikes);
     }

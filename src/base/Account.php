@@ -6,6 +6,7 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\AccountInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\web\User;
@@ -102,5 +103,32 @@ class Account extends PodiumComponent implements AccountInterface
     public function unignore(MembershipInterface $target): bool
     {
         return $this->podium->member->unignore($this->membership, $target);
+    }
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbUp(ModelInterface $post): bool
+    {
+        return $this->podium->post->thumbUp($this->membership, $post);
+    }
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbDown(ModelInterface $post): bool
+    {
+        return $this->podium->post->thumbDown($this->membership, $post);
+    }
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function thumbReset(ModelInterface $post): bool
+    {
+        return $this->podium->post->thumbReset($this->membership, $post);
     }
 }
