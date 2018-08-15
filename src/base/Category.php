@@ -62,7 +62,7 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function getCategoryModel(): ModelInterface
     {
-        return $this->categoryHandler;
+        return new $this->categoryHandler;
     }
 
     /**
@@ -92,7 +92,7 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function getCategoryForm(): AuthoredFormInterface
     {
-        return $this->categoryFormHandler;
+        return new $this->categoryFormHandler;
     }
 
     /**
@@ -138,7 +138,7 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function getCategorySorter(): SortableInterface
     {
-        return $this->categorySorterHandler;
+        return new $this->categorySorterHandler;
     }
 
     /**

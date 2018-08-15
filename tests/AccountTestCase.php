@@ -15,6 +15,8 @@ use yii\web\User;
 abstract class AccountTestCase extends DbTestCase
 {
     /**
+     * @throws \yii\base\InvalidRouteException
+     * @throws \yii\console\Exception
      * @throws \yii\db\Exception
      */
     public static function setUpBeforeClass(): void

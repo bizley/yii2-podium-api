@@ -56,7 +56,7 @@ class Thread extends PodiumComponent implements ThreadInterface
      */
     public function getThreadModel(): ModelInterface
     {
-        return $this->threadHandler;
+        return new $this->threadHandler;
     }
 
     /**
@@ -86,7 +86,7 @@ class Thread extends PodiumComponent implements ThreadInterface
      */
     public function getThreadForm(): CategorisedFormInterface
     {
-        return $this->threadFormHandler;
+        return new $this->threadFormHandler;
     }
 
     /**

@@ -75,7 +75,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMembership(): MembershipInterface
     {
-        return $this->memberHandler;
+        return new $this->memberHandler;
     }
 
     /**
@@ -83,7 +83,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getRegistration(): RegistrationInterface
     {
-        return $this->registrationHandler;
+        return new $this->registrationHandler;
     }
 
     /**
@@ -91,7 +91,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getFriendship(): FriendshipInterface
     {
-        return $this->friendshipHandler;
+        return new $this->friendshipHandler;
     }
 
     /**
@@ -99,7 +99,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getIgnoring(): IgnoringInterface
     {
-        return $this->ignoringHandler;
+        return new $this->ignoringHandler;
     }
 
     /**

@@ -65,7 +65,7 @@ class Forum extends PodiumComponent implements ForumInterface
      */
     public function getForumModel(): ModelInterface
     {
-        return $this->forumHandler;
+        return new $this->forumHandler;
     }
 
     /**
@@ -95,7 +95,7 @@ class Forum extends PodiumComponent implements ForumInterface
      */
     public function getForumForm(): CategorisedFormInterface
     {
-        return $this->forumFormHandler;
+        return new $this->forumFormHandler;
     }
 
     /**
@@ -143,7 +143,7 @@ class Forum extends PodiumComponent implements ForumInterface
      */
     public function getForumSorter(): SortableInterface
     {
-        return $this->forumSorterHandler;
+        return new $this->forumSorterHandler;
     }
 
     /**
