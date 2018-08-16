@@ -53,7 +53,6 @@ class MemberIgnoringTest extends DbTestCase
         ],
         'podium_acquaintance' => [
             [
-                'id' => 100,
                 'member_id' => 101,
                 'target_id' => 102,
                 'type_id' => AcquaintanceType::IGNORE,

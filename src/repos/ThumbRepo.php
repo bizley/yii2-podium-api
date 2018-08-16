@@ -9,7 +9,6 @@ use yii\db\ActiveRecord;
 /**
  * Thumb Active Record.
  *
- * @property int $id
  * @property int $member_id
  * @property int $post_id
  * @property int $thumb

@@ -9,7 +9,6 @@ use yii\db\ActiveRecord;
 /**
  * Acquaintance Active Record.
  *
- * @property int $id
  * @property int $member_id
  * @property int $target_id
  * @property string $type_id

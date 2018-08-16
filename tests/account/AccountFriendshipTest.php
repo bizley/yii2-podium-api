@@ -54,7 +54,6 @@ class AccountFriendshipTest extends AccountTestCase
         ],
         'podium_acquaintance' => [
             [
-                'id' => 10,
                 'member_id' => 10,
                 'target_id' => 12,
                 'type_id' => AcquaintanceType::FRIEND,

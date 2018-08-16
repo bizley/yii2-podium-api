@@ -86,9 +86,8 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-                'type_id' => $this->type_id,
             ])->exists()) {
-            $this->addError('target_id', Yii::t('podium.error', 'target.already.befriended'));
+            $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
             return false;
         }
         if (!$this->save()) {

@@ -110,7 +110,6 @@ class AccountLikingTest extends AccountTestCase
         ],
         'podium_thumb' => [
             [
-                'id' => 1,
                 'member_id' => 1,
                 'post_id' => 2,
                 'thumb' => 1,
@@ -118,7 +117,6 @@ class AccountLikingTest extends AccountTestCase
                 'updated_at' => 1,
             ],
             [
-                'id' => 2,
                 'member_id' => 1,
                 'post_id' => 3,
                 'thumb' => -1,

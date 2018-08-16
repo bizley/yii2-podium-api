@@ -104,7 +104,6 @@ class PostLikingTest extends DbTestCase
         ],
         'podium_thumb' => [
             [
-                'id' => 1,
                 'member_id' => 2,
                 'post_id' => 1,
                 'thumb' => 1,
@@ -112,7 +111,6 @@ class PostLikingTest extends DbTestCase
                 'updated_at' => 1,
             ],
             [
-                'id' => 2,
                 'member_id' => 3,
                 'post_id' => 1,
                 'thumb' => -1,

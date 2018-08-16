@@ -14,7 +14,6 @@ class m180814_201400_create_table_podium_thumb extends Migration
         }
 
         $this->createTable('{{%podium_thumb}}', [
-            'id' => $this->primaryKey(),
             'member_id' => $this->integer()->notNull(),
             'post_id' => $this->integer()->notNull(),
             'thumb' => $this->tinyInteger(1)->notNull(),
@@ -22,6 +21,7 @@ class m180814_201400_create_table_podium_thumb extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
+        $this->addPrimaryKey('pk-podium_thumb', '{{%podium_thumb}}', ['member_id', 'post_id']);
         $this->addForeignKey(
             'fk-podium_thumb-member_id',
             '{{%podium_thumb}}', 'member_id',
