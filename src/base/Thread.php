@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\BookmarkingInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LockableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -48,6 +49,12 @@ class Thread extends PodiumComponent implements ThreadInterface
     public $subscribingHandler = \bizley\podium\api\models\thread\Subscribing::class;
 
     /**
+     * @var string|array|BookmarkingInterface
+     * Component ID, class, configuration array, or instance of BookmarkingInterface.
+     */
+    public $bookmarkingHandler = \bizley\podium\api\models\thread\Bookmarking::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init(): void
@@ -57,6 +64,7 @@ class Thread extends PodiumComponent implements ThreadInterface
         $this->threadHandler = Instance::ensure($this->threadHandler, ModelInterface::class);
         $this->threadFormHandler = Instance::ensure($this->threadFormHandler, CategorisedFormInterface::class);
         $this->subscribingHandler = Instance::ensure($this->subscribingHandler, SubscribingInterface::class);
+        $this->bookmarkingHandler = Instance::ensure($this->bookmarkingHandler, BookmarkingInterface::class);
     }
 
     /**
@@ -237,5 +245,27 @@ class Thread extends PodiumComponent implements ThreadInterface
         $subscribing->setThread($thread);
 
         return $subscribing->unsubscribe();
+    }
+
+    /**
+     * @return BookmarkingInterface
+     */
+    public function getBookmarking(): BookmarkingInterface
+    {
+        return new $this->bookmarkingHandler;
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function mark(MembershipInterface $member, ModelInterface $post): bool
+    {
+        $bookmarking = $this->getBookmarking();
+        $bookmarking->setMember($member);
+        $bookmarking->setPost($post);
+
+        return $bookmarking->mark();
     }
 }

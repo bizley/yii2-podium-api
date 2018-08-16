@@ -25,7 +25,7 @@ class m180816_190400_create_table_podium_bookmark extends Migration
             'fk-podium_bookmark-member_id',
             '{{%podium_bookmark}}', 'member_id',
             '{{%podium_member}}', 'id',
-            'NO ACTION', 'CASCADE');
+            'CASCADE', 'CASCADE');
         $this->addForeignKey(
             'fk-podium_bookmark-thread_id',
             '{{%podium_bookmark}}', 'thread_id',

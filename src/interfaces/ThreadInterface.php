@@ -113,4 +113,16 @@ interface ThreadInterface
      * @return bool
      */
     public function unsubscribe(MembershipInterface $member, ModelInterface $thread): bool;
+
+    /**
+    * @return BookmarkingInterface
+    */
+    public function getBookmarking(): BookmarkingInterface;
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function mark(MembershipInterface $member, ModelInterface $post): bool;
 }
