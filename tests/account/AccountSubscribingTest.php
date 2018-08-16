@@ -78,7 +78,6 @@ class AccountSubscribingTest extends AccountTestCase
         ],
         'podium_subscription' => [
             [
-                'id' => 1,
                 'member_id' => 1,
                 'thread_id' => 2,
                 'created_at' => 1,

@@ -14,7 +14,6 @@ class m180812_102800_create_table_podium_subscription extends Migration
         }
 
         $this->createTable('{{%podium_subscription}}', [
-            'id' => $this->primaryKey(),
             'member_id' => $this->integer()->notNull(),
             'thread_id' => $this->integer()->notNull(),
             'seen' => $this->boolean()->notNull()->defaultValue(true),
@@ -22,6 +21,7 @@ class m180812_102800_create_table_podium_subscription extends Migration
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
+        $this->addPrimaryKey('pk-podium_subscription', '{{%podium_subscription}}', ['member_id', 'thread_id']);
         $this->addForeignKey(
             'fk-podium_subscription-member_id',
             '{{%podium_subscription}}', 'member_id',

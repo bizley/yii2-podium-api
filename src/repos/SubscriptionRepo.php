@@ -7,9 +7,8 @@ namespace bizley\podium\api\repos;
 use yii\db\ActiveRecord;
 
 /**
- * Thread Active Record.
+ * Subscription Active Record.
  *
- * @property int $id
  * @property int $member_id
  * @property int $thread_id
  * @property bool $seen
