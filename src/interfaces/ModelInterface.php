@@ -28,6 +28,11 @@ interface ModelInterface
     public function getId(): int;
 
     /**
+     * @return int
+     */
+    public function getCreatedAt(): int;
+
+    /**
      * @param DataFilter|null $filter
      * @param Sort|array|bool|null $sort
      * @param Pagination|array|bool|null $pagination

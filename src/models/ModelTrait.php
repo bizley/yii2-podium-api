@@ -36,6 +36,14 @@ trait ModelTrait
     }
 
     /**
+     * @return int
+     */
+    public function getCreatedAt(): int
+    {
+        return $this->created_at;
+    }
+
+    /**
      * @param DataFilter|null $filter
      * @param Sort|array|bool|null $sort
      * @param Pagination|array|bool|null $pagination

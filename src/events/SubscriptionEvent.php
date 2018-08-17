@@ -8,7 +8,7 @@ use bizley\podium\api\interfaces\SubscribingInterface;
 use yii\base\Event;
 
 /**
- * Class PinEvent
+ * Class SubscriptionEvent
  * @package bizley\podium\api\events
  */
 class SubscriptionEvent extends Event
