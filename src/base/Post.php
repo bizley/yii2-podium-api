@@ -54,21 +54,13 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
-     * @return ModelInterface
-     */
-    public function getPostModel(): ModelInterface
-    {
-        return new $this->postHandler;
-    }
-
-    /**
      * @param int $id
      * @return ModelInterface|null
      */
     public function getPostById(int $id): ?ModelInterface
     {
-        $postModel = $this->getPostModel();
-        return $postModel::findById($id);
+        $postClass = $this->postHandler;
+        return $postClass::findById($id);
     }
 
     /**
@@ -79,8 +71,8 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $postModel = $this->getPostModel();
-        return $postModel::findByFilter($filter, $sort, $pagination);
+        $postClass = $this->postHandler;
+        return $postClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**

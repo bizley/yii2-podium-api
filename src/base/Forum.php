@@ -61,21 +61,13 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * @return ModelInterface
-     */
-    public function getForumModel(): ModelInterface
-    {
-        return new $this->forumHandler;
-    }
-
-    /**
      * @param int $id
      * @return ModelInterface|null
      */
     public function getForumById(int $id): ?ModelInterface
     {
-        $forumModel = $this->getForumModel();
-        return $forumModel::findById($id);
+        $forumClass = $this->forumHandler;
+        return $forumClass::findById($id);
     }
 
     /**
@@ -86,8 +78,8 @@ class Forum extends PodiumComponent implements ForumInterface
      */
     public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $forumModel = $this->getForumModel();
-        return $forumModel::findByFilter($filter, $sort, $pagination);
+        $forumClass = $this->forumHandler;
+        return $forumClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**

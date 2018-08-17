@@ -58,21 +58,13 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
-     * @return ModelInterface
-     */
-    public function getCategoryModel(): ModelInterface
-    {
-        return new $this->categoryHandler;
-    }
-
-    /**
      * @param int $id
      * @return ModelInterface|null
      */
     public function getCategoryById(int $id): ?ModelInterface
     {
-        $categoryModel = $this->getCategoryModel();
-        return $categoryModel::findById($id);
+        $categoryClass = $this->categoryHandler;
+        return $categoryClass::findById($id);
     }
 
     /**
@@ -83,8 +75,8 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $categoryModel = $this->getCategoryModel();
-        return $categoryModel::findByFilter($filter, $sort, $pagination);
+        $categoryClass = $this->categoryHandler;
+        return $categoryClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**

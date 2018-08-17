@@ -11,12 +11,6 @@ namespace bizley\podium\api\interfaces;
 interface MemberInterface
 {
     /**
-     * Returns member handler.
-     * @return MembershipInterface
-     */
-    public function getMembership(): MembershipInterface;
-
-    /**
      * @param int $id
      * @return MembershipInterface|null
      */

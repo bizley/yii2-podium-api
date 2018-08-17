@@ -17,12 +17,6 @@ interface ForumInterface
     public function getForumById(int $id): ?ModelInterface;
 
     /**
-     * Returns forum model handler.
-     * @return ModelInterface
-     */
-    public function getForumModel(): ModelInterface;
-
-    /**
      * Returns forum form handler.
      * @return CategorisedFormInterface
      */

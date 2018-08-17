@@ -71,14 +71,6 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
-     * @return MembershipInterface
-     */
-    public function getMembership(): MembershipInterface
-    {
-        return new $this->memberHandler;
-    }
-
-    /**
      * @return RegistrationInterface
      */
     public function getRegistration(): RegistrationInterface
@@ -182,7 +174,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMemberById(int $id): ?MembershipInterface
     {
-        $membership = $this->getMembership();
+        $membership = $this->memberHandler;
         return $membership::findById($id);
     }
 
@@ -192,7 +184,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMemberByUserId($id): ?MembershipInterface
     {
-        $membership = $this->getMembership();
+        $membership = $this->memberHandler;
         return $membership::findByUserId($id);
     }
 
@@ -204,7 +196,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $membership = $this->getMembership();
+        $membership = $this->memberHandler;
         return $membership::findByFilter($filter, $sort, $pagination);
     }
 

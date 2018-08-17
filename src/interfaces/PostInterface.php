@@ -17,12 +17,6 @@ interface PostInterface
     public function getPostById(int $id): ?ModelInterface;
 
     /**
-     * Returns post model handler.
-     * @return ModelInterface
-     */
-    public function getPostModel(): ModelInterface;
-
-    /**
      * Returns post form handler.
      * @return CategorisedFormInterface
      */

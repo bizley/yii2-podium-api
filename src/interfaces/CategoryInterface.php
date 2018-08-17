@@ -17,12 +17,6 @@ interface CategoryInterface
     public function getCategoryById(int $id): ?ModelInterface;
 
     /**
-     * Returns category model handler.
-     * @return ModelInterface
-     */
-    public function getCategoryModel(): ModelInterface;
-
-    /**
      * Returns category form handler.
      * @return AuthoredFormInterface
      */

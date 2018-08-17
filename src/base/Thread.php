@@ -68,21 +68,13 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
-     * @return ModelInterface
-     */
-    public function getThreadModel(): ModelInterface
-    {
-        return new $this->threadHandler;
-    }
-
-    /**
      * @param int $id
      * @return ModelInterface|null
      */
     public function getThreadById(int $id): ?ModelInterface
     {
-        $threadModel = $this->getThreadModel();
-        return $threadModel::findById($id);
+        $threadClass = $this->threadHandler;
+        return $threadClass::findById($id);
     }
 
     /**
@@ -93,8 +85,8 @@ class Thread extends PodiumComponent implements ThreadInterface
      */
     public function getThreads(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $threadModel = $this->getThreadModel();
-        return $threadModel::findByFilter($filter, $sort, $pagination);
+        $threadClass = $this->threadHandler;
+        return $threadClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**

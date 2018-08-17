@@ -17,12 +17,6 @@ interface ThreadInterface
     public function getThreadById(int $id): ?ModelInterface;
 
     /**
-     * Returns thread model handler.
-     * @return ModelInterface
-     */
-    public function getThreadModel(): ModelInterface;
-
-    /**
      * Returns thread form handler.
      * @return CategorisedFormInterface
      */
