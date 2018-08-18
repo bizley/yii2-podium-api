@@ -9,10 +9,11 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
     public function up(): void
     {
         $tableOptions = null;
-        $typeId = $this->string(45)->notNull();
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $typeId = 'ENUM("friend","ignore") NOT NULL';
+        } else {
+            $typeId = $this->string(45)->notNull();
         }
 
         $this->createTable('{{%podium_acquaintance}}', [
