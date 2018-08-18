@@ -145,7 +145,7 @@ class Liking extends ThumbRepo implements LikingInterface
     public function afterThumbUp(): void
     {
         $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent([
-            'thumb' => $this
+            'model' => $this
         ]));
     }
 
@@ -222,7 +222,7 @@ class Liking extends ThumbRepo implements LikingInterface
     public function afterThumbDown(): void
     {
         $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent([
-            'thumb' => $this
+            'model' => $this
         ]));
     }
 

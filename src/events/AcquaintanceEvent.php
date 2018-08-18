@@ -37,5 +37,5 @@ class AcquaintanceEvent extends Event
     /**
      * @var FriendshipInterface|IgnoringInterface
      */
-    public $acquaintance;
+    public $model;
 }

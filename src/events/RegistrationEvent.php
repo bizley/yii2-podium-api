@@ -21,5 +21,5 @@ class RegistrationEvent extends Event
     /**
      * @var Registration
      */
-    public $registration;
+    public $model;
 }

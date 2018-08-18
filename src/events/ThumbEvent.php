@@ -31,5 +31,5 @@ class ThumbEvent extends Event
     /**
      * @var LikingInterface
      */
-    public $thumb;
+    public $model;
 }

@@ -101,7 +101,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     public function afterBefriend(): void
     {
         $this->trigger(self::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent([
-            'acquaintance' => $this
+            'model' => $this
         ]));
     }
 

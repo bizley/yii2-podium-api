@@ -104,7 +104,7 @@ class Registration extends MemberRepo implements RegistrationInterface
     public function afterRegister(): void
     {
         $this->trigger(self::EVENT_AFTER_REGISTERING, new RegistrationEvent([
-            'registration' => $this
+            'model' => $this
         ]));
     }
 }

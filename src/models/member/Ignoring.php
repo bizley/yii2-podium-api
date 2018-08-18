@@ -98,7 +98,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     public function afterIgnore(): void
     {
         $this->trigger(self::EVENT_AFTER_IGNORING, new AcquaintanceEvent([
-            'acquaintance' => $this
+            'model' => $this
         ]));
     }
 
