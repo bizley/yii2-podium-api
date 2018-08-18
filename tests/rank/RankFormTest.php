@@ -79,6 +79,16 @@ class RankFormTest extends DbTestCase
         Event::off(RankForm::class, RankForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateWithSameMinPosts(): void
+    {
+        $data = [
+            'name' => 'rank-new',
+            'min_posts' => 0,
+        ];
+        $this->assertFalse($this->podium()->rank->create($data));
+        $this->assertEmpty(CategoryRepo::findOne(['name' => 'rank-new']));
+    }
+
     public function testUpdate(): void
     {
         Event::on(RankForm::class, RankForm::EVENT_BEFORE_EDITING, function () {

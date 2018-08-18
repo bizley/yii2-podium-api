@@ -65,7 +65,6 @@
 - [ ] Poll
 - [ ] Message
 - [ ] Activity
-
 - [ ] Group
 
 ## NOTES:
