@@ -7,6 +7,8 @@
   - [x] befriend member
   - [x] ignore member
   - [x] like post
+  - [x] subscribe thread
+  - [x] bookmark thread
 - [x] Member
   - [x] befriend member
   - [x] ignore member
@@ -42,9 +44,9 @@
   - [x] move thread
   - [x] pin thread
   - [x] lock thread
-  - [ ] thread viewer
   - [x] subscribe thread
   - [x] archive thread
+  - [x] bookmark thread
 - [x] Post
   - [x] view post
   - [x] list posts

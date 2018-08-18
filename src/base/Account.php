@@ -149,4 +149,13 @@ class Account extends PodiumComponent implements AccountInterface
     {
         return $this->podium->thread->unsubscribe($this->membership, $thread);
     }
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function mark(ModelInterface $post): bool
+    {
+        return $this->podium->thread->mark($this->membership, $post);
+    }
 }

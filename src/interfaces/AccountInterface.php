@@ -72,4 +72,10 @@ interface AccountInterface
      * @return bool
      */
     public function unsubscribe(ModelInterface $thread): bool;
+
+    /**
+     * @param ModelInterface $post
+     * @return bool
+     */
+    public function mark(ModelInterface $post): bool;
 }
