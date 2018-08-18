@@ -11,6 +11,8 @@ return [
     'forum.visible' => 'Forum Visible For Guests',
     'member.username' => 'Username',
     'post.content' => 'Post Content',
+    'rank.minimum.posts' => 'Rank Minimum Number Of Posts',
+    'rank.name' => 'Rank Name',
     'registration.user.id' => 'User ID',
     'registration.username' => 'Username',
     'thread.name' => 'Thread Name',

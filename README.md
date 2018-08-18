@@ -56,10 +56,16 @@
   - [x] move post
   - [x] like post
   - [x] archive post
+- [x] Rank
+  - [x] view rank
+  - [x] list ranks
+  - [x] create rank
+  - [x] update rank
+  - [x] delete rank
 - [ ] Poll
 - [ ] Message
 - [ ] Activity
-- [ ] Rank
+
 - [ ] Group
 
 ## NOTES:

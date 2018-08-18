@@ -12,7 +12,7 @@ interface CategoryInterface
 {
     /**
      * @param int $id
-     * @return CategoryInterface|null
+     * @return ModelInterface|null
      */
     public function getCategoryById(int $id): ?ModelInterface;
 
