@@ -103,7 +103,7 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
 
         $bookmark = $this->getBookmark();
 
-        if ($bookmark->last_seen !== null && $bookmark->last_seen >= $this->getPostModel()->created_at) {
+        if ($bookmark->last_seen !== null && $bookmark->last_seen >= $this->getPostModel()->getCreatedAt()) {
             return true;
         }
         $bookmark->last_seen = $this->getPostModel()->getCreatedAt();

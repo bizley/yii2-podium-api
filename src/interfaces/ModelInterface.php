@@ -58,4 +58,14 @@ interface ModelInterface
      * @throws InvalidConfigException
      */
     public function convert(string $targetClass);
+
+    /**
+     * @return int
+     */
+    public function getPostsCount(): int;
+
+    /**
+     * @return bool
+     */
+    public function isArchived(): bool;
 }

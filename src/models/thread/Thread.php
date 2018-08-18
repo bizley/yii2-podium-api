@@ -24,4 +24,20 @@ class Thread extends ThreadRepo implements ModelInterface
     {
         return Forum::findById($this->forum_id);
     }
+
+    /**
+     * @return int
+     */
+    public function getPostsCount(): int
+    {
+        return $this->posts_count;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return (bool) $this->archived;
+    }
 }

@@ -64,7 +64,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
             if (!$thread->getParent()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating forum counters!');
             }
-            if ($thread->posts_count === 0 && !$thread->archived && !$thread->convert(ThreadArchiver::class)->archive()) {
+            if ($thread->getPostsCount() === 0 && !$thread->isArchived() && !$thread->convert(ThreadArchiver::class)->archive()) {
                 throw new Exception('Error while archiving thread!');
             }
 

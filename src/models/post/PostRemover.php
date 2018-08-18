@@ -55,7 +55,7 @@ class PostRemover extends PostRepo implements RemovableInterface
 
         try {
             $thread = $this->getThreadModel();
-            if ($thread->posts_count === 0 && $thread->archived) {
+            if ($thread->getPostsCount() === 0 && $thread->isArchived()) {
                 if (!$thread->convert(ThreadRemover::class)->remove()) {
                     Yii::error('Error while deleting empty archived thread', 'podium');
                     return false;

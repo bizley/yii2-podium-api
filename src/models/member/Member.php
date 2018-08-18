@@ -35,4 +35,21 @@ class Member extends MemberRepo implements MembershipInterface
     {
         throw new NotSupportedException('Member has not got a parent.');
     }
+
+    /**
+     * @return int
+     */
+    public function getPostsCount(): int
+    {
+        // TODO
+    }
+
+    /**
+     * @return bool
+     * @throws NotSupportedException
+     */
+    public function isArchived(): bool
+    {
+        throw new NotSupportedException('Member can not be archived.');
+    }
 }

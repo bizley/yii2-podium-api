@@ -8,6 +8,7 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\PostRepo;
+use yii\base\NotSupportedException;
 
 /**
  * Class Thread
@@ -23,5 +24,22 @@ class Post extends PostRepo implements ModelInterface
     public function getParent(): ModelInterface
     {
         return Thread::findById($this->thread_id);
+    }
+
+    /**
+     * @return int
+     * @throws NotSupportedException
+     */
+    public function getPostsCount(): int
+    {
+        throw new NotSupportedException('Post has not got posts.');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return (bool) $this->archived;
     }
 }

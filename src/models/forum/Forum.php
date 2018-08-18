@@ -24,4 +24,20 @@ class Forum extends ForumRepo implements ModelInterface
     {
         return Category::findById($this->category_id);
     }
+
+    /**
+     * @return int
+     */
+    public function getPostsCount(): int
+    {
+        return $this->posts_count;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return (bool) $this->archived;
+    }
 }

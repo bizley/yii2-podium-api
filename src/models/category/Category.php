@@ -25,4 +25,21 @@ class Category extends CategoryRepo implements ModelInterface
     {
         throw new NotSupportedException('Category has not got a parent.');
     }
+
+    /**
+     * @return int
+     * @throws NotSupportedException
+     */
+    public function getPostsCount(): int
+    {
+        throw new NotSupportedException('Category has not got posts.');
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return (bool) $this->archived;
+    }
 }

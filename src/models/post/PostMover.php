@@ -114,7 +114,7 @@ class PostMover extends PostRepo implements MovableInterface
             if (!$this->getOldThreadModel()->getParent()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating old forum counters!');
             }
-            if ($this->getOldThreadModel()->posts_count === 0) {
+            if ($this->getOldThreadModel()->getPostsCount() === 0) {
                 $threadArchiver = $this->getOldThreadModel()->convert(ThreadArchiver::class);
                 if (!$threadArchiver->archive()) {
                     throw new Exception('Error while archiving old empty thread!');
