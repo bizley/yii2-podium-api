@@ -24,15 +24,6 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     public const EVENT_AFTER_UNIGNORING = 'podium.acquaintance.unignoring.after';
 
     /**
-     * Sets acquaintance type.
-     */
-    public function init(): void
-    {
-        parent::init();
-        $this->type_id = AcquaintanceType::IGNORE;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function behaviors(): array
@@ -87,6 +78,9 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
             return false;
         }
+
+        $this->type_id = AcquaintanceType::IGNORE;
+
         if (!$this->save()) {
             Yii::error(['Error while ignoring member', $this->errors], 'podium');
             return false;

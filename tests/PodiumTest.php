@@ -9,9 +9,9 @@ use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Post;
+use bizley\podium\api\base\Rank;
 use bizley\podium\api\base\Thread;
 use bizley\podium\api\Podium;
-use bizley\podium\tests\props\EchoMigrateController;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -136,21 +136,8 @@ class PodiumTest extends DbTestCase
      */
     public function testGetMember(): void
     {
-        static::mockApplication([
-            'controllerMap' => [
-                'migrate' => [
-                    'class' => EchoMigrateController::class,
-                    'migrationPath' => __DIR__ . '/../migrations/',
-                    'interactive' => false,
-                ],
-            ],
-            'components' => [
-                'db' => static::getConnection(),
-            ],
-        ], \yii\console\Application::class);
-        static::runSilentMigration('migrate/up');
+        static::mockApplication();
         $this->assertInstanceOf(Member::class, $this->podium()->getMember());
-        static::runSilentMigration('migrate/down', ['all']);
     }
 
     /**
@@ -169,5 +156,14 @@ class PodiumTest extends DbTestCase
     {
         static::mockApplication();
         $this->assertInstanceOf(Thread::class, $this->podium()->getThread());
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function testGetRank(): void
+    {
+        static::mockApplication();
+        $this->assertInstanceOf(Rank::class, $this->podium()->getRank());
     }
 }

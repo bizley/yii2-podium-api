@@ -27,15 +27,6 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     public const EVENT_AFTER_UNFRIENDING = 'podium.acquaintance.unfriending.after';
 
     /**
-     * Sets acquaintance type.
-     */
-    public function init(): void
-    {
-        parent::init();
-        $this->type_id = AcquaintanceType::FRIEND;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function behaviors(): array
@@ -90,6 +81,9 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
             return false;
         }
+
+        $this->type_id = AcquaintanceType::FRIEND;
+
         if (!$this->save()) {
             Yii::error(['Error while befriending member', $this->errors], 'podium');
             return false;

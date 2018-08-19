@@ -21,12 +21,6 @@ class Registration extends MemberRepo implements RegistrationInterface
     public const EVENT_BEFORE_REGISTERING = 'podium.member.registering.before';
     public const EVENT_AFTER_REGISTERING = 'podium.member.registering.after';
 
-    public function init(): void
-    {
-        parent::init();
-        $this->status_id = MemberStatus::REGISTERED;
-    }
-
     /**
      * @return array
      */
@@ -93,6 +87,9 @@ class Registration extends MemberRepo implements RegistrationInterface
         if (!$this->beforeRegister()) {
             return false;
         }
+
+        $this->status_id = MemberStatus::REGISTERED;
+
         if (!$this->save()) {
             Yii::error(['Error while registering member', $this->errors], 'podium');
             return false;
