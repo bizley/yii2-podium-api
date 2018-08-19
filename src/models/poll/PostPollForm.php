@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\models\post;
+namespace bizley\podium\api\models\poll;
 
+use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
@@ -16,15 +17,40 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
 
 /**
- * Class PostForm
- * @package bizley\podium\api\models\post
+ * Class PostPollForm
+ * @package bizley\podium\api\models\poll
  */
-class PostForm extends PostRepo implements CategorisedFormInterface
+class PostPollForm extends PostRepo implements CategorisedFormInterface
 {
-    public const EVENT_BEFORE_CREATING = 'podium.post.creating.before';
-    public const EVENT_AFTER_CREATING = 'podium.post.creating.after';
-    public const EVENT_BEFORE_EDITING = 'podium.post.editing.before';
-    public const EVENT_AFTER_EDITING = 'podium.post.editing.after';
+    public const EVENT_BEFORE_CREATING = 'podium.poll.creating.before';
+    public const EVENT_AFTER_CREATING = 'podium.poll.creating.after';
+    public const EVENT_BEFORE_EDITING = 'podium.poll.editing.before';
+    public const EVENT_AFTER_EDITING = 'podium.poll.editing.after';
+
+    /**
+     * @var string
+     */
+    public $question;
+
+    /**
+     * @var bool
+     */
+    public $revealed;
+
+    /**
+     * @var string
+     */
+    public $choice_id;
+
+    /**
+     * @var int
+     */
+    public $expires_at;
+
+    /**
+     * @var array
+     */
+    public $answers = [];
 
     /**
      * @param MembershipInterface $author
@@ -99,8 +125,14 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     public function rules(): array
     {
         return [
-            [['content'], 'required'],
-            [['content'], 'string', 'min' => 3],
+            [['revealed'], 'default', 'value' => true],
+            [['choice_id'], 'default', 'value' => PollChoice::SINGLE],
+            [['question', 'revealed', 'choice_id', 'expires_at', 'answers'], 'required'],
+            [['question'], 'string', 'min' => 3],
+            [['revealed'], 'boolean'],
+            [['choice_id'], 'in', 'range' => PollChoice::keys()],
+            [['expires_at'], 'integer'],
+            [['answers'], 'each', 'rule' => ['string', 'min' => 3]],
         ];
     }
 
@@ -110,7 +142,11 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     public function attributeLabels(): array
     {
         return [
-            'content' => Yii::t('podium.label', 'post.content'),
+            'revealed' => Yii::t('podium.label', 'poll.revealed'),
+            'choice_id' => Yii::t('podium.label', 'poll.choice.type'),
+            'question' => Yii::t('podium.label', 'poll.question'),
+            'expires_at' => Yii::t('podium.label', 'poll.expires'),
+            'answers' => Yii::t('podium.label', 'poll.answers'),
         ];
     }
 
@@ -151,23 +187,45 @@ class PostForm extends PostRepo implements CategorisedFormInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->type_id = PostType::POST;
+            $this->type_id = PostType::POLL;
 
             if (!$this->save()) {
-                Yii::error(['Error while creating post', $this->errors], 'podium');
-                throw new Exception('Error while creating post!');
+                Yii::error(['Error while creating post for poll', $this->errors], 'podium');
+                throw new Exception('Error while creating post for poll!');
             }
+
+            $poll = new PollForm([
+                'post_id' => $this->id,
+                'question' => $this->question,
+                'revelead' => $this->revealed,
+                'choice_id' => $this->choice_id,
+                'expires_at' => $this->expires_at,
+            ]);
+            if (!$poll->create()) {
+                throw new Exception('Error while creating poll!');
+            }
+
+            foreach ($this->answers as $answer) {
+                $pollAnswer = new PollAnswerForm([
+                    'poll_id' => $poll->id,
+                    'answer' => $answer,
+                ]);
+                if (!$pollAnswer->create()) {
+                    throw new Exception('Error while creating poll answer!');
+                }
+            }
+
             $this->afterCreate();
 
             $transaction->commit();
             return true;
 
         } catch (\Throwable $exc) {
-            Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while creating poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
                 $transaction->rollBack();
             } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+                Yii::error(['Exception while poll creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
         return false;
@@ -199,8 +257,10 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
+        
         $this->edited = true;
         $this->edited_at = time();
+
         if (!$this->save()) {
             Yii::error(['Error while editing post', $this->errors], 'podium');
             return false;

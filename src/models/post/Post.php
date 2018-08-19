@@ -11,7 +11,7 @@ use bizley\podium\api\repos\PostRepo;
 use yii\base\NotSupportedException;
 
 /**
- * Class Thread
+ * Class Post
  * @package bizley\podium\api\models\post
  */
 class Post extends PostRepo implements ModelInterface

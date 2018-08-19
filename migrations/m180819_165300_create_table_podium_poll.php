@@ -21,7 +21,7 @@ class m180819_165300_create_table_podium_poll extends Migration
             'post_id' => $this->integer()->notNull(),
             'question' => $this->string(255)->notNull(),
             'revealed' => $this->boolean()->notNull()->defaultValue(true),
-            'type_id' => $choiceId,
+            'choice_id' => $choiceId,
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
             'expires_at' => $this->integer(),

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\enums\PostType;
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LikingInterface;
@@ -16,6 +17,7 @@ use bizley\podium\api\interfaces\RemovableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Post
@@ -36,6 +38,12 @@ class Post extends PodiumComponent implements PostInterface
     public $postFormHandler = \bizley\podium\api\models\post\PostForm::class;
 
     /**
+     * @var string|array|CategorisedFormInterface
+     * Component ID, class, configuration array, or instance of CategorisedFormInterface.
+     */
+    public $pollFormHandler = \bizley\podium\api\models\poll\PostPollForm::class;
+
+    /**
      * @var string|array|LikingInterface
      * Component ID, class, configuration array, or instance of LikingInterface.
      */
@@ -50,6 +58,7 @@ class Post extends PodiumComponent implements PostInterface
 
         $this->postHandler = Instance::ensure($this->postHandler, ModelInterface::class);
         $this->postFormHandler = Instance::ensure($this->postFormHandler, CategorisedFormInterface::class);
+        $this->pollFormHandler = Instance::ensure($this->pollFormHandler, CategorisedFormInterface::class);
         $this->likingHandler = Instance::ensure($this->likingHandler, LikingInterface::class);
     }
 
@@ -84,6 +93,14 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * @return CategorisedFormInterface
+     */
+    public function getPollForm(): CategorisedFormInterface
+    {
+        return new $this->pollFormHandler;
+    }
+
+    /**
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
@@ -91,7 +108,9 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function create(array $data, MembershipInterface $author, ModelInterface $thread): bool
     {
-        $postForm = $this->getPostForm();
+        $type = ArrayHelper::remove($data, 'type_id', PostType::POST);
+
+        $postForm = $type === PostType::POLL ? $this->getPollForm() : $this->getPostForm();
         $postForm->setAuthor($author);
         $postForm->setThread($thread);
 
@@ -102,16 +121,16 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
-     * @param ModelFormInterface $postForm
+     * @param ModelFormInterface $postOrPollForm
      * @param array $data
      * @return bool
      */
-    public function edit(ModelFormInterface $postForm, array $data): bool
+    public function edit(ModelFormInterface $postOrPollForm, array $data): bool
     {
-        if (!$postForm->loadData($data)) {
+        if (!$postOrPollForm->loadData($data)) {
             return false;
         }
-        return $postForm->edit();
+        return $postOrPollForm->edit();
     }
 
     /**

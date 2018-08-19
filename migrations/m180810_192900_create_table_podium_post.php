@@ -13,7 +13,7 @@ class m180810_192900_create_table_podium_post extends Migration
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $typeId = 'ENUM("post","poll") NOT NULL DEFAULT "post"';
         } else {
-            $typeId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\PollType::SINGLE_CHOICE);
+            $typeId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\PollChoice::SINGLE);
         }
 
         $this->createTable('{{%podium_post}}', [
@@ -22,7 +22,7 @@ class m180810_192900_create_table_podium_post extends Migration
             'forum_id' => $this->integer()->notNull(),
             'thread_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
-            'content' => $this->text()->notNull(),
+            'content' => $this->text(),
             'edited' => $this->boolean()->notNull()->defaultValue(false),
             'likes' => $this->integer()->notNull()->defaultValue(0),
             'dislikes' => $this->integer()->notNull()->defaultValue(0),
