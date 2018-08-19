@@ -7,6 +7,8 @@ return [
     'forum.already.archived' => 'Forum is already archived.',
     'forum.must.be.archived' => 'Forum must be archived first.',
     'forum.not.archived' => 'Forum is not archived.',
+    'group.already.joined' => 'Group is already joined.',
+    'group.not.joined' => 'Group is not joined.',
     'member.already.active' => 'Member is already active.',
     'member.already.banned' => 'Member is already banned.',
     'post.already.archived' => 'Post is already archived.',

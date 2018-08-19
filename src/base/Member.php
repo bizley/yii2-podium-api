@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\FriendshipInterface;
+use bizley\podium\api\interfaces\GroupingInterface;
 use bizley\podium\api\interfaces\IgnoringInterface;
 use bizley\podium\api\interfaces\BanInterface;
 use bizley\podium\api\interfaces\MemberInterface;
@@ -13,9 +14,6 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
-use bizley\podium\api\models\member\Friendship;
-use bizley\podium\api\models\member\Ignoring;
-use bizley\podium\api\models\member\Registration;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -29,6 +27,7 @@ use yii\di\Instance;
  * @property FriendshipInterface $friendship
  * @property RegistrationInterface $registration
  * @property MembershipInterface $membership
+ * @property GroupingInterface $grouping
  * @property IgnoringInterface $ignoring
  */
 class Member extends PodiumComponent implements MemberInterface
@@ -43,19 +42,25 @@ class Member extends PodiumComponent implements MemberInterface
      * @var string|array|RegistrationInterface
      * Component ID, class, configuration array, or instance of RegistrationInterface.
      */
-    public $registrationHandler = Registration::class;
+    public $registrationHandler = \bizley\podium\api\models\member\Registration::class;
 
     /**
      * @var string|array|FriendshipInterface
      * Component ID, class, configuration array, or instance of FriendshipInterface.
      */
-    public $friendshipHandler = Friendship::class;
+    public $friendshipHandler = \bizley\podium\api\models\member\Friendship::class;
 
     /**
      * @var string|array|IgnoringInterface
      * Component ID, class, configuration array, or instance of IgnoringInterface.
      */
-    public $ignoringHandler = Ignoring::class;
+    public $ignoringHandler = \bizley\podium\api\models\member\Ignoring::class;
+
+    /**
+     * @var string|array|GroupingInterface
+     * Component ID, class, configuration array, or instance of GroupingInterface.
+     */
+    public $groupingHandler = \bizley\podium\api\models\member\Grouping::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -68,6 +73,7 @@ class Member extends PodiumComponent implements MemberInterface
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
+        $this->groupingHandler = Instance::ensure($this->groupingHandler, GroupingInterface::class);
     }
 
     /**
@@ -229,5 +235,41 @@ class Member extends PodiumComponent implements MemberInterface
     public function unban(BanInterface $member): bool
     {
         return $member->unban();
+    }
+
+    /**
+     * @return GroupingInterface
+     */
+    public function getGrouping(): GroupingInterface
+    {
+        return new $this->groupingHandler;
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function join(MembershipInterface $member, ModelInterface $group): bool
+    {
+        $grouping = $this->getGrouping();
+        $grouping->setMember($member);
+        $grouping->setGroup($group);
+
+        return $grouping->join();
+    }
+
+    /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function leave(MembershipInterface $member, ModelInterface $group): bool
+    {
+        $grouping = $this->getGrouping();
+        $grouping->setMember($member);
+        $grouping->setGroup($group);
+
+        return $grouping->leave();
     }
 }

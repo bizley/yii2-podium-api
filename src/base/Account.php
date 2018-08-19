@@ -158,4 +158,22 @@ class Account extends PodiumComponent implements AccountInterface
     {
         return $this->podium->thread->mark($this->membership, $post);
     }
+
+    /**
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function join(ModelInterface $group): bool
+    {
+        return $this->podium->member->join($this->membership, $group);
+    }
+
+    /**
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function leave(ModelInterface $group): bool
+    {
+        return $this->podium->member->leave($this->membership, $group);
+    }
 }

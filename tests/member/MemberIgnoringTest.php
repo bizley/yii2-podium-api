@@ -77,12 +77,11 @@ class MemberIgnoringTest extends DbTestCase
 
         $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
             'target_id' => 101,
             'type_id' => AcquaintanceType::IGNORE,
-        ]);
-        $this->assertNotEmpty($acq);
+        ]));
 
         $this->assertArrayHasKey(Ignoring::EVENT_BEFORE_IGNORING, static::$eventsRaised);
         $this->assertArrayHasKey(Ignoring::EVENT_AFTER_IGNORING, static::$eventsRaised);
@@ -97,12 +96,11 @@ class MemberIgnoringTest extends DbTestCase
 
         $this->assertFalse($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
             'target_id' => 101,
             'type_id' => AcquaintanceType::IGNORE,
-        ]);
-        $this->assertEmpty($acq);
+        ]));
 
         Event::off(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, $handler);
     }
@@ -123,12 +121,11 @@ class MemberIgnoringTest extends DbTestCase
 
         $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 101,
             'target_id' => 102,
             'type_id' => AcquaintanceType::IGNORE,
-        ]);
-        $this->assertEmpty($acq);
+        ]));
 
         $this->assertArrayHasKey(Ignoring::EVENT_BEFORE_UNIGNORING, static::$eventsRaised);
         $this->assertArrayHasKey(Ignoring::EVENT_AFTER_UNIGNORING, static::$eventsRaised);
@@ -143,12 +140,11 @@ class MemberIgnoringTest extends DbTestCase
 
         $this->assertFalse($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 101,
             'target_id' => 102,
             'type_id' => AcquaintanceType::IGNORE,
-        ]);
-        $this->assertNotEmpty($acq);
+        ]));
 
         Event::off(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, $handler);
     }

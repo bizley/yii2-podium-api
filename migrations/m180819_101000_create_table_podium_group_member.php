@@ -19,6 +19,7 @@ class m180819_101000_create_table_podium_group_member extends Migration
             'created_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
+        $this->addPrimaryKey('pk-podium_group_member', '{{%podium_group_member}}', ['member_id', 'group_id']);
         $this->addForeignKey(
             'fk-podium_group_member-member_id',
             '{{%podium_group_member}}', 'member_id',

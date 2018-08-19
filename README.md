@@ -9,6 +9,7 @@
   - [x] like post
   - [x] subscribe thread
   - [x] bookmark thread
+  - [x] join group
 - [x] Member
   - [x] befriend member
   - [x] ignore member
@@ -18,6 +19,7 @@
   - [x] delete member
   - [x] ban member
   - [ ] member profile
+  - [x] join group
 - [x] Category
   - [x] view category
   - [x] list categories
@@ -62,10 +64,15 @@
   - [x] create rank
   - [x] update rank
   - [x] delete rank
+- [x] Group
+  - [x] view group
+  - [x] list groups
+  - [x] create group
+  - [x] update group
+  - [x] delete group
 - [ ] Poll
 - [ ] Message
 - [ ] Activity
-- [ ] Group
 
 ## NOTES:
 

@@ -78,4 +78,16 @@ interface AccountInterface
      * @return bool
      */
     public function mark(ModelInterface $post): bool;
+
+    /**
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function join(ModelInterface $group): bool;
+
+    /**
+     * @param ModelInterface $group
+     * @return bool
+     */
+    public function leave(ModelInterface $group): bool;
 }
