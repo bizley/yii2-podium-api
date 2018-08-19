@@ -9,6 +9,7 @@ return [
     'forum.sort' => 'Forum Sort Order',
     'forum.sort.order' => 'Forum Sort Order',
     'forum.visible' => 'Forum Visible For Guests',
+    'group.name' => 'Group Name',
     'member.username' => 'Username',
     'post.content' => 'Post Content',
     'rank.minimum.posts' => 'Rank Minimum Number Of Posts',

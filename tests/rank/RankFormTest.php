@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\tests\rank;
 
 use bizley\podium\api\models\rank\RankForm;
-use bizley\podium\api\repos\CategoryRepo;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
@@ -74,7 +73,7 @@ class RankFormTest extends DbTestCase
         ];
         $this->assertFalse($this->podium()->rank->create($data));
 
-        $this->assertEmpty(CategoryRepo::findOne(['name' => 'rank-new']));
+        $this->assertEmpty(RankRepo::findOne(['name' => 'rank-new']));
 
         Event::off(RankForm::class, RankForm::EVENT_BEFORE_CREATING, $handler);
     }
@@ -86,7 +85,7 @@ class RankFormTest extends DbTestCase
             'min_posts' => 0,
         ];
         $this->assertFalse($this->podium()->rank->create($data));
-        $this->assertEmpty(CategoryRepo::findOne(['name' => 'rank-new']));
+        $this->assertEmpty(RankRepo::findOne(['name' => 'rank-new']));
     }
 
     public function testUpdate(): void
