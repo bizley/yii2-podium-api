@@ -37,7 +37,7 @@ class Member extends MemberRepo implements MembershipInterface
      */
     public function getParent(): ModelInterface
     {
-        throw new NotSupportedException('Member has not got a parent.');
+        throw new NotSupportedException('Member has got no parent.');
     }
 
     /**

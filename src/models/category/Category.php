@@ -23,7 +23,7 @@ class Category extends CategoryRepo implements ModelInterface
      */
     public function getParent(): ModelInterface
     {
-        throw new NotSupportedException('Category has not got a parent.');
+        throw new NotSupportedException('Category has got no parent.');
     }
 
     /**
@@ -32,7 +32,7 @@ class Category extends CategoryRepo implements ModelInterface
      */
     public function getPostsCount(): int
     {
-        throw new NotSupportedException('Category has not got posts.');
+        throw new NotSupportedException('Category has got no posts.');
     }
 
     /**

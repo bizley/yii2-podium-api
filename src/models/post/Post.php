@@ -32,7 +32,7 @@ class Post extends PostRepo implements ModelInterface
      */
     public function getPostsCount(): int
     {
-        throw new NotSupportedException('Post has not got posts.');
+        throw new NotSupportedException('Post has got no posts.');
     }
 
     /**

@@ -23,7 +23,7 @@ class Rank extends RankRepo implements ModelInterface
      */
     public function getParent(): ModelInterface
     {
-        throw new NotSupportedException('Rank has not got a parent.');
+        throw new NotSupportedException('Rank has got no parent.');
     }
 
     /**
@@ -32,7 +32,7 @@ class Rank extends RankRepo implements ModelInterface
      */
     public function getPostsCount(): int
     {
-        throw new NotSupportedException('Rank has not got posts.');
+        throw new NotSupportedException('Rank has got no posts.');
     }
 
     /**

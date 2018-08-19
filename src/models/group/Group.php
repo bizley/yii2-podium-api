@@ -23,7 +23,7 @@ class Group extends GroupRepo implements ModelInterface
      */
     public function getParent(): ModelInterface
     {
-        throw new NotSupportedException('Group has not got a parent.');
+        throw new NotSupportedException('Group has got no parent.');
     }
 
     /**
@@ -32,7 +32,7 @@ class Group extends GroupRepo implements ModelInterface
      */
     public function getPostsCount(): int
     {
-        throw new NotSupportedException('Group has not got posts.');
+        throw new NotSupportedException('Group has got no posts.');
     }
 
     /**
