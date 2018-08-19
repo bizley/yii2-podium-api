@@ -14,11 +14,15 @@ use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\Exception;
 
 /**
  * Class PostPollForm
  * @package bizley\podium\api\models\poll
+ *
+ * @property PollForm $poll
+ * @property PollAnswerForm[] $pollAnswers
  */
 class PostPollForm extends PostRepo implements CategorisedFormInterface
 {
@@ -51,6 +55,59 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
      * @var array
      */
     public $answers = [];
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPoll(): ActiveQuery
+    {
+        return $this->hasOne(PollForm::class, ['post_id' => 'id']);
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPollAnswers(): ActiveQuery
+    {
+        return $this->hasMany(PollAnswerForm::class, ['poll_id' => 'id'])->via('poll');
+    }
+
+    private $_oldAnswers = [];
+
+    /**
+     * @return array
+     */
+    public function getOldAnswers(): array
+    {
+        return $this->_oldAnswers;
+    }
+
+    /**
+     * @param string $oldAnswer
+     */
+    public function addOldAnswer(string $oldAnswer): void
+    {
+        $this->_oldAnswers[] = $oldAnswer;
+    }
+
+    public function afterFind(): void
+    {
+        $poll = $this->poll;
+        if ($poll !== null) {
+            $this->question = $poll->question;
+            $this->revealed = $poll->revelead;
+            $this->choice_id = $poll->choice_id;
+            $this->expires_at = $poll->expires_at;
+
+            $answers = $this->pollAnswers;
+            foreach ($answers as $pollAnswer) {
+                $this->addOldAnswer($pollAnswer->answer);
+                $this->answers[] = $pollAnswer->answer;
+            }
+        }
+
+        parent::afterFind();
+    }
 
     /**
      * @param MembershipInterface $author
@@ -257,16 +314,66 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeEdit()) {
             return false;
         }
-        
-        $this->edited = true;
-        $this->edited_at = time();
 
-        if (!$this->save()) {
-            Yii::error(['Error while editing post', $this->errors], 'podium');
-            return false;
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $this->edited = true;
+            $this->edited_at = time();
+
+            if (!$this->save()) {
+                Yii::error(['Error while editing post for poll', $this->errors], 'podium');
+                return false;
+            }
+
+            $poll = $this->poll;
+            if ($poll === null) {
+                throw new Exception('Poll does not exist!');
+            }
+
+            foreach (['question', 'revelead', 'choice_id', 'expires_at'] as $property) {
+                if ($this->$property !== $poll->$property) {
+                    $poll->$property = $this->$property;
+                }
+            }
+
+            if (!$poll->edit()) {
+                throw new Exception('Error while editing poll!');
+            }
+
+            $answersToAdd = array_diff($this->answers, $this->getOldAnswers());
+            $answersToRemove = array_diff($this->getOldAnswers(), $this->answers);
+
+            foreach ($answersToAdd as $answer) {
+                $pollAnswer = new PollAnswerForm([
+                    'poll_id' => $poll->id,
+                    'answer' => $answer,
+                ]);
+                if (!$pollAnswer->create()) {
+                    throw new Exception('Error while creating poll answer!');
+                }
+            }
+            foreach ($answersToRemove as $answer) {
+                $pollAnswer = new PollAnswerRemover([
+                    'poll_id' => $poll->id,
+                    'answer' => $answer,
+                ]);
+                if (!$pollAnswer->remove()) {
+                    throw new Exception('Error while removing poll answer!');
+                }
+            }
+
+            $this->afterEdit();
+            return true;
+
+        } catch (\Throwable $exc) {
+            Yii::error(['Exception while editing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            try {
+                $transaction->rollBack();
+            } catch (\Throwable $excTrans) {
+                Yii::error(['Exception while poll editing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
+            }
         }
-        $this->afterEdit();
-        return true;
+        return false;
     }
 
     public function afterEdit(): void
@@ -282,7 +389,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
      */
     public function setCategory(ModelInterface $category): void
     {
-        throw new NotSupportedException('Post category can not be set directly.');
+        throw new NotSupportedException('Poll category can not be set directly.');
     }
 
     /**
@@ -291,6 +398,6 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
      */
     public function setForum(ModelInterface $forum): void
     {
-        throw new NotSupportedException('Post forum can not be set directly.');
+        throw new NotSupportedException('Poll forum can not be set directly.');
     }
 }
