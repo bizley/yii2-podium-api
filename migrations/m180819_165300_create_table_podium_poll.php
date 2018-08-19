@@ -11,9 +11,9 @@ class m180819_165300_create_table_podium_poll extends Migration
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
-            $typeId = 'ENUM("single","multiple") NOT NULL DEFAULT "single"';
+            $choiceId = 'ENUM("single","multiple") NOT NULL DEFAULT "single"';
         } else {
-            $typeId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\PollType::SINGLE_CHOICE);
+            $choiceId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\PollChoice::SINGLE);
         }
 
         $this->createTable('{{%podium_poll}}', [
@@ -21,7 +21,7 @@ class m180819_165300_create_table_podium_poll extends Migration
             'post_id' => $this->integer()->notNull(),
             'question' => $this->string(255)->notNull(),
             'revealed' => $this->boolean()->notNull()->defaultValue(true),
-            'type_id' => $typeId,
+            'type_id' => $choiceId,
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
             'expires_at' => $this->integer(),

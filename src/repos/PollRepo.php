@@ -13,7 +13,7 @@ use yii\db\ActiveRecord;
  * @property int $post_id
  * @property string $question
  * @property bool $revelead
- * @property string $type_id
+ * @property string $choice_id
  * @property int $created_at
  * @property int $updated_at
  * @property int $expires_at
