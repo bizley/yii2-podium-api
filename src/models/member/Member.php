@@ -8,11 +8,15 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\repos\MemberRepo;
+use bizley\podium\api\repos\PostRepo;
 use yii\base\NotSupportedException;
 
 /**
  * Class Member
  * @package bizley\podium\api\models\member
+ *
+ * @property ModelInterface $parent
+ * @property int $postsCount
  */
 class Member extends MemberRepo implements MembershipInterface
 {
@@ -38,10 +42,15 @@ class Member extends MemberRepo implements MembershipInterface
 
     /**
      * @return int
+     * @throws NotSupportedException
      */
     public function getPostsCount(): int
     {
-        // TODO
+        $counter = PostRepo::find()->where(['author_id' => $this->getId()])->count();
+        if ($counter > PHP_INT_MAX) {
+            throw new NotSupportedException('Your system can not handle integer that big.');
+        }
+        return (int) $counter;
     }
 
     /**

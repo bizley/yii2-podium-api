@@ -38,6 +38,74 @@ class MemberTest extends DbTestCase
                 'updated_at' => 1,
             ],
         ],
+        'podium_category' => [
+            [
+                'id' => 1,
+                'author_id' => 2,
+                'name' => 'category1',
+                'slug' => 'category1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_forum' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'author_id' => 2,
+                'name' => 'forum1',
+                'slug' => 'forum1',
+                'threads_count' => 5,
+                'posts_count' => 67,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_thread' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 2,
+                'name' => 'thread1',
+                'slug' => 'thread1',
+                'posts_count' => 21,
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_post' => [
+            [
+                'id' => 1,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 2,
+                'content' => 'post1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 2,
+                'content' => 'post2',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 3,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 2,
+                'content' => 'post3',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
     ];
 
     public function testGetMemberById(): void
@@ -75,5 +143,11 @@ class MemberTest extends DbTestCase
         $members = $this->podium()->member->getMembers($filter);
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $member = $this->podium()->member->getMemberById(2);
+        $this->assertEquals(3, $member->getPostsCount());
     }
 }
