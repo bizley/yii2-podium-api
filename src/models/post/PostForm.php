@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\post;
 
+use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -149,6 +150,8 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             if (!$this->getForumModel()->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating forum counters!');
             }
+
+            $this->type_id = PostType::POST;
 
             if (!$this->save()) {
                 Yii::error(['Error while creating post', $this->errors], 'podium');
