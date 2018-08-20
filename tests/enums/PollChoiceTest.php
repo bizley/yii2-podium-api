@@ -16,8 +16,8 @@ class PollChoiceTest extends TestCase
     public function testData(): void
     {
         $this->assertEquals([
-            PollChoice::SINGLE => 'poll.type.single',
-            PollChoice::MULTIPLE => 'poll.type.multiple',
+            PollChoice::SINGLE => 'poll.choice.single',
+            PollChoice::MULTIPLE => 'poll.choice.multiple',
         ], PollChoice::data());
     }
 }

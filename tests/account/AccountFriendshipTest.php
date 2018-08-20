@@ -96,12 +96,11 @@ class AccountFriendshipTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->befriend(Member::findOne(11)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::FRIEND,
-        ]);
-        $this->assertNotEmpty($acq);
+        ]));
 
         $this->assertArrayHasKey(Friendship::EVENT_BEFORE_BEFRIENDING, static::$eventsRaised);
         $this->assertArrayHasKey(Friendship::EVENT_AFTER_BEFRIENDING, static::$eventsRaised);
@@ -116,12 +115,11 @@ class AccountFriendshipTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->befriend(Member::findOne(11)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::FRIEND,
-        ]);
-        $this->assertEmpty($acq);
+        ]));
 
         Event::off(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
     }
@@ -142,12 +140,11 @@ class AccountFriendshipTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->unfriend(Member::findOne(12)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::FRIEND,
-        ]);
-        $this->assertEmpty($acq);
+        ]));
 
         $this->assertArrayHasKey(Friendship::EVENT_BEFORE_UNFRIENDING, static::$eventsRaised);
         $this->assertArrayHasKey(Friendship::EVENT_AFTER_UNFRIENDING, static::$eventsRaised);
@@ -162,12 +159,11 @@ class AccountFriendshipTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->unfriend(Member::findOne(12)));
 
-        $acq = AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::FRIEND,
-        ]);
-        $this->assertNotEmpty($acq);
+        ]));
 
         Event::off(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
     }

@@ -118,15 +118,17 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         if (!$this->beforeUnfriend()) {
             return false;
         }
+
         $friendship = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
-            'type_id' => $this->type_id,
+            'type_id' => AcquaintanceType::FRIEND,
         ])->one();
         if ($friendship === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.befriended'));
             return false;
         }
+
         try {
             if (!$friendship->delete()) {
                 Yii::error('Error while unfriending member', 'podium');

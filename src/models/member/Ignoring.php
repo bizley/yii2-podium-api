@@ -115,15 +115,17 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         if (!$this->beforeUnignore()) {
             return false;
         }
+
         $ignoring = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
-            'type_id' => $this->type_id,
+            'type_id' => AcquaintanceType::IGNORE,
         ])->one();
         if ($ignoring === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.ignored'));
             return false;
         }
+
         try {
             if (!$ignoring->delete()) {
                 Yii::error('Error while unignoring member', 'podium');
