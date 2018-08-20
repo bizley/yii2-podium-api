@@ -22,10 +22,7 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
     public function behaviors(): array
     {
         return [
-            'timestamp' => [
-                'class' => TimestampBehavior::class,
-                'updatedAtAttribute' => false,
-            ],
+            'timestamp' => TimestampBehavior::class,
         ];
     }
 
@@ -56,9 +53,10 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
     /**
      * Updates model.
      * @return bool
+     * @throws NotSupportedException
      */
     public function edit(): bool
     {
-        // TODO: Implement edit() method.
+        throw new NotSupportedException('Use PostPollForm to update poll.');
     }
 }

@@ -56,6 +56,10 @@ class PollForm extends PollRepo implements ModelFormInterface
      */
     public function edit(): bool
     {
-        // TODO: Implement edit() method.
+        if (!$this->save(false)) {
+            Yii::error(['Error while updating poll', $this->errors], 'podium');
+            return false;
+        }
+        return true;
     }
 }

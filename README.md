@@ -70,7 +70,17 @@
   - [x] create group
   - [x] update group
   - [x] delete group
-- [ ] Poll
+- [x] Poll
+  - [x] view poll
+  - [x] list polls
+  - [x] create poll
+  - [x] update poll
+  - [ ] delete poll
+  - [x] view poll answer
+  - [x] list poll answers
+  - [x] create poll answer
+  - [x] update poll answer
+  - [x] delete poll answer
 - [ ] Message
 - [ ] Activity
 

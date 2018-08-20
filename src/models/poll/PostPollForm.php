@@ -83,11 +83,12 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
+     * @param int $id
      * @param string $oldAnswer
      */
-    public function addOldAnswer(string $oldAnswer): void
+    public function addOldAnswer(int $id, string $oldAnswer): void
     {
-        $this->_oldAnswers[] = $oldAnswer;
+        $this->_oldAnswers[$id] = $oldAnswer;
     }
 
     public function afterFind(): void
@@ -95,13 +96,13 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
         $poll = $this->poll;
         if ($poll !== null) {
             $this->question = $poll->question;
-            $this->revealed = $poll->revelead;
+            $this->revealed = $poll->revealed;
             $this->choice_id = $poll->choice_id;
             $this->expires_at = $poll->expires_at;
 
             $answers = $this->pollAnswers;
             foreach ($answers as $pollAnswer) {
-                $this->addOldAnswer($pollAnswer->answer);
+                $this->addOldAnswer($pollAnswer->id, $pollAnswer->answer);
                 $this->answers[] = $pollAnswer->answer;
             }
         }
@@ -184,8 +185,8 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
         return [
             [['revealed'], 'default', 'value' => true],
             [['choice_id'], 'default', 'value' => PollChoice::SINGLE],
-            [['question', 'revealed', 'choice_id', 'expires_at', 'answers'], 'required'],
-            [['question'], 'string', 'min' => 3],
+            [['question', 'revealed', 'choice_id', 'expires_at', 'answers', 'content'], 'required'],
+            [['question', 'content'], 'string', 'min' => 3],
             [['revealed'], 'boolean'],
             [['choice_id'], 'in', 'range' => PollChoice::keys()],
             [['expires_at'], 'integer'],
@@ -199,6 +200,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
     public function attributeLabels(): array
     {
         return [
+            'content' => Yii::t('podium.label', 'post.content'),
             'revealed' => Yii::t('podium.label', 'poll.revealed'),
             'choice_id' => Yii::t('podium.label', 'poll.choice.type'),
             'question' => Yii::t('podium.label', 'poll.question'),
@@ -254,7 +256,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $poll = new PollForm([
                 'post_id' => $this->id,
                 'question' => $this->question,
-                'revelead' => $this->revealed,
+                'revealed' => $this->revealed,
                 'choice_id' => $this->choice_id,
                 'expires_at' => $this->expires_at,
             ]);
@@ -330,7 +332,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 throw new Exception('Poll does not exist!');
             }
 
-            foreach (['question', 'revelead', 'choice_id', 'expires_at'] as $property) {
+            foreach (['question', 'revealed', 'choice_id', 'expires_at'] as $property) {
                 if ($this->$property !== $poll->$property) {
                     $poll->$property = $this->$property;
                 }
@@ -352,17 +354,15 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                     throw new Exception('Error while creating poll answer!');
                 }
             }
-            foreach ($answersToRemove as $answer) {
-                $pollAnswer = new PollAnswerRemover([
-                    'poll_id' => $poll->id,
-                    'answer' => $answer,
-                ]);
-                if (!$pollAnswer->remove()) {
+            foreach ($answersToRemove as $answerId => $answer) {
+                if (!PollAnswerRemover::findOne($answerId)->remove()) {
                     throw new Exception('Error while removing poll answer!');
                 }
             }
 
             $this->afterEdit();
+
+            $transaction->commit();
             return true;
 
         } catch (\Throwable $exc) {

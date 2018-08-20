@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\post\PostForm;
 use bizley\podium\api\models\thread\Thread;
@@ -111,6 +112,7 @@ class PostFormTest extends DbTestCase
             'likes' => 0,
             'dislikes' => 0,
             'edited_at' => null,
+            'type_id' => PostType::POST,
         ]), [
             'content' => $post->content,
             'author_id' => $post->author_id,
@@ -121,6 +123,7 @@ class PostFormTest extends DbTestCase
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
             'edited_at' => $post->edited_at,
+            'type_id' => $post->type_id,
         ]);
 
         $this->assertEquals(3, ThreadRepo::findOne(1)->posts_count);
@@ -170,6 +173,7 @@ class PostFormTest extends DbTestCase
             'likes' => 0,
             'dislikes' => 0,
             'edited_at' => time(),
+            'type_id' => PostType::POST,
         ]), [
             'content' => $post->content,
             'author_id' => $post->author_id,
@@ -180,6 +184,7 @@ class PostFormTest extends DbTestCase
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
             'edited_at' => $post->edited_at,
+            'type_id' => $post->type_id,
         ]);
         $this->assertEmpty(PostRepo::findOne(['content' => 'post1']));
 
