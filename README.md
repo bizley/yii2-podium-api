@@ -97,4 +97,3 @@
 
 - getModels methods in interfaces
 - get errors on methods returns
-- getParent change to use relations

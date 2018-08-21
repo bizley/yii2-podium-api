@@ -9,10 +9,15 @@ use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\repos\PollAnswerRepo;
 use yii\base\NotSupportedException;
+use yii\db\ActiveQuery;
 
 /**
  * Class PollAnswer
  * @package bizley\podium\api\models\poll
+ *
+ * @property ModelInterface $parent
+ * @property Poll $poll
+ * @property int $pollId
  */
 class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
 {
@@ -23,7 +28,15 @@ class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
      */
     public function getParent(): ModelInterface
     {
-        return Poll::findById($this->poll_id);
+        return $this->poll;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getPoll(): ActiveQuery
+    {
+        return $this->hasOne(Poll::class, ['id' => 'poll_id']);
     }
 
     /**

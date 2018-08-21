@@ -8,10 +8,15 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\repos\ThreadRepo;
+use yii\db\ActiveQuery;
 
 /**
  * Class Thread
  * @package bizley\podium\api\models\thread
+ *
+ * @property ModelInterface $parent
+ * @property Forum $forum
+ * @property int $postsCount
  */
 class Thread extends ThreadRepo implements ModelInterface
 {
@@ -22,7 +27,15 @@ class Thread extends ThreadRepo implements ModelInterface
      */
     public function getParent(): ModelInterface
     {
-        return Forum::findById($this->forum_id);
+        return $this->forum;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getForum(): ActiveQuery
+    {
+        return $this->hasOne(Forum::class, ['id' => 'forum_id']);
     }
 
     /**
