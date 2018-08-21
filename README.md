@@ -75,7 +75,7 @@
   - [x] list polls
   - [x] create poll
   - [x] update poll
-  - [ ] delete poll
+  - [x] delete poll
   - [x] view poll answer
   - [x] list poll answers
   - [x] create poll answer
