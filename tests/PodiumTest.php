@@ -8,6 +8,7 @@ use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Member;
+use bizley\podium\api\base\Message;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
 use bizley\podium\api\base\Thread;
@@ -130,9 +131,6 @@ class PodiumTest extends DbTestCase
 
     /**
      * @throws \yii\base\InvalidConfigException
-     * @throws \yii\base\InvalidRouteException
-     * @throws \yii\console\Exception
-     * @throws \yii\db\Exception
      */
     public function testGetMember(): void
     {
@@ -165,5 +163,14 @@ class PodiumTest extends DbTestCase
     {
         static::mockApplication();
         $this->assertInstanceOf(Rank::class, $this->podium()->getRank());
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function testGetMessage(): void
+    {
+        static::mockApplication();
+        $this->assertInstanceOf(Message::class, $this->podium()->getMessage());
     }
 }

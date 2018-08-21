@@ -10,6 +10,7 @@
   - [x] subscribe thread
   - [x] bookmark thread
   - [x] join group
+  - [ ] poll vote
 - [x] Member
   - [x] befriend member
   - [x] ignore member
@@ -18,7 +19,6 @@
   - [x] update member
   - [x] delete member
   - [x] ban member
-  - [ ] member profile
   - [x] join group
 - [x] Category
   - [x] view category
@@ -82,11 +82,19 @@
   - [x] update poll answer
   - [x] delete poll answer
   - [x] poll vote
-- [ ] Message
-- [ ] Activity
+- [x] Message
+  - [ ] view message
+  - [ ] list messages
+  - [ ] create message
+  - [ ] delete message
+  - [ ] archive message
 
 ## NOTES:
 
 - When method operates on model not fetched from DB use handler.
 
 ## TODO:
+
+- poll voting from account
+- getModels methods in interfaces
+- get errors on methods returns

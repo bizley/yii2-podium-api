@@ -9,6 +9,7 @@ use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
+use bizley\podium\api\base\Message;
 use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
@@ -41,6 +42,7 @@ use yii\i18n\PhpMessageSource;
  * @property Forum $forum
  * @property Group $group
  * @property Member $member
+ * @property Message $message
  * @property Poll $poll
  * @property Post $post
  * @property Rank $rank
@@ -93,6 +95,7 @@ class Podium extends ServiceLocator
             'forum' => ['class' => Forum::class],
             'group' => ['class' => Group::class],
             'member' => ['class' => Member::class],
+            'message' => ['class' => Message::class],
             'poll' => ['class' => Poll::class],
             'post' => ['class' => Post::class],
             'rank' => ['class' => Rank::class],
@@ -148,6 +151,16 @@ class Podium extends ServiceLocator
     public function getMember()
     {
         return $this->get('member');
+    }
+
+    /**
+     * Returns message component.
+     * @return Message|null|object
+     * @throws InvalidConfigException
+     */
+    public function getMessage()
+    {
+        return $this->get('message');
     }
 
     /**
