@@ -81,6 +81,7 @@
   - [x] create poll answer
   - [x] update poll answer
   - [x] delete poll answer
+  - [ ] poll vote
 - [ ] Message
 - [ ] Activity
 

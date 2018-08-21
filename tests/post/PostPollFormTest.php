@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\poll;
+namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
@@ -20,7 +20,7 @@ use yii\base\Event;
 
 /**
  * Class PostPollFormTest
- * @package bizley\podium\tests\poll
+ * @package bizley\podium\tests\post
  */
 class PostPollFormTest extends DbTestCase
 {
@@ -129,6 +129,7 @@ class PostPollFormTest extends DbTestCase
         });
 
         $data = [
+            'type_id' => PostType::POLL,
             'content' => 'post-new',
             'question' => 'question-new',
             'revealed' => false,
@@ -136,7 +137,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 1,
             'answers' => ['answer1', 'answer2'],
         ];
-        $this->assertTrue($this->podium()->poll->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
 
         $post = PostRepo::findOne(['content' => 'post-new']);
         $this->assertEquals([
@@ -196,6 +197,7 @@ class PostPollFormTest extends DbTestCase
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_CREATING, $handler);
 
         $data = [
+            'type_id' => PostType::POLL,
             'content' => 'post-new',
             'question' => 'question-new',
             'revealed' => false,
@@ -203,7 +205,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 1,
             'answers' => ['answer1', 'answer2'],
         ];
-        $this->assertFalse($this->podium()->poll->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
 
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-new']));
 
@@ -230,7 +232,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertTrue($this->podium()->poll->edit(PostPollForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->post->edit(PostPollForm::findOne(1),  $data));
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals([
@@ -295,7 +297,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1),  $data));
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
