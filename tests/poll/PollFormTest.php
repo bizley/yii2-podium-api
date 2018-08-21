@@ -88,6 +88,30 @@ class PollFormTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+            [
+                'id' => 2,
+                'post_id' => 1,
+                'question' => 'question2',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_poll_answer' => [
+            [
+                'id' => 1,
+                'poll_id' => 2,
+                'answer' => 'answer1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_poll_vote' => [
+            [
+                'poll_id' => 2,
+                'member_id' => 1,
+                'answer_id' => 1,
+                'created_at' => 1,
+            ],
         ],
     ];
 
@@ -126,5 +150,13 @@ class PollFormTest extends DbTestCase
 
         $pollUpdated = PollRepo::findOne(1);
         $this->assertEquals('question-updated', $pollUpdated->question);
+    }
+
+    public function testUpdateAlreadyVoted(): void
+    {
+        $poll = PollForm::findOne(2);
+        $poll->question = 'question-updated';
+
+        $this->assertFalse($poll->edit());
     }
 }

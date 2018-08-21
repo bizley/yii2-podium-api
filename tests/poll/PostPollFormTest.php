@@ -86,12 +86,30 @@ class PostPollFormTest extends DbTestCase
                 'updated_at' => 1,
                 'type_id' => PostType::POLL,
             ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
+                'content' => 'post2',
+                'created_at' => 1,
+                'updated_at' => 1,
+                'type_id' => PostType::POLL,
+            ],
         ],
         'podium_poll' => [
             [
                 'id' => 1,
                 'post_id' => 1,
                 'question' => 'question1',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+            [
+                'id' => 2,
+                'post_id' => 2,
+                'question' => 'question2',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -110,6 +128,21 @@ class PostPollFormTest extends DbTestCase
                 'answer' => 'answer2',
                 'created_at' => 1,
                 'updated_at' => 1,
+            ],
+            [
+                'id' => 3,
+                'poll_id' => 2,
+                'answer' => 'answer3',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_poll_vote' => [
+            [
+                'poll_id' => 2,
+                'member_id' => 1,
+                'answer_id' => 3,
+                'created_at' => 1,
             ],
         ],
     ];
@@ -301,5 +334,18 @@ class PostPollFormTest extends DbTestCase
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
 
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateAlreadyVoted(): void
+    {
+        $data = [
+            'content' => 'post-updated',
+            'question' => 'question-updated',
+            'revealed' => true,
+            'choice_id' => PollChoice::SINGLE,
+            'expires_at' => 2,
+            'answers' => ['answer3'],
+        ];
+        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2),  $data));
     }
 }

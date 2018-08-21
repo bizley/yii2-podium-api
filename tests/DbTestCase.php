@@ -77,6 +77,16 @@ abstract class DbTestCase extends TestCase
                 'podium' => [
                     'class' => Podium::class
                 ],
+                'i18n' => [
+                    'translations' => [
+                        'podium.*' => [
+                            'class' => \yii\i18n\PhpMessageSource::class,
+                            'sourceLanguage' => 'en',
+                            'forceTranslation' => true,
+                            'basePath' => '@app/messages',
+                        ],
+                    ],
+                ],
             ],
         ], $config));
     }

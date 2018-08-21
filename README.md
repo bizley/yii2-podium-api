@@ -90,5 +90,3 @@
 - When method operates on model not fetched from DB use handler.
 
 ## TODO:
-
-- block poll editing after vote

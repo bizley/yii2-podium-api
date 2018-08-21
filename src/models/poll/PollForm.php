@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\poll;
 
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\repos\PollRepo;
+use bizley\podium\api\repos\PollVoteRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -56,6 +57,11 @@ class PollForm extends PollRepo implements ModelFormInterface
      */
     public function edit(): bool
     {
+        if (PollVoteRepo::find()->where(['poll_id' => $this->id])->exists()) {
+            $this->addError('id', Yii::t('podium.error', 'poll.already.voted'));
+            return false;
+        }
+
         if (!$this->save(false)) {
             Yii::error(['Error while updating poll', $this->errors], 'podium');
             return false;

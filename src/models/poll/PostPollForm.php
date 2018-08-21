@@ -10,6 +10,7 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\repos\PollVoteRepo;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -314,6 +315,11 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
     public function edit(): bool
     {
         if (!$this->beforeEdit()) {
+            return false;
+        }
+
+        if (PollVoteRepo::find()->where(['poll_id' => $this->id])->exists()) {
+            $this->addError('id', Yii::t('podium.error', 'poll.already.voted'));
             return false;
         }
 
