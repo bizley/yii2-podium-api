@@ -7,6 +7,8 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\AccountInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\PollAnswerModelInterface;
+use bizley\podium\api\interfaces\PollModelInterface;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\web\User;
@@ -175,5 +177,16 @@ class Account extends PodiumComponent implements AccountInterface
     public function leave(ModelInterface $group): bool
     {
         return $this->podium->member->leave($this->membership, $group);
+    }
+
+    /**
+     * Votes in poll.
+     * @param PollModelInterface $poll
+     * @param PollAnswerModelInterface[] $answers
+     * @return bool
+     */
+    public function vote(PollModelInterface $poll, array $answers): bool
+    {
+        return $this->podium->poll->vote($this->membership, $poll, $answers);
     }
 }

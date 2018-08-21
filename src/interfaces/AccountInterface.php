@@ -90,4 +90,12 @@ interface AccountInterface
      * @return bool
      */
     public function leave(ModelInterface $group): bool;
+
+    /**
+     * Votes in poll.
+     * @param PollModelInterface $poll
+     * @param PollAnswerModelInterface[] $answers
+     * @return bool
+     */
+    public function vote(PollModelInterface $poll, array $answers): bool;
 }

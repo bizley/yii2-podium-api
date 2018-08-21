@@ -8,6 +8,7 @@ use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
@@ -124,7 +125,7 @@ class Poll extends PodiumComponent implements PollInterface
      * Votes in poll.
      * @param MembershipInterface $member
      * @param PollModelInterface $poll
-     * @param array $answers
+     * @param PollAnswerModelInterface[] $answers
      * @return bool
      */
     public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): bool

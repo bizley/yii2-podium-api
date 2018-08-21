@@ -10,7 +10,7 @@
   - [x] subscribe thread
   - [x] bookmark thread
   - [x] join group
-  - [ ] poll vote
+  - [x] poll vote
 - [x] Member
   - [x] befriend member
   - [x] ignore member
@@ -95,7 +95,6 @@
 
 ## TODO:
 
-- poll voting from account
 - getModels methods in interfaces
 - get errors on methods returns
 - getParent change to use relations

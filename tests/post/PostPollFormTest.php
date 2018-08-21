@@ -179,7 +179,7 @@ class PostPollFormTest extends DbTestCase
             'category_id' => 1,
             'forum_id' => 1,
             'thread_id' => 1,
-            'edited' => false,
+            'edited' => 0,
             'likes' => 0,
             'dislikes' => 0,
             'edited_at' => null,
@@ -273,10 +273,9 @@ class PostPollFormTest extends DbTestCase
             'category_id' => 1,
             'forum_id' => 1,
             'thread_id' => 1,
-            'edited' => true,
+            'edited' => 1,
             'likes' => 0,
             'dislikes' => 0,
-            'edited_at' => time(),
             'type_id' => PostType::POLL,
         ], [
             'author_id' => $post->author_id,
@@ -286,7 +285,6 @@ class PostPollFormTest extends DbTestCase
             'edited' => $post->edited,
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
-            'edited_at' => $post->edited_at,
             'type_id' => $post->type_id,
         ]);
         $this->assertEmpty(PostRepo::findOne(['content' => 'post1']));
