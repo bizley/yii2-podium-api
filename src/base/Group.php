@@ -35,7 +35,7 @@ class Group extends PodiumComponent implements GroupInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 

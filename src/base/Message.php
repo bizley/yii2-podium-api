@@ -12,6 +12,8 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 /**
@@ -35,7 +37,7 @@ class Message extends PodiumComponent implements MessageInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -55,8 +57,8 @@ class Message extends PodiumComponent implements MessageInterface
 
     /**
      * @param null|DataFilter $filter
-     * @param null $sort
-     * @param null $pagination
+     * @param null|bool|array|Sort $sort
+     * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
     public function getMessages(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface

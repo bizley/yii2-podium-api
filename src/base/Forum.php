@@ -51,7 +51,7 @@ class Forum extends PodiumComponent implements ForumInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 

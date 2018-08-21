@@ -16,6 +16,8 @@ use bizley\podium\api\interfaces\PostInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
@@ -52,7 +54,7 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -74,8 +76,8 @@ class Post extends PodiumComponent implements PostInterface
 
     /**
      * @param null|DataFilter $filter
-     * @param null $sort
-     * @param null $pagination
+     * @param null|bool|array|Sort $sort
+     * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface

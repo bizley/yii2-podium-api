@@ -65,7 +65,7 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 

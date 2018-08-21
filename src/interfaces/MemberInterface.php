@@ -4,6 +4,11 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use yii\data\DataFilter;
+use yii\data\DataProviderInterface;
+use yii\data\Pagination;
+use yii\data\Sort;
+
 /**
  * Interface MemberComponentInterface
  * @package bizley\podium\api\interfaces
@@ -21,6 +26,14 @@ interface MemberInterface
      * @return MembershipInterface|null
      */
     public function getMemberByUserId($id): ?MembershipInterface;
+
+    /**
+     * @param null|DataFilter $filter
+     * @param null|bool|array|Sort $sort
+     * @param null|bool|array|Pagination $pagination
+     * @return DataProviderInterface
+     */
+    public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns registration handler.

@@ -35,7 +35,7 @@ class Rank extends PodiumComponent implements RankInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
