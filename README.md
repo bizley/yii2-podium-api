@@ -81,7 +81,7 @@
   - [x] create poll answer
   - [x] update poll answer
   - [x] delete poll answer
-  - [ ] poll vote
+  - [x] poll vote
 - [ ] Message
 - [ ] Activity
 
@@ -91,3 +91,4 @@
 
 ## TODO:
 
+- block poll editing after vote

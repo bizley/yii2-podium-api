@@ -12,9 +12,9 @@ interface PollInterface
 {
     /**
      * @param int $id
-     * @return ModelInterface|null
+     * @return PollModelInterface|null
      */
-    public function getPollByPostId(int $id): ?ModelInterface;
+    public function getPollByPostId(int $id): ?PollModelInterface;
 
     /**
      * Returns poll form handler.
@@ -44,4 +44,19 @@ interface PollInterface
      * @return bool
      */
     public function remove(RemovableInterface $pollRemover): bool;
+
+    /**
+     * Returns voting handler.
+     * @return VotingInterface
+     */
+    public function getVoting(): VotingInterface;
+
+    /**
+     * Votes in poll.
+     * @param MembershipInterface $member
+     * @param PollModelInterface $poll
+     * @param PollAnswerModelInterface[] $answers
+     * @return bool
+     */
+    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): bool;
 }

@@ -7,15 +7,16 @@ namespace bizley\podium\tests\poll;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\PollAnswerForm;
+use bizley\podium\api\models\poll\PollVoteForm;
 use bizley\podium\api\repos\PollAnswerRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\NotSupportedException;
 
 /**
- * Class PollAnswerFormTest
+ * Class PollVoteFormTest
  * @package bizley\podium\tests\poll
  */
-class PollAnswerFormTest extends DbTestCase
+class PollVoteFormTest extends DbTestCase
 {
     /**
      * @var array
@@ -97,23 +98,38 @@ class PollAnswerFormTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+            [
+                'id' => 2,
+                'poll_id' => 1,
+                'answer' => 'answer2',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
+        ],
+        'podium_poll_vote' => [
+            [
+                'poll_id' => 1,
+                'member_id' => 1,
+                'answer_id' => 2,
+                'created_at' => 1,
+            ],
         ],
     ];
 
     public function testCreate(): void
     {
-        $pollAnswer = new PollAnswerForm([
+        $pollVote = new PollVoteForm([
+            'member_id' => 1,
             'poll_id' => 1,
-            'answer' => 'answer-new',
+            'answer_id' => 1,
         ]);
 
-        $this->assertTrue($pollAnswer->create());
-        $this->assertEquals(1, PollAnswerRepo::findOne(['answer' => 'answer-new'])->poll_id);
+        $this->assertTrue($pollVote->create());
     }
 
     public function testUpdate(): void
     {
         $this->expectException(NotSupportedException::class);
-        PollAnswerForm::findOne(1)->edit();
+        PollVoteForm::findOne(1)->edit();
     }
 }

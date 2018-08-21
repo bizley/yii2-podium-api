@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\poll;
 
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\api\repos\PollRepo;
@@ -14,7 +15,7 @@ use yii\base\NotSupportedException;
  * Class Poll
  * @package bizley\podium\api\models\poll
  */
-class Poll extends PollRepo implements ModelInterface
+class Poll extends PollRepo implements PollModelInterface
 {
     use ModelTrait;
 
@@ -50,5 +51,13 @@ class Poll extends PollRepo implements ModelInterface
     public function isArchived(): bool
     {
         return $this->getParent()->isArchived();
+    }
+
+    /**
+     * @return string
+     */
+    public function getChoiceId(): string
+    {
+        return $this->choice_id;
     }
 }
