@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\ArchivableInterface;
-use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MessageFormInterface;
 use bizley\podium\api\interfaces\MessageInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use yii\data\DataFilter;
@@ -28,8 +27,8 @@ class Message extends PodiumComponent implements MessageInterface
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|ModelFormInterface
-     * Component ID, class, configuration array, or instance of ModelFormInterface.
+     * @var string|array|MessageFormInterface
+     * Component ID, class, configuration array, or instance of MessageFormInterface.
      */
     public $messageFormHandler = \bizley\podium\api\models\message\MessageForm::class;
 
@@ -41,7 +40,7 @@ class Message extends PodiumComponent implements MessageInterface
         parent::init();
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
-        $this->messageFormHandler = Instance::ensure($this->messageFormHandler, ModelFormInterface::class);
+        $this->messageFormHandler = Instance::ensure($this->messageFormHandler, MessageFormInterface::class);
     }
 
     /**
@@ -67,9 +66,9 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * @return CategorisedFormInterface
+     * @return MessageFormInterface
      */
-    public function getMessageForm(): ModelFormInterface
+    public function getMessageForm(): MessageFormInterface
     {
         return new $this->messageFormHandler;
     }

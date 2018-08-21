@@ -6,13 +6,16 @@ namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelTrait;
-use bizley\podium\api\models\thread\Thread;
-use bizley\podium\api\repos\PostRepo;
+use bizley\podium\api\repos\MessageRepo;
 use yii\base\NotSupportedException;
+use yii\db\ActiveQuery;
 
 /**
  * Class Message
  * @package bizley\podium\api\models\message
+ *
+ * @property ModelInterface $parent
+ * @property Message $repliedMessage
  */
 class Message extends MessageRepo implements ModelInterface
 {
@@ -23,7 +26,15 @@ class Message extends MessageRepo implements ModelInterface
      */
     public function getParent(): ModelInterface
     {
-        return Thread::findById($this->thread_id);
+        return $this->repliedMessage;
+    }
+
+    /**
+     * @return ActiveQuery
+     */
+    public function getRepliedMessage(): ActiveQuery
+    {
+        return $this->hasOne(static::class, ['id' => 'reply_to_id']);
     }
 
     /**
@@ -37,9 +48,10 @@ class Message extends MessageRepo implements ModelInterface
 
     /**
      * @return bool
+     * @throws NotSupportedException
      */
     public function isArchived(): bool
     {
-        return (bool) $this->archived;
+        throw new NotSupportedException('Message itself can not be archived.');
     }
 }

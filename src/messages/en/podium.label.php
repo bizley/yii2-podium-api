@@ -11,6 +11,8 @@ return [
     'forum.visible' => 'Forum Visible For Guests',
     'group.name' => 'Group Name',
     'member.username' => 'Username',
+    'message.content' => 'Message Content',
+    'message.subject' => 'Message Subject',
     'poll.answers' => 'Poll Answers',
     'poll.choice.type' => 'Poll Answers Choice Type',
     'poll.expires' => 'Poll Ends Date',

@@ -18,9 +18,9 @@ interface MessageInterface
 
     /**
      * Returns forum form handler.
-     * @return ModelFormInterface
+     * @return MessageFormInterface
      */
-    public function getMessageForm(): ModelFormInterface;
+    public function getMessageForm(): MessageFormInterface;
 
     /**
      * Creates message.
