@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\forum;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
@@ -51,19 +52,21 @@ class ForumMover extends ForumRepo implements MovableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(): bool
+    public function move(): PodiumResponse
     {
         if (!$this->beforeMove()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while moving forum', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterMove();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterMove(): void

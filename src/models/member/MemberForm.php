@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\repos\MemberRepo;
@@ -79,19 +80,21 @@ class MemberForm extends MemberRepo implements ModelFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         if (!$this->beforeEdit()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while editing member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterEdit();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterEdit(): void
@@ -103,10 +106,10 @@ class MemberForm extends MemberRepo implements ModelFormInterface
 
     /**
      * Creates new model.
-     * @return bool
+     * @return PodiumResponse
      * @throws NotSupportedException
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         throw new NotSupportedException('Member must not be created using this form. Use bizley\podium\api\models\member\Registration.');
     }

@@ -103,9 +103,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function befriend(MembershipInterface $member, MembershipInterface $target): bool
+    public function befriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $friendship = $this->getFriendship();
         $friendship->setMember($member);
@@ -116,9 +116,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unfriend(MembershipInterface $member, MembershipInterface $target): bool
+    public function unfriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $friendship = $this->getFriendship();
         $friendship->setMember($member);
@@ -129,9 +129,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ignore(MembershipInterface $member, MembershipInterface $target): bool
+    public function ignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $ignoring = $this->getIgnoring();
         $ignoring->setMember($member);
@@ -142,9 +142,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unignore(MembershipInterface $member, MembershipInterface $target): bool
+    public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $ignoring = $this->getIgnoring();
         $ignoring->setMember($member);
@@ -154,22 +154,22 @@ class Member extends PodiumComponent implements MemberInterface
 
     /**
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function register(array $data): bool
+    public function register(array $data): PodiumResponse
     {
         $registration = $this->getRegistration();
         if (!$registration->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $registration->register();
     }
 
     /**
      * @param RemovableInterface $memberRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $memberRemover): bool
+    public function remove(RemovableInterface $memberRemover): PodiumResponse
     {
         return $memberRemover->remove();
     }
@@ -209,30 +209,30 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param ModelFormInterface $memberForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $memberForm, array $data): bool
+    public function edit(ModelFormInterface $memberForm, array $data): PodiumResponse
     {
         if (!$memberForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $memberForm->edit();
     }
 
     /**
      * @param BanInterface $member
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ban(BanInterface $member): bool
+    public function ban(BanInterface $member): PodiumResponse
     {
         return $member->ban();
     }
 
     /**
      * @param BanInterface $member
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unban(BanInterface $member): bool
+    public function unban(BanInterface $member): PodiumResponse
     {
         return $member->unban();
     }
@@ -248,9 +248,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $group
-     * @return bool
+     * @return PodiumResponse
      */
-    public function join(MembershipInterface $member, ModelInterface $group): bool
+    public function join(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
         $grouping = $this->getGrouping();
         $grouping->setMember($member);
@@ -262,9 +262,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $group
-     * @return bool
+     * @return PodiumResponse
      */
-    public function leave(MembershipInterface $member, ModelInterface $group): bool
+    public function leave(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
         $grouping = $this->getGrouping();
         $grouping->setMember($member);

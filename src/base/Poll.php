@@ -42,7 +42,7 @@ class Poll extends PodiumComponent implements PollInterface
     /**
      * @throws \yii\base\InvalidConfigException
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
 
@@ -75,16 +75,16 @@ class Poll extends PodiumComponent implements PollInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): bool
+    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
     {
         $pollForm = $this->getPollForm();
         $pollForm->setAuthor($author);
         $pollForm->setThread($thread);
 
         if (!$pollForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $pollForm->create();
     }
@@ -93,21 +93,21 @@ class Poll extends PodiumComponent implements PollInterface
      * Updates poll post.
      * @param ModelFormInterface $postPollForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postPollForm, array $data): bool
+    public function edit(ModelFormInterface $postPollForm, array $data): PodiumResponse
     {
         if (!$postPollForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $postPollForm->edit();
     }
 
     /**
      * @param RemovableInterface $pollRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $pollRemover): bool
+    public function remove(RemovableInterface $pollRemover): PodiumResponse
     {
         return $pollRemover->remove();
     }
@@ -126,9 +126,9 @@ class Poll extends PodiumComponent implements PollInterface
      * @param MembershipInterface $member
      * @param PollModelInterface $poll
      * @param PollAnswerModelInterface[] $answers
-     * @return bool
+     * @return PodiumResponse
      */
-    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): bool
+    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): PodiumResponse
     {
         $voting = $this->getVoting();
         $voting->setMember($member);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface LikeableInterface
  * @package bizley\podium\api\interfaces
@@ -12,19 +14,19 @@ interface LikeableInterface
 {
     /**
      * Gives thumb up.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbUp(): bool;
+    public function thumbUp(): PodiumResponse;
 
     /**
      * Gives thumb down.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbDown(): bool;
+    public function thumbDown(): PodiumResponse;
 
     /**
      * Resets thumb.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbReset(): bool;
+    public function thumbReset(): PodiumResponse;
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface PollInterface
  * @package bizley\podium\api\interfaces
@@ -27,23 +29,23 @@ interface PollInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): bool;
+    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse;
 
     /**
      * Updates poll post.
      * @param ModelFormInterface $postPollForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postPollForm, array $data): bool;
+    public function edit(ModelFormInterface $postPollForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $pollRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $pollRemover): bool;
+    public function remove(RemovableInterface $pollRemover): PodiumResponse;
 
     /**
      * Returns voting handler.
@@ -56,7 +58,7 @@ interface PollInterface
      * @param MembershipInterface $member
      * @param PollModelInterface $poll
      * @param PollAnswerModelInterface[] $answers
-     * @return bool
+     * @return PodiumResponse
      */
-    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): bool;
+    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): PodiumResponse;
 }

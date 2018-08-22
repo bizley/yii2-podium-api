@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\PinEvent;
 use bizley\podium\api\interfaces\PinnableInterface;
 use bizley\podium\api\repos\ThreadRepo;
@@ -43,22 +44,22 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function pin(): bool
+    public function pin(): PodiumResponse
     {
         if (!$this->beforePin()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $this->pinned = true;
         if (!$this->save()) {
             Yii::error(['Error while pinning thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterPin();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterPin(): void
@@ -80,22 +81,22 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unpin(): bool
+    public function unpin(): PodiumResponse
     {
         if (!$this->beforeUnpin()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $this->pinned = false;
         if (!$this->save()) {
             Yii::error(['Error while unpinning thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterUnpin();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnpin(): void

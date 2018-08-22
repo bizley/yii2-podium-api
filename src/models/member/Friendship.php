@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
 use bizley\podium\api\interfaces\FriendshipInterface;
@@ -67,29 +68,30 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function befriend(): bool
+    public function befriend(): PodiumResponse
     {
         if (!$this->beforeBefriend()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
             ])->exists()) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->type_id = AcquaintanceType::FRIEND;
 
         if (!$this->save()) {
             Yii::error(['Error while befriending member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterBefriend();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterBefriend(): void
@@ -111,12 +113,12 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unfriend(): bool
+    public function unfriend(): PodiumResponse
     {
         if (!$this->beforeUnfriend()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $friendship = static::find()->where([
@@ -126,21 +128,21 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         ])->one();
         if ($friendship === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.befriended'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         try {
             if (!$friendship->delete()) {
                 Yii::error('Error while unfriending member', 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unfriending member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterUnfriend();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnfriend(): void

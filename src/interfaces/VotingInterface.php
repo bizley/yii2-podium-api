@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface VotingInterface
  * @package bizley\podium\api\interfaces
@@ -29,7 +31,7 @@ interface VotingInterface
     public function setAnswers(array $answers): void;
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function vote(): bool;
+    public function vote(): PodiumResponse;
 }

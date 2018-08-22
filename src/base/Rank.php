@@ -75,14 +75,14 @@ class Rank extends PodiumComponent implements RankInterface
 
     /**
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data): bool
+    public function create(array $data): PodiumResponse
     {
         $rankForm = $this->getRankForm();
 
         if (!$rankForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $rankForm->create();
     }
@@ -90,21 +90,21 @@ class Rank extends PodiumComponent implements RankInterface
     /**
      * @param ModelFormInterface $rankForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $rankForm, array $data): bool
+    public function edit(ModelFormInterface $rankForm, array $data): PodiumResponse
     {
         if (!$rankForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $rankForm->edit();
     }
 
     /**
      * @param RemovableInterface $rankRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $rankRemover): bool
+    public function remove(RemovableInterface $rankRemover): PodiumResponse
     {
         return $rankRemover->remove();
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\poll;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
@@ -231,12 +232,12 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->beforeCreate()) {
-            return false;
+            return PodiumResponse::error();
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -278,7 +279,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $this->afterCreate();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -288,7 +289,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while poll creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterCreate(): void
@@ -310,17 +311,17 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         if (!$this->beforeEdit()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         if (PollVoteRepo::find()->where(['poll_id' => $this->id])->exists()) {
             $this->addError('id', Yii::t('podium.error', 'poll.already.voted'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -330,7 +331,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
 
             if (!$this->save()) {
                 Yii::error(['Error while editing post for poll', $this->errors], 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
 
             $poll = $this->poll;
@@ -369,7 +370,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $this->afterEdit();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success($this);
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while editing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -379,7 +380,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while poll editing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterEdit(): void

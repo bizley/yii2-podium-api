@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SubscriptionEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -61,26 +62,29 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function subscribe(): bool
+    public function subscribe(): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'thread_id' => $this->thread_id,
             ])->exists()) {
             $this->addError('thread_id', Yii::t('podium.error', 'thread.already.subscribed'));
-            return false;
+            return PodiumResponse::error($this);
         }
+
         if (!$this->save()) {
             Yii::error(['Error while subscribing thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterSubscribe();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterSubscribe(): void
@@ -102,33 +106,34 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unsubscribe(): bool
+    public function unsubscribe(): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         $subscription = static::find()->where([
             'member_id' => $this->member_id,
             'thread_id' => $this->thread_id,
         ])->one();
         if ($subscription === null) {
             $this->addError('thread_id', Yii::t('podium.error', 'thread.not.subscribed'));
-            return false;
+            return PodiumResponse::error($this);
         }
         try {
             if (!$subscription->delete()) {
                 Yii::error('Error while unsubscribing thread', 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterUnsubscribe();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnsubscribe(): void

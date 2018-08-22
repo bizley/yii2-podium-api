@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -38,21 +39,21 @@ interface RankInterface
     /**
      * Creates rank.
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data): bool;
+    public function create(array $data): PodiumResponse;
 
     /**
      * Updates rank.
      * @param ModelFormInterface $rankForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $rankForm, array $data): bool;
+    public function edit(ModelFormInterface $rankForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $rankRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $rankRemover): bool;
+    public function remove(RemovableInterface $rankRemover): PodiumResponse;
 }

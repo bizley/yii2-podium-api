@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\post;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
@@ -135,12 +136,12 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->beforeCreate()) {
-            return false;
+            return PodiumResponse::error();
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -160,7 +161,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             $this->afterCreate();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -170,7 +171,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterCreate(): void
@@ -192,21 +193,23 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         if (!$this->beforeEdit()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         $this->edited = true;
         $this->edited_at = time();
         if (!$this->save()) {
             Yii::error(['Error while editing post', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterEdit();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterEdit(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\rank;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\repos\RankRepo;
@@ -30,27 +31,27 @@ class RankRemover extends RankRepo implements RemovableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(): bool
+    public function remove(): PodiumResponse
     {
         if (!$this->beforeRemove()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting rank', 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
 
             $this->afterRemove();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing rank', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterRemove(): void

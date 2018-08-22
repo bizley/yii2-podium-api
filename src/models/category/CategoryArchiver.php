@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\category;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\repos\CategoryRepo;
@@ -32,26 +33,26 @@ class CategoryArchiver extends CategoryRepo implements ArchivableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(): bool
+    public function archive(): PodiumResponse
     {
         if (!$this->beforeArchive()) {
-            return false;
+            return PodiumResponse::error();
         }
         if ($this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'category.already.archived'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->archived = true;
         if (!$this->save()) {
-            Yii::error('Error while archiving category', 'podium');
-            return false;
+            Yii::error(['Error while archiving category', $this->errors], 'podium');
+            return PodiumResponse::error($this);
         }
 
         $this->afterArchive();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterArchive(): void
@@ -73,26 +74,26 @@ class CategoryArchiver extends CategoryRepo implements ArchivableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(): bool
+    public function revive(): PodiumResponse
     {
         if (!$this->beforeRevive()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'category.not.archived'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->archived = false;
         if (!$this->save()) {
-            Yii::error('Error while reviving category', 'podium');
-            return false;
+            Yii::error(['Error while reviving category', $this->errors], 'podium');
+            return PodiumResponse::error($this);
         }
 
         $this->afterRevive();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterRevive(): void

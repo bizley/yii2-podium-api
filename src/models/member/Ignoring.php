@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
 use bizley\podium\api\interfaces\IgnoringInterface;
@@ -64,29 +65,30 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ignore(): bool
+    public function ignore(): PodiumResponse
     {
         if (!$this->beforeIgnore()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
             ])->exists()) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->type_id = AcquaintanceType::IGNORE;
 
         if (!$this->save()) {
             Yii::error(['Error while ignoring member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterIgnore();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterIgnore(): void
@@ -108,12 +110,12 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unignore(): bool
+    public function unignore(): PodiumResponse
     {
         if (!$this->beforeUnignore()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $ignoring = static::find()->where([
@@ -123,21 +125,21 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         ])->one();
         if ($ignoring === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.ignored'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         try {
             if (!$ignoring->delete()) {
                 Yii::error('Error while unignoring member', 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterUnignore();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnignore(): void

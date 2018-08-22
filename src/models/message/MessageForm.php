@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\message;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageFormInterface;
@@ -111,13 +112,14 @@ class MessageForm extends MessageRepo implements MessageFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->beforeCreate()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save()) {
@@ -130,7 +132,7 @@ class MessageForm extends MessageRepo implements MessageFormInterface
             $this->afterCreate();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating message', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -140,7 +142,7 @@ class MessageForm extends MessageRepo implements MessageFormInterface
                 Yii::error(['Exception while message creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterCreate(): void
@@ -152,10 +154,10 @@ class MessageForm extends MessageRepo implements MessageFormInterface
 
     /**
      * Updates model.
-     * @return bool
+     * @return PodiumResponse
      * @throws NotSupportedException
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         throw new NotSupportedException('Message can not be edited.');
     }

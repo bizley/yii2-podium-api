@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\BookmarkEvent;
 use bizley\podium\api\interfaces\BookmarkingInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -93,27 +94,28 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function mark(): bool
+    public function mark(): PodiumResponse
     {
         if (!$this->beforeMark()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $bookmark = $this->getBookmark();
 
         if ($bookmark->last_seen !== null && $bookmark->last_seen >= $this->getPostModel()->getCreatedAt()) {
-            return true;
+            return PodiumResponse::success();
         }
         $bookmark->last_seen = $this->getPostModel()->getCreatedAt();
 
         if (!$bookmark->save()) {
             Yii::error(['Error while bookmarking thread', $bookmark->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterMark();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterMark(): void

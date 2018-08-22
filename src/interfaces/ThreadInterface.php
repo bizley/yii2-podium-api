@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -40,67 +41,67 @@ interface ThreadInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $forum
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $forum): bool;
+    public function create(array $data, MembershipInterface $author, ModelInterface $forum): PodiumResponse;
 
     /**
      * Updates thread.
      * @param ModelFormInterface $threadForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $threadForm, array $data): bool;
+    public function edit(ModelFormInterface $threadForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $threadRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $threadRemover): bool;
+    public function remove(RemovableInterface $threadRemover): PodiumResponse;
 
     /**
      * Moves thread to different forum.
      * @param MovableInterface $threadMover
      * @param ModelInterface $forum
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $threadMover, ModelInterface $forum): bool;
+    public function move(MovableInterface $threadMover, ModelInterface $forum): PodiumResponse;
 
     /**
      * @param PinnableInterface $threadPinner
-     * @return bool
+     * @return PodiumResponse
      */
-    public function pin(PinnableInterface $threadPinner): bool;
+    public function pin(PinnableInterface $threadPinner): PodiumResponse;
 
     /**
      * @param PinnableInterface $threadPinner
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unpin(PinnableInterface $threadPinner): bool;
+    public function unpin(PinnableInterface $threadPinner): PodiumResponse;
 
     /**
      * @param LockableInterface $threadLocker
-     * @return bool
+     * @return PodiumResponse
      */
-    public function lock(LockableInterface $threadLocker): bool;
+    public function lock(LockableInterface $threadLocker): PodiumResponse;
 
     /**
      * @param LockableInterface $threadLocker
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unlock(LockableInterface $threadLocker): bool;
+    public function unlock(LockableInterface $threadLocker): PodiumResponse;
 
     /**
      * @param ArchivableInterface $threadArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $threadArchiver): bool;
+    public function archive(ArchivableInterface $threadArchiver): PodiumResponse;
 
     /**
      * @param ArchivableInterface $threadArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $threadArchiver): bool;
+    public function revive(ArchivableInterface $threadArchiver): PodiumResponse;
 
     /**
      * @return SubscribingInterface
@@ -110,16 +111,16 @@ interface ThreadInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function subscribe(MembershipInterface $member, ModelInterface $thread): bool;
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): bool;
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 
     /**
     * @return BookmarkingInterface
@@ -129,7 +130,7 @@ interface ThreadInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function mark(MembershipInterface $member, ModelInterface $post): bool;
+    public function mark(MembershipInterface $member, ModelInterface $post): PodiumResponse;
 }

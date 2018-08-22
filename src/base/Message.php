@@ -79,43 +79,43 @@ class Message extends PodiumComponent implements MessageInterface
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): bool
+    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse
     {
         $messageForm = $this->getMessageForm();
         $messageForm->setSender($sender);
         $messageForm->setReceiver($receiver);
 
         if (!$messageForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $messageForm->create();
     }
 
     /**
      * @param RemovableInterface $messageRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $messageRemover): bool
+    public function remove(RemovableInterface $messageRemover): PodiumResponse
     {
         return $messageRemover->remove();
     }
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): bool
+    public function archive(ArchivableInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->archive();
     }
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): bool
+    public function revive(ArchivableInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->revive();
     }

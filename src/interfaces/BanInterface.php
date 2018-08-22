@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface BanInterface
  * @package bizley\podium\api\interfaces
@@ -11,12 +13,12 @@ namespace bizley\podium\api\interfaces;
 interface BanInterface
 {
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ban(): bool;
+    public function ban(): PodiumResponse;
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unban(): bool;
+    public function unban(): PodiumResponse;
 }

@@ -73,108 +73,108 @@ class Account extends PodiumComponent implements AccountInterface
 
     /**
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function befriend(MembershipInterface $target): bool
+    public function befriend(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->befriend($this->membership, $target);
     }
 
     /**
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unfriend(MembershipInterface $target): bool
+    public function unfriend(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->unfriend($this->membership, $target);
     }
 
     /**
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ignore(MembershipInterface $target): bool
+    public function ignore(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->ignore($this->membership, $target);
     }
 
     /**
      * @param MembershipInterface $target
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unignore(MembershipInterface $target): bool
+    public function unignore(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->unignore($this->membership, $target);
     }
 
     /**
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbUp(ModelInterface $post): bool
+    public function thumbUp(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbUp($this->membership, $post);
     }
 
     /**
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbDown(ModelInterface $post): bool
+    public function thumbDown(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbDown($this->membership, $post);
     }
 
     /**
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbReset(ModelInterface $post): bool
+    public function thumbReset(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbReset($this->membership, $post);
     }
 
     /**
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function subscribe(ModelInterface $thread): bool
+    public function subscribe(ModelInterface $thread): PodiumResponse
     {
         return $this->podium->thread->subscribe($this->membership, $thread);
     }
 
     /**
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unsubscribe(ModelInterface $thread): bool
+    public function unsubscribe(ModelInterface $thread): PodiumResponse
     {
         return $this->podium->thread->unsubscribe($this->membership, $thread);
     }
 
     /**
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function mark(ModelInterface $post): bool
+    public function mark(ModelInterface $post): PodiumResponse
     {
         return $this->podium->thread->mark($this->membership, $post);
     }
 
     /**
      * @param ModelInterface $group
-     * @return bool
+     * @return PodiumResponse
      */
-    public function join(ModelInterface $group): bool
+    public function join(ModelInterface $group): PodiumResponse
     {
         return $this->podium->member->join($this->membership, $group);
     }
 
     /**
      * @param ModelInterface $group
-     * @return bool
+     * @return PodiumResponse
      */
-    public function leave(ModelInterface $group): bool
+    public function leave(ModelInterface $group): PodiumResponse
     {
         return $this->podium->member->leave($this->membership, $group);
     }
@@ -183,9 +183,9 @@ class Account extends PodiumComponent implements AccountInterface
      * Votes in poll.
      * @param PollModelInterface $poll
      * @param PollAnswerModelInterface[] $answers
-     * @return bool
+     * @return PodiumResponse
      */
-    public function vote(PollModelInterface $poll, array $answers): bool
+    public function vote(PollModelInterface $poll, array $answers): PodiumResponse
     {
         return $this->podium->poll->vote($this->membership, $poll, $answers);
     }

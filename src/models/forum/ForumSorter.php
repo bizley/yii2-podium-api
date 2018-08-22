@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\forum;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
@@ -73,16 +74,16 @@ class ForumSorter extends ForumRepo implements SortableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(): bool
+    public function sort(): PodiumResponse
     {
         if (!$this->beforeSort()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (!$this->validate()) {
             Yii::warning(['Forums sort validation failed', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -97,8 +98,10 @@ class ForumSorter extends ForumRepo implements SortableInterface
                 }
             }
             $transaction->commit();
+
             $this->afterSort();
-            return true;
+            return PodiumResponse::success();
+
         } catch (\Throwable $exc) {
             Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
@@ -106,7 +109,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while forums sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
-            return false;
+            return PodiumResponse::error($this);
         }
     }
 

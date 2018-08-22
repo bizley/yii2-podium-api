@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -39,23 +40,23 @@ interface CategoryInterface
      * Creates category.
      * @param array $data
      * @param MembershipInterface $author
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author): bool;
+    public function create(array $data, MembershipInterface $author): PodiumResponse;
 
     /**
      * Updates category.
      * @param ModelFormInterface $categoryForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): bool;
+    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $categoryRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $categoryRemover): bool;
+    public function remove(RemovableInterface $categoryRemover): PodiumResponse;
 
     /**
      * @return SortableInterface
@@ -65,19 +66,19 @@ interface CategoryInterface
     /**
      * Sorts categories.
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(array $data = []): bool;
+    public function sort(array $data = []): PodiumResponse;
 
     /**
      * @param ArchivableInterface $categoryArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $categoryArchiver): bool;
+    public function archive(ArchivableInterface $categoryArchiver): PodiumResponse;
 
     /**
      * @param ArchivableInterface $categoryArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $categoryArchiver): bool;
+    public function revive(ArchivableInterface $categoryArchiver): PodiumResponse;
 }

@@ -106,9 +106,9 @@ class Post extends PodiumComponent implements PostInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): bool
+    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
     {
         $type = ArrayHelper::remove($data, 'type_id', PostType::POST);
 
@@ -117,7 +117,7 @@ class Post extends PodiumComponent implements PostInterface
         $postForm->setThread($thread);
 
         if (!$postForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $postForm->create();
     }
@@ -125,21 +125,21 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @param ModelFormInterface $postOrPollForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postOrPollForm, array $data): bool
+    public function edit(ModelFormInterface $postOrPollForm, array $data): PodiumResponse
     {
         if (!$postOrPollForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $postOrPollForm->edit();
     }
 
     /**
      * @param RemovableInterface $postRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $postRemover): bool
+    public function remove(RemovableInterface $postRemover): PodiumResponse
     {
         return $postRemover->remove();
     }
@@ -147,9 +147,9 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @param MovableInterface $postMover
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $postMover, ModelInterface $thread): bool
+    public function move(MovableInterface $postMover, ModelInterface $thread): PodiumResponse
     {
         $postMover->setThread($thread);
 
@@ -158,18 +158,18 @@ class Post extends PodiumComponent implements PostInterface
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): bool
+    public function archive(ArchivableInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->archive();
     }
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): bool
+    public function revive(ArchivableInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->revive();
     }
@@ -185,9 +185,9 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbUp(MembershipInterface $member, ModelInterface $post): bool
+    public function thumbUp(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
         $liking->setMember($member);
@@ -198,9 +198,9 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbDown(MembershipInterface $member, ModelInterface $post): bool
+    public function thumbDown(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
         $liking->setMember($member);
@@ -211,9 +211,9 @@ class Post extends PodiumComponent implements PostInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbReset(MembershipInterface $member, ModelInterface $post): bool
+    public function thumbReset(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
         $liking->setMember($member);

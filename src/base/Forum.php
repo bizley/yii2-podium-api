@@ -94,16 +94,16 @@ class Forum extends PodiumComponent implements ForumInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $category
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $category): bool
+    public function create(array $data, MembershipInterface $author, ModelInterface $category): PodiumResponse
     {
         $forumForm = $this->getForumForm();
         $forumForm->setAuthor($author);
         $forumForm->setCategory($category);
 
         if (!$forumForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $forumForm->create();
     }
@@ -111,21 +111,21 @@ class Forum extends PodiumComponent implements ForumInterface
     /**
      * @param ModelFormInterface $forumForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $forumForm, array $data): bool
+    public function edit(ModelFormInterface $forumForm, array $data): PodiumResponse
     {
         if (!$forumForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $forumForm->edit();
     }
 
     /**
      * @param RemovableInterface $forumRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $forumRemover): bool
+    public function remove(RemovableInterface $forumRemover): PodiumResponse
     {
         return $forumRemover->remove();
     }
@@ -141,15 +141,15 @@ class Forum extends PodiumComponent implements ForumInterface
     /**
      * @param ModelInterface $category
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(ModelInterface $category, array $data = []): bool
+    public function sort(ModelInterface $category, array $data = []): PodiumResponse
     {
         $forumSorter = $this->getForumSorter();
         $forumSorter->setCategory($category);
 
         if (!$forumSorter->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $forumSorter->sort();
     }
@@ -157,9 +157,9 @@ class Forum extends PodiumComponent implements ForumInterface
     /**
      * @param MovableInterface $forumMover
      * @param ModelInterface $category
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $forumMover, ModelInterface $category): bool
+    public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse
     {
         $forumMover->setCategory($category);
 
@@ -168,18 +168,18 @@ class Forum extends PodiumComponent implements ForumInterface
 
     /**
      * @param ArchivableInterface $forumArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $forumArchiver): bool
+    public function archive(ArchivableInterface $forumArchiver): PodiumResponse
     {
         return $forumArchiver->archive();
     }
 
     /**
      * @param ArchivableInterface $forumArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $forumArchiver): bool
+    public function revive(ArchivableInterface $forumArchiver): PodiumResponse
     {
         return $forumArchiver->revive();
     }

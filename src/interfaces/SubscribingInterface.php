@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface SubscribingInterface
  * @package bizley\podium\api\interfaces
@@ -24,13 +26,13 @@ interface SubscribingInterface
 
     /**
      * Subscribes.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function subscribe(): bool;
+    public function subscribe(): PodiumResponse;
 
     /**
      * Unsubscribes.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unsubscribe(): bool;
+    public function unsubscribe(): PodiumResponse;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\poll;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\events\VoteEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -82,12 +83,12 @@ class Voting extends Model implements VotingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function vote(): bool
+    public function vote(): PodiumResponse
     {
         if (!$this->beforeVote()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         if (PollVoteRepo::find()->where([
@@ -95,12 +96,12 @@ class Voting extends Model implements VotingInterface
                 'poll_id' => $this->poll_id,
             ])->exists()) {
             $this->addError('poll_id', Yii::t('podium.error', 'poll.already.voted'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         if ($this->choice_id === PollChoice::SINGLE && \count($this->answers) > 1) {
             $this->addError('answers', Yii::t('podium.error', 'poll.one.vote.allowed'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $transaction = Yii::$app->db->beginTransaction();
@@ -131,7 +132,7 @@ class Voting extends Model implements VotingInterface
             $this->afterVote();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while voting', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -141,7 +142,7 @@ class Voting extends Model implements VotingInterface
                 Yii::error(['Exception while voting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterVote(): void

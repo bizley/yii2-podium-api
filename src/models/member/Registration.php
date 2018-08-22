@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\events\RegistrationEvent;
 use bizley\podium\api\interfaces\RegistrationInterface;
@@ -80,22 +81,23 @@ class Registration extends MemberRepo implements RegistrationInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function register(): bool
+    public function register(): PodiumResponse
     {
         if (!$this->beforeRegister()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $this->status_id = MemberStatus::REGISTERED;
 
         if (!$this->save()) {
             Yii::error(['Error while registering member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterRegister();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterRegister(): void

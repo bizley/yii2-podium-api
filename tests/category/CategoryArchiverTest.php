@@ -67,7 +67,7 @@ class CategoryArchiverTest extends DbTestCase
             static::$eventsRaised[CategoryArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->archive(CategoryArchiver::findOne(1)));
+        $this->assertTrue($this->podium()->category->archive(CategoryArchiver::findOne(1))->result);
 
         $this->assertEquals(true, CategoryRepo::findOne(1)->archived);
 
@@ -82,7 +82,7 @@ class CategoryArchiverTest extends DbTestCase
         };
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(1))->result);
 
         $this->assertEquals(false, CategoryRepo::findOne(1)->archived);
 
@@ -91,7 +91,7 @@ class CategoryArchiverTest extends DbTestCase
 
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(2))->result);
     }
 
     public function testRevive(): void

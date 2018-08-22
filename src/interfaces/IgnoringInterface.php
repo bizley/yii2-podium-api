@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface IgnoringInterface
  * @package bizley\podium\api\interfaces
@@ -24,15 +26,15 @@ interface IgnoringInterface
 
     /**
      * Handles ignoring process.
-     * @return bool whether ignoring was successful
+     * @return PodiumResponse
      */
-    public function ignore(): bool;
+    public function ignore(): PodiumResponse;
 
     /**
      * Handles unignoring process.
-     * @return bool whether unignoring was successful
+     * @return PodiumResponse
      */
-    public function unignore(): bool;
+    public function unignore(): PodiumResponse;
 
     /**
      * @return bool whether member is ignoring target

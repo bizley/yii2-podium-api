@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -40,25 +41,25 @@ interface MessageInterface
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): bool;
+    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse;
 
     /**
      * @param RemovableInterface $messageRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $messageRemover): bool;
+    public function remove(RemovableInterface $messageRemover): PodiumResponse;
 
     /**
      * @param ArchivableInterface $messageArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $messageArchiver): bool;
+    public function archive(ArchivableInterface $messageArchiver): PodiumResponse;
 
     /**
      * @param ArchivableInterface $messageArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $messageArchiver): bool;
+    public function revive(ArchivableInterface $messageArchiver): PodiumResponse;
 }

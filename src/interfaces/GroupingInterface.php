@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface GroupingInterface
  * @package bizley\podium\api\interfaces
@@ -24,13 +26,13 @@ interface GroupingInterface
 
     /**
      * Joins group.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function join(): bool;
+    public function join(): PodiumResponse;
 
     /**
      * Leaves group.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function leave(): bool;
+    public function leave(): PodiumResponse;
 }

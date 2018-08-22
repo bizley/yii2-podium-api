@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\category;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
@@ -65,16 +66,16 @@ class CategorySorter extends CategoryRepo implements SortableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(): bool
+    public function sort(): PodiumResponse
     {
         if (!$this->beforeSort()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (!$this->validate()) {
             Yii::warning(['Categories sort validation failed', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -88,9 +89,12 @@ class CategorySorter extends CategoryRepo implements SortableInterface
                     $nextOrder++;
                 }
             }
+
             $transaction->commit();
+
             $this->afterSort();
-            return true;
+            return PodiumResponse::success();
+
         } catch (\Throwable $exc) {
             Yii::error(['Exception while sorting categories', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             try {
@@ -98,7 +102,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while categories sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
-            return false;
+            return PodiumResponse::error($this);
         }
     }
 

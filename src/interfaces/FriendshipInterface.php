@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface FriendshipInterface
  * @package bizley\podium\api\interfaces
@@ -24,15 +26,15 @@ interface FriendshipInterface
 
     /**
      * Handles befriending process.
-     * @return bool whether befriending was successful
+     * @return PodiumResponse
      */
-    public function befriend(): bool;
+    public function befriend(): PodiumResponse;
 
     /**
      * Handles unfriending process.
-     * @return bool whether unfriending was successful
+     * @return PodiumResponse
      */
-    public function unfriend(): bool;
+    public function unfriend(): PodiumResponse;
 
     /**
      * @return bool whether target is a friend of member

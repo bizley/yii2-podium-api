@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\post;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -44,16 +45,16 @@ class PostArchiver extends PostRepo implements ArchivableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(): bool
+    public function archive(): PodiumResponse
     {
         if (!$this->beforeArchive()) {
-            return false;
+            return PodiumResponse::error();
         }
         if ($this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'post.already.archived'));
-            return false;
+            return PodiumResponse::error($this);
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
@@ -77,7 +78,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
             $this->afterArchive();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while archiving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -87,7 +88,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
                 Yii::error(['Exception while post archiving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterArchive(): void
@@ -109,17 +110,18 @@ class PostArchiver extends PostRepo implements ArchivableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(): bool
+    public function revive(): PodiumResponse
     {
         if (!$this->beforeRevive()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'post.not.archived'));
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $thread = $this->getThreadModel();
@@ -139,7 +141,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
             $this->afterRevive();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while reviving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -149,7 +151,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
                 Yii::error(['Exception while post reviving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterRevive(): void

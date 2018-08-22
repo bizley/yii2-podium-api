@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\poll;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\repos\PollAnswerRepo;
 use Yii;
@@ -39,23 +40,23 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
 
     /**
      * Creates new model.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->save(false)) {
             Yii::error(['Error while creating poll answer', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
-        return true;
+        return PodiumResponse::success();
     }
 
     /**
      * Updates model.
-     * @return bool
+     * @return PodiumResponse
      * @throws NotSupportedException
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         throw new NotSupportedException('Use PostPollForm to update poll.');
     }

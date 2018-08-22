@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface ModelFormInterface
  * @package bizley\podium\api\interfaces
@@ -19,13 +21,13 @@ interface ModelFormInterface
 
     /**
      * Creates new model.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool;
+    public function create(): PodiumResponse;
 
     /**
      * Updates model.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool;
+    public function edit(): PodiumResponse;
 }

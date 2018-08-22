@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -40,43 +41,43 @@ interface PostInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): bool;
+    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse;
 
     /**
      * Updates post.
      * @param ModelFormInterface $postForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postForm, array $data): bool;
+    public function edit(ModelFormInterface $postForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $postRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $postRemover): bool;
+    public function remove(RemovableInterface $postRemover): PodiumResponse;
 
     /**
      * Moves post to different thread.
      * @param MovableInterface $postMover
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $postMover, ModelInterface $thread): bool;
+    public function move(MovableInterface $postMover, ModelInterface $thread): PodiumResponse;
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): bool;
+    public function archive(ArchivableInterface $postArchiver): PodiumResponse;
 
     /**
      * @param ArchivableInterface $postArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): bool;
+    public function revive(ArchivableInterface $postArchiver): PodiumResponse;
 
     /**
      * @return LikingInterface
@@ -86,21 +87,21 @@ interface PostInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbUp(MembershipInterface $member, ModelInterface $post): bool;
+    public function thumbUp(MembershipInterface $member, ModelInterface $post): PodiumResponse;
 
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbDown(MembershipInterface $member, ModelInterface $post): bool;
+    public function thumbDown(MembershipInterface $member, ModelInterface $post): PodiumResponse;
 
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function thumbReset(MembershipInterface $member, ModelInterface $post): bool;
+    public function thumbReset(MembershipInterface $member, ModelInterface $post): PodiumResponse;
 }

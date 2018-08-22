@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\events\BanEvent;
 use bizley\podium\api\interfaces\BanInterface;
@@ -44,25 +45,26 @@ class MemberBan extends MemberRepo implements BanInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function ban(): bool
+    public function ban(): PodiumResponse
     {
         if (!$this->beforeBan()) {
-            return false;
+            return PodiumResponse::error();
         }
         if ($this->status_id === MemberStatus::BANNED) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.banned'));
-            return false;
+            return PodiumResponse::error($this);
         }
         $this->status_id = MemberStatus::BANNED;
 
         if (!$this->save(false)) {
             Yii::error(['Error while banning member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterBan();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterBan(): void
@@ -84,25 +86,26 @@ class MemberBan extends MemberRepo implements BanInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unban(): bool
+    public function unban(): PodiumResponse
     {
         if (!$this->beforeUnban()) {
-            return false;
+            return PodiumResponse::error();
         }
         if ($this->status_id === MemberStatus::ACTIVE) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.active'));
-            return false;
+            return PodiumResponse::error($this);
         }
         $this->status_id = MemberStatus::ACTIVE;
 
         if (!$this->save(false)) {
             Yii::error(['Error while unbanning member', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterUnban();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnban(): void

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
@@ -90,13 +91,14 @@ class ThreadMover extends ThreadRepo implements MovableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(): bool
+    public function move(): PodiumResponse
     {
         if (!$this->beforeMove()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->getOldForumModel()->updateCounters([
@@ -121,7 +123,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             $this->afterMove();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -131,7 +133,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
                 Yii::error(['Exception while thread moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterMove(): void

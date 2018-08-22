@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -40,23 +41,23 @@ interface ForumInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $category
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $category): bool;
+    public function create(array $data, MembershipInterface $author, ModelInterface $category): PodiumResponse;
 
     /**
      * Updates forum.
      * @param ModelFormInterface $forumForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $forumForm, array $data): bool;
+    public function edit(ModelFormInterface $forumForm, array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $forumRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $forumRemover): bool;
+    public function remove(RemovableInterface $forumRemover): PodiumResponse;
 
     /**
      * @return SortableInterface
@@ -67,27 +68,27 @@ interface ForumInterface
      * Sorts forums.
      * @param ModelInterface $category
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(ModelInterface $category, array $data = []): bool;
+    public function sort(ModelInterface $category, array $data = []): PodiumResponse;
 
     /**
      * Moves forum to different category.
      * @param MovableInterface $forumMover
      * @param ModelInterface $category
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $forumMover, ModelInterface $category): bool;
+    public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse;
 
     /**
      * @param ArchivableInterface $forumArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $forumArchiver): bool;
+    public function archive(ArchivableInterface $forumArchiver): PodiumResponse;
 
     /**
      * @param ArchivableInterface $forumArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $forumArchiver): bool;
+    public function revive(ArchivableInterface $forumArchiver): PodiumResponse;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\forum;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\repos\ForumRepo;
@@ -30,31 +31,31 @@ class ForumRemover extends ForumRepo implements RemovableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(): bool
+    public function remove(): PodiumResponse
     {
         if (!$this->beforeRemove()) {
-            return false;
+            return PodiumResponse::error();
         }
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'forum.must.be.archived'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting forum', 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
 
             $this->afterRemove();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterRemove(): void

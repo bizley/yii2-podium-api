@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -120,13 +121,14 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->beforeCreate()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
@@ -135,12 +137,12 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
             if (!$this->save()) {
                 Yii::error(['Error while creating thread', $this->errors], 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
             $this->afterCreate();
 
             $transaction->commit();
-            return true;
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -150,7 +152,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
                 Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return false;
+        return PodiumResponse::error($this);
     }
 
     public function afterCreate(): void
@@ -172,19 +174,21 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         if (!$this->beforeEdit()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while editing thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterEdit();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterEdit(): void

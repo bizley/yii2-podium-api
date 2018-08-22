@@ -90,15 +90,15 @@ class Category extends PodiumComponent implements CategoryInterface
     /**
      * @param array $data
      * @param MembershipInterface $author
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author): bool
+    public function create(array $data, MembershipInterface $author): PodiumResponse
     {
         $categoryForm = $this->getCategoryForm();
         $categoryForm->setAuthor($author);
 
         if (!$categoryForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $categoryForm->create();
     }
@@ -106,21 +106,21 @@ class Category extends PodiumComponent implements CategoryInterface
     /**
      * @param ModelFormInterface $categoryForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): bool
+    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse
     {
         if (!$categoryForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $categoryForm->edit();
     }
 
     /**
      * @param RemovableInterface $categoryRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $categoryRemover): bool
+    public function remove(RemovableInterface $categoryRemover): PodiumResponse
     {
         return $categoryRemover->remove();
     }
@@ -135,32 +135,32 @@ class Category extends PodiumComponent implements CategoryInterface
 
     /**
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function sort(array $data = []): bool
+    public function sort(array $data = []): PodiumResponse
     {
         $categorySorter = $this->getCategorySorter();
 
         if (!$categorySorter->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $categorySorter->sort();
     }
 
     /**
      * @param ArchivableInterface $categoryArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $categoryArchiver): bool
+    public function archive(ArchivableInterface $categoryArchiver): PodiumResponse
     {
         return $categoryArchiver->archive();
     }
 
     /**
      * @param ArchivableInterface $categoryArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $categoryArchiver): bool
+    public function revive(ArchivableInterface $categoryArchiver): PodiumResponse
     {
         return $categoryArchiver->revive();
     }

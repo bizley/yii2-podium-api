@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface RegistrationInterface
  * @package bizley\podium\api\interfaces
@@ -19,7 +21,7 @@ interface RegistrationInterface
 
     /**
      * Registers new Podium account.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function register(): bool;
+    public function register(): PodiumResponse;
 }

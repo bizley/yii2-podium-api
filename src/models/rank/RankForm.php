@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\rank;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\repos\RankRepo;
@@ -76,19 +77,21 @@ class RankForm extends RankRepo implements ModelFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(): bool
+    public function create(): PodiumResponse
     {
         if (!$this->beforeCreate()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while creating rank', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterCreate();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterCreate(): void
@@ -110,19 +113,21 @@ class RankForm extends RankRepo implements ModelFormInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(): bool
+    public function edit(): PodiumResponse
     {
         if (!$this->beforeEdit()) {
-            return false;
+            return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while editing rank', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterEdit();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterEdit(): void

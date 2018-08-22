@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
  * Interface MovableInterface
  * @package bizley\podium\api\interfaces
@@ -12,9 +14,9 @@ interface MovableInterface
 {
     /**
      * Moves model.
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(): bool;
+    public function move(): PodiumResponse;
 
     /**
      * @param ModelInterface $category

@@ -103,16 +103,16 @@ class Thread extends PodiumComponent implements ThreadInterface
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $forum
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $forum): bool
+    public function create(array $data, MembershipInterface $author, ModelInterface $forum): PodiumResponse
     {
         $threadForm = $this->getThreadForm();
         $threadForm->setAuthor($author);
         $threadForm->setForum($forum);
 
         if (!$threadForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $threadForm->create();
     }
@@ -120,21 +120,21 @@ class Thread extends PodiumComponent implements ThreadInterface
     /**
      * @param ModelFormInterface $threadForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $threadForm, array $data): bool
+    public function edit(ModelFormInterface $threadForm, array $data): PodiumResponse
     {
         if (!$threadForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $threadForm->edit();
     }
 
     /**
      * @param RemovableInterface $threadRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $threadRemover): bool
+    public function remove(RemovableInterface $threadRemover): PodiumResponse
     {
         return $threadRemover->remove();
     }
@@ -142,9 +142,9 @@ class Thread extends PodiumComponent implements ThreadInterface
     /**
      * @param MovableInterface $threadMover
      * @param ModelInterface $forum
-     * @return bool
+     * @return PodiumResponse
      */
-    public function move(MovableInterface $threadMover, ModelInterface $forum): bool
+    public function move(MovableInterface $threadMover, ModelInterface $forum): PodiumResponse
     {
         $threadMover->setForum($forum);
 
@@ -153,54 +153,54 @@ class Thread extends PodiumComponent implements ThreadInterface
 
     /**
      * @param PinnableInterface $threadPinner
-     * @return bool
+     * @return PodiumResponse
      */
-    public function pin(PinnableInterface $threadPinner): bool
+    public function pin(PinnableInterface $threadPinner): PodiumResponse
     {
         return $threadPinner->pin();
     }
 
     /**
      * @param PinnableInterface $threadPinner
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unpin(PinnableInterface $threadPinner): bool
+    public function unpin(PinnableInterface $threadPinner): PodiumResponse
     {
         return $threadPinner->unpin();
     }
 
     /**
      * @param LockableInterface $threadLocker
-     * @return bool
+     * @return PodiumResponse
      */
-    public function lock(LockableInterface $threadLocker): bool
+    public function lock(LockableInterface $threadLocker): PodiumResponse
     {
         return $threadLocker->lock();
     }
 
     /**
      * @param LockableInterface $threadLocker
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unlock(LockableInterface $threadLocker): bool
+    public function unlock(LockableInterface $threadLocker): PodiumResponse
     {
         return $threadLocker->unlock();
     }
 
     /**
      * @param ArchivableInterface $threadArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $threadArchiver): bool
+    public function archive(ArchivableInterface $threadArchiver): PodiumResponse
     {
         return $threadArchiver->archive();
     }
 
     /**
      * @param ArchivableInterface $threadArchiver
-     * @return bool
+     * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $threadArchiver): bool
+    public function revive(ArchivableInterface $threadArchiver): PodiumResponse
     {
         return $threadArchiver->revive();
     }
@@ -216,9 +216,9 @@ class Thread extends PodiumComponent implements ThreadInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function subscribe(MembershipInterface $member, ModelInterface $thread): bool
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
         $subscribing = $this->getSubscribing();
         $subscribing->setMember($member);
@@ -230,9 +230,9 @@ class Thread extends PodiumComponent implements ThreadInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $thread
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): bool
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
         $subscribing = $this->getSubscribing();
         $subscribing->setMember($member);
@@ -252,9 +252,9 @@ class Thread extends PodiumComponent implements ThreadInterface
     /**
      * @param MembershipInterface $member
      * @param ModelInterface $post
-     * @return bool
+     * @return PodiumResponse
      */
-    public function mark(MembershipInterface $member, ModelInterface $post): bool
+    public function mark(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $bookmarking = $this->getBookmarking();
         $bookmarking->setMember($member);

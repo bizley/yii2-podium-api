@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\GroupEvent;
 use bizley\podium\api\interfaces\GroupingInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -64,12 +65,12 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function join(): bool
+    public function join(): PodiumResponse
     {
         if (!$this->beforeJoin()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         if (static::find()->where([
@@ -77,15 +78,16 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
                 'group_id' => $this->group_id,
             ])->exists()) {
             $this->addError('group_id', Yii::t('podium.error', 'group.already.joined'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         if (!$this->save()) {
             Yii::error(['Error while joining group', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
+
         $this->afterJoin();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterJoin(): void
@@ -107,12 +109,12 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function leave(): bool
+    public function leave(): PodiumResponse
     {
         if (!$this->beforeLeave()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $groupMember = static::find()->where([
@@ -121,21 +123,21 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
         ])->one();
         if ($groupMember === null) {
             $this->addError('group_id', Yii::t('podium.error', 'group.not.joined'));
-            return false;
+            return PodiumResponse::error($this);
         }
 
         try {
             if (!$groupMember->delete()) {
                 Yii::error(['Error while leaving group', $this->errors], 'podium');
-                return false;
+                return PodiumResponse::error($this);
             }
         } catch (\Throwable $exc) {
             Yii::error(['Exception while leaving group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterLeave();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterLeave(): void

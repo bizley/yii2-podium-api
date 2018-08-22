@@ -75,14 +75,14 @@ class Group extends PodiumComponent implements GroupInterface
 
     /**
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function create(array $data): bool
+    public function create(array $data): PodiumResponse
     {
         $groupForm = $this->getGroupForm();
 
         if (!$groupForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $groupForm->create();
     }
@@ -90,21 +90,21 @@ class Group extends PodiumComponent implements GroupInterface
     /**
      * @param ModelFormInterface $groupForm
      * @param array $data
-     * @return bool
+     * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $groupForm, array $data): bool
+    public function edit(ModelFormInterface $groupForm, array $data): PodiumResponse
     {
         if (!$groupForm->loadData($data)) {
-            return false;
+            return PodiumResponse::error();
         }
         return $groupForm->edit();
     }
 
     /**
      * @param RemovableInterface $groupRemover
-     * @return bool
+     * @return PodiumResponse
      */
-    public function remove(RemovableInterface $groupRemover): bool
+    public function remove(RemovableInterface $groupRemover): PodiumResponse
     {
         return $groupRemover->remove();
     }

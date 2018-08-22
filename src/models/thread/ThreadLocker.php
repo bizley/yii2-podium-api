@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\thread;
 
+use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\LockEvent;
 use bizley\podium\api\interfaces\LockableInterface;
 use bizley\podium\api\repos\ThreadRepo;
@@ -43,22 +44,22 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function lock(): bool
+    public function lock(): PodiumResponse
     {
         if (!$this->beforeLock()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $this->locked = true;
         if (!$this->save()) {
             Yii::error(['Error while locking thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterLock();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterLock(): void
@@ -80,22 +81,22 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
     }
 
     /**
-     * @return bool
+     * @return PodiumResponse
      */
-    public function unlock(): bool
+    public function unlock(): PodiumResponse
     {
         if (!$this->beforeUnlock()) {
-            return false;
+            return PodiumResponse::error();
         }
 
         $this->locked = false;
         if (!$this->save()) {
             Yii::error(['Error while unlocking thread', $this->errors], 'podium');
-            return false;
+            return PodiumResponse::error($this);
         }
 
         $this->afterUnlock();
-        return true;
+        return PodiumResponse::success();
     }
 
     public function afterUnlock(): void
