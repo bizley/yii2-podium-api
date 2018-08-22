@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\MessageFormInterface;
+use bizley\podium\api\interfaces\SendingInterface;
+use bizley\podium\api\models\poll\MessageParticipantForm;
 use bizley\podium\api\repos\MessageRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -15,13 +17,13 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
 
 /**
- * Class MessageForm
+ * Class MessageSender
  * @package bizley\podium\api\models\message
  */
-class MessageForm extends MessageRepo implements MessageFormInterface
+class MessageSender extends MessageRepo implements SendingInterface
 {
-    public const EVENT_BEFORE_CREATING = 'podium.message.creating.before';
-    public const EVENT_AFTER_CREATING = 'podium.message.creating.after';
+    public const EVENT_BEFORE_SENDING = 'podium.message.sending.before';
+    public const EVENT_AFTER_SENDING = 'podium.message.sending.after';
 
     private $_senderId;
 
@@ -103,10 +105,10 @@ class MessageForm extends MessageRepo implements MessageFormInterface
     /**
      * @return bool
      */
-    public function beforeCreate(): bool
+    public function beforeSend(): bool
     {
         $event = new MessageEvent();
-        $this->trigger(self::EVENT_BEFORE_CREATING, $event);
+        $this->trigger(self::EVENT_BEFORE_SENDING, $event);
 
         return $event->canCreate;
     }
@@ -114,9 +116,9 @@ class MessageForm extends MessageRepo implements MessageFormInterface
     /**
      * @return PodiumResponse
      */
-    public function create(): PodiumResponse
+    public function send(): PodiumResponse
     {
-        if (!$this->beforeCreate()) {
+        if (!$this->beforeSend()) {
             return PodiumResponse::error();
         }
 
@@ -127,9 +129,27 @@ class MessageForm extends MessageRepo implements MessageFormInterface
                 throw new Exception('Error while creating message!');
             }
 
+            $senderCopy = new MessageParticipantForm([
+                'member_id' => $this->getSender(),
+                'message_id' => $this->id,
+                'status_id' => MessageStatus::READ,
+            ]);
+            if (!$senderCopy->create()) {
+                Yii::error(['Error while creating sender message copy', $senderCopy->errors], 'podium');
+                throw new Exception('Error while creating sender message copy!');
+            }
 
+            $receiverCopy = new MessageParticipantForm([
+                'member_id' => $this->getReceiver(),
+                'message_id' => $this->id,
+                'status_id' => MessageStatus::NEW,
+            ]);
+            if (!$receiverCopy->create()) {
+                Yii::error(['Error while creating receiver message copy', $receiverCopy->errors], 'podium');
+                throw new Exception('Error while creating receiver message copy!');
+            }
 
-            $this->afterCreate();
+            $this->afterSend();
 
             $transaction->commit();
             return PodiumResponse::success();
@@ -145,9 +165,9 @@ class MessageForm extends MessageRepo implements MessageFormInterface
         return PodiumResponse::error($this);
     }
 
-    public function afterCreate(): void
+    public function afterSend(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new MessageEvent([
+        $this->trigger(self::EVENT_AFTER_SENDING, new MessageEvent([
             'model' => $this
         ]));
     }
@@ -160,5 +180,15 @@ class MessageForm extends MessageRepo implements MessageFormInterface
     public function edit(): PodiumResponse
     {
         throw new NotSupportedException('Message can not be edited.');
+    }
+
+    /**
+     * Creates model.
+     * @return PodiumResponse
+     * @throws NotSupportedException
+     */
+    public function create(): PodiumResponse
+    {
+        throw new NotSupportedException('Use send to create message.');
     }
 }

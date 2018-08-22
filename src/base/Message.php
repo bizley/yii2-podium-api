@@ -6,10 +6,10 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\MessageFormInterface;
 use bizley\podium\api\interfaces\MessageInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\SendingInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -29,10 +29,10 @@ class Message extends PodiumComponent implements MessageInterface
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|MessageFormInterface
-     * Component ID, class, configuration array, or instance of MessageFormInterface.
+     * @var string|array|SendingInterface
+     * Component ID, class, configuration array, or instance of SendingInterface.
      */
-    public $messageFormHandler = \bizley\podium\api\models\message\MessageForm::class;
+    public $sendingHandler = \bizley\podium\api\models\message\MessageSender::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -42,7 +42,7 @@ class Message extends PodiumComponent implements MessageInterface
         parent::init();
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
-        $this->messageFormHandler = Instance::ensure($this->messageFormHandler, MessageFormInterface::class);
+        $this->sendingHandler = Instance::ensure($this->sendingHandler, SendingInterface::class);
     }
 
     /**
@@ -68,11 +68,11 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * @return MessageFormInterface
+     * @return SendingInterface
      */
-    public function getMessageForm(): MessageFormInterface
+    public function getSending(): SendingInterface
     {
-        return new $this->messageFormHandler;
+        return new $this->sendingHandler;
     }
 
     /**
@@ -81,16 +81,16 @@ class Message extends PodiumComponent implements MessageInterface
      * @param MembershipInterface $receiver
      * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse
+    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse
     {
-        $messageForm = $this->getMessageForm();
-        $messageForm->setSender($sender);
-        $messageForm->setReceiver($receiver);
+        $sending = $this->getSending();
+        $sending->setSender($sender);
+        $sending->setReceiver($receiver);
 
-        if (!$messageForm->loadData($data)) {
+        if (!$sending->loadData($data)) {
             return PodiumResponse::error();
         }
-        return $messageForm->create();
+        return $sending->create();
     }
 
     /**
@@ -103,20 +103,20 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param ArchivableInterface $messageArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): PodiumResponse
+    public function archive(ArchivableInterface $messageArchiver): PodiumResponse
     {
-        return $postArchiver->archive();
+        return $messageArchiver->archive();
     }
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param ArchivableInterface $messageArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): PodiumResponse
+    public function revive(ArchivableInterface $messageArchiver): PodiumResponse
     {
-        return $postArchiver->revive();
+        return $messageArchiver->revive();
     }
 }

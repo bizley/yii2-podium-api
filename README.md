@@ -95,4 +95,4 @@
 
 ## TODO:
 
-- get errors on methods returns
+- test errors on PodiumResponse

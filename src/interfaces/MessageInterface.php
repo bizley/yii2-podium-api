@@ -32,18 +32,18 @@ interface MessageInterface
 
     /**
      * Returns forum form handler.
-     * @return MessageFormInterface
+     * @return SendingInterface
      */
-    public function getMessageForm(): MessageFormInterface;
+    public function getSending(): SendingInterface;
 
     /**
-     * Creates message.
+     * Sends message.
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
      * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse;
+    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse;
 
     /**
      * @param RemovableInterface $messageRemover
