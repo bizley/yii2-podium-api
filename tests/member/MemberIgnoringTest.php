@@ -75,7 +75,7 @@ class MemberIgnoringTest extends DbTestCase
             static::$eventsRaised[Ignoring::EVENT_AFTER_IGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101)));
+        $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101))->result);
 
         $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
@@ -94,7 +94,7 @@ class MemberIgnoringTest extends DbTestCase
         };
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, $handler);
 
-        $this->assertFalse($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101)));
+        $this->assertFalse($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
@@ -107,7 +107,7 @@ class MemberIgnoringTest extends DbTestCase
 
     public function testIgnoreAgain(): void
     {
-        $this->assertFalse($this->podium()->member->ignore(Member::findOne(101), Member::findOne(102)));
+        $this->assertFalse($this->podium()->member->ignore(Member::findOne(101), Member::findOne(102))->result);
     }
 
     public function testUnignore(): void
@@ -119,7 +119,7 @@ class MemberIgnoringTest extends DbTestCase
             static::$eventsRaised[Ignoring::EVENT_AFTER_UNIGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102)));
+        $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 101,
@@ -138,7 +138,7 @@ class MemberIgnoringTest extends DbTestCase
         };
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, $handler);
 
-        $this->assertFalse($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102)));
+        $this->assertFalse($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102))->result);
 
         $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 101,
@@ -151,6 +151,6 @@ class MemberIgnoringTest extends DbTestCase
 
     public function testUnignoreAgain(): void
     {
-        $this->assertFalse($this->podium()->member->unignore(Member::findOne(100), Member::findOne(101)));
+        $this->assertFalse($this->podium()->member->unignore(Member::findOne(100), Member::findOne(101))->result);
     }
 }

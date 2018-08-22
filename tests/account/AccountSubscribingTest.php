@@ -118,7 +118,7 @@ class AccountSubscribingTest extends AccountTestCase
             static::$eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->subscribe(Thread::findOne(1)));
+        $this->assertTrue($this->podium()->account->subscribe(Thread::findOne(1))->result);
 
         $subscription = SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -138,7 +138,7 @@ class AccountSubscribingTest extends AccountTestCase
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
 
-        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(1)));
+        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(1))->result);
 
         $this->assertEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -150,7 +150,7 @@ class AccountSubscribingTest extends AccountTestCase
 
     public function testSubscribeAgain(): void
     {
-        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(2)));
+        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(2))->result);
     }
 
     public function testUnsubscribe(): void
@@ -162,7 +162,7 @@ class AccountSubscribingTest extends AccountTestCase
             static::$eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->unsubscribe(Thread::findOne(2)));
+        $this->assertTrue($this->podium()->account->unsubscribe(Thread::findOne(2))->result);
 
         $this->assertEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -180,7 +180,7 @@ class AccountSubscribingTest extends AccountTestCase
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
 
-        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(2)));
+        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(2))->result);
 
         $this->assertNotEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -192,6 +192,6 @@ class AccountSubscribingTest extends AccountTestCase
 
     public function testUnsubscribeAgain(): void
     {
-        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(1)));
+        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(1))->result);
     }
 }

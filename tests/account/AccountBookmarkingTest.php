@@ -130,7 +130,7 @@ class AccountBookmarkingTest extends AccountTestCase
             static::$eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->mark(Post::findOne(2)));
+        $this->assertTrue($this->podium()->account->mark(Post::findOne(2))->result);
 
         $this->assertEquals(100, BookmarkRepo::findOne([
             'member_id' => 1,
@@ -148,7 +148,7 @@ class AccountBookmarkingTest extends AccountTestCase
         };
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
 
-        $this->assertFalse($this->podium()->account->mark(Post::findOne(2)));
+        $this->assertFalse($this->podium()->account->mark(Post::findOne(2))->result);
 
         $this->assertEquals(10, BookmarkRepo::findOne([
             'member_id' => 1,
@@ -160,7 +160,7 @@ class AccountBookmarkingTest extends AccountTestCase
 
     public function testNoUpdateMark(): void
     {
-        $this->assertTrue($this->podium()->account->mark(Post::findOne(1)));
+        $this->assertTrue($this->podium()->account->mark(Post::findOne(1))->result);
 
         $this->assertEquals(10, BookmarkRepo::findOne([
             'member_id' => 1,

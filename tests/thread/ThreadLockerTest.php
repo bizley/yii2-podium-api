@@ -92,7 +92,7 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_LOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->lock(ThreadLocker::findOne(1)));
+        $this->assertTrue($this->podium()->thread->lock(ThreadLocker::findOne(1))->result);
         $this->assertEquals(1, ThreadRepo::findOne(1)->locked);
 
         $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_LOCKING, $this->eventsRaised);
@@ -106,7 +106,7 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->lock(ThreadLocker::findOne(1)));
+        $this->assertFalse($this->podium()->thread->lock(ThreadLocker::findOne(1))->result);
         $this->assertEquals(0, ThreadRepo::findOne(1)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
@@ -121,7 +121,7 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_UNLOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->unlock(ThreadLocker::findOne(2)));
+        $this->assertTrue($this->podium()->thread->unlock(ThreadLocker::findOne(2))->result);
         $this->assertEquals(0, ThreadRepo::findOne(2)->locked);
 
         $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_UNLOCKING, $this->eventsRaised);
@@ -135,7 +135,7 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->unlock(ThreadLocker::findOne(2)));
+        $this->assertFalse($this->podium()->thread->unlock(ThreadLocker::findOne(2))->result);
         $this->assertEquals(1, ThreadRepo::findOne(2)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);

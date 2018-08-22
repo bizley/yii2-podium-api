@@ -105,7 +105,7 @@ class ThreadRemoverTest extends DbTestCase
             static::$eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1)));
+        $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1))->result);
 
         $this->assertEmpty(ThreadRepo::findOne(1));
         $this->assertEmpty(PostRepo::findOne(1));
@@ -121,7 +121,7 @@ class ThreadRemoverTest extends DbTestCase
         };
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(1)));
+        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(1))->result);
 
         $this->assertNotEmpty(ThreadRepo::findOne(1));
         $this->assertNotEmpty(PostRepo::findOne(1));
@@ -131,7 +131,7 @@ class ThreadRemoverTest extends DbTestCase
 
     public function testNonArchived(): void
     {
-        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(2)));
+        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(2))->result);
         $this->assertNotEmpty(ThreadRepo::findOne(2));
     }
 }

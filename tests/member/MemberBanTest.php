@@ -56,7 +56,7 @@ class MemberBanTest extends DbTestCase
             static::$eventsRaised[MemberBan::EVENT_AFTER_BANNING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->ban(MemberBan::findOne(100)));
+        $this->assertTrue($this->podium()->member->ban(MemberBan::findOne(100))->result);
 
         $banned = MemberRepo::findOne(100);
         $this->assertEquals(MemberStatus::BANNED, $banned->status_id);
@@ -72,7 +72,7 @@ class MemberBanTest extends DbTestCase
         };
         Event::on(MemberBan::class, MemberBan::EVENT_BEFORE_BANNING, $handler);
 
-        $this->assertFalse($this->podium()->member->ban(MemberBan::findOne(100)));
+        $this->assertFalse($this->podium()->member->ban(MemberBan::findOne(100))->result);
 
         $notbanned = MemberRepo::findOne(100);
         $this->assertEquals(MemberStatus::ACTIVE, $notbanned->status_id);
@@ -82,7 +82,7 @@ class MemberBanTest extends DbTestCase
 
     public function testBanAgain(): void
     {
-        $this->assertFalse($this->podium()->member->ban(MemberBan::findOne(101)));
+        $this->assertFalse($this->podium()->member->ban(MemberBan::findOne(101))->result);
     }
 
     public function testUnban(): void
@@ -94,7 +94,7 @@ class MemberBanTest extends DbTestCase
             static::$eventsRaised[MemberBan::EVENT_AFTER_UNBANNING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->unban(MemberBan::findOne(101)));
+        $this->assertTrue($this->podium()->member->unban(MemberBan::findOne(101))->result);
 
         $unbanned = MemberRepo::findOne(101);
         $this->assertEquals(MemberStatus::ACTIVE, $unbanned->status_id);
@@ -110,7 +110,7 @@ class MemberBanTest extends DbTestCase
         };
         Event::on(MemberBan::class, MemberBan::EVENT_BEFORE_UNBANNING, $handler);
 
-        $this->assertFalse($this->podium()->member->unban(MemberBan::findOne(101)));
+        $this->assertFalse($this->podium()->member->unban(MemberBan::findOne(101))->result);
 
         $notunbanned = MemberRepo::findOne(101);
         $this->assertEquals(MemberStatus::BANNED, $notunbanned->status_id);
@@ -120,6 +120,6 @@ class MemberBanTest extends DbTestCase
 
     public function testUnbanAgain(): void
     {
-        $this->assertFalse($this->podium()->member->unban(MemberBan::findOne(100)));
+        $this->assertFalse($this->podium()->member->unban(MemberBan::findOne(100))->result);
     }
 }

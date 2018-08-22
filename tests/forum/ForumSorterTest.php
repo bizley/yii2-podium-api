@@ -110,7 +110,7 @@ class ForumSorterTest extends DbTestCase
             $this->eventsRaised[ForumSorter::EVENT_AFTER_SORTING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2]));
+        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
 
         $this->assertEquals(0, ForumRepo::findOne(3)->sort);
         $this->assertEquals(1, ForumRepo::findOne(1)->sort);
@@ -127,7 +127,7 @@ class ForumSorterTest extends DbTestCase
         };
         Event::on(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, $handler);
 
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2]));
+        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
 
         $this->assertEquals(-9, ForumRepo::findOne(3)->sort);
         $this->assertEquals(8, ForumRepo::findOne(1)->sort);
@@ -138,17 +138,17 @@ class ForumSorterTest extends DbTestCase
 
     public function testSortWrongDataType(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), ['aaa']));
+        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), ['aaa'])->result);
     }
 
     public function testSortWrongDataId(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [99]));
+        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [99])->result);
     }
 
     public function testSortForumsInWrongCategory(): void
     {
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(2), [3, 1, 2]));
+        $this->assertTrue($this->podium()->forum->sort(Category::findOne(2), [3, 1, 2])->result);
 
         $this->assertEquals(-9, ForumRepo::findOne(3)->sort);
         $this->assertEquals(8, ForumRepo::findOne(1)->sort);
@@ -157,7 +157,7 @@ class ForumSorterTest extends DbTestCase
 
     public function testSortWithOutsideForum(): void
     {
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 4]));
+        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 4])->result);
 
         $this->assertEquals(0, ForumRepo::findOne(3)->sort);
         $this->assertEquals(1, ForumRepo::findOne(1)->sort);

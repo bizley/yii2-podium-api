@@ -121,7 +121,7 @@ class ThreadBookmarkingTest extends DbTestCase
             static::$eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->mark(Member::findOne(1), Post::findOne(1)));
+        $this->assertTrue($this->podium()->thread->mark(Member::findOne(1), Post::findOne(1))->result);
 
         $bookmark = BookmarkRepo::findOne([
             'member_id' => 1,
@@ -141,7 +141,7 @@ class ThreadBookmarkingTest extends DbTestCase
         };
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->mark(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->thread->mark(Member::findOne(1), Post::findOne(1))->result);
 
         $this->assertEmpty(BookmarkRepo::findOne([
             'member_id' => 1,
@@ -153,7 +153,7 @@ class ThreadBookmarkingTest extends DbTestCase
 
     public function testUpdateMark(): void
     {
-        $this->assertTrue($this->podium()->thread->mark(Member::findOne(2), Post::findOne(2)));
+        $this->assertTrue($this->podium()->thread->mark(Member::findOne(2), Post::findOne(2))->result);
 
         $this->assertEquals(100, BookmarkRepo::findOne([
             'member_id' => 2,
@@ -163,7 +163,7 @@ class ThreadBookmarkingTest extends DbTestCase
 
     public function testNoUpdateMark(): void
     {
-        $this->assertTrue($this->podium()->thread->mark(Member::findOne(2), Post::findOne(1)));
+        $this->assertTrue($this->podium()->thread->mark(Member::findOne(2), Post::findOne(1))->result);
 
         $this->assertEquals(10, BookmarkRepo::findOne([
             'member_id' => 2,

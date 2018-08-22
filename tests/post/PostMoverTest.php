@@ -130,7 +130,7 @@ class PostMoverTest extends DbTestCase
             $this->eventsRaised[PostMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2)));
+        $this->assertTrue($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2))->result);
 
         $post = PostRepo::findOne(1);
         $this->assertEquals(1, $post->category_id);
@@ -152,7 +152,7 @@ class PostMoverTest extends DbTestCase
         };
         Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2)));
+        $this->assertFalse($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2))->result);
         $this->assertEquals(1, PostRepo::findOne(1)->thread_id);
 
         Event::off(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
@@ -160,7 +160,7 @@ class PostMoverTest extends DbTestCase
 
     public function testMoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->move(PostMover::findOne(2), Thread::findOne(1)));
+        $this->assertTrue($this->podium()->post->move(PostMover::findOne(2), Thread::findOne(1))->result);
 
         $post = PostRepo::findOne(2);
         $this->assertEquals(1, $post->category_id);

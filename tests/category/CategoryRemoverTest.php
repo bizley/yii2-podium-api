@@ -105,7 +105,7 @@ class CategoryRemoverTest extends DbTestCase
             static::$eventsRaised[CategoryRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->remove(CategoryRemover::findOne(1)));
+        $this->assertTrue($this->podium()->category->remove(CategoryRemover::findOne(1))->result);
 
         $this->assertEmpty(CategoryRepo::findOne(1));
         $this->assertEmpty(ForumRepo::findOne(1));
@@ -123,7 +123,7 @@ class CategoryRemoverTest extends DbTestCase
         };
         Event::on(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(1)));
+        $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(1))->result);
 
         $this->assertNotEmpty(CategoryRepo::findOne(1));
         $this->assertNotEmpty(ForumRepo::findOne(1));
@@ -135,7 +135,7 @@ class CategoryRemoverTest extends DbTestCase
 
     public function testNonArchived(): void
     {
-        $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(2)));
+        $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(2))->result);
         $this->assertNotEmpty(CategoryRepo::findOne(2));
     }
 }

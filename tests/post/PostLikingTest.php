@@ -134,7 +134,7 @@ class PostLikingTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_UP] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1))->result);
 
         $this->assertEquals(1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -156,7 +156,7 @@ class PostLikingTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(1), Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -172,12 +172,12 @@ class PostLikingTest extends DbTestCase
 
     public function testAlreadyThumbedUp(): void
     {
-        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(2), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbUp(Member::findOne(2), Post::findOne(1))->result);
     }
 
     public function testChangeToThumbUp(): void
     {
-        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(3), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbUp(Member::findOne(3), Post::findOne(1))->result);
 
         $this->assertEquals(1, ThumbRepo::findOne([
             'member_id' => 3,
@@ -198,7 +198,7 @@ class PostLikingTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_DOWN] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1))->result);
 
         $this->assertEquals(-1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -220,7 +220,7 @@ class PostLikingTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(1), Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -236,12 +236,12 @@ class PostLikingTest extends DbTestCase
 
     public function testAlreadyThumbedDown(): void
     {
-        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(3), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbDown(Member::findOne(3), Post::findOne(1))->result);
     }
 
     public function testChangeToThumbDown(): void
     {
-        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(2), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbDown(Member::findOne(2), Post::findOne(1))->result);
 
         $this->assertEquals(-1, ThumbRepo::findOne([
             'member_id' => 3,
@@ -262,7 +262,7 @@ class PostLikingTest extends DbTestCase
             static::$eventsRaised[Liking::EVENT_AFTER_THUMB_RESET] = true;
         });
 
-        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 2,
@@ -284,7 +284,7 @@ class PostLikingTest extends DbTestCase
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
 
-        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(2), Post::findOne(1))->result);
 
         $this->assertNotEmpty(ThumbRepo::findOne([
             'member_id' => 2,
@@ -300,12 +300,12 @@ class PostLikingTest extends DbTestCase
 
     public function testNoThumbToReset(): void
     {
-        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(1), Post::findOne(1)));
+        $this->assertFalse($this->podium()->post->thumbReset(Member::findOne(1), Post::findOne(1))->result);
     }
 
     public function testThumbResetFromDown(): void
     {
-        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(3), Post::findOne(1)));
+        $this->assertTrue($this->podium()->post->thumbReset(Member::findOne(3), Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 3,

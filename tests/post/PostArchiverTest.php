@@ -131,7 +131,7 @@ class PostArchiverTest extends DbTestCase
             static::$eventsRaised[PostArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(1)));
+        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(1))->result);
 
         $this->assertEquals(true, PostRepo::findOne(1)->archived);
 
@@ -149,7 +149,7 @@ class PostArchiverTest extends DbTestCase
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(1))->result);
 
         $this->assertEquals(false, PostRepo::findOne(1)->archived);
 
@@ -161,12 +161,12 @@ class PostArchiverTest extends DbTestCase
 
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(2))->result);
     }
 
     public function testArchiveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(3)));
+        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(3))->result);
 
         $this->assertEquals(true, PostRepo::findOne(3)->archived);
         $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
@@ -181,7 +181,7 @@ class PostArchiverTest extends DbTestCase
             static::$eventsRaised[PostArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->revive(PostArchiver::findOne(2)));
+        $this->assertTrue($this->podium()->post->revive(PostArchiver::findOne(2))->result);
 
         $this->assertEquals(false, PostRepo::findOne(2)->archived);
 
@@ -199,7 +199,7 @@ class PostArchiverTest extends DbTestCase
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(2))->result);
 
         $this->assertEquals(true, PostRepo::findOne(2)->archived);
 
@@ -211,6 +211,6 @@ class PostArchiverTest extends DbTestCase
 
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(1))->result);
     }
 }

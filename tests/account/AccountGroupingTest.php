@@ -88,7 +88,7 @@ class AccountGroupingTest extends AccountTestCase
             static::$eventsRaised[Grouping::EVENT_AFTER_JOINING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->join(Group::findOne(1)));
+        $this->assertTrue($this->podium()->account->join(Group::findOne(1))->result);
 
         $this->assertNotEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -106,7 +106,7 @@ class AccountGroupingTest extends AccountTestCase
         };
         Event::on(Grouping::class, Grouping::EVENT_BEFORE_JOINING, $handler);
 
-        $this->assertFalse($this->podium()->account->join(Group::findOne(1)));
+        $this->assertFalse($this->podium()->account->join(Group::findOne(1))->result);
 
         $this->assertEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -118,7 +118,7 @@ class AccountGroupingTest extends AccountTestCase
 
     public function testJoinAgain(): void
     {
-        $this->assertFalse($this->podium()->account->join(Group::findOne(2)));
+        $this->assertFalse($this->podium()->account->join(Group::findOne(2))->result);
     }
 
     public function testLeave(): void
@@ -130,7 +130,7 @@ class AccountGroupingTest extends AccountTestCase
             static::$eventsRaised[Grouping::EVENT_AFTER_LEAVING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->leave(Group::findOne(2)));
+        $this->assertTrue($this->podium()->account->leave(Group::findOne(2))->result);
 
         $this->assertEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -148,7 +148,7 @@ class AccountGroupingTest extends AccountTestCase
         };
         Event::on(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, $handler);
 
-        $this->assertFalse($this->podium()->account->leave(Group::findOne(2)));
+        $this->assertFalse($this->podium()->account->leave(Group::findOne(2))->result);
 
         $this->assertNotEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -160,6 +160,6 @@ class AccountGroupingTest extends AccountTestCase
 
     public function testLeaveAgain(): void
     {
-        $this->assertFalse($this->podium()->account->leave(Group::findOne(1)));
+        $this->assertFalse($this->podium()->account->leave(Group::findOne(1))->result);
     }
 }

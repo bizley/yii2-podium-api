@@ -94,7 +94,7 @@ class AccountIgnoringTest extends AccountTestCase
             static::$eventsRaised[Ignoring::EVENT_AFTER_IGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->ignore(Member::findOne(11)));
+        $this->assertTrue($this->podium()->account->ignore(Member::findOne(11))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -114,7 +114,7 @@ class AccountIgnoringTest extends AccountTestCase
         };
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, $handler);
 
-        $this->assertFalse($this->podium()->account->ignore(Member::findOne(11)));
+        $this->assertFalse($this->podium()->account->ignore(Member::findOne(11))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -128,7 +128,7 @@ class AccountIgnoringTest extends AccountTestCase
 
     public function testIgnoreAgain(): void
     {
-        $this->assertFalse($this->podium()->account->ignore(Member::findOne(12)));
+        $this->assertFalse($this->podium()->account->ignore(Member::findOne(12))->result);
     }
 
     public function testUnignore(): void
@@ -140,7 +140,7 @@ class AccountIgnoringTest extends AccountTestCase
             static::$eventsRaised[Ignoring::EVENT_AFTER_UNIGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->unignore(Member::findOne(12)));
+        $this->assertTrue($this->podium()->account->unignore(Member::findOne(12))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -160,7 +160,7 @@ class AccountIgnoringTest extends AccountTestCase
         };
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, $handler);
 
-        $this->assertFalse($this->podium()->account->unignore(Member::findOne(12)));
+        $this->assertFalse($this->podium()->account->unignore(Member::findOne(12))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -174,6 +174,6 @@ class AccountIgnoringTest extends AccountTestCase
 
     public function testUnignoreAgain(): void
     {
-        $this->assertFalse($this->podium()->account->unignore(Member::findOne(11)));
+        $this->assertFalse($this->podium()->account->unignore(Member::findOne(11))->result);
     }
 }

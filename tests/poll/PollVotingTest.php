@@ -186,7 +186,7 @@ class PollVotingTest extends DbTestCase
             static::$eventsRaised[Voting::EVENT_AFTER_VOTING] = true;
         });
 
-        $this->assertTrue($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(1)]));
+        $this->assertTrue($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(1)])->result);
 
         $this->assertNotEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -205,7 +205,7 @@ class PollVotingTest extends DbTestCase
         };
         Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);
 
-        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(1)]));
+        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(1)])->result);
 
         $this->assertEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -218,12 +218,12 @@ class PollVotingTest extends DbTestCase
 
     public function testVoteAgain(): void
     {
-        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(3), [PollAnswer::findOne(4)]));
+        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(3), [PollAnswer::findOne(4)])->result);
     }
 
     public function testVoteMultiple(): void
     {
-        $this->assertTrue($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(2), PollAnswer::findAll(['poll_id' => 2])));
+        $this->assertTrue($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(2), PollAnswer::findAll(['poll_id' => 2]))->result);
 
         $this->assertNotEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -239,11 +239,11 @@ class PollVotingTest extends DbTestCase
 
     public function testVoteMultipleInSingleChoicePoll(): void
     {
-        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), PollAnswer::findAll(['poll_id' => 2])));
+        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), PollAnswer::findAll(['poll_id' => 2]))->result);
     }
 
     public function testVoteWrongAnswer(): void
     {
-        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(4)]));
+        $this->assertFalse($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(4)])->result);
     }
 }

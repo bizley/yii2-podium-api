@@ -77,7 +77,7 @@ class ForumMoverTest extends DbTestCase
             $this->eventsRaised[ForumMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2)));
+        $this->assertTrue($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2))->result);
         $this->assertEquals(2, ForumRepo::findOne(1)->category_id);
 
         $this->assertArrayHasKey(ForumMover::EVENT_BEFORE_MOVING, $this->eventsRaised);
@@ -91,7 +91,7 @@ class ForumMoverTest extends DbTestCase
         };
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2)));
+        $this->assertFalse($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2))->result);
         $this->assertEquals(1, ForumRepo::findOne(1)->category_id);
 
         Event::off(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);

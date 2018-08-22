@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\account;
+namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Registration;
@@ -12,7 +12,7 @@ use yii\base\Event;
 
 /**
  * Class RegistrationTest
- * @package bizley\podium\tests\account
+ * @package bizley\podium\tests\member
  */
 class RegistrationTest extends DbTestCase
 {
@@ -41,7 +41,7 @@ class RegistrationTest extends DbTestCase
             'user_id' => '100',
             'username' => 'testname',
         ];
-        $this->assertTrue($this->podium()->member->register($data));
+        $this->assertTrue($this->podium()->member->register($data)->result);
 
         $member = MemberRepo::findOne(['username' => 'testname']);
         $this->assertEquals(array_merge($data, [
@@ -69,7 +69,7 @@ class RegistrationTest extends DbTestCase
             'user_id' => '101',
             'username' => 'notestname',
         ];
-        $this->assertFalse($this->podium()->member->register($data));
+        $this->assertFalse($this->podium()->member->register($data)->result);
 
         $this->assertEmpty( MemberRepo::findOne(['username' => 'notestname']));
 

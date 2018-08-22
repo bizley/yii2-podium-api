@@ -96,7 +96,7 @@ class ThreadArchiverTest extends DbTestCase
             static::$eventsRaised[ThreadArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->archive(ThreadArchiver::findOne(1)));
+        $this->assertTrue($this->podium()->thread->archive(ThreadArchiver::findOne(1))->result);
 
         $this->assertEquals(true, ThreadRepo::findOne(1)->archived);
 
@@ -115,7 +115,7 @@ class ThreadArchiverTest extends DbTestCase
         };
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(1))->result);
 
         $this->assertEquals(false, ThreadRepo::findOne(1)->archived);
 
@@ -128,7 +128,7 @@ class ThreadArchiverTest extends DbTestCase
 
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(2))->result);
     }
 
     public function testRevive(): void
@@ -140,7 +140,7 @@ class ThreadArchiverTest extends DbTestCase
             static::$eventsRaised[ThreadArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->revive(ThreadArchiver::findOne(2)));
+        $this->assertTrue($this->podium()->thread->revive(ThreadArchiver::findOne(2))->result);
 
         $this->assertEquals(false, ThreadRepo::findOne(2)->archived);
 
@@ -159,7 +159,7 @@ class ThreadArchiverTest extends DbTestCase
         };
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(2))->result);
 
         $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
 
@@ -172,6 +172,6 @@ class ThreadArchiverTest extends DbTestCase
 
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(1))->result);
     }
 }

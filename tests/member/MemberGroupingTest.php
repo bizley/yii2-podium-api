@@ -73,7 +73,7 @@ class MemberGroupingTest extends DbTestCase
             static::$eventsRaised[Grouping::EVENT_AFTER_JOINING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->join(Member::findOne(1), Group::findOne(1)));
+        $this->assertTrue($this->podium()->member->join(Member::findOne(1), Group::findOne(1))->result);
 
         $this->assertNotEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -91,7 +91,7 @@ class MemberGroupingTest extends DbTestCase
         };
         Event::on(Grouping::class, Grouping::EVENT_BEFORE_JOINING, $handler);
 
-        $this->assertFalse($this->podium()->member->join(Member::findOne(1), Group::findOne(1)));
+        $this->assertFalse($this->podium()->member->join(Member::findOne(1), Group::findOne(1))->result);
 
         $this->assertEmpty(GroupMemberRepo::findOne([
             'member_id' => 1,
@@ -103,7 +103,7 @@ class MemberGroupingTest extends DbTestCase
 
     public function testJoinAgain(): void
     {
-        $this->assertFalse($this->podium()->member->join(Member::findOne(2), Group::findOne(1)));
+        $this->assertFalse($this->podium()->member->join(Member::findOne(2), Group::findOne(1))->result);
     }
 
     public function testLeave(): void
@@ -115,7 +115,7 @@ class MemberGroupingTest extends DbTestCase
             static::$eventsRaised[Grouping::EVENT_AFTER_LEAVING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->leave(Member::findOne(2), Group::findOne(1)));
+        $this->assertTrue($this->podium()->member->leave(Member::findOne(2), Group::findOne(1))->result);
 
         $this->assertEmpty(GroupMemberRepo::findOne([
             'member_id' => 2,
@@ -133,7 +133,7 @@ class MemberGroupingTest extends DbTestCase
         };
         Event::on(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, $handler);
 
-        $this->assertFalse($this->podium()->member->leave(Member::findOne(2), Group::findOne(1)));
+        $this->assertFalse($this->podium()->member->leave(Member::findOne(2), Group::findOne(1))->result);
 
         $this->assertNotEmpty(GroupMemberRepo::findOne([
             'member_id' => 2,
@@ -145,6 +145,6 @@ class MemberGroupingTest extends DbTestCase
 
     public function testLeaveAgain(): void
     {
-        $this->assertFalse($this->podium()->member->leave(Member::findOne(1), Group::findOne(1)));
+        $this->assertFalse($this->podium()->member->leave(Member::findOne(1), Group::findOne(1))->result);
     }
 }

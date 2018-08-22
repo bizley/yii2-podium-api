@@ -75,7 +75,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1)));
+        $this->assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
 
         $forum = ForumRepo::findOne(['name' => 'forum-new']);
         $this->assertEquals(array_merge($data, [
@@ -111,7 +111,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertFalse($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1)));
+        $this->assertFalse($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
 
         $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-new']));
 
@@ -132,7 +132,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->forum->edit(ForumForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->forum->edit(ForumForm::findOne(1),  $data)->result);
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
         $this->assertEquals(array_merge($data, [
@@ -169,7 +169,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(ForumRepo::findOne(['name' => 'forum1']));
         $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-updated']));

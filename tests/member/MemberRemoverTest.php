@@ -47,7 +47,7 @@ class MemberRemoverTest extends DbTestCase
             static::$eventsRaised[MemberRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->remove(MemberRemover::findOne(100)));
+        $this->assertTrue($this->podium()->member->remove(MemberRemover::findOne(100))->result);
 
         $this->assertEmpty(MemberRepo::findOne(100));
 
@@ -62,7 +62,7 @@ class MemberRemoverTest extends DbTestCase
         };
         Event::on(MemberRemover::class, MemberRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->member->remove(MemberRemover::findOne(100)));
+        $this->assertFalse($this->podium()->member->remove(MemberRemover::findOne(100))->result);
 
         $this->assertNotEmpty(MemberRepo::findOne(100));
 

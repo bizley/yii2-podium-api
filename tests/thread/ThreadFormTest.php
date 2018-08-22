@@ -85,7 +85,7 @@ class ThreadFormTest extends DbTestCase
         });
 
         $data = ['name' => 'thread-new'];
-        $this->assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1)));
+        $this->assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-new']);
         $this->assertEquals(array_merge($data, [
@@ -119,7 +119,7 @@ class ThreadFormTest extends DbTestCase
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
 
         $data = ['name' => 'thread-new'];
-        $this->assertFalse($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1)));
+        $this->assertFalse($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
 
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-new']));
 
@@ -138,7 +138,7 @@ class ThreadFormTest extends DbTestCase
         });
 
         $data = ['name' => 'thread-updated'];
-        $this->assertTrue($this->podium()->thread->edit(ThreadForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->thread->edit(ThreadForm::findOne(1),  $data)->result);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-updated']);
         $this->assertEquals(array_merge($data, [
@@ -173,7 +173,7 @@ class ThreadFormTest extends DbTestCase
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = ['name' => 'thread-updated'];
-        $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(ThreadRepo::findOne(['name' => 'thread1']));
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-updated']));

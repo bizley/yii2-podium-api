@@ -76,7 +76,7 @@ class CategorySorterTest extends DbTestCase
             $this->eventsRaised[CategorySorter::EVENT_AFTER_SORTING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->sort([3, 1, 2]));
+        $this->assertTrue($this->podium()->category->sort([3, 1, 2])->result);
 
         $this->assertEquals(0, CategoryRepo::findOne(3)->sort);
         $this->assertEquals(1, CategoryRepo::findOne(1)->sort);
@@ -93,7 +93,7 @@ class CategorySorterTest extends DbTestCase
         };
         Event::on(CategorySorter::class, CategorySorter::EVENT_BEFORE_SORTING, $handler);
 
-        $this->assertFalse($this->podium()->category->sort([3, 1, 2]));
+        $this->assertFalse($this->podium()->category->sort([3, 1, 2])->result);
 
         $this->assertEquals(-5, CategoryRepo::findOne(3)->sort);
         $this->assertEquals(10, CategoryRepo::findOne(1)->sort);
@@ -104,11 +104,11 @@ class CategorySorterTest extends DbTestCase
 
     public function testSortWrongDataType(): void
     {
-        $this->assertFalse($this->podium()->category->sort(['aaa']));
+        $this->assertFalse($this->podium()->category->sort(['aaa'])->result);
     }
 
     public function testSortWrongDataId(): void
     {
-        $this->assertFalse($this->podium()->category->sort([99]));
+        $this->assertFalse($this->podium()->category->sort([99])->result);
     }
 }

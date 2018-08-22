@@ -100,7 +100,7 @@ class PostFormTest extends DbTestCase
         });
 
         $data = ['content' => 'post-new'];
-        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1))->result);
 
         $post = PostRepo::findOne(['content' => 'post-new']);
         $this->assertEquals(array_merge($data, [
@@ -141,7 +141,7 @@ class PostFormTest extends DbTestCase
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_CREATING, $handler);
 
         $data = ['content' => 'post-new'];
-        $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1))->result);
 
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-new']));
 
@@ -161,7 +161,7 @@ class PostFormTest extends DbTestCase
         });
 
         $data = ['content' => 'post-updated'];
-        $this->assertTrue($this->podium()->post->edit(PostForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->post->edit(PostForm::findOne(1),  $data)->result);
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals(array_merge($data, [
@@ -203,7 +203,7 @@ class PostFormTest extends DbTestCase
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = ['content' => 'post-updated'];
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));

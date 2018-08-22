@@ -63,7 +63,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->category->create($data, Member::findOne(1)));
+        $this->assertTrue($this->podium()->category->create($data, Member::findOne(1))->result);
 
         $category = CategoryRepo::findOne(['name' => 'category-new']);
         $this->assertEquals(array_merge($data, [
@@ -93,7 +93,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertFalse($this->podium()->category->create($data, Member::findOne(1)));
+        $this->assertFalse($this->podium()->category->create($data, Member::findOne(1))->result);
 
         $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-new']));
 
@@ -114,7 +114,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->category->edit(CategoryForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->category->edit(CategoryForm::findOne(1),  $data)->result);
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
         $this->assertEquals(array_merge($data, [
@@ -145,7 +145,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(CategoryRepo::findOne(['name' => 'category1']));
         $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-updated']));

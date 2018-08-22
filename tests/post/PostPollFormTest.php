@@ -170,7 +170,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 1,
             'answers' => ['answer1', 'answer2'],
         ];
-        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1))->result);
 
         $post = PostRepo::findOne(['content' => 'post-new']);
         $this->assertEquals([
@@ -238,7 +238,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 1,
             'answers' => ['answer1', 'answer2'],
         ];
-        $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1)));
+        $this->assertFalse($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1))->result);
 
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-new']));
 
@@ -265,7 +265,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertTrue($this->podium()->post->edit(PostPollForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->post->edit(PostPollForm::findOne(1),  $data)->result);
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals([
@@ -328,7 +328,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
@@ -346,6 +346,6 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(2),  $data));
+        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(2),  $data)->result);
     }
 }

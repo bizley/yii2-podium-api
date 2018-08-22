@@ -125,7 +125,7 @@ class PollFormTest extends DbTestCase
             'expires_at' => 1,
         ]);
 
-        $this->assertTrue($poll->create());
+        $this->assertTrue($poll->create()->result);
 
         $pollCreated = PollRepo::findOne(['question' => 'question-new']);
         $this->assertEquals([
@@ -146,7 +146,7 @@ class PollFormTest extends DbTestCase
         $poll = PollForm::findOne(1);
         $poll->question = 'question-updated';
 
-        $this->assertTrue($poll->edit());
+        $this->assertTrue($poll->edit()->result);
 
         $pollUpdated = PollRepo::findOne(1);
         $this->assertEquals('question-updated', $pollUpdated->question);
@@ -157,6 +157,6 @@ class PollFormTest extends DbTestCase
         $poll = PollForm::findOne(2);
         $poll->question = 'question-updated';
 
-        $this->assertFalse($poll->edit());
+        $this->assertFalse($poll->edit()->result);
     }
 }

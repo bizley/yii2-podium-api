@@ -102,7 +102,7 @@ class PollAnswerRemoverTest extends DbTestCase
 
     public function testRemove(): void
     {
-        $this->assertTrue(PollAnswerRemover::findOne(1)->remove());
+        $this->assertTrue(PollAnswerRemover::findOne(1)->remove()->result);
         $this->assertEmpty(PollAnswerRepo::findOne(1));
     }
 }

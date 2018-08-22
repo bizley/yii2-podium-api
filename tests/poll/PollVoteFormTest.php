@@ -124,7 +124,7 @@ class PollVoteFormTest extends DbTestCase
             'answer_id' => 1,
         ]);
 
-        $this->assertTrue($pollVote->create());
+        $this->assertTrue($pollVote->create()->result);
     }
 
     public function testUpdate(): void

@@ -44,7 +44,7 @@ class RankRemoverTest extends DbTestCase
             static::$eventsRaised[RankRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->rank->remove(RankRemover::findOne(1)));
+        $this->assertTrue($this->podium()->rank->remove(RankRemover::findOne(1))->result);
 
         $this->assertEmpty(RankRepo::findOne(1));
 
@@ -59,7 +59,7 @@ class RankRemoverTest extends DbTestCase
         };
         Event::on(RankRemover::class, RankRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->rank->remove(RankRemover::findOne(1)));
+        $this->assertFalse($this->podium()->rank->remove(RankRemover::findOne(1))->result);
 
         $this->assertNotEmpty(RankRepo::findOne(1));
 

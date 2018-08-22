@@ -92,7 +92,7 @@ class ThreadPinnerTest extends DbTestCase
             $this->eventsRaised[ThreadPinner::EVENT_AFTER_PINNING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->pin(ThreadPinner::findOne(1)));
+        $this->assertTrue($this->podium()->thread->pin(ThreadPinner::findOne(1))->result);
         $this->assertEquals(1, ThreadRepo::findOne(1)->pinned);
 
         $this->assertArrayHasKey(ThreadPinner::EVENT_BEFORE_PINNING, $this->eventsRaised);
@@ -106,7 +106,7 @@ class ThreadPinnerTest extends DbTestCase
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
 
-        $this->assertFalse($this->podium()->thread->pin(ThreadPinner::findOne(1)));
+        $this->assertFalse($this->podium()->thread->pin(ThreadPinner::findOne(1))->result);
         $this->assertEquals(0, ThreadRepo::findOne(1)->pinned);
 
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
@@ -121,7 +121,7 @@ class ThreadPinnerTest extends DbTestCase
             $this->eventsRaised[ThreadPinner::EVENT_AFTER_UNPINNING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->unpin(ThreadPinner::findOne(2)));
+        $this->assertTrue($this->podium()->thread->unpin(ThreadPinner::findOne(2))->result);
         $this->assertEquals(0, ThreadRepo::findOne(2)->pinned);
 
         $this->assertArrayHasKey(ThreadPinner::EVENT_BEFORE_UNPINNING, $this->eventsRaised);
@@ -135,7 +135,7 @@ class ThreadPinnerTest extends DbTestCase
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);
 
-        $this->assertFalse($this->podium()->thread->unpin(ThreadPinner::findOne(2)));
+        $this->assertFalse($this->podium()->thread->unpin(ThreadPinner::findOne(2))->result);
         $this->assertEquals(1, ThreadRepo::findOne(2)->pinned);
 
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);

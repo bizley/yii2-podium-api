@@ -43,7 +43,7 @@ class GroupRemoverTest extends DbTestCase
             static::$eventsRaised[GroupRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->group->remove(GroupRemover::findOne(1)));
+        $this->assertTrue($this->podium()->group->remove(GroupRemover::findOne(1))->result);
 
         $this->assertEmpty(GroupRepo::findOne(1));
 
@@ -58,7 +58,7 @@ class GroupRemoverTest extends DbTestCase
         };
         Event::on(GroupRemover::class, GroupRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->group->remove(GroupRemover::findOne(1)));
+        $this->assertFalse($this->podium()->group->remove(GroupRemover::findOne(1))->result);
 
         $this->assertNotEmpty(GroupRepo::findOne(1));
 

@@ -75,7 +75,7 @@ class MemberFriendshipTest extends DbTestCase
             static::$eventsRaised[Friendship::EVENT_AFTER_BEFRIENDING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101)));
+        $this->assertTrue($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101))->result);
 
         $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
@@ -94,7 +94,7 @@ class MemberFriendshipTest extends DbTestCase
         };
         Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
 
-        $this->assertFalse($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101)));
+        $this->assertFalse($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 100,
@@ -107,7 +107,7 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testBefriendAgain(): void
     {
-        $this->assertFalse($this->podium()->member->befriend(Member::findOne(101), Member::findOne(102)));
+        $this->assertFalse($this->podium()->member->befriend(Member::findOne(101), Member::findOne(102))->result);
     }
 
     public function testUnfriend(): void
@@ -119,7 +119,7 @@ class MemberFriendshipTest extends DbTestCase
             static::$eventsRaised[Friendship::EVENT_AFTER_UNFRIENDING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102)));
+        $this->assertTrue($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 101,
@@ -138,7 +138,7 @@ class MemberFriendshipTest extends DbTestCase
         };
         Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
 
-        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102)));
+        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102))->result);
 
         $this->assertNotEmpty( AcquaintanceRepo::findOne([
             'member_id' => 101,
@@ -151,6 +151,6 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testUnfriendAgain(): void
     {
-        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(100), Member::findOne(101)));
+        $this->assertFalse($this->podium()->member->unfriend(Member::findOne(100), Member::findOne(101))->result);
     }
 }

@@ -44,7 +44,7 @@ class GroupFormTest extends DbTestCase
         });
 
         $data = ['name' => 'group-new'];
-        $this->assertTrue($this->podium()->group->create($data));
+        $this->assertTrue($this->podium()->group->create($data)->result);
 
         $rank = GroupRepo::findOne(['name' => 'group-new']);
         $this->assertEquals($data, ['name' => $rank->name]);
@@ -61,7 +61,7 @@ class GroupFormTest extends DbTestCase
         Event::on(GroupForm::class, GroupForm::EVENT_BEFORE_CREATING, $handler);
 
         $data = ['name' => 'group-new'];
-        $this->assertFalse($this->podium()->group->create($data));
+        $this->assertFalse($this->podium()->group->create($data)->result);
 
         $this->assertEmpty(GroupRepo::findOne(['name' => 'group-new']));
 
@@ -70,7 +70,7 @@ class GroupFormTest extends DbTestCase
 
     public function testCreateWithSameName(): void
     {
-        $this->assertFalse($this->podium()->group->create(['name' => 'group1']));
+        $this->assertFalse($this->podium()->group->create(['name' => 'group1'])->result);
     }
 
     public function testUpdate(): void
@@ -83,7 +83,7 @@ class GroupFormTest extends DbTestCase
         });
 
         $data = ['name' => 'group-updated'];
-        $this->assertTrue($this->podium()->group->edit(GroupForm::findOne(1),  $data));
+        $this->assertTrue($this->podium()->group->edit(GroupForm::findOne(1),  $data)->result);
 
         $rank = GroupRepo::findOne(['name' => 'group-updated']);
         $this->assertEquals($data, ['name' => $rank->name]);
@@ -101,7 +101,7 @@ class GroupFormTest extends DbTestCase
         Event::on(GroupForm::class, GroupForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = ['name' => 'group-updated'];
-        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1),  $data));
+        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1),  $data)->result);
 
         $this->assertNotEmpty(GroupRepo::findOne(['name' => 'group1']));
         $this->assertEmpty(GroupRepo::findOne(['name' => 'group-updated']));

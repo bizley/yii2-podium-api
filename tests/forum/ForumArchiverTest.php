@@ -79,7 +79,7 @@ class ForumArchiverTest extends DbTestCase
             static::$eventsRaised[ForumArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->archive(ForumArchiver::findOne(1)));
+        $this->assertTrue($this->podium()->forum->archive(ForumArchiver::findOne(1))->result);
 
         $this->assertEquals(true, ForumRepo::findOne(1)->archived);
 
@@ -94,7 +94,7 @@ class ForumArchiverTest extends DbTestCase
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(1))->result);
 
         $this->assertEquals(false, ForumRepo::findOne(1)->archived);
 
@@ -103,7 +103,7 @@ class ForumArchiverTest extends DbTestCase
 
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(2))->result);
     }
 
     public function testRevive(): void
@@ -115,7 +115,7 @@ class ForumArchiverTest extends DbTestCase
             static::$eventsRaised[ForumArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->revive(ForumArchiver::findOne(2)));
+        $this->assertTrue($this->podium()->forum->revive(ForumArchiver::findOne(2))->result);
 
         $this->assertEquals(false, ForumRepo::findOne(2)->archived);
 
@@ -130,7 +130,7 @@ class ForumArchiverTest extends DbTestCase
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(2)));
+        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(2))->result);
 
         $this->assertEquals(true, ForumRepo::findOne(2)->archived);
 
@@ -139,6 +139,6 @@ class ForumArchiverTest extends DbTestCase
 
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(1)));
+        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(1))->result);
     }
 }

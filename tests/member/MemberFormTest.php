@@ -47,7 +47,7 @@ class MemberFormTest extends DbTestCase
             $this->eventsRaised[MemberForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->edit(MemberForm::findOne(1),  ['username' => 'username-updated']));
+        $this->assertTrue($this->podium()->member->edit(MemberForm::findOne(1),  ['username' => 'username-updated'])->result);
 
         $member = MemberRepo::findOne(['username' => 'username-updated']);
         $this->assertNotEmpty($member);
@@ -65,7 +65,7 @@ class MemberFormTest extends DbTestCase
         };
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
 
-        $this->assertFalse($this->podium()->member->edit(MemberForm::findOne(1),  ['username' => 'username-updated']));
+        $this->assertFalse($this->podium()->member->edit(MemberForm::findOne(1),  ['username' => 'username-updated'])->result);
 
         $this->assertNotEmpty(MemberRepo::findOne(['username' => 'member']));
         $this->assertEmpty(MemberRepo::findOne(['username' => 'username-updated']));

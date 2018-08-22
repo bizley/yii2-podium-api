@@ -131,7 +131,7 @@ class PostRemoverTest extends DbTestCase
             static::$eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1)));
+        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1))->result);
 
         $this->assertEmpty(PostRepo::findOne(1));
 
@@ -146,7 +146,7 @@ class PostRemoverTest extends DbTestCase
         };
         Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(1)));
+        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(1))->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
 
@@ -155,7 +155,7 @@ class PostRemoverTest extends DbTestCase
 
     public function testRemoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(3)));
+        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(3))->result);
 
         $this->assertEmpty(PostRepo::findOne(3));
         $this->assertEmpty(ThreadRepo::findOne(2));

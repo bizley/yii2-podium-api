@@ -107,7 +107,7 @@ class PollAnswerFormTest extends DbTestCase
             'answer' => 'answer-new',
         ]);
 
-        $this->assertTrue($pollAnswer->create());
+        $this->assertTrue($pollAnswer->create()->result);
         $this->assertEquals(1, PollAnswerRepo::findOne(['answer' => 'answer-new'])->poll_id);
     }
 

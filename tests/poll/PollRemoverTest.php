@@ -123,7 +123,7 @@ class PollRemoverTest extends DbTestCase
             static::$eventsRaised[PollRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->poll->remove(PollRemover::findOne(1)));
+        $this->assertTrue($this->podium()->poll->remove(PollRemover::findOne(1))->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
         $this->assertEmpty(PollRepo::findOne(1));
@@ -141,7 +141,7 @@ class PollRemoverTest extends DbTestCase
         };
         Event::on(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->poll->remove(PollRemover::findOne(1)));
+        $this->assertFalse($this->podium()->poll->remove(PollRemover::findOne(1))->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
         $this->assertNotEmpty(PollRepo::findOne(1));
