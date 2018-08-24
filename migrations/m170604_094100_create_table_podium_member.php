@@ -11,9 +11,9 @@ class m170604_094100_create_table_podium_member extends Migration
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
-            $statusId = 'ENUM("registered","active","banned") NOT NULL';
+            $statusId = 'ENUM("registered","active","banned") NOT NULL DEFAULT "registered"';
         } else {
-            $statusId = $this->string(45)->notNull();
+            $statusId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\MemberStatus::REGISTERED);
         }
 
         $this->createTable('{{%podium_member}}', [

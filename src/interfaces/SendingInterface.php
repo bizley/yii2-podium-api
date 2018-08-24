@@ -26,4 +26,9 @@ interface SendingInterface extends ModelFormInterface
      * @return PodiumResponse
      */
     public function send(): PodiumResponse;
+
+    /**
+     * @param MessageParticipantModelInterface|null $replyTo
+     */
+    public function setReplyTo(?MessageParticipantModelInterface $replyTo): void;
 }

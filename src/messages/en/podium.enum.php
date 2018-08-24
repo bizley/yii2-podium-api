@@ -6,6 +6,8 @@ return [
     'member.status.active' => 'Active',
     'member.status.banned' => 'Banned',
     'member.status.registered' => 'Registered',
+    'message.side.receiver' => 'Receiver',
+    'message.side.sender' => 'Sender',
     'message.status.new' => 'New',
     'message.status.read' => 'Read',
     'message.status.replied' => 'Replied',

@@ -7,6 +7,7 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageInterface;
+use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\SendingInterface;
@@ -32,7 +33,7 @@ class Message extends PodiumComponent implements MessageInterface
      * @var string|array|SendingInterface
      * Component ID, class, configuration array, or instance of SendingInterface.
      */
-    public $sendingHandler = \bizley\podium\api\models\message\MessageSender::class;
+    public $sendingHandler = \bizley\podium\api\models\message\Sending::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -79,18 +80,20 @@ class Message extends PodiumComponent implements MessageInterface
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
+     * @param MessageParticipantModelInterface $replyTo
      * @return PodiumResponse
      */
-    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse
+    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
     {
         $sending = $this->getSending();
         $sending->setSender($sender);
         $sending->setReceiver($receiver);
+        $sending->setReplyTo($replyTo);
 
         if (!$sending->loadData($data)) {
             return PodiumResponse::error();
         }
-        return $sending->create();
+        return $sending->send();
     }
 
     /**

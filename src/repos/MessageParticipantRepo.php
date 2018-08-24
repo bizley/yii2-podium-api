@@ -12,6 +12,7 @@ use yii\db\ActiveRecord;
  * @property int $message_id
  * @property int $member_id
  * @property string $status_id
+ * @property string $side_id
  * @property bool $archived
  * @property int $created_at
  * @property int $updated_at

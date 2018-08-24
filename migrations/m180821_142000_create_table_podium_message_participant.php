@@ -11,15 +11,18 @@ class m180821_142000_create_table_podium_message_participant extends Migration
         $tableOptions = null;
         if ($this->db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
-            $statusId = 'ENUM("new","read") DEFAULT "new"';
+            $statusId = 'ENUM("new","read","replied") NOT NULL DEFAULT "new"';
+            $sideId = 'ENUM("sender","receiver") NOT NULL';
         } else {
             $statusId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\MessageStatus::NEW);
+            $sideId = $this->string(45)->notNull();
         }
 
         $this->createTable('{{%podium_message_participant}}', [
             'message_id' => $this->integer(11)->notNull(),
             'member_id' => $this->integer(11)->notNull(),
             'status_id' => $statusId,
+            'side_id' => $sideId,
             'archived' => $this->boolean()->notNull()->defaultValue(false),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),

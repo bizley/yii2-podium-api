@@ -41,9 +41,10 @@ interface MessageInterface
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
+     * @param MessageParticipantModelInterface $replyTo
      * @return PodiumResponse
      */
-    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver): PodiumResponse;
+    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse;
 
     /**
      * @param RemovableInterface $messageRemover
