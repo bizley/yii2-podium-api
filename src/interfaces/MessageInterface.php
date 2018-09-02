@@ -47,20 +47,20 @@ interface MessageInterface
     public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse;
 
     /**
-     * @param RemovableInterface $messageRemover
+     * @param RemovableInterface $messageParticipantRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $messageRemover): PodiumResponse;
+    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $messageArchiver
+     * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $messageArchiver): PodiumResponse;
+    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $messageArchiver
+     * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $messageArchiver): PodiumResponse;
+    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
 }

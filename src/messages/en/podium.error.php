@@ -11,6 +11,8 @@ return [
     'group.not.joined' => 'Group is not joined.',
     'member.already.active' => 'Member is already active.',
     'member.already.banned' => 'Member is already banned.',
+    'message.already.archived' => 'Message is already archived.',
+    'message.not.archived' => 'Message is not archived.',
     'message.wrong.reply' => 'Replying to wrong message.',
     'poll.already.voted' => 'Poll vote is already done.',
     'poll.one.vote.allowed' => 'Poll allows only one vote.',

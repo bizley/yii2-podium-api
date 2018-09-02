@@ -97,29 +97,29 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * @param RemovableInterface $messageRemover
+     * @param RemovableInterface $messageParticipantRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $messageRemover): PodiumResponse
+    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse
     {
-        return $messageRemover->remove();
+        return $messageParticipantRemover->remove();
     }
 
     /**
-     * @param ArchivableInterface $messageArchiver
+     * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $messageArchiver): PodiumResponse
+    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
     {
-        return $messageArchiver->archive();
+        return $messageParticipantArchiver->archive();
     }
 
     /**
-     * @param ArchivableInterface $messageArchiver
+     * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $messageArchiver): PodiumResponse
+    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
     {
-        return $messageArchiver->revive();
+        return $messageParticipantArchiver->revive();
     }
 }

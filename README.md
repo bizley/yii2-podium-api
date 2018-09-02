@@ -83,11 +83,11 @@
   - [x] delete poll answer
   - [x] poll vote
 - [x] Message
-  - [ ] view message
-  - [ ] list messages
-  - [ ] create message
+  - [x] view message
+  - [x] list messages
+  - [x] send message
   - [ ] delete message
-  - [ ] archive message
+  - [x] archive message
 
 ## NOTES:
 
