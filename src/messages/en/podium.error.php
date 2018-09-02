@@ -12,6 +12,7 @@ return [
     'member.already.active' => 'Member is already active.',
     'member.already.banned' => 'Member is already banned.',
     'message.already.archived' => 'Message is already archived.',
+    'message.must.be.archived' => 'Message must be archived first.',
     'message.not.archived' => 'Message is not archived.',
     'message.wrong.reply' => 'Replying to wrong message.',
     'poll.already.voted' => 'Poll vote is already done.',

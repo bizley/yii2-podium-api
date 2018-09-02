@@ -86,7 +86,7 @@
   - [x] view message
   - [x] list messages
   - [x] send message
-  - [ ] delete message
+  - [x] delete message
   - [x] archive message
 
 ## NOTES:
