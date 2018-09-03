@@ -23,7 +23,7 @@ use yii\web\User;
 class Account extends PodiumComponent implements AccountInterface
 {
     /**
-     * @var string|array|MembershipInterface
+     * @var string|array|MembershipInterface membership handler
      * Component ID, class, configuration array, or instance of MembershipInterface.
      */
     public $membershipHandler = \bizley\podium\api\models\member\Member::class;
@@ -72,6 +72,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Befriends target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
@@ -81,6 +82,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Unfriends target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
@@ -90,6 +92,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Ignores target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
@@ -99,6 +102,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Unignores target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
@@ -108,6 +112,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Gives post a thumb up.
      * @param ModelInterface $post
      * @return PodiumResponse
      */
@@ -117,6 +122,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Gives post a thumb down.
      * @param ModelInterface $post
      * @return PodiumResponse
      */
@@ -126,6 +132,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Resets post given thumb.
      * @param ModelInterface $post
      * @return PodiumResponse
      */
@@ -135,6 +142,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Subscribes to a thread.
      * @param ModelInterface $thread
      * @return PodiumResponse
      */
@@ -144,6 +152,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Unsubscribes from a thread.
      * @param ModelInterface $thread
      * @return PodiumResponse
      */
@@ -153,6 +162,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Marks last seen post in a thread.
      * @param ModelInterface $post
      * @return PodiumResponse
      */
@@ -162,6 +172,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Adds member to a group.
      * @param ModelInterface $group
      * @return PodiumResponse
      */
@@ -171,6 +182,7 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * Removes member from a group.
      * @param ModelInterface $group
      * @return PodiumResponse
      */

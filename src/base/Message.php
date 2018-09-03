@@ -24,13 +24,13 @@ use yii\di\Instance;
 class Message extends PodiumComponent implements MessageInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface message handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|SendingInterface
+     * @var string|array|SendingInterface sending handler
      * Component ID, class, configuration array, or instance of SendingInterface.
      */
     public $sendingHandler = \bizley\podium\api\models\message\Sending::class;
@@ -77,6 +77,7 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
+     * Sends message.
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
@@ -97,6 +98,7 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
+     * Deletes message copy.
      * @param RemovableInterface $messageParticipantRemover
      * @return PodiumResponse
      */
@@ -106,6 +108,7 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
+     * Archives message copy.
      * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */
@@ -115,6 +118,7 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
+     * Revives message copy.
      * @param ArchivableInterface $messageParticipantArchiver
      * @return PodiumResponse
      */

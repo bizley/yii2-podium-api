@@ -31,19 +31,19 @@ use yii\di\Instance;
 class Forum extends PodiumComponent implements ForumInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface forum handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $forumHandler = \bizley\podium\api\models\forum\Forum::class;
 
     /**
-     * @var string|array|CategorisedFormInterface
+     * @var string|array|CategorisedFormInterface forum form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
     public $forumFormHandler = \bizley\podium\api\models\forum\ForumForm::class;
 
     /**
-     * @var string|array|SortableInterface
+     * @var string|array|SortableInterface forum sorter handler
      * Component ID, class, configuration array, or instance of SortableInterface.
      */
     public $forumSorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
@@ -91,6 +91,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Creates forum.
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $category
@@ -109,6 +110,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Updates forum.
      * @param ModelFormInterface $forumForm
      * @param array $data
      * @return PodiumResponse
@@ -122,6 +124,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Deletes forum.
      * @param RemovableInterface $forumRemover
      * @return PodiumResponse
      */
@@ -139,6 +142,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Sorts forums.
      * @param ModelInterface $category
      * @param array $data
      * @return PodiumResponse
@@ -155,6 +159,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Moves forum to different category.
      * @param MovableInterface $forumMover
      * @param ModelInterface $category
      * @return PodiumResponse
@@ -167,6 +172,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Archives forum.
      * @param ArchivableInterface $forumArchiver
      * @return PodiumResponse
      */
@@ -176,6 +182,7 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * Revives forum.
      * @param ArchivableInterface $forumArchiver
      * @return PodiumResponse
      */

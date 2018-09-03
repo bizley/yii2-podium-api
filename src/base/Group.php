@@ -21,13 +21,13 @@ use yii\di\Instance;
 class Group extends PodiumComponent implements GroupInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface group handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $groupHandler = \bizley\podium\api\models\group\Group::class;
 
     /**
-     * @var string|array|ModelFormInterface
+     * @var string|array|ModelFormInterface group form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
     public $groupFormHandler = \bizley\podium\api\models\group\GroupForm::class;
@@ -74,6 +74,7 @@ class Group extends PodiumComponent implements GroupInterface
     }
 
     /**
+     * Creates group.
      * @param array $data
      * @return PodiumResponse
      */
@@ -88,6 +89,7 @@ class Group extends PodiumComponent implements GroupInterface
     }
 
     /**
+     * Updates group.
      * @param ModelFormInterface $groupForm
      * @param array $data
      * @return PodiumResponse
@@ -101,6 +103,7 @@ class Group extends PodiumComponent implements GroupInterface
     }
 
     /**
+     * Deletes group.
      * @param RemovableInterface $groupRemover
      * @return PodiumResponse
      */

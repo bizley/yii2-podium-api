@@ -28,19 +28,19 @@ use yii\di\Instance;
 class Category extends PodiumComponent implements CategoryInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface category handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $categoryHandler = \bizley\podium\api\models\category\Category::class;
 
     /**
-     * @var string|array|AuthoredFormInterface
+     * @var string|array|AuthoredFormInterface category form handler
      * Component ID, class, configuration array, or instance of AuthoredFormInterface.
      */
     public $categoryFormHandler = \bizley\podium\api\models\category\CategoryForm::class;
 
     /**
-     * @var string|array|SortableInterface
+     * @var string|array|SortableInterface category sorter handler
      * Component ID, class, configuration array, or instance of SortableInterface.
      */
     public $categorySorterHandler = \bizley\podium\api\models\category\CategorySorter::class;
@@ -88,6 +88,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Creates category.
      * @param array $data
      * @param MembershipInterface $author
      * @return PodiumResponse
@@ -104,6 +105,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Updates category.
      * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return PodiumResponse
@@ -117,6 +119,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Deletes category.
      * @param RemovableInterface $categoryRemover
      * @return PodiumResponse
      */
@@ -134,6 +137,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Sorts categories.
      * @param array $data
      * @return PodiumResponse
      */
@@ -148,6 +152,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Archives category.
      * @param ArchivableInterface $categoryArchiver
      * @return PodiumResponse
      */
@@ -157,6 +162,7 @@ class Category extends PodiumComponent implements CategoryInterface
     }
 
     /**
+     * Revives category.
      * @param ArchivableInterface $categoryArchiver
      * @return PodiumResponse
      */

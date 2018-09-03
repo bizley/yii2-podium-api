@@ -22,19 +22,19 @@ use yii\di\Instance;
 class Poll extends PodiumComponent implements PollInterface
 {
     /**
-     * @var string|array|PollModelInterface
+     * @var string|array|PollModelInterface poll handler
      * Component ID, class, configuration array, or instance of PollModelInterface.
      */
     public $pollHandler = \bizley\podium\api\models\poll\Poll::class;
 
     /**
-     * @var string|array|CategorisedFormInterface
+     * @var string|array|CategorisedFormInterface poll form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
     public $pollFormHandler = \bizley\podium\api\models\poll\PostPollForm::class;
 
     /**
-     * @var string|array|VotingInterface
+     * @var string|array|VotingInterface voting handler
      * Component ID, class, configuration array, or instance of VotingInterface.
      */
     public $votingHandler = \bizley\podium\api\models\poll\Voting::class;
@@ -104,6 +104,7 @@ class Poll extends PodiumComponent implements PollInterface
     }
 
     /**
+     * Deletes poll.
      * @param RemovableInterface $pollRemover
      * @return PodiumResponse
      */
@@ -113,7 +114,6 @@ class Poll extends PodiumComponent implements PollInterface
     }
 
     /**
-     * Returns poll form handler.
      * @return VotingInterface
      */
     public function getVoting(): VotingInterface

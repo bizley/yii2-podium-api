@@ -33,31 +33,31 @@ use yii\di\Instance;
 class Member extends PodiumComponent implements MemberInterface
 {
     /**
-     * @var string|array|MembershipInterface
+     * @var string|array|MembershipInterface member handler
      * Component ID, class, configuration array, or instance of MembershipInterface.
      */
     public $memberHandler = \bizley\podium\api\models\member\Member::class;
 
     /**
-     * @var string|array|RegistrationInterface
+     * @var string|array|RegistrationInterface registration handler
      * Component ID, class, configuration array, or instance of RegistrationInterface.
      */
     public $registrationHandler = \bizley\podium\api\models\member\Registration::class;
 
     /**
-     * @var string|array|FriendshipInterface
+     * @var string|array|FriendshipInterface friendship handler
      * Component ID, class, configuration array, or instance of FriendshipInterface.
      */
     public $friendshipHandler = \bizley\podium\api\models\member\Friendship::class;
 
     /**
-     * @var string|array|IgnoringInterface
+     * @var string|array|IgnoringInterface ignoring handler
      * Component ID, class, configuration array, or instance of IgnoringInterface.
      */
     public $ignoringHandler = \bizley\podium\api\models\member\Ignoring::class;
 
     /**
-     * @var string|array|GroupingInterface
+     * @var string|array|GroupingInterface grouping handler
      * Component ID, class, configuration array, or instance of GroupingInterface.
      */
     public $groupingHandler = \bizley\podium\api\models\member\Grouping::class;
@@ -77,14 +77,6 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
-     * @return RegistrationInterface
-     */
-    public function getRegistration(): RegistrationInterface
-    {
-        return new $this->registrationHandler;
-    }
-
-    /**
      * @return FriendshipInterface
      */
     public function getFriendship(): FriendshipInterface
@@ -93,14 +85,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
-     * @return IgnoringInterface
-     */
-    public function getIgnoring(): IgnoringInterface
-    {
-        return new $this->ignoringHandler;
-    }
-
-    /**
+     * Befriends target by a member,
      * @param MembershipInterface $member
      * @param MembershipInterface $target
      * @return PodiumResponse
@@ -114,6 +99,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Unfriends target by a member.
      * @param MembershipInterface $member
      * @param MembershipInterface $target
      * @return PodiumResponse
@@ -127,6 +113,15 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * @return IgnoringInterface
+     */
+    public function getIgnoring(): IgnoringInterface
+    {
+        return new $this->ignoringHandler;
+    }
+
+    /**
+     * Ignores target by a member.
      * @param MembershipInterface $member
      * @param MembershipInterface $target
      * @return PodiumResponse
@@ -140,6 +135,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Unignores target by a member.
      * @param MembershipInterface $member
      * @param MembershipInterface $target
      * @return PodiumResponse
@@ -153,6 +149,15 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * @return RegistrationInterface
+     */
+    public function getRegistration(): RegistrationInterface
+    {
+        return new $this->registrationHandler;
+    }
+
+    /**
+     * Registers member.
      * @param array $data
      * @return PodiumResponse
      */
@@ -166,6 +171,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Deletes member.
      * @param RemovableInterface $memberRemover
      * @return PodiumResponse
      */
@@ -207,6 +213,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Updates member.
      * @param ModelFormInterface $memberForm
      * @param array $data
      * @return PodiumResponse
@@ -220,6 +227,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Bans member.
      * @param BanInterface $member
      * @return PodiumResponse
      */
@@ -229,6 +237,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Unbans member.
      * @param BanInterface $member
      * @return PodiumResponse
      */
@@ -246,6 +255,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Adds member to a group.
      * @param MembershipInterface $member
      * @param ModelInterface $group
      * @return PodiumResponse
@@ -260,6 +270,7 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
+     * Removes member from a group.
      * @param MembershipInterface $member
      * @param ModelInterface $group
      * @return PodiumResponse

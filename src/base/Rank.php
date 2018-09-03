@@ -21,13 +21,13 @@ use yii\di\Instance;
 class Rank extends PodiumComponent implements RankInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface rank handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $rankHandler = \bizley\podium\api\models\rank\Rank::class;
 
     /**
-     * @var string|array|ModelFormInterface
+     * @var string|array|ModelFormInterface rank form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
     public $rankFormHandler = \bizley\podium\api\models\rank\RankForm::class;
@@ -74,6 +74,7 @@ class Rank extends PodiumComponent implements RankInterface
     }
 
     /**
+     * Creates rank.
      * @param array $data
      * @return PodiumResponse
      */
@@ -88,6 +89,7 @@ class Rank extends PodiumComponent implements RankInterface
     }
 
     /**
+     * Updates rank.
      * @param ModelFormInterface $rankForm
      * @param array $data
      * @return PodiumResponse
@@ -101,6 +103,7 @@ class Rank extends PodiumComponent implements RankInterface
     }
 
     /**
+     * Deletes rank.
      * @param RemovableInterface $rankRemover
      * @return PodiumResponse
      */

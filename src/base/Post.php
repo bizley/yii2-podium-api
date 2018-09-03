@@ -28,25 +28,25 @@ use yii\helpers\ArrayHelper;
 class Post extends PodiumComponent implements PostInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface post handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $postHandler = \bizley\podium\api\models\post\Post::class;
 
     /**
-     * @var string|array|CategorisedFormInterface
+     * @var string|array|CategorisedFormInterface post form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
     public $postFormHandler = \bizley\podium\api\models\post\PostForm::class;
 
     /**
-     * @var string|array|CategorisedFormInterface
+     * @var string|array|CategorisedFormInterface poll form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
     public $pollFormHandler = \bizley\podium\api\models\poll\PostPollForm::class;
 
     /**
-     * @var string|array|LikingInterface
+     * @var string|array|LikingInterface liking handler
      * Component ID, class, configuration array, or instance of LikingInterface.
      */
     public $likingHandler = \bizley\podium\api\models\post\Liking::class;
@@ -103,6 +103,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Creates standard post or poll post.
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
@@ -123,6 +124,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Updates standard post or poll post.
      * @param ModelFormInterface $postOrPollForm
      * @param array $data
      * @return PodiumResponse
@@ -136,6 +138,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Deletes post.
      * @param RemovableInterface $postRemover
      * @return PodiumResponse
      */
@@ -145,6 +148,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Moves post.
      * @param MovableInterface $postMover
      * @param ModelInterface $thread
      * @return PodiumResponse
@@ -157,6 +161,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Archives post.
      * @param ArchivableInterface $postArchiver
      * @return PodiumResponse
      */
@@ -166,6 +171,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Revives post.
      * @param ArchivableInterface $postArchiver
      * @return PodiumResponse
      */
@@ -183,6 +189,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Gives post a thumb up.
      * @param MembershipInterface $member
      * @param ModelInterface $post
      * @return PodiumResponse
@@ -196,6 +203,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Gives post a thumb down.
      * @param MembershipInterface $member
      * @param ModelInterface $post
      * @return PodiumResponse
@@ -209,6 +217,7 @@ class Post extends PodiumComponent implements PostInterface
     }
 
     /**
+     * Resets post given thumb.
      * @param MembershipInterface $member
      * @param ModelInterface $post
      * @return PodiumResponse

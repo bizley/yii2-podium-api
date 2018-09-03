@@ -24,6 +24,7 @@ class PodiumResponse extends Component
     public $errors = [];
 
     /**
+     * Returns successful response.
      * @return PodiumResponse
      */
     public static function success(): PodiumResponse
@@ -32,6 +33,7 @@ class PodiumResponse extends Component
     }
 
     /**
+     * Returns erroneous response.
      * @param Model|null $model
      * @return PodiumResponse
      */

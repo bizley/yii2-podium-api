@@ -33,25 +33,25 @@ use yii\di\Instance;
 class Thread extends PodiumComponent implements ThreadInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|ModelInterface thread handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $threadHandler = \bizley\podium\api\models\thread\Thread::class;
 
     /**
-     * @var string|array|CategorisedFormInterface
+     * @var string|array|CategorisedFormInterface thread form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
     public $threadFormHandler = \bizley\podium\api\models\thread\ThreadForm::class;
 
     /**
-     * @var string|array|SubscribingInterface
+     * @var string|array|SubscribingInterface subscribing handler
      * Component ID, class, configuration array, or instance of SubscribingInterface.
      */
     public $subscribingHandler = \bizley\podium\api\models\thread\Subscribing::class;
 
     /**
-     * @var string|array|BookmarkingInterface
+     * @var string|array|BookmarkingInterface bookmarking handler
      * Component ID, class, configuration array, or instance of BookmarkingInterface.
      */
     public $bookmarkingHandler = \bizley\podium\api\models\thread\Bookmarking::class;
@@ -100,6 +100,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Creates thread.
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $forum
@@ -118,6 +119,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Updates thread.
      * @param ModelFormInterface $threadForm
      * @param array $data
      * @return PodiumResponse
@@ -131,6 +133,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Deletes thread.
      * @param RemovableInterface $threadRemover
      * @return PodiumResponse
      */
@@ -140,6 +143,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Moves thread.
      * @param MovableInterface $threadMover
      * @param ModelInterface $forum
      * @return PodiumResponse
@@ -152,6 +156,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Pins thread
      * @param PinnableInterface $threadPinner
      * @return PodiumResponse
      */
@@ -161,6 +166,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Unpins thread.
      * @param PinnableInterface $threadPinner
      * @return PodiumResponse
      */
@@ -170,6 +176,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Locks thread.
      * @param LockableInterface $threadLocker
      * @return PodiumResponse
      */
@@ -179,6 +186,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Unlocks thread.
      * @param LockableInterface $threadLocker
      * @return PodiumResponse
      */
@@ -188,6 +196,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Archives thread.
      * @param ArchivableInterface $threadArchiver
      * @return PodiumResponse
      */
@@ -197,6 +206,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Revives thread.
      * @param ArchivableInterface $threadArchiver
      * @return PodiumResponse
      */
@@ -214,6 +224,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Subscribes to a thread.
      * @param MembershipInterface $member
      * @param ModelInterface $thread
      * @return PodiumResponse
@@ -228,6 +239,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Unsubscribes from a thread.
      * @param MembershipInterface $member
      * @param ModelInterface $thread
      * @return PodiumResponse
@@ -250,6 +262,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     }
 
     /**
+     * Marks last seen post in a thread.
      * @param MembershipInterface $member
      * @param ModelInterface $post
      * @return PodiumResponse
