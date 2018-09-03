@@ -131,14 +131,15 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
-                throw new Exception('Error while updating forum counters!');
-            }
-
             if (!$this->save()) {
                 Yii::error(['Error while creating thread', $this->errors], 'podium');
                 return PodiumResponse::error($this);
             }
+
+            if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
+                throw new Exception('Error while updating forum counters!');
+            }
+
             $this->afterCreate();
 
             $transaction->commit();
@@ -152,7 +153,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
                 Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterCreate(): void

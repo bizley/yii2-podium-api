@@ -125,15 +125,16 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
         try {
             if (!$subscription->delete()) {
                 Yii::error('Error while unsubscribing thread', 'podium');
-                return PodiumResponse::error($this);
+                return PodiumResponse::error();
             }
+
+            $this->afterUnsubscribe();
+            return PodiumResponse::success();
+
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return PodiumResponse::error($this);
+            return PodiumResponse::error();
         }
-
-        $this->afterUnsubscribe();
-        return PodiumResponse::success();
     }
 
     public function afterUnsubscribe(): void

@@ -85,7 +85,7 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
                 Yii::error(['Exception while thread archiving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterArchive(): void
@@ -122,17 +122,17 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $this->archived = false;
+            if (!$this->save()) {
+                Yii::error(['Error while reviving thread', $this->errors], 'podium');
+                return PodiumResponse::error($this);
+            }
+
             if (!$this->getForumModel()->updateCounters([
                 'threads_count' => 1,
                 'posts_count' => $this->posts_count,
             ])) {
                 throw new Exception('Error while updating forum counters!');
-            }
-
-            $this->archived = false;
-            if (!$this->save()) {
-                Yii::error('Error while reviving thread', 'podium');
-                throw new Exception('Error while reviving thread!');
             }
 
             $this->afterRevive();
@@ -148,7 +148,7 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
                 Yii::error(['Exception while thread reviving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterRevive(): void

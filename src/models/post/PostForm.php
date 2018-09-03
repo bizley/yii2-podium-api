@@ -143,8 +143,15 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $this->type_id = PostType::POST;
+            if (!$this->save()) {
+                Yii::error(['Error while creating post', $this->errors], 'podium');
+                return PodiumResponse::error($this);
+            }
+
             if (!$this->getThreadModel()->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating thread counters!');
             }
@@ -152,12 +159,6 @@ class PostForm extends PostRepo implements CategorisedFormInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->type_id = PostType::POST;
-
-            if (!$this->save()) {
-                Yii::error(['Error while creating post', $this->errors], 'podium');
-                throw new Exception('Error while creating post!');
-            }
             $this->afterCreate();
 
             $transaction->commit();
@@ -171,7 +172,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterCreate(): void

@@ -131,11 +131,11 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         try {
             if (!$ignoring->delete()) {
                 Yii::error('Error while unignoring member', 'podium');
-                return PodiumResponse::error($this);
+                return PodiumResponse::error();
             }
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return PodiumResponse::error($this);
+            return PodiumResponse::error();
         }
 
         $this->afterUnignore();

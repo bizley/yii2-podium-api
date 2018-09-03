@@ -111,7 +111,7 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
 
         if (!$bookmark->save()) {
             Yii::error(['Error while bookmarking thread', $bookmark->errors], 'podium');
-            return PodiumResponse::error($this);
+            return PodiumResponse::error($bookmark);
         }
 
         $this->afterMark();

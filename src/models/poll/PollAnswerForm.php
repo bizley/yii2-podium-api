@@ -45,8 +45,8 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
     public function create(): PodiumResponse
     {
         if (!$this->save(false)) {
-            Yii::error(['Error while creating poll answer', $this->errors], 'podium');
-            return PodiumResponse::error($this);
+            Yii::error('Error while creating poll answer', 'podium');
+            return PodiumResponse::error();
         }
         return PodiumResponse::success();
     }

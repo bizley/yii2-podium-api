@@ -59,8 +59,8 @@ class MemberBan extends MemberRepo implements BanInterface
         $this->status_id = MemberStatus::BANNED;
 
         if (!$this->save(false)) {
-            Yii::error(['Error while banning member', $this->errors], 'podium');
-            return PodiumResponse::error($this);
+            Yii::error('Error while banning member', 'podium');
+            return PodiumResponse::error();
         }
 
         $this->afterBan();
@@ -100,8 +100,8 @@ class MemberBan extends MemberRepo implements BanInterface
         $this->status_id = MemberStatus::ACTIVE;
 
         if (!$this->save(false)) {
-            Yii::error(['Error while unbanning member', $this->errors], 'podium');
-            return PodiumResponse::error($this);
+            Yii::error('Error while unbanning member', 'podium');
+            return PodiumResponse::error();
         }
 
         $this->afterUnban();

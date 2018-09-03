@@ -262,7 +262,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 'choice_id' => $this->choice_id,
                 'expires_at' => $this->expires_at,
             ]);
-            if (!$poll->create()) {
+            if (!$poll->create()->result) {
                 throw new Exception('Error while creating poll!');
             }
 
@@ -271,7 +271,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                     'poll_id' => $poll->id,
                     'answer' => $answer,
                 ]);
-                if (!$pollAnswer->create()) {
+                if (!$pollAnswer->create()->result) {
                     throw new Exception('Error while creating poll answer!');
                 }
             }
@@ -289,7 +289,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while poll creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterCreate(): void
@@ -345,7 +345,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 }
             }
 
-            if (!$poll->edit()) {
+            if (!$poll->edit()->result) {
                 throw new Exception('Error while editing poll!');
             }
 
@@ -357,12 +357,12 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                     'poll_id' => $poll->id,
                     'answer' => $answer,
                 ]);
-                if (!$pollAnswer->create()) {
+                if (!$pollAnswer->create()->result) {
                     throw new Exception('Error while creating poll answer!');
                 }
             }
             foreach ($answersToRemove as $answerId => $answer) {
-                if (!PollAnswerRemover::findOne($answerId)->remove()) {
+                if (($pollAnswerRemover = PollAnswerRemover::findOne($answerId)) === null || !$pollAnswerRemover->remove()->result) {
                     throw new Exception('Error while removing poll answer!');
                 }
             }
@@ -370,7 +370,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $this->afterEdit();
 
             $transaction->commit();
-            return PodiumResponse::success($this);
+            return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while editing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -380,7 +380,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 Yii::error(['Exception while poll editing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterEdit(): void

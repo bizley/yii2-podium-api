@@ -58,9 +58,9 @@ class PostRemover extends PostRepo implements RemovableInterface
         try {
             $thread = $this->getThreadModel();
             if ($thread->getPostsCount() === 0 && $thread->isArchived()) {
-                if (!$thread->convert(ThreadRemover::class)->remove()) {
+                if (!$thread->convert(ThreadRemover::class)->remove()->result) {
                     Yii::error('Error while deleting empty archived thread', 'podium');
-                    return PodiumResponse::error($this);
+                    return PodiumResponse::error();
                 }
 
                 $this->afterRemove();
@@ -69,7 +69,7 @@ class PostRemover extends PostRepo implements RemovableInterface
 
             if ($this->delete() === false) {
                 Yii::error('Error while deleting post', 'podium');
-                return PodiumResponse::error($this);
+                return PodiumResponse::error();
             }
 
             $this->afterRemove();
@@ -78,7 +78,7 @@ class PostRemover extends PostRepo implements RemovableInterface
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

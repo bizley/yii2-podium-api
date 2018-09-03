@@ -101,6 +101,11 @@ class ThreadMover extends ThreadRepo implements MovableInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            if (!$this->save()) {
+                Yii::error(['Error while moving thread', $this->errors], 'podium');
+                return PodiumResponse::error($this);
+            }
+
             if (!$this->getOldForumModel()->updateCounters([
                 'threads_count' => -1,
                 'posts_count' => -$this->posts_count,
@@ -113,11 +118,6 @@ class ThreadMover extends ThreadRepo implements MovableInterface
                 'posts_count' => $this->posts_count,
             ])) {
                 throw new Exception('Error while updating new forum counters!');
-            }
-
-            if (!$this->save(false)) {
-                Yii::error(['Error while moving thread', $this->errors], 'podium');
-                throw new Exception('Error while moving thread!');
             }
 
             $this->afterMove();
@@ -133,7 +133,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
                 Yii::error(['Exception while thread moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterMove(): void

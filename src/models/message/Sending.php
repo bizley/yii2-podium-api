@@ -154,7 +154,7 @@ class Sending extends MessageRepo implements SendingInterface
 
             if (!$this->save()) {
                 Yii::error(['Error while creating message', $this->errors], 'podium');
-                throw new Exception('Error while creating message!');
+                return PodiumResponse::error($this);
             }
 
             if ($this->reply_to_id) {
@@ -166,9 +166,7 @@ class Sending extends MessageRepo implements SendingInterface
                     Yii::error('Can not find message participant copy to change its status.', 'podium');
                     throw new Exception('Can not find message participant copy to change its status!');
                 }
-                $response = $repliedMessage->markReplied();
-                if (!$response->result) {
-                    Yii::error(['Error while marking message participant copy as replied.', $response->errors], 'podium');
+                if (!$repliedMessage->markReplied()->result) {
                     throw new Exception('Error while marking message participant copy as replied!');
                 }
             }
@@ -179,8 +177,7 @@ class Sending extends MessageRepo implements SendingInterface
                 'status_id' => MessageStatus::READ,
                 'side_id' => MessageSide::SENDER,
             ]);
-            if (!$senderCopy->create()) {
-                Yii::error(['Error while creating sender message copy', $senderCopy->errors], 'podium');
+            if (!$senderCopy->create()->result) {
                 throw new Exception('Error while creating sender message copy!');
             }
 
@@ -190,8 +187,7 @@ class Sending extends MessageRepo implements SendingInterface
                 'status_id' => MessageStatus::NEW,
                 'side_id' => MessageSide::RECEIVER,
             ]);
-            if (!$receiverCopy->create()) {
-                Yii::error(['Error while creating receiver message copy', $receiverCopy->errors], 'podium');
+            if (!$receiverCopy->create()->result) {
                 throw new Exception('Error while creating receiver message copy!');
             }
 
@@ -208,7 +204,7 @@ class Sending extends MessageRepo implements SendingInterface
                 Yii::error(['Exception while message creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterSend(): void

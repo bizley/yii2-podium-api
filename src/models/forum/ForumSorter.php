@@ -89,11 +89,13 @@ class ForumSorter extends ForumRepo implements SortableInterface
         try {
             $nextOrder = 0;
             foreach ($this->sortOrder as $forumId) {
-                $result = static::updateAll([
-                    'sort' => $nextOrder,
-                    'updated_at' => time(),
-                ], ['id' => $forumId, 'category_id' => $this->category_id]);
-                if ($result > 0) {
+                if (static::updateAll([
+                        'sort' => $nextOrder,
+                        'updated_at' => time(),
+                    ], [
+                        'id' => $forumId,
+                        'category_id' => $this->category_id
+                    ]) > 0) {
                     $nextOrder++;
                 }
             }
@@ -109,7 +111,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while forums sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
-            return PodiumResponse::error($this);
+            return PodiumResponse::error();
         }
     }
 

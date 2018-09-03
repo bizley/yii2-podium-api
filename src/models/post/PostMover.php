@@ -107,7 +107,7 @@ class PostMover extends PostRepo implements MovableInterface
         try {
             if (!$this->save()) {
                 Yii::error(['Error while moving post', $this->errors], 'podium');
-                throw new Exception('Error while moving post!');
+                return PodiumResponse::error($this);
             }
 
             if (!$this->getOldThreadModel()->updateCounters(['posts_count' => -1])) {
@@ -123,7 +123,7 @@ class PostMover extends PostRepo implements MovableInterface
                 }
                 $threadRemover = $this->getOldThreadModel()->convert(ThreadRemover::class);
                 $threadRemover->archived = true;
-                if (!$threadRemover->remove()) {
+                if (!$threadRemover->remove()->result) {
                     throw new Exception('Error while deleting old empty thread!');
                 }
             }
@@ -148,7 +148,7 @@ class PostMover extends PostRepo implements MovableInterface
                 Yii::error(['Exception while post moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterMove(): void

@@ -81,11 +81,10 @@ class CategorySorter extends CategoryRepo implements SortableInterface
         try {
             $nextOrder = 0;
             foreach ($this->sortOrder as $categoryId) {
-                $result = static::updateAll([
-                    'sort' => $nextOrder,
-                    'updated_at' => time(),
-                ], ['id' => $categoryId]);
-                if ($result > 0) {
+                if (static::updateAll([
+                        'sort' => $nextOrder,
+                        'updated_at' => time(),
+                    ], ['id' => $categoryId]) > 0) {
                     $nextOrder++;
                 }
             }

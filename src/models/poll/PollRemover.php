@@ -42,7 +42,7 @@ class PollRemover extends PollRepo implements RemovableInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting poll', 'podium');
-                return PodiumResponse::error($this);
+                return PodiumResponse::error();
             }
 
             $this->afterRemove();
@@ -51,7 +51,7 @@ class PollRemover extends PollRepo implements RemovableInterface
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

@@ -46,7 +46,7 @@ class CategoryRemover extends CategoryRepo implements RemovableInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting category', 'podium');
-                return PodiumResponse::error($this);
+                return PodiumResponse::error();
             }
 
             $this->afterRemove();
@@ -55,7 +55,7 @@ class CategoryRemover extends CategoryRepo implements RemovableInterface
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

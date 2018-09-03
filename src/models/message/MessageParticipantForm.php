@@ -46,8 +46,8 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
     public function create(): PodiumResponse
     {
         if (!$this->save(false)) {
-            Yii::error(['Error while creating message participant copy', $this->errors], 'podium');
-            return PodiumResponse::error($this);
+            Yii::error('Error while creating message participant copy', 'podium');
+            return PodiumResponse::error();
         }
         return PodiumResponse::success();
     }
@@ -59,8 +59,8 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
     {
         $this->status_id = MessageStatus::READ;
         if (!$this->save(false)) {
-            Yii::error(['Error while marking message participant copy as read', $this->errors], 'podium');
-            return PodiumResponse::error($this);
+            Yii::error('Error while marking message participant copy as read', 'podium');
+            return PodiumResponse::error();
         }
         return PodiumResponse::success();
     }

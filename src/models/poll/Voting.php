@@ -123,8 +123,7 @@ class Voting extends Model implements VotingInterface
                     'poll_id' => $this->poll_id,
                     'answer_id' => $pollAnswer->getId(),
                 ]);
-                if (!$vote->create()) {
-                    Yii::error(['Error while voting', $vote->errors], 'podium');
+                if (!$vote->create()->result) {
                     throw new Exception('Error while voting!');
                 }
             }
@@ -142,7 +141,7 @@ class Voting extends Model implements VotingInterface
                 Yii::error(['Exception while voting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterVote(): void

@@ -128,16 +128,17 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
 
         try {
             if (!$groupMember->delete()) {
-                Yii::error(['Error while leaving group', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+                Yii::error('Error while leaving group', 'podium');
+                return PodiumResponse::error();
             }
+
+            $this->afterLeave();
+            return PodiumResponse::success();
+
         } catch (\Throwable $exc) {
             Yii::error(['Exception while leaving group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            return PodiumResponse::error($this);
+            return PodiumResponse::error();
         }
-
-        $this->afterLeave();
-        return PodiumResponse::success();
     }
 
     public function afterLeave(): void

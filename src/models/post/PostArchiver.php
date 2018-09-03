@@ -58,6 +58,12 @@ class PostArchiver extends PostRepo implements ArchivableInterface
         }
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $this->archived = true;
+            if (!$this->save()) {
+                Yii::error('Error while archiving post', 'podium');
+                return PodiumResponse::error($this);
+            }
+
             $thread = $this->getThreadModel();
             if (!$thread->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating thread counters!');
@@ -67,12 +73,6 @@ class PostArchiver extends PostRepo implements ArchivableInterface
             }
             if ($thread->getPostsCount() === 0 && !$thread->isArchived() && !$thread->convert(ThreadArchiver::class)->archive()) {
                 throw new Exception('Error while archiving thread!');
-            }
-
-            $this->archived = true;
-            if (!$this->save()) {
-                Yii::error('Error while archiving post', 'podium');
-                throw new Exception('Error while archiving post!');
             }
 
             $this->afterArchive();
@@ -88,7 +88,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
                 Yii::error(['Exception while post archiving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterArchive(): void
@@ -124,18 +124,18 @@ class PostArchiver extends PostRepo implements ArchivableInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
+            $this->archived = false;
+            if (!$this->save()) {
+                Yii::error('Error while reviving post', 'podium');
+                return PodiumResponse::error($this);
+            }
+
             $thread = $this->getThreadModel();
             if (!$thread->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating thread counters!');
             }
             if (!$thread->getParent()->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating forum counters!');
-            }
-
-            $this->archived = false;
-            if (!$this->save()) {
-                Yii::error('Error while reviving post', 'podium');
-                throw new Exception('Error while reviving post!');
             }
 
             $this->afterRevive();
@@ -151,7 +151,7 @@ class PostArchiver extends PostRepo implements ArchivableInterface
                 Yii::error(['Exception while post reviving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
         }
-        return PodiumResponse::error($this);
+        return PodiumResponse::error();
     }
 
     public function afterRevive(): void
