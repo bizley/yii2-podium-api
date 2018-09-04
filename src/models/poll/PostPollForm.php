@@ -174,9 +174,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -239,6 +237,13 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
         }
+
+        $this->type_id = PostType::POLL;
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->getThreadModel()->updateCounters(['posts_count' => 1])) {
@@ -248,10 +253,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->type_id = PostType::POLL;
-
-            if (!$this->save()) {
-                Yii::error(['Error while creating post for poll', $this->errors], 'podium');
+            if (!$this->save(false)) {
                 throw new Exception('Error while creating post for poll!');
             }
 
@@ -279,6 +281,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $this->afterCreate();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -288,15 +291,13 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while poll creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -324,14 +325,17 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             return PodiumResponse::error($this);
         }
 
+        $this->edited = true;
+        $this->edited_at = time();
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $this->edited = true;
-            $this->edited_at = time();
-
-            if (!$this->save()) {
-                Yii::error(['Error while editing post for poll', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while editing post for poll!');
             }
 
             $poll = $this->poll;
@@ -370,6 +374,7 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             $this->afterEdit();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -379,15 +384,13 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while poll editing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 
     /**

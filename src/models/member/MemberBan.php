@@ -28,9 +28,7 @@ class MemberBan extends MemberRepo implements BanInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -52,10 +50,12 @@ class MemberBan extends MemberRepo implements BanInterface
         if (!$this->beforeBan()) {
             return PodiumResponse::error();
         }
+
         if ($this->status_id === MemberStatus::BANNED) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.banned'));
             return PodiumResponse::error($this);
         }
+
         $this->status_id = MemberStatus::BANNED;
 
         if (!$this->save(false)) {
@@ -64,14 +64,13 @@ class MemberBan extends MemberRepo implements BanInterface
         }
 
         $this->afterBan();
+
         return PodiumResponse::success();
     }
 
     public function afterBan(): void
     {
-        $this->trigger(self::EVENT_AFTER_BANNING, new BanEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_BANNING, new BanEvent(['model' => $this]));
     }
 
     /**
@@ -93,10 +92,12 @@ class MemberBan extends MemberRepo implements BanInterface
         if (!$this->beforeUnban()) {
             return PodiumResponse::error();
         }
+
         if ($this->status_id === MemberStatus::ACTIVE) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.active'));
             return PodiumResponse::error($this);
         }
+
         $this->status_id = MemberStatus::ACTIVE;
 
         if (!$this->save(false)) {
@@ -105,13 +106,12 @@ class MemberBan extends MemberRepo implements BanInterface
         }
 
         $this->afterUnban();
+
         return PodiumResponse::success();
     }
 
     public function afterUnban(): void
     {
-        $this->trigger(self::EVENT_AFTER_UNBANNING, new BanEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_UNBANNING, new BanEvent(['model' => $this]));
     }
 }

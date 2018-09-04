@@ -72,6 +72,7 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         if (!$this->beforeIgnore()) {
             return PodiumResponse::error();
         }
+
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
@@ -88,14 +89,13 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
         }
 
         $this->afterIgnore();
+
         return PodiumResponse::success();
     }
 
     public function afterIgnore(): void
     {
-        $this->trigger(self::EVENT_AFTER_IGNORING, new AcquaintanceEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_IGNORING, new AcquaintanceEvent(['model' => $this]));
     }
 
     /**
@@ -133,13 +133,15 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
                 Yii::error('Error while unignoring member', 'podium');
                 return PodiumResponse::error();
             }
+
+            $this->afterUnignore();
+
+            return PodiumResponse::success();
+
         } catch (\Throwable $exc) {
             Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }
-
-        $this->afterUnignore();
-        return PodiumResponse::success();
     }
 
     public function afterUnignore(): void

@@ -40,6 +40,7 @@ class ForumArchiver extends ForumRepo implements ArchivableInterface
         if (!$this->beforeArchive()) {
             return PodiumResponse::error();
         }
+
         if ($this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'forum.already.archived'));
             return PodiumResponse::error($this);
@@ -52,14 +53,13 @@ class ForumArchiver extends ForumRepo implements ArchivableInterface
         }
 
         $this->afterArchive();
+
         return PodiumResponse::success();
     }
 
     public function afterArchive(): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
     /**
@@ -81,6 +81,7 @@ class ForumArchiver extends ForumRepo implements ArchivableInterface
         if (!$this->beforeRevive()) {
             return PodiumResponse::error();
         }
+
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'forum.not.archived'));
             return PodiumResponse::error($this);
@@ -93,13 +94,12 @@ class ForumArchiver extends ForumRepo implements ArchivableInterface
         }
 
         $this->afterRevive();
+
         return PodiumResponse::success();
     }
 
     public function afterRevive(): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
     }
 }

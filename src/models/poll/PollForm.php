@@ -23,9 +23,7 @@ class PollForm extends PollRepo implements ModelFormInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -49,6 +47,7 @@ class PollForm extends PollRepo implements ModelFormInterface
             Yii::error('Error while creating poll', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 
@@ -67,6 +66,7 @@ class PollForm extends PollRepo implements ModelFormInterface
             Yii::error('Error while updating poll', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 }

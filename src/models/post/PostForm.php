@@ -89,9 +89,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -110,9 +108,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'content' => Yii::t('podium.label', 'post.content'),
-        ];
+        return ['content' => Yii::t('podium.label', 'post.content')];
     }
 
     /**
@@ -144,12 +140,16 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             return PodiumResponse::error();
         }
 
+        $this->type_id = PostType::POST;
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $this->type_id = PostType::POST;
-            if (!$this->save()) {
-                Yii::error(['Error while creating post', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while creating post!');
             }
 
             if (!$this->getThreadModel()->updateCounters(['posts_count' => 1])) {
@@ -162,6 +162,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             $this->afterCreate();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -171,15 +172,13 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -204,20 +203,20 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
         $this->edited = true;
         $this->edited_at = time();
+
         if (!$this->save()) {
             Yii::error(['Error while editing post', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 
     /**

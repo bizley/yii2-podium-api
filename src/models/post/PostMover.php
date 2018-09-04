@@ -78,9 +78,7 @@ class PostMover extends PostRepo implements MovableInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -103,11 +101,14 @@ class PostMover extends PostRepo implements MovableInterface
             return PodiumResponse::error();
         }
 
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->save()) {
-                Yii::error(['Error while moving post', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while moving post!');
             }
 
             if (!$this->getOldThreadModel()->updateCounters(['posts_count' => -1])) {
@@ -138,6 +139,7 @@ class PostMover extends PostRepo implements MovableInterface
             $this->afterMove();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -147,15 +149,13 @@ class PostMover extends PostRepo implements MovableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while post moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterMove(): void
     {
-        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));
     }
 
     /**

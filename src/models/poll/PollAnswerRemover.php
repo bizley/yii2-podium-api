@@ -25,11 +25,12 @@ class PollAnswerRemover extends PollAnswerRepo implements RemovableInterface
                 Yii::error('Error while deleting poll answer', 'podium');
                 return PodiumResponse::error();
             }
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing poll answer', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 }

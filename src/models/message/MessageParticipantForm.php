@@ -23,9 +23,7 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -49,6 +47,7 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
             Yii::error('Error while creating message participant copy', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 
@@ -58,10 +57,12 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
     public function markRead(): PodiumResponse
     {
         $this->status_id = MessageStatus::READ;
+
         if (!$this->save(false)) {
             Yii::error('Error while marking message participant copy as read', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 
@@ -71,10 +72,12 @@ class MessageParticipantForm extends MessageParticipantRepo implements ModelForm
     public function markReplied(): PodiumResponse
     {
         $this->status_id = MessageStatus::REPLIED;
+
         if (!$this->save(false)) {
             Yii::error(['Error while marking message participant copy as replied', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
+
         return PodiumResponse::success();
     }
 

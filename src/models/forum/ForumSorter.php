@@ -48,9 +48,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'sortOrder' => Yii::t('podium.label', 'forum.sort.order'),
-        ];
+        return ['sortOrder' => Yii::t('podium.label', 'forum.sort.order')];
     }
 
     /**
@@ -81,10 +79,12 @@ class ForumSorter extends ForumRepo implements SortableInterface
         if (!$this->beforeSort()) {
             return PodiumResponse::error();
         }
+
         if (!$this->validate()) {
             Yii::warning(['Forums sort validation failed', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $nextOrder = 0;
@@ -99,9 +99,11 @@ class ForumSorter extends ForumRepo implements SortableInterface
                     $nextOrder++;
                 }
             }
+
             $transaction->commit();
 
             $this->afterSort();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {

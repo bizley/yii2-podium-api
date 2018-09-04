@@ -74,9 +74,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -99,11 +97,14 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             return PodiumResponse::error();
         }
 
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->save()) {
-                Yii::error(['Error while moving thread', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while moving thread!');
             }
 
             if (!$this->getOldForumModel()->updateCounters([
@@ -123,6 +124,7 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             $this->afterMove();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -132,15 +134,13 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thread moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterMove(): void
     {
-        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));
     }
 
     /**

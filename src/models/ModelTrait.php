@@ -11,6 +11,8 @@ use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * Trait ModelTrait
@@ -51,6 +53,7 @@ trait ModelTrait
      */
     public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
+        /* @var $query ActiveQuery */
         $query = static::find();
 
         if ($filter !== null) {
@@ -79,6 +82,7 @@ trait ModelTrait
      */
     public function convert(string $targetClass)
     {
+        /* @var $targetModel ActiveRecord */
         $targetModel = new $targetClass;
 
         if (static::tableName() !== $targetModel::tableName()) {

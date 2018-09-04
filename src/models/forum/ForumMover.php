@@ -35,9 +35,7 @@ class ForumMover extends ForumRepo implements MovableInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -66,14 +64,13 @@ class ForumMover extends ForumRepo implements MovableInterface
         }
 
         $this->afterMove();
+
         return PodiumResponse::success();
     }
 
     public function afterMove(): void
     {
-        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));
     }
 
     /**

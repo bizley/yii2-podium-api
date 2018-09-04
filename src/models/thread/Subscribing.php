@@ -29,9 +29,7 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -84,14 +82,13 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
         }
 
         $this->afterSubscribe();
+
         return PodiumResponse::success();
     }
 
     public function afterSubscribe(): void
     {
-        $this->trigger(self::EVENT_AFTER_SUBSCRIBING, new SubscriptionEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_SUBSCRIBING, new SubscriptionEvent(['model' => $this]));
     }
 
     /**
@@ -122,6 +119,7 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
             $this->addError('thread_id', Yii::t('podium.error', 'thread.not.subscribed'));
             return PodiumResponse::error($this);
         }
+
         try {
             if (!$subscription->delete()) {
                 Yii::error('Error while unsubscribing thread', 'podium');
@@ -129,6 +127,7 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
             }
 
             $this->afterUnsubscribe();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {

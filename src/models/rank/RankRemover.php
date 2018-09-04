@@ -46,12 +46,13 @@ class RankRemover extends RankRepo implements RemovableInterface
             }
 
             $this->afterRemove();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing rank', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

@@ -100,19 +100,20 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while creating category', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
+
         $this->afterCreate();
+
         return PodiumResponse::success();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -134,18 +135,19 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
         if (!$this->beforeEdit()) {
             return PodiumResponse::error();
         }
+
         if (!$this->save()) {
             Yii::error(['Error while editing category', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
+
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 }

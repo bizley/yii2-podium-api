@@ -73,10 +73,12 @@ class CategorySorter extends CategoryRepo implements SortableInterface
         if (!$this->beforeSort()) {
             return PodiumResponse::error();
         }
+
         if (!$this->validate()) {
             Yii::warning(['Categories sort validation failed', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $nextOrder = 0;
@@ -92,6 +94,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
             $transaction->commit();
 
             $this->afterSort();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {

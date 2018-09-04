@@ -114,7 +114,6 @@ class Voting extends Model implements VotingInterface
                 }
 
                 if ($pollAnswer->getPollId() !== $this->poll_id) {
-                    $this->addError('answers', Yii::t('podium.error', 'poll.wrong.answer'));
                     throw new Exception('Wrong poll answer!');
                 }
 
@@ -131,6 +130,7 @@ class Voting extends Model implements VotingInterface
             $this->afterVote();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -140,14 +140,12 @@ class Voting extends Model implements VotingInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while voting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterVote(): void
     {
-        $this->trigger(self::EVENT_AFTER_VOTING, new VoteEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_VOTING, new VoteEvent(['model' => $this]));
     }
 }

@@ -27,9 +27,7 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -53,20 +51,20 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
         }
 
         $this->pinned = true;
+
         if (!$this->save()) {
             Yii::error(['Error while pinning thread', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterPin();
+
         return PodiumResponse::success();
     }
 
     public function afterPin(): void
     {
-        $this->trigger(self::EVENT_AFTER_PINNING, new PinEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_PINNING, new PinEvent(['model' => $this]));
     }
 
     /**
@@ -90,19 +88,19 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
         }
 
         $this->pinned = false;
+
         if (!$this->save()) {
             Yii::error(['Error while unpinning thread', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterUnpin();
+
         return PodiumResponse::success();
     }
 
     public function afterUnpin(): void
     {
-        $this->trigger(self::EVENT_AFTER_UNPINNING, new PinEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_UNPINNING, new PinEvent(['model' => $this]));
     }
 }

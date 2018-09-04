@@ -40,26 +40,27 @@ class MessageParticipantArchiver extends MessageParticipantRepo implements Archi
         if (!$this->beforeArchive()) {
             return PodiumResponse::error();
         }
+
         if ($this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'message.already.archived'));
             return PodiumResponse::error($this);
         }
 
         $this->archived = true;
+
         if (!$this->save()) {
             Yii::error('Error while archiving message', 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterArchive();
+
         return PodiumResponse::success();
     }
 
     public function afterArchive(): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
     /**
@@ -81,25 +82,26 @@ class MessageParticipantArchiver extends MessageParticipantRepo implements Archi
         if (!$this->beforeRevive()) {
             return PodiumResponse::error();
         }
+
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'message.not.archived'));
             return PodiumResponse::error($this);
         }
 
         $this->archived = false;
+
         if (!$this->save()) {
             Yii::error('Error while reviving message', 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterRevive();
+
         return PodiumResponse::success();
     }
 
     public function afterRevive(): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
     }
 }

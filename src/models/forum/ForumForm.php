@@ -117,14 +117,13 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
         }
 
         $this->afterCreate();
+
         return PodiumResponse::success();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -153,14 +152,13 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
         }
 
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 
     /**

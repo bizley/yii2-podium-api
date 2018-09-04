@@ -75,6 +75,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         if (!$this->beforeBefriend()) {
             return PodiumResponse::error();
         }
+
         if (static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
@@ -91,14 +92,13 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         }
 
         $this->afterBefriend();
+
         return PodiumResponse::success();
     }
 
     public function afterBefriend(): void
     {
-        $this->trigger(self::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent(['model' => $this]));
     }
 
     /**
@@ -138,6 +138,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
             }
 
             $this->afterUnfriend();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {

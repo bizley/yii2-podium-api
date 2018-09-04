@@ -27,9 +27,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -49,9 +47,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'name' => Yii::t('podium.label', 'group.name'),
-        ];
+        return ['name' => Yii::t('podium.label', 'group.name')];
     }
 
     /**
@@ -89,14 +85,13 @@ class GroupForm extends GroupRepo implements ModelFormInterface
         }
 
         $this->afterCreate();
+
         return PodiumResponse::success();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -125,13 +120,12 @@ class GroupForm extends GroupRepo implements ModelFormInterface
         }
 
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 }

@@ -87,14 +87,13 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
         }
 
         $this->afterJoin();
+
         return PodiumResponse::success();
     }
 
     public function afterJoin(): void
     {
-        $this->trigger(self::EVENT_AFTER_JOINING, new GroupEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_JOINING, new GroupEvent(['model' => $this]));
     }
 
     /**
@@ -133,6 +132,7 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
             }
 
             $this->afterLeave();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {

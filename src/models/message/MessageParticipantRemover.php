@@ -47,7 +47,6 @@ class MessageParticipantRemover extends MessageParticipantRepo implements Remova
         }
 
         $transaction = Yii::$app->db->beginTransaction();
-
         try {
             if ((int)static::find()->where(['message_id' => $this->message_id])->count() === 1) {
 
@@ -65,6 +64,7 @@ class MessageParticipantRemover extends MessageParticipantRepo implements Remova
                 $this->afterRemove();
 
                 $transaction->commit();
+
                 return PodiumResponse::success();
             }
 
@@ -76,6 +76,7 @@ class MessageParticipantRemover extends MessageParticipantRepo implements Remova
             $this->afterRemove();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -85,8 +86,8 @@ class MessageParticipantRemover extends MessageParticipantRepo implements Remova
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while message removing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error($this);
     }
 
     public function afterRemove(): void

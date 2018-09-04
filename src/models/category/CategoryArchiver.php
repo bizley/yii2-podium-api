@@ -40,6 +40,7 @@ class CategoryArchiver extends CategoryRepo implements ArchivableInterface
         if (!$this->beforeArchive()) {
             return PodiumResponse::error();
         }
+
         if ($this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'category.already.archived'));
             return PodiumResponse::error($this);
@@ -52,14 +53,13 @@ class CategoryArchiver extends CategoryRepo implements ArchivableInterface
         }
 
         $this->afterArchive();
+
         return PodiumResponse::success();
     }
 
     public function afterArchive(): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
     /**
@@ -93,13 +93,12 @@ class CategoryArchiver extends CategoryRepo implements ArchivableInterface
         }
 
         $this->afterRevive();
+
         return PodiumResponse::success();
     }
 
     public function afterRevive(): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
     }
 }

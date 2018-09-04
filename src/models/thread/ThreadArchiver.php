@@ -57,6 +57,12 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             return PodiumResponse::error($this);
         }
 
+        $this->archived = true;
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->getForumModel()->updateCounters([
@@ -66,15 +72,14 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->archived = true;
-            if (!$this->save()) {
-                Yii::error('Error while archiving thread', 'podium');
+            if (!$this->save(false)) {
                 throw new Exception('Error while archiving thread!');
             }
 
             $this->afterArchive();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -84,15 +89,13 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thread archiving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterArchive(): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
     /**
@@ -120,12 +123,16 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             return PodiumResponse::error($this);
         }
 
+        $this->archived = false;
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $this->archived = false;
-            if (!$this->save()) {
-                Yii::error(['Error while reviving thread', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while reviving thread');
             }
 
             if (!$this->getForumModel()->updateCounters([
@@ -138,6 +145,7 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             $this->afterRevive();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -147,14 +155,12 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thread reviving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterRevive(): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
     }
 }

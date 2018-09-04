@@ -97,13 +97,12 @@ class Registration extends MemberRepo implements RegistrationInterface
         }
 
         $this->afterRegister();
+
         return PodiumResponse::success();
     }
 
     public function afterRegister(): void
     {
-        $this->trigger(self::EVENT_AFTER_REGISTERING, new RegistrationEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_REGISTERING, new RegistrationEvent(['model' => $this]));
     }
 }

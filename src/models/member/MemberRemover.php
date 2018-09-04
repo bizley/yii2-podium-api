@@ -38,6 +38,7 @@ class MemberRemover extends MemberRepo implements RemovableInterface
         if (!$this->beforeRemove()) {
             return PodiumResponse::error();
         }
+
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting member', 'podium');
@@ -45,12 +46,13 @@ class MemberRemover extends MemberRepo implements RemovableInterface
             }
 
             $this->afterRemove();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

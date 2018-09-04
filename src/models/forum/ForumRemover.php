@@ -38,6 +38,7 @@ class ForumRemover extends ForumRepo implements RemovableInterface
         if (!$this->beforeRemove()) {
             return PodiumResponse::error();
         }
+
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'forum.must.be.archived'));
             return PodiumResponse::error($this);
@@ -50,12 +51,13 @@ class ForumRemover extends ForumRepo implements RemovableInterface
             }
 
             $this->afterRemove();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while removing forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterRemove(): void

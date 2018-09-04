@@ -49,6 +49,7 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
     public function setPost(ModelInterface $post): void
     {
         $this->setPostModel($post);
+
         $this->thread_id = $post->getParent()->getId();
     }
 
@@ -90,6 +91,7 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
             'member_id' => $this->member_id,
             'thread_id' => $this->thread_id,
         ])->one();
+
         return $bookmark ?? $this;
     }
 
@@ -107,6 +109,7 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
         if ($bookmark->last_seen !== null && $bookmark->last_seen >= $this->getPostModel()->getCreatedAt()) {
             return PodiumResponse::success();
         }
+
         $bookmark->last_seen = $this->getPostModel()->getCreatedAt();
 
         if (!$bookmark->save()) {
@@ -115,13 +118,12 @@ class Bookmarking extends BookmarkRepo implements BookmarkingInterface
         }
 
         $this->afterMark();
+
         return PodiumResponse::success();
     }
 
     public function afterMark(): void
     {
-        $this->trigger(self::EVENT_AFTER_MARKING, new BookmarkEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_MARKING, new BookmarkEvent(['model' => $this]));
     }
 }

@@ -22,9 +22,7 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -48,6 +46,7 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
             Yii::error('Error while creating poll answer', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 

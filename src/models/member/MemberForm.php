@@ -54,9 +54,7 @@ class MemberForm extends MemberRepo implements ModelFormInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'username' => Yii::t('podium.label', 'member.username'),
-        ];
+        return ['username' => Yii::t('podium.label', 'member.username')];
     }
 
     /**
@@ -94,14 +92,13 @@ class MemberForm extends MemberRepo implements ModelFormInterface
         }
 
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 
     /**

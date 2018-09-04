@@ -51,6 +51,7 @@ class PollVoteForm extends PollVoteRepo implements ModelFormInterface
             Yii::error('Error while creating poll', 'podium');
             return PodiumResponse::error();
         }
+
         return PodiumResponse::success();
     }
 

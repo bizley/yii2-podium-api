@@ -95,9 +95,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'name' => Yii::t('podium.label', 'thread.name'),
-        ];
+        return ['name' => Yii::t('podium.label', 'thread.name')];
     }
 
     /**
@@ -129,11 +127,14 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             return PodiumResponse::error();
         }
 
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->save()) {
-                Yii::error(['Error while creating thread', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while creating thread');
             }
 
             if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
@@ -143,6 +144,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             $this->afterCreate();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -152,15 +154,13 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
@@ -189,14 +189,13 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
         }
 
         $this->afterEdit();
+
         return PodiumResponse::success();
     }
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
     }
 
     /**

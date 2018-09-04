@@ -32,9 +32,7 @@ class Liking extends ThumbRepo implements LikingInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -107,12 +105,16 @@ class Liking extends ThumbRepo implements LikingInterface
             $model = $rate;
         }
 
+        $model->thumb = 1;
+
+        if (!$model->validate()) {
+            return PodiumResponse::error($model);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $model->thumb = 1;
-            if (!$model->save()) {
-                Yii::error(['Error while giving thumb up', $model->errors], 'podium');
-                return PodiumResponse::error($model);
+            if (!$model->save(false)) {
+                throw new Exception('Error while giving thumb up!');
             }
 
             if ($rate === null) {
@@ -129,6 +131,7 @@ class Liking extends ThumbRepo implements LikingInterface
             $this->afterThumbUp();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -138,15 +141,13 @@ class Liking extends ThumbRepo implements LikingInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thumb up giving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterThumbUp(): void
     {
-        $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent(['model' => $this]));
     }
 
     /**
@@ -183,12 +184,16 @@ class Liking extends ThumbRepo implements LikingInterface
             $model = $rate;
         }
 
+        $model->thumb = -1;
+
+        if (!$model->validate()) {
+            return PodiumResponse::error($model);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $model->thumb = -1;
-            if (!$model->save()) {
-                Yii::error(['Error while giving thumb down', $model->errors], 'podium');
-                return PodiumResponse::error($model);
+            if (!$model->save(false)) {
+                throw new Exception('Error while giving thumb down');
             }
 
             if ($rate === null) {
@@ -205,6 +210,7 @@ class Liking extends ThumbRepo implements LikingInterface
             $this->afterThumbDown();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -214,15 +220,13 @@ class Liking extends ThumbRepo implements LikingInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thumb down giving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterThumbDown(): void
     {
-        $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent(['model' => $this]));
     }
 
     /**
@@ -266,13 +270,13 @@ class Liking extends ThumbRepo implements LikingInterface
             }
 
             if (!$rate->delete()) {
-                Yii::error('Error while resetting thumb', 'podium');
-                return PodiumResponse::error();
+                throw new Exception('Error while resetting thumb');
             }
 
             $this->afterThumbReset();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -282,8 +286,8 @@ class Liking extends ThumbRepo implements LikingInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while thumb resetting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterThumbReset(): void

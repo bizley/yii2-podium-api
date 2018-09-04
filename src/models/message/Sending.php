@@ -87,9 +87,7 @@ class Sending extends MessageRepo implements SendingInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -148,13 +146,16 @@ class Sending extends MessageRepo implements SendingInterface
             return PodiumResponse::error($this);
         }
 
+        $this->reply_to_id = $this->getReplyTo() ? $this->getReplyTo()->getParent()->getId() : null;
+
+        if (!$this->validate()) {
+            return PodiumResponse::error($this);
+        }
+
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $this->reply_to_id = $this->getReplyTo() ? $this->getReplyTo()->getParent()->getId() : null;
-
-            if (!$this->save()) {
-                Yii::error(['Error while creating message', $this->errors], 'podium');
-                return PodiumResponse::error($this);
+            if (!$this->save(false)) {
+                throw new Exception('Error while creating message!');
             }
 
             if ($this->reply_to_id) {
@@ -163,7 +164,6 @@ class Sending extends MessageRepo implements SendingInterface
                     'message_id' => $this->reply_to_id,
                 ]);
                 if ($repliedMessage === null) {
-                    Yii::error('Can not find message participant copy to change its status.', 'podium');
                     throw new Exception('Can not find message participant copy to change its status!');
                 }
                 if (!$repliedMessage->markReplied()->result) {
@@ -194,6 +194,7 @@ class Sending extends MessageRepo implements SendingInterface
             $this->afterSend();
 
             $transaction->commit();
+
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
@@ -203,15 +204,13 @@ class Sending extends MessageRepo implements SendingInterface
             } catch (\Throwable $excTrans) {
                 Yii::error(['Exception while message creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
             }
+            return PodiumResponse::error();
         }
-        return PodiumResponse::error();
     }
 
     public function afterSend(): void
     {
-        $this->trigger(self::EVENT_AFTER_SENDING, new MessageEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_SENDING, new MessageEvent(['model' => $this]));
     }
 
     /**

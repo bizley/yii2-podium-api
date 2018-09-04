@@ -27,9 +27,7 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
      */
     public function behaviors(): array
     {
-        return [
-            'timestamp' => TimestampBehavior::class,
-        ];
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     /**
@@ -53,20 +51,20 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
         }
 
         $this->locked = true;
+
         if (!$this->save()) {
             Yii::error(['Error while locking thread', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterLock();
+
         return PodiumResponse::success();
     }
 
     public function afterLock(): void
     {
-        $this->trigger(self::EVENT_AFTER_LOCKING, new LockEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_LOCKING, new LockEvent(['model' => $this]));
     }
 
     /**
@@ -90,19 +88,19 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
         }
 
         $this->locked = false;
+
         if (!$this->save()) {
             Yii::error(['Error while unlocking thread', $this->errors], 'podium');
             return PodiumResponse::error($this);
         }
 
         $this->afterUnlock();
+
         return PodiumResponse::success();
     }
 
     public function afterUnlock(): void
     {
-        $this->trigger(self::EVENT_AFTER_UNLOCKING, new LockEvent([
-            'model' => $this
-        ]));
+        $this->trigger(self::EVENT_AFTER_UNLOCKING, new LockEvent(['model' => $this]));
     }
 }
