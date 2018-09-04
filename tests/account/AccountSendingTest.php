@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\message;
+namespace bizley\podium\tests\account;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
@@ -12,14 +12,15 @@ use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\api\models\message\Sending;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;
-use bizley\podium\tests\DbTestCase;
+use bizley\podium\tests\AccountTestCase;
+use bizley\podium\tests\props\UserIdentity;
 use yii\base\Event;
 
 /**
- * Class MessageSendingTest
- * @package bizley\podium\tests\message
+ * Class AccountSendingTest
+ * @package bizley\podium\tests\account
  */
-class MessageSendingTest extends DbTestCase
+class AccountSendingTest extends AccountTestCase
 {
     /**
      * @var array
@@ -79,6 +80,24 @@ class MessageSendingTest extends DbTestCase
      */
     protected static $eventsRaised = [];
 
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function setUp(): void
+    {
+        $this->fixturesUp();
+        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    protected function tearDown(): void
+    {
+        $this->fixturesDown();
+        parent::tearDown();
+    }
+
     public function testSend(): void
     {
         Event::on(Sending::class, Sending::EVENT_BEFORE_SENDING, function () {
@@ -92,7 +111,7 @@ class MessageSendingTest extends DbTestCase
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertTrue($this->podium()->message->send($data, Member::findOne(1), Member::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->send($data, Member::findOne(2))->result);
 
         $message = MessageRepo::findOne(['subject' => 'new-subject']);
         $this->assertEquals(array_merge($data, [
@@ -146,7 +165,7 @@ class MessageSendingTest extends DbTestCase
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertFalse($this->podium()->message->send($data, Member::findOne(1), Member::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->send($data, Member::findOne(2))->result);
 
         $this->assertEmpty(MessageRepo::findOne(['subject' => 'new-subject']));
 
@@ -159,7 +178,7 @@ class MessageSendingTest extends DbTestCase
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertTrue($this->podium()->message->send($data, Member::findOne(1), Member::findOne(2), MessageParticipant::findOne([
+        $this->assertTrue($this->podium()->account->send($data, Member::findOne(2), MessageParticipant::findOne([
             'message_id' => 1,
             'side_id' => MessageSide::SENDER,
         ]))->result);

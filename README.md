@@ -11,6 +11,7 @@
   - [x] bookmark thread
   - [x] join group
   - [x] poll vote
+  - [x] send message
 - [x] Member
   - [x] befriend member
   - [x] ignore member

@@ -6,6 +6,7 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\AccountInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
@@ -200,5 +201,17 @@ class Account extends PodiumComponent implements AccountInterface
     public function vote(PollModelInterface $poll, array $answers): PodiumResponse
     {
         return $this->podium->poll->vote($this->membership, $poll, $answers);
+    }
+
+    /**
+     * Sends message.
+     * @param array $data
+     * @param MembershipInterface $receiver
+     * @param MessageParticipantModelInterface $replyTo
+     * @return PodiumResponse
+     */
+    public function send(array $data, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
+    {
+        return $this->podium->message->send($data, $this->membership, $receiver, $replyTo);
     }
 }
