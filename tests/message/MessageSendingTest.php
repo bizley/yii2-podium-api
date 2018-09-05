@@ -153,6 +153,11 @@ class MessageSendingTest extends DbTestCase
         Event::off(Sending::class, Sending::EVENT_BEFORE_SENDING, $handler);
     }
 
+    public function testSendLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->message->send([], Member::findOne(1), Member::findOne(2))->result);
+    }
+
     public function testSendReply(): void
     {
         $data = [

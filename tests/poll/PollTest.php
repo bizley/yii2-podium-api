@@ -116,6 +116,12 @@ class PollTest extends DbTestCase
         $this->assertEquals(2, $poll->getId());
     }
 
+    public function testGetComponentPollByPostId(): void
+    {
+        $poll = $this->podium()->poll->getPollByPostId(2);
+        $this->assertEquals(2, $poll->getId());
+    }
+
     public function testNonExistingPoll(): void
     {
         $this->assertEmpty(Poll::findById(999));

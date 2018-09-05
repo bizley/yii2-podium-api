@@ -94,6 +94,14 @@ class CategoryArchiverTest extends DbTestCase
         $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(2))->result);
     }
 
+    public function testFailedArchive(): void
+    {
+        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($this->podium()->category->archive($mock)->result);
+    }
+
     public function testRevive(): void
     {
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -128,5 +136,14 @@ class CategoryArchiverTest extends DbTestCase
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->category->revive(CategoryArchiver::findOne(1))->result);
+    }
+
+    public function testFailedRevive(): void
+    {
+        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+        $mock->archived = true;
+
+        $this->assertFalse($this->podium()->category->revive($mock)->result);
     }
 }

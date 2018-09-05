@@ -136,6 +136,11 @@ class ForumSorterTest extends DbTestCase
         Event::off(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, $handler);
     }
 
+    public function testSortLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [])->result);
+    }
+
     public function testSortWrongDataType(): void
     {
         $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), ['aaa'])->result);

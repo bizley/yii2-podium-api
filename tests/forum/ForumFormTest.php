@@ -118,6 +118,11 @@ class ForumFormTest extends DbTestCase
         Event::off(ForumForm::class, ForumForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->forum->create([], Member::findOne(1), Category::findOne(1))->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, function () {
@@ -132,7 +137,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->forum->edit(ForumForm::findOne(1),  $data)->result);
+        $this->assertTrue($this->podium()->forum->edit(ForumForm::findOne(1), $data)->result);
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
         $this->assertEquals(array_merge($data, [
@@ -169,11 +174,16 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1), $data)->result);
 
         $this->assertNotEmpty(ForumRepo::findOne(['name' => 'forum1']));
         $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-updated']));
 
         Event::off(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1), [])->result);
     }
 }

@@ -68,6 +68,11 @@ class GroupFormTest extends DbTestCase
         Event::off(GroupForm::class, GroupForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->group->create([])->result);
+    }
+
     public function testCreateWithSameName(): void
     {
         $this->assertFalse($this->podium()->group->create(['name' => 'group1'])->result);
@@ -83,7 +88,7 @@ class GroupFormTest extends DbTestCase
         });
 
         $data = ['name' => 'group-updated'];
-        $this->assertTrue($this->podium()->group->edit(GroupForm::findOne(1),  $data)->result);
+        $this->assertTrue($this->podium()->group->edit(GroupForm::findOne(1), $data)->result);
 
         $rank = GroupRepo::findOne(['name' => 'group-updated']);
         $this->assertEquals($data, ['name' => $rank->name]);
@@ -101,11 +106,16 @@ class GroupFormTest extends DbTestCase
         Event::on(GroupForm::class, GroupForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = ['name' => 'group-updated'];
-        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1), $data)->result);
 
         $this->assertNotEmpty(GroupRepo::findOne(['name' => 'group1']));
         $this->assertEmpty(GroupRepo::findOne(['name' => 'group-updated']));
 
         Event::off(GroupForm::class, GroupForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1), [])->result);
     }
 }

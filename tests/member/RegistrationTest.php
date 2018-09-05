@@ -75,4 +75,9 @@ class RegistrationTest extends DbTestCase
 
         Event::off(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
     }
+
+    public function testRegisterLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->member->register([])->result);
+    }
 }

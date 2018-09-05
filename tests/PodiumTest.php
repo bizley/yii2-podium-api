@@ -7,8 +7,10 @@ namespace bizley\podium\tests;
 use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
+use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Message;
+use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
 use bizley\podium\api\base\Thread;
@@ -172,5 +174,23 @@ class PodiumTest extends DbTestCase
     {
         static::mockApplication();
         $this->assertInstanceOf(Message::class, $this->podium()->getMessage());
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function testGetGroup(): void
+    {
+        static::mockApplication();
+        $this->assertInstanceOf(Group::class, $this->podium()->getGroup());
+    }
+
+    /**
+     * @throws \yii\base\InvalidConfigException
+     */
+    public function testGetPoll(): void
+    {
+        static::mockApplication();
+        $this->assertInstanceOf(Poll::class, $this->podium()->getPoll());
     }
 }

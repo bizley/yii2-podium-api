@@ -58,7 +58,7 @@ class Poll extends PodiumComponent implements PollInterface
     public function getPollByPostId(int $id): ?PollModelInterface
     {
         $pollClass = $this->pollHandler;
-        return $pollClass::findById($id);
+        return $pollClass::findByPostId($id);
     }
 
     /**

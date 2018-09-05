@@ -14,4 +14,10 @@ interface PollModelInterface extends ModelInterface
      * @return string
      */
     public function getChoiceId(): string;
+
+    /**
+     * @param int $modelId
+     * @return ModelInterface|null
+     */
+    public static function findByPostId(int $modelId): ?ModelInterface;
 }

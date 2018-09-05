@@ -246,6 +246,11 @@ class PostPollFormTest extends DbTestCase
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, function () {
@@ -326,12 +331,17 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1), $data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
 
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1), [])->result);
     }
 
     public function testUpdateAlreadyVoted(): void
@@ -344,6 +354,6 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2),  $data)->result);
+        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2), $data)->result);
     }
 }

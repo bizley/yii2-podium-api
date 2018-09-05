@@ -151,6 +151,11 @@ class PostFormTest extends DbTestCase
         Event::off(PostForm::class, PostForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->post->create([], Member::findOne(1), Thread::findOne(1))->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, function () {
@@ -203,11 +208,16 @@ class PostFormTest extends DbTestCase
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = ['content' => 'post-updated'];
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), $data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
 
         Event::off(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), [])->result);
     }
 }

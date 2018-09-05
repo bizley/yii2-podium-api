@@ -40,9 +40,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
      */
     public function attributeLabels(): array
     {
-        return [
-            'sortOrder' => Yii::t('podium.label', 'category.sort.order'),
-        ];
+        return ['sortOrder' => Yii::t('podium.label', 'category.sort.order')];
     }
 
     /**
@@ -51,7 +49,10 @@ class CategorySorter extends CategoryRepo implements SortableInterface
      */
     public function loadData(array $data = []): bool
     {
-        return $this->load(['sortOrder' => $data], '');
+        if (!empty($data)) {
+            $data = ['sortOrder' => $data];
+        }
+        return $this->load($data, '');
     }
 
     /**

@@ -102,6 +102,11 @@ class CategorySorterTest extends DbTestCase
         Event::off(CategorySorter::class, CategorySorter::EVENT_BEFORE_SORTING, $handler);
     }
 
+    public function testSortLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->category->sort([])->result);
+    }
+
     public function testSortWrongDataType(): void
     {
         $this->assertFalse($this->podium()->category->sort(['aaa'])->result);

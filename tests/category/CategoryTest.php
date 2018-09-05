@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\tests\category;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\category\Category;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -37,6 +39,7 @@ class CategoryTest extends DbTestCase
                 'slug' => 'category1',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
             ],
             [
                 'id' => 2,
@@ -45,6 +48,7 @@ class CategoryTest extends DbTestCase
                 'slug' => 'category2',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => false,
             ],
         ],
     ];
@@ -78,5 +82,23 @@ class CategoryTest extends DbTestCase
         $categories = $this->podium()->category->getCategories($filter);
         $this->assertEquals(1, $categories->getTotalCount());
         $this->assertEquals([2], $categories->getKeys());
+    }
+
+    public function testGetParent(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Category())->getParent();
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Category())->getPostsCount();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->assertTrue($this->podium()->category->getCategoryById(1)->isArchived());
+        $this->assertFalse($this->podium()->category->getCategoryById(2)->isArchived());
     }
 }

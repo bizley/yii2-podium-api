@@ -57,7 +57,10 @@ class ForumSorter extends ForumRepo implements SortableInterface
      */
     public function loadData(array $data = []): bool
     {
-        return $this->load(['sortOrder' => $data], '');
+        if (!empty($data)) {
+            $data = ['sortOrder' => $data];
+        }
+        return $this->load($data, '');
     }
 
     /**

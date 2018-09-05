@@ -100,6 +100,16 @@ class CategoryFormTest extends DbTestCase
         Event::off(CategoryForm::class, CategoryForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->category->create([], Member::findOne(1))->result);
+    }
+
+    public function testFailedCreate(): void
+    {
+        $this->assertFalse((new CategoryForm())->create()->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, function () {
@@ -114,7 +124,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->category->edit(CategoryForm::findOne(1),  $data)->result);
+        $this->assertTrue($this->podium()->category->edit(CategoryForm::findOne(1), $data)->result);
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
         $this->assertEquals(array_merge($data, [
@@ -145,11 +155,30 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1), $data)->result);
 
         $this->assertNotEmpty(CategoryRepo::findOne(['name' => 'category1']));
         $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-updated']));
 
         Event::off(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1), [])->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $this->assertFalse((new CategoryForm())->edit()->result);
+    }
+
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals([
+            'name' => 'Category Name',
+            'visible' => 'Category Visible For Guests',
+            'sort' => 'Category Sort Order',
+        ], (new CategoryForm())->attributeLabels());
     }
 }

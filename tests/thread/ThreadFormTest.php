@@ -128,6 +128,11 @@ class ThreadFormTest extends DbTestCase
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    public function testCreateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->thread->create([], Member::findOne(1), Forum::findOne(1))->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, function () {
@@ -179,5 +184,10 @@ class ThreadFormTest extends DbTestCase
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-updated']));
 
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
+    }
+
+    public function testUpdateLoadFalse(): void
+    {
+        $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1), [])->result);
     }
 }

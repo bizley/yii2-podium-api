@@ -93,7 +93,3 @@
 ## NOTES:
 
 - When method operates on model not fetched from DB use handler.
-
-## TODO:
-
-- test errors on PodiumResponse
