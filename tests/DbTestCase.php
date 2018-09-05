@@ -32,9 +32,9 @@ abstract class DbTestCase extends TestCase
      * @var array
      */
     protected static $database = [
-        'dsn' => 'mysql:host=127.0.0.1;dbname=podium_test',
-        'username' => 'root',
-        'password' => '',
+        'dsn' => 'mysql:host=localhost;dbname=podiumtest',
+        'username' => 'podium',
+        'password' => 'podium',
         'charset' => 'utf8',
     ];
 
