@@ -1,3 +1,5 @@
+[![Build Status](https://img.shields.io/travis/bizley/yii2-podium-api.svg)](https://travis-ci.org/bizley/yii2-podium-api)
+
 # Yii 2 Podium API
 
 ## COMPONENTS:
