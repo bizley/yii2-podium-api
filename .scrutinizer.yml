@@ -3,4 +3,4 @@ imports:
 
 tools:
     external_code_coverage:
-        timeout: 600
+        timeout: 1000
