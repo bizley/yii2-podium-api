@@ -25,9 +25,9 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getForumModel(): ModelInterface
+    public function getForumModel(): ?ModelInterface
     {
         return Forum::findById($this->forum_id);
     }
@@ -65,7 +65,11 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->getForumModel()->updateCounters([
+            $forum = $this->getForumModel();
+            if ($forum === null) {
+                throw new Exception('Can not find parent forum!');
+            }
+            if (!$forum->updateCounters([
                 'threads_count' => -1,
                 'posts_count' => -$this->posts_count,
             ])) {

@@ -12,6 +12,7 @@ use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
+use yii\db\Exception;
 
 /**
  * Class PostRemover
@@ -23,9 +24,9 @@ class PostRemover extends PostRepo implements RemovableInterface
     public const EVENT_AFTER_REMOVING = 'podium.post.removing.after';
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getThreadModel(): ModelInterface
+    public function getThreadModel(): ?ModelInterface
     {
         return Thread::findById($this->thread_id);
     }
@@ -57,6 +58,9 @@ class PostRemover extends PostRepo implements RemovableInterface
 
         try {
             $thread = $this->getThreadModel();
+            if ($thread === null) {
+                throw new Exception('Can not find parent thread!');
+            }
             if ($thread->getPostsCount() === 0 && $thread->isArchived()) {
                 if (!$thread->convert(ThreadRemover::class)->remove()->result) {
                     Yii::error('Error while deleting empty archived thread', 'podium');
