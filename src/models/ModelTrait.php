@@ -94,4 +94,10 @@ trait ModelTrait
 
         return $targetModel;
     }
+
+    /**
+     * Returns the old attribute values.
+     * @return array the old attribute values (name-value pairs)
+     */
+    abstract public function getOldAttributes(); // BC declaration
 }

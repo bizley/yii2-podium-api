@@ -26,9 +26,9 @@ class PostArchiver extends PostRepo implements ArchivableInterface
     public const EVENT_AFTER_REVIVING = 'podium.post.reviving.after';
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getThreadModel(): ModelInterface
+    public function getThreadModel(): ?ModelInterface
     {
         return Thread::findById($this->thread_id);
     }
@@ -71,10 +71,17 @@ class PostArchiver extends PostRepo implements ArchivableInterface
             }
 
             $thread = $this->getThreadModel();
+            if ($thread === null) {
+                throw new Exception('Can not find parent thread!');
+            }
             if (!$thread->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if (!$thread->getParent()->updateCounters(['posts_count' => -1])) {
+            $forum = $thread->getParent();
+            if ($forum === null) {
+                throw new Exception('Can not find parent forum!');
+            }
+            if (!$forum->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating forum counters!');
             }
             if ($thread->getPostsCount() === 0 && !$thread->isArchived() && !$thread->convert(ThreadArchiver::class)->archive()) {

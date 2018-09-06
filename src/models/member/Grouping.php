@@ -126,7 +126,7 @@ class Grouping extends GroupMemberRepo implements GroupingInterface
         }
 
         try {
-            if (!$groupMember->delete()) {
+            if ($groupMember->delete() === false) {
                 Yii::error('Error while leaving group', 'podium');
                 return PodiumResponse::error();
             }

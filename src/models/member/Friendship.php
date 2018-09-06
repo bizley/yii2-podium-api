@@ -132,7 +132,7 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
         }
 
         try {
-            if (!$friendship->delete()) {
+            if ($friendship->delete() === false) {
                 Yii::error('Error while unfriending member', 'podium');
                 return PodiumResponse::error();
             }

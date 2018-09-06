@@ -31,17 +31,25 @@ abstract class DbTestCase extends TestCase
     /**
      * @var array
      */
-    protected static $database = [
-        'dsn' => 'mysql:host=localhost;dbname=podiumtest',
-        'username' => 'podium',
-        'password' => 'podium',
-        'charset' => 'utf8',
-    ];
+    protected static $database = [];
 
     /**
      * @var Connection
      */
     protected static $db;
+
+    /**
+     * @var array
+     */
+    public static $params;
+
+    public static function getParam($name, $default = null)
+    {
+        if (static::$params === null) {
+            static::$params = require __DIR__ . '/config.php';
+        }
+        return static::$params[$name] ?? $default;
+    }
 
     /**
      * @throws \yii\base\InvalidRouteException
@@ -127,6 +135,7 @@ abstract class DbTestCase extends TestCase
      */
     public static function getConnection(): Connection
     {
+        static::$database = static::getParam(static::$driverName);
         if (static::$db === null) {
             $db = new Connection();
             $db->dsn = static::$database['dsn'];

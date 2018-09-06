@@ -18,10 +18,10 @@ class Group extends GroupRepo implements ModelInterface
     use ModelTrait;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      * @throws NotSupportedException
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         throw new NotSupportedException('Group has got no parent.');
     }

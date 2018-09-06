@@ -158,7 +158,7 @@ class Sending extends MessageRepo implements SendingInterface
                 throw new Exception('Error while creating message!');
             }
 
-            if ($this->reply_to_id) {
+            if ($this->reply_to_id !== null) {
                 $repliedMessage = MessageParticipantForm::findOne([
                     'member_id' => $this->getSender(),
                     'message_id' => $this->reply_to_id,

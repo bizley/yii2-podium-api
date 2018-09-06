@@ -23,9 +23,9 @@ class Forum extends ForumRepo implements ModelInterface
     use ModelTrait;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         return $this->category;
     }

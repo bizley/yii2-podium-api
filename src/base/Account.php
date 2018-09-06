@@ -73,123 +73,148 @@ class Account extends PodiumComponent implements AccountInterface
     }
 
     /**
+     * @return MembershipInterface
+     * @throws NoMembershipException
+     */
+    public function ensureMembership(): MembershipInterface
+    {
+        $member = $this->getMembership();
+        if ($member === null) {
+            throw new NoMembershipException('Membership data missing.');
+        }
+        return $member;
+    }
+
+    /**
      * Befriends target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function befriend(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->befriend($this->membership, $target);
+        return $this->podium->member->befriend($this->ensureMembership(), $target);
     }
 
     /**
      * Unfriends target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function unfriend(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->unfriend($this->membership, $target);
+        return $this->podium->member->unfriend($this->ensureMembership(), $target);
     }
 
     /**
      * Ignores target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function ignore(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->ignore($this->membership, $target);
+        return $this->podium->member->ignore($this->ensureMembership(), $target);
     }
 
     /**
      * Unignores target member.
      * @param MembershipInterface $target
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function unignore(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->unignore($this->membership, $target);
+        return $this->podium->member->unignore($this->ensureMembership(), $target);
     }
 
     /**
      * Gives post a thumb up.
      * @param ModelInterface $post
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function thumbUp(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbUp($this->membership, $post);
+        return $this->podium->post->thumbUp($this->ensureMembership(), $post);
     }
 
     /**
      * Gives post a thumb down.
      * @param ModelInterface $post
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function thumbDown(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbDown($this->membership, $post);
+        return $this->podium->post->thumbDown($this->ensureMembership(), $post);
     }
 
     /**
      * Resets post given thumb.
      * @param ModelInterface $post
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function thumbReset(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbReset($this->membership, $post);
+        return $this->podium->post->thumbReset($this->ensureMembership(), $post);
     }
 
     /**
      * Subscribes to a thread.
      * @param ModelInterface $thread
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function subscribe(ModelInterface $thread): PodiumResponse
     {
-        return $this->podium->thread->subscribe($this->membership, $thread);
+        return $this->podium->thread->subscribe($this->ensureMembership(), $thread);
     }
 
     /**
      * Unsubscribes from a thread.
      * @param ModelInterface $thread
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function unsubscribe(ModelInterface $thread): PodiumResponse
     {
-        return $this->podium->thread->unsubscribe($this->membership, $thread);
+        return $this->podium->thread->unsubscribe($this->ensureMembership(), $thread);
     }
 
     /**
      * Marks last seen post in a thread.
      * @param ModelInterface $post
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function mark(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->thread->mark($this->membership, $post);
+        return $this->podium->thread->mark($this->ensureMembership(), $post);
     }
 
     /**
      * Adds member to a group.
      * @param ModelInterface $group
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function join(ModelInterface $group): PodiumResponse
     {
-        return $this->podium->member->join($this->membership, $group);
+        return $this->podium->member->join($this->ensureMembership(), $group);
     }
 
     /**
      * Removes member from a group.
      * @param ModelInterface $group
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function leave(ModelInterface $group): PodiumResponse
     {
-        return $this->podium->member->leave($this->membership, $group);
+        return $this->podium->member->leave($this->ensureMembership(), $group);
     }
 
     /**
@@ -197,10 +222,11 @@ class Account extends PodiumComponent implements AccountInterface
      * @param PollModelInterface $poll
      * @param PollAnswerModelInterface[] $answers
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function vote(PollModelInterface $poll, array $answers): PodiumResponse
     {
-        return $this->podium->poll->vote($this->membership, $poll, $answers);
+        return $this->podium->poll->vote($this->ensureMembership(), $poll, $answers);
     }
 
     /**
@@ -209,9 +235,10 @@ class Account extends PodiumComponent implements AccountInterface
      * @param MembershipInterface $receiver
      * @param MessageParticipantModelInterface $replyTo
      * @return PodiumResponse
+     * @throws NoMembershipException
      */
     public function send(array $data, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
     {
-        return $this->podium->message->send($data, $this->membership, $receiver, $replyTo);
+        return $this->podium->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
     }
 }

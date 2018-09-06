@@ -182,7 +182,7 @@ class Member extends PodiumComponent implements MemberInterface
 
     /**
      * @param int $id
-     * @return MembershipInterface|ModelInterface|null
+     * @return MembershipInterface|null
      */
     public function getMemberById(int $id): ?MembershipInterface
     {

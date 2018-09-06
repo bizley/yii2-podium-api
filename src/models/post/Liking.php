@@ -269,7 +269,7 @@ class Liking extends ThumbRepo implements LikingInterface
                 throw new Exception('Error while updating post likes!');
             }
 
-            if (!$rate->delete()) {
+            if ($rate->delete() === false) {
                 throw new Exception('Error while resetting thumb');
             }
 

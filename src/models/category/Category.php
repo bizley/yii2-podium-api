@@ -18,10 +18,10 @@ class Category extends CategoryRepo implements ModelInterface
     use ModelTrait;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      * @throws NotSupportedException
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         throw new NotSupportedException('Category has got no parent.');
     }

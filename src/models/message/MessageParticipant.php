@@ -25,9 +25,9 @@ class MessageParticipant extends MessageParticipantRepo implements MessagePartic
     use ModelTrait;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         return $this->message;
     }

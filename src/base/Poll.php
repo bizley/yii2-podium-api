@@ -53,7 +53,7 @@ class Poll extends PodiumComponent implements PollInterface
 
     /**
      * @param int $id
-     * @return ModelInterface|null
+     * @return PollModelInterface|null
      */
     public function getPollByPostId(int $id): ?PollModelInterface
     {

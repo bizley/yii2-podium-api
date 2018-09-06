@@ -41,9 +41,9 @@ interface ModelInterface
     public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getParent(): ModelInterface;
+    public function getParent(): ?ModelInterface;
 
     /**
      * @param array $counters the counters to be updated (attribute name => increment value)

@@ -18,10 +18,10 @@ class Rank extends RankRepo implements ModelInterface
     use ModelTrait;
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      * @throws NotSupportedException
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         throw new NotSupportedException('Rank has got no parent.');
     }

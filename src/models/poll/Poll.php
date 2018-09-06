@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\models\ModelTrait;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\api\repos\PollRepo;
+use yii\base\InvalidValueException;
 use yii\base\NotSupportedException;
 use yii\db\ActiveQuery;
 
@@ -34,9 +35,9 @@ class Poll extends PollRepo implements PollModelInterface
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getParent(): ModelInterface
+    public function getParent(): ?ModelInterface
     {
         return $this->post;
     }
@@ -60,10 +61,16 @@ class Poll extends PollRepo implements PollModelInterface
 
     /**
      * @return bool
+     * @throws InvalidValueException
      */
     public function isArchived(): bool
     {
-        return $this->getParent()->isArchived();
+        $post = $this->getParent();
+        if ($post === null) {
+            throw new InvalidValueException('Floating poll detected!');
+        }
+
+        return $post->isArchived();
     }
 
     /**
