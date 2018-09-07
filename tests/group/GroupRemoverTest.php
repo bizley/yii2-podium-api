@@ -64,4 +64,20 @@ class GroupRemoverTest extends DbTestCase
 
         Event::off(GroupRemover::class, GroupRemover::EVENT_BEFORE_REMOVING, $handler);
     }
+
+    public function testFailedDelete(): void
+    {
+        $mock = $this->getMockBuilder(GroupRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testExceptionDelete(): void
+    {
+        $mock = $this->getMockBuilder(GroupRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

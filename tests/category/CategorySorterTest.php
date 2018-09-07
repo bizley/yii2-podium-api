@@ -5,10 +5,14 @@ declare(strict_types=1);
 namespace bizley\podium\tests\category;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\category\CategorySorter;
+use bizley\podium\api\models\forum\Forum;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\CategoryRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class CategorySorterTest
@@ -115,5 +119,32 @@ class CategorySorterTest extends DbTestCase
     public function testSortWrongDataId(): void
     {
         $this->assertFalse($this->podium()->category->sort([99])->result);
+    }
+
+    public function testExceptionSort(): void
+    {
+        $mock = $this->getMockBuilder(CategorySorter::class)->setMethods(['afterSort'])->getMock();
+        $mock->method('afterSort')->will($this->throwException(new \Exception()));
+        $mock->sortOrder = [1];
+
+        $this->assertFalse($mock->sort()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new CategorySorter())->setCategory(new Category());
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new CategorySorter())->setForum(new Forum());
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new CategorySorter())->setThread(new Thread());
     }
 }

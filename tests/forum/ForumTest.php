@@ -47,6 +47,8 @@ class ForumTest extends DbTestCase
                 'name' => 'forum1',
                 'slug' => 'forum1',
                 'sort' => 8,
+                'archived' => false,
+                'posts_count' => 5,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -57,6 +59,7 @@ class ForumTest extends DbTestCase
                 'name' => 'forum2',
                 'slug' => 'forum2',
                 'sort' => 4,
+                'archived' => true,
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
@@ -92,5 +95,16 @@ class ForumTest extends DbTestCase
         $forums = $this->podium()->forum->getForums($filter);
         $this->assertEquals(1, $forums->getTotalCount());
         $this->assertEquals([2], $forums->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->assertEquals(5, $this->podium()->forum->getForumById(1)->getPostsCount());
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->assertFalse($this->podium()->forum->getForumById(1)->isArchived());
+        $this->assertTrue($this->podium()->forum->getForumById(2)->isArchived());
     }
 }

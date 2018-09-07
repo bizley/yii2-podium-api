@@ -10,6 +10,7 @@ use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Group;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Message;
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
@@ -192,5 +193,10 @@ class PodiumTest extends DbTestCase
     {
         static::mockApplication();
         $this->assertInstanceOf(Poll::class, $this->podium()->getPoll());
+    }
+
+    public function testNoMembershipExcName(): void
+    {
+        $this->assertEquals('No Membership Exception', (new NoMembershipException())->getName());
     }
 }

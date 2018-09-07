@@ -6,11 +6,14 @@ namespace bizley\podium\tests\forum;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\forum\ForumForm;
 use bizley\podium\api\models\member\Member;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class ForumFormTest
@@ -123,6 +126,11 @@ class ForumFormTest extends DbTestCase
         $this->assertFalse($this->podium()->forum->create([], Member::findOne(1), Category::findOne(1))->result);
     }
 
+    public function testFailedCreate(): void
+    {
+        $this->assertFalse((new ForumForm())->create()->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, function () {
@@ -185,5 +193,35 @@ class ForumFormTest extends DbTestCase
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1), [])->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $this->assertFalse((new ForumForm())->edit()->result);
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumForm())->setForum(new Forum());
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumForm())->setThread(new Thread());
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals([
+            'name' => 'forum.name',
+            'visible' => 'forum.visible',
+            'sort' => 'forum.sort',
+        ], (new ForumForm())->attributeLabels());
     }
 }

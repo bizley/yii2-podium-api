@@ -138,4 +138,22 @@ class CategoryRemoverTest extends DbTestCase
         $this->assertFalse($this->podium()->category->remove(CategoryRemover::findOne(2))->result);
         $this->assertNotEmpty(CategoryRepo::findOne(2));
     }
+
+    public function testFailedDelete(): void
+    {
+        $mock = $this->getMockBuilder(CategoryRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testExceptionDelete(): void
+    {
+        $mock = $this->getMockBuilder(CategoryRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

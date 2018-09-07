@@ -173,12 +173,16 @@ class CategoryFormTest extends DbTestCase
         $this->assertFalse((new CategoryForm())->edit()->result);
     }
 
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
     public function testAttributeLabels(): void
     {
         $this->assertEquals([
-            'name' => 'Category Name',
-            'visible' => 'Category Visible For Guests',
-            'sort' => 'Category Sort Order',
+            'name' => 'category.name',
+            'visible' => 'category.visible',
+            'sort' => 'category.sort',
         ], (new CategoryForm())->attributeLabels());
     }
 }

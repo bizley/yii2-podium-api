@@ -106,6 +106,14 @@ class ForumArchiverTest extends DbTestCase
         $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(2))->result);
     }
 
+    public function testFailedArchive(): void
+    {
+        $mock = $this->getMockBuilder(ForumArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($this->podium()->forum->archive($mock)->result);
+    }
+
     public function testRevive(): void
     {
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -140,5 +148,14 @@ class ForumArchiverTest extends DbTestCase
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(1))->result);
+    }
+
+    public function testFailedRevive(): void
+    {
+        $mock = $this->getMockBuilder(ForumArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+        $mock->archived = true;
+
+        $this->assertFalse($this->podium()->forum->revive($mock)->result);
     }
 }

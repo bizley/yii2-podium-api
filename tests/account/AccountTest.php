@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\Account;
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
@@ -64,5 +66,11 @@ class AccountTest extends AccountTestCase
         $membership = $this->podium()->account->getMembership();
         $this->assertNotEmpty($membership);
         $this->assertEquals(10, $this->podium()->account->getId());
+    }
+
+    public function testFailedMembershipEnsure(): void
+    {
+        $this->expectException(NoMembershipException::class);
+        (new Account())->ensureMembership();
     }
 }

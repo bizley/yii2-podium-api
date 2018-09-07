@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\group;
 
+use bizley\podium\api\models\group\Group;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -62,5 +64,23 @@ class GroupTest extends DbTestCase
         $groups = $this->podium()->group->getGroups($filter);
         $this->assertEquals(1, $groups->getTotalCount());
         $this->assertEquals([2], $groups->getKeys());
+    }
+
+    public function testGetParent(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Group())->getParent();
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Group())->getPostsCount();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Group())->isArchived();
     }
 }

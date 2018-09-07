@@ -6,10 +6,13 @@ namespace bizley\podium\tests\forum;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\forum\ForumSorter;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class ForumSorterTest
@@ -167,5 +170,26 @@ class ForumSorterTest extends DbTestCase
         $this->assertEquals(0, ForumRepo::findOne(3)->sort);
         $this->assertEquals(1, ForumRepo::findOne(1)->sort);
         $this->assertEquals(100, ForumRepo::findOne(4)->sort);
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumSorter())->setForum(new Forum());
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumSorter())->setThread(new Thread());
+    }
+
+    public function testExceptionSort(): void
+    {
+        $mock = $this->getMockBuilder(ForumSorter::class)->setMethods(['afterSort'])->getMock();
+        $mock->method('afterSort')->will($this->throwException(new \Exception()));
+        $mock->sortOrder = [1];
+
+        $this->assertFalse($mock->sort()->result);
     }
 }

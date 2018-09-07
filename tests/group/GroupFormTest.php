@@ -118,4 +118,9 @@ class GroupFormTest extends DbTestCase
     {
         $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1), [])->result);
     }
+
+    public function testFailedEdit(): void
+    {
+        $this->assertFalse((new GroupForm())->edit()->result);
+    }
 }

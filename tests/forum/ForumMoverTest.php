@@ -6,10 +6,13 @@ namespace bizley\podium\tests\forum;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\forum\ForumMover;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class ForumMoverTest
@@ -95,5 +98,25 @@ class ForumMoverTest extends DbTestCase
         $this->assertEquals(1, ForumRepo::findOne(1)->category_id);
 
         Event::off(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumMover())->setForum(new Forum());
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ForumMover())->setThread(new Thread());
+    }
+
+    public function testFailedMove(): void
+    {
+        $mock = $this->getMockBuilder(ForumMover::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($this->podium()->forum->move($mock, Category::findById(1))->result);
     }
 }
