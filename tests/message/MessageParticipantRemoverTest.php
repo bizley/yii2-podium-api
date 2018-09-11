@@ -184,7 +184,7 @@ class MessageParticipantRemoverTest extends DbTestCase
         $mock->method('delete')->willReturn(false);
 
         $mock->archived = true;
-        
+
         $this->assertFalse($mock->remove()->result);
     }
 }

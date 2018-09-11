@@ -150,4 +150,20 @@ class PollRemoverTest extends DbTestCase
 
         Event::off(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, $handler);
     }
+
+    public function testExceptionRemove(): void
+    {
+        $mock = $this->getMockBuilder(PollRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testFailedRemove(): void
+    {
+        $mock = $this->getMockBuilder(PollRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

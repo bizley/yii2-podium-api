@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -132,5 +134,21 @@ class PollAnswerTest extends DbTestCase
         $pollAnswers = PollAnswer::findByFilter($filter);
         $this->assertEquals(1, $pollAnswers->getTotalCount());
         $this->assertEquals([2], $pollAnswers->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PollAnswer())->getPostsCount();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->assertFalse(PollAnswer::findById(1)->isArchived());
+    }
+
+    public function testGetParent(): void
+    {
+        $this->assertEquals(Poll::findOne(1), PollAnswer::findById(1)->getParent());
     }
 }

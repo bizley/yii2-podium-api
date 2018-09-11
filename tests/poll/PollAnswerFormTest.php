@@ -116,4 +116,18 @@ class PollAnswerFormTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         PollAnswerForm::findOne(1)->edit();
     }
+
+    public function testLoadData(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PollAnswerForm())->loadData();
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(PollAnswerForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
 }

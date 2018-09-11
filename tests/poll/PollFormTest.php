@@ -10,6 +10,7 @@ use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\PollForm;
 use bizley\podium\api\repos\PollRepo;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 
 /**
  * Class PollFormTest
@@ -158,5 +159,27 @@ class PollFormTest extends DbTestCase
         $poll->question = 'question-updated';
 
         $this->assertFalse($poll->edit()->result);
+    }
+
+    public function testLoadData(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PollForm())->loadData();
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(PollForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $mock = $this->getMockBuilder(PollForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->edit()->result);
     }
 }

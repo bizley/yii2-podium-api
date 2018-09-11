@@ -356,4 +356,39 @@ class PostPollFormTest extends DbTestCase
         ];
         $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2), $data)->result);
     }
+
+    public function testValidate(): void
+    {
+        $this->assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(PostPollForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->content = 'post-updated';
+        $mock->question = 'question-updated';
+        $mock->expires_at = 2;
+        $mock->answers = ['answer3'];
+        $mock->setThread(Thread::findOne(1));
+
+        $this->assertFalse($mock->create()->result);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals([
+            'content' => 'post.content',
+            'revealed' => 'poll.revealed',
+            'choice_id' => 'poll.choice.type',
+            'question' => 'poll.question',
+            'expires_at' => 'poll.expires',
+            'answers' => 'poll.answers',
+        ], (new PostPollForm())->attributeLabels());
+    }
 }

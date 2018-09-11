@@ -6,8 +6,11 @@ namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\Poll;
+use bizley\podium\api\models\post\Post;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
+use yii\db\ActiveQuery;
 
 /**
  * Class PollTest
@@ -84,6 +87,7 @@ class PollTest extends DbTestCase
                 'content' => 'post2',
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
             ],
         ],
         'podium_poll' => [
@@ -145,5 +149,27 @@ class PollTest extends DbTestCase
         $polls = Poll::findByFilter($filter);
         $this->assertEquals(1, $polls->getTotalCount());
         $this->assertEquals([2], $polls->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Poll())->getPostsCount();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->assertTrue($this->podium()->poll->getPollByPostId(2)->isArchived());
+        $this->assertFalse($this->podium()->poll->getPollByPostId(1)->isArchived());
+    }
+
+    public function testGetParent(): void
+    {
+        $this->assertEquals(Post::findOne(2), $this->podium()->poll->getPollByPostId(2)->getParent());
+    }
+
+    public function testGetPost(): void
+    {
+        $this->assertInstanceOf(ActiveQuery::class, $this->podium()->poll->getPollByPostId(1)->getPost());
     }
 }

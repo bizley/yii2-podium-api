@@ -132,4 +132,18 @@ class PollVoteFormTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         PollVoteForm::findOne(1)->edit();
     }
+
+    public function testLoadData(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PollVoteForm())->loadData();
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(PollVoteForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
 }
