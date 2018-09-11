@@ -68,4 +68,20 @@ class MemberRemoverTest extends DbTestCase
 
         Event::off(MemberRemover::class, MemberRemover::EVENT_BEFORE_REMOVING, $handler);
     }
+
+    public function testFailedRemove(): void
+    {
+        $mock = $this->getMockBuilder(MemberRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testExceptionRemove(): void
+    {
+        $mock = $this->getMockBuilder(MemberRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

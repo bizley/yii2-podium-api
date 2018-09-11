@@ -90,4 +90,45 @@ class MessageParticipantFormTest extends DbTestCase
             'message_id' => 1,
         ])->edit();
     }
+
+    public function testLoadData(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new MessageParticipantForm())->loadData();
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
+    public function testMarkRead(): void
+    {
+        $messageParticipant = MessageParticipantForm::findOne([
+            'message_id' => 1,
+            'member_id' => 1,
+        ]);
+
+        $this->assertTrue($messageParticipant->markRead()->result);
+        $this->assertEquals(MessageStatus::READ, $messageParticipant->status_id);
+    }
+
+    public function testFailedMarkRead(): void
+    {
+        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->markRead()->result);
+    }
+
+    public function testFailedMarkReplied(): void
+    {
+        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->markReplied()->result);
+    }
 }

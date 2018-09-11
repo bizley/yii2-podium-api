@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\tests\message;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\message\Message;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -39,6 +41,7 @@ class MessageTest extends DbTestCase
             ],
             [
                 'id' => 2,
+                'reply_to_id' => 1,
                 'subject' => 'subject2',
                 'content' => 'content2',
                 'created_at' => 1,
@@ -76,5 +79,31 @@ class MessageTest extends DbTestCase
         $messages = $this->podium()->message->getMessages($filter);
         $this->assertEquals(1, $messages->getTotalCount());
         $this->assertEquals([2], $messages->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Message())->getPostsCount();
+    }
+
+    public function testGetNoParent(): void
+    {
+        $message = $this->podium()->message->getMessageById(1);
+        $this->assertEmpty($message->getParent());
+    }
+
+    public function testGetParent(): void
+    {
+        $message = $this->podium()->message->getMessageById(2);
+        $reply = Message::findOne(1);
+
+        $this->assertEquals($reply, $message->getParent());
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Message())->isArchived();
     }
 }

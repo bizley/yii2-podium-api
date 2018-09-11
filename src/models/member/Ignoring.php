@@ -148,16 +148,4 @@ class Ignoring extends AcquaintanceRepo implements IgnoringInterface
     {
         $this->trigger(self::EVENT_AFTER_UNIGNORING);
     }
-
-    /**
-     * @return bool
-     */
-    public function isIgnoring(): bool
-    {
-        return static::find()->where([
-            'member_id' => $this->member_id,
-            'target_id' => $this->target_id,
-            'type_id' => $this->type_id,
-        ])->exists();
-    }
 }

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\member\Member;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -149,5 +151,17 @@ class MemberTest extends DbTestCase
     {
         $member = $this->podium()->member->getMemberById(2);
         $this->assertEquals(3, $member->getPostsCount());
+    }
+
+    public function testGetParent(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Member())->getParent();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Member())->isArchived();
     }
 }

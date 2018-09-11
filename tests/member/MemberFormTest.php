@@ -9,6 +9,7 @@ use bizley\podium\api\models\member\MemberForm;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class MemberFormTest
@@ -76,5 +77,28 @@ class MemberFormTest extends DbTestCase
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->member->edit(MemberForm::findOne(1), [])->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $mock = $this->getMockBuilder(MemberForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testCreate(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new MemberForm())->create();
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals(['username' => 'member.username'], (new MemberForm())->attributeLabels());
     }
 }

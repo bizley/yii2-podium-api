@@ -151,16 +151,4 @@ class Friendship extends AcquaintanceRepo implements FriendshipInterface
     {
         $this->trigger(self::EVENT_AFTER_UNFRIENDING);
     }
-
-    /**
-     * @return bool
-     */
-    public function isFriend(): bool
-    {
-        return static::find()->where([
-                'member_id' => $this->member_id,
-                'target_id' => $this->target_id,
-                'type_id' => $this->type_id,
-            ])->exists();
-    }
 }

@@ -106,6 +106,14 @@ class MemberGroupingTest extends DbTestCase
         $this->assertFalse($this->podium()->member->join(Member::findOne(2), Group::findOne(1))->result);
     }
 
+    public function testFailedJoin(): void
+    {
+        $mock = $this->getMockBuilder(Grouping::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->join()->result);
+    }
+
     public function testLeave(): void
     {
         Event::on(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, function () {
@@ -146,5 +154,16 @@ class MemberGroupingTest extends DbTestCase
     public function testLeaveAgain(): void
     {
         $this->assertFalse($this->podium()->member->leave(Member::findOne(1), Group::findOne(1))->result);
+    }
+
+    public function testExceptionLeave(): void
+    {
+        $mock = $this->getMockBuilder(Grouping::class)->setMethods(['afterLeave'])->getMock();
+        $mock->method('afterLeave')->will($this->throwException(new \Exception()));
+
+        $mock->setMember(Member::findOne(2));
+        $mock->setGroup(Group::findOne(1));
+
+        $this->assertFalse($mock->leave()->result);
     }
 }

@@ -80,4 +80,21 @@ class RegistrationTest extends DbTestCase
     {
         $this->assertFalse($this->podium()->member->register([])->result);
     }
+
+    public function testFailedRegister(): void
+    {
+        $this->assertFalse((new Registration())->register()->result);
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals([
+            'user_id' => 'registration.user.id',
+            'username' => 'registration.username',
+        ], (new Registration())->attributeLabels());
+    }
 }

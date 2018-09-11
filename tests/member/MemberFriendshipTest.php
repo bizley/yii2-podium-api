@@ -110,6 +110,14 @@ class MemberFriendshipTest extends DbTestCase
         $this->assertFalse($this->podium()->member->befriend(Member::findOne(101), Member::findOne(102))->result);
     }
 
+    public function testFailedBefriend(): void
+    {
+        $mock = $this->getMockBuilder(Friendship::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->befriend()->result);
+    }
+
     public function testUnfriend(): void
     {
         Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, function () {
@@ -152,5 +160,16 @@ class MemberFriendshipTest extends DbTestCase
     public function testUnfriendAgain(): void
     {
         $this->assertFalse($this->podium()->member->unfriend(Member::findOne(100), Member::findOne(101))->result);
+    }
+
+    public function testExceptionUnfriend(): void
+    {
+        $mock = $this->getMockBuilder(Friendship::class)->setMethods(['afterUnfriend'])->getMock();
+        $mock->method('afterUnfriend')->will($this->throwException(new \Exception()));
+
+        $mock->setMember(Member::findOne(101));
+        $mock->setTarget(Member::findOne(102));
+
+        $this->assertFalse($mock->unfriend()->result);
     }
 }

@@ -35,9 +35,4 @@ interface IgnoringInterface
      * @return PodiumResponse
      */
     public function unignore(): PodiumResponse;
-
-    /**
-     * @return bool whether member is ignoring target
-     */
-    public function isIgnoring(): bool;
 }

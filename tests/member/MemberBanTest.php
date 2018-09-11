@@ -85,6 +85,16 @@ class MemberBanTest extends DbTestCase
         $this->assertFalse($this->podium()->member->ban(MemberBan::findOne(101))->result);
     }
 
+    public function testFailedBan(): void
+    {
+        $mock = $this->getMockBuilder(MemberBan::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->status_id = MemberStatus::ACTIVE;
+
+        $this->assertFalse($mock->ban()->result);
+    }
+
     public function testUnban(): void
     {
         Event::on(MemberBan::class, MemberBan::EVENT_BEFORE_UNBANNING, function () {
@@ -121,5 +131,15 @@ class MemberBanTest extends DbTestCase
     public function testUnbanAgain(): void
     {
         $this->assertFalse($this->podium()->member->unban(MemberBan::findOne(100))->result);
+    }
+
+    public function testFailedUnban(): void
+    {
+        $mock = $this->getMockBuilder(MemberBan::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->status_id = MemberStatus::BANNED;
+
+        $this->assertFalse($mock->unban()->result);
     }
 }

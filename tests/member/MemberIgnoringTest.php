@@ -110,6 +110,14 @@ class MemberIgnoringTest extends DbTestCase
         $this->assertFalse($this->podium()->member->ignore(Member::findOne(101), Member::findOne(102))->result);
     }
 
+    public function testFailedIgnore(): void
+    {
+        $mock = $this->getMockBuilder(Ignoring::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->ignore()->result);
+    }
+
     public function testUnignore(): void
     {
         Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, function () {
@@ -152,5 +160,16 @@ class MemberIgnoringTest extends DbTestCase
     public function testUnignoreAgain(): void
     {
         $this->assertFalse($this->podium()->member->unignore(Member::findOne(100), Member::findOne(101))->result);
+    }
+
+    public function testExceptionUnignore(): void
+    {
+        $mock = $this->getMockBuilder(Ignoring::class)->setMethods(['afterUnignore'])->getMock();
+        $mock->method('afterUnignore')->will($this->throwException(new \Exception()));
+
+        $mock->setMember(Member::findOne(101));
+        $mock->setTarget(Member::findOne(102));
+
+        $this->assertFalse($mock->unignore()->result);
     }
 }

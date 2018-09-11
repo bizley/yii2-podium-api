@@ -35,9 +35,4 @@ interface FriendshipInterface
      * @return PodiumResponse
      */
     public function unfriend(): PodiumResponse;
-
-    /**
-     * @return bool whether target is a friend of member
-     */
-    public function isFriend(): bool;
 }

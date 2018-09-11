@@ -8,6 +8,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -63,6 +64,7 @@ class MessageParticipantTest extends DbTestCase
                 'side_id' => MessageSide::RECEIVER,
                 'created_at' => 1,
                 'updated_at' => 1,
+                'archived' => true,
             ],
         ],
     ];
@@ -96,5 +98,29 @@ class MessageParticipantTest extends DbTestCase
         $messageParticipants = MessageParticipant::findByFilter($filter);
         $this->assertEquals(1, $messageParticipants->getTotalCount());
         $this->assertEquals([['message_id' => 1, 'member_id' => 2]], $messageParticipants->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new MessageParticipant())->getPostsCount();
+    }
+
+    public function testIsArchived(): void
+    {
+        $this->assertTrue(MessageParticipant::findOne([
+            'message_id' => 1,
+            'member_id' => 2,
+        ])->isArchived());
+        $this->assertFalse(MessageParticipant::findOne([
+            'message_id' => 1,
+            'member_id' => 1,
+        ])->isArchived());
+    }
+
+    public function testGetId(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new MessageParticipant())->getId();
     }
 }

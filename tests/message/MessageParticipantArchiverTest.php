@@ -126,6 +126,14 @@ class MessageParticipantArchiverTest extends DbTestCase
         ]))->result);
     }
 
+    public function testFailedArchive(): void
+    {
+        $mock = $this->getMockBuilder(MessageParticipantArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->archive()->result);
+    }
+
     public function testRevive(): void
     {
         Event::on(MessageParticipantArchiver::class, MessageParticipantArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -175,5 +183,15 @@ class MessageParticipantArchiverTest extends DbTestCase
             'message_id' => 1,
             'member_id' => 1,
         ]))->result);
+    }
+
+    public function testFailedRevive(): void
+    {
+        $mock = $this->getMockBuilder(MessageParticipantArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->revive()->result);
     }
 }

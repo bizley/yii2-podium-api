@@ -14,6 +14,7 @@ use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class MessageSendingTest
@@ -210,5 +211,58 @@ class MessageSendingTest extends DbTestCase
             'status_id' => $messageReceiver->status_id,
             'archived' => $messageReceiver->archived,
         ]);
+    }
+
+    public function testSendValidation(): void
+    {
+        $data = ['content' => 'new-content'];
+        $this->assertFalse($this->podium()->message->send($data, Member::findOne(1), Member::findOne(2))->result);
+    }
+
+    public function testSendWrongReply(): void
+    {
+        $data = [
+            'subject' => 'new-subject',
+            'content' => 'new-content',
+        ];
+        $this->assertFalse($this->podium()->message->send($data, Member::findOne(1), Member::findOne(2), MessageParticipant::findOne([
+            'message_id' => 1,
+            'member_id' => 1,
+        ]))->result);
+    }
+
+    public function testFailedSend(): void
+    {
+        $mock = $this->getMockBuilder(Sending::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->subject = 'new-subject';
+        $mock->content = 'new-content';
+
+        $this->assertFalse($mock->send()->result);
+    }
+
+    public function testCreate(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Sending())->create();
+    }
+
+    public function testEdit(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Sending())->edit();
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals([
+            'content' => 'message.content',
+            'subject' => 'message.subject',
+        ], (new Sending())->attributeLabels());
     }
 }
