@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models;
 
 use bizley\podium\api\interfaces\ModelInterface;
-use yii\base\InvalidConfigException;
+use yii\base\InvalidArgumentException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -78,7 +78,7 @@ trait ModelTrait
     /**
      * @param string $targetClass
      * @return mixed
-     * @throws InvalidConfigException
+     * @throws InvalidArgumentException
      */
     public function convert(string $targetClass)
     {
@@ -86,7 +86,7 @@ trait ModelTrait
         $targetModel = new $targetClass;
 
         if (static::tableName() !== $targetModel::tableName()) {
-            throw new InvalidConfigException('You can only convert object extending the same repository.');
+            throw new InvalidArgumentException('You can only convert object extending the same repository.');
         }
 
         static::populateRecord($targetModel, $this->getOldAttributes());

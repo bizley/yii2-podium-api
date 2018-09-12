@@ -6,6 +6,8 @@ namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PostType;
+use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\post\PostForm;
 use bizley\podium\api\models\thread\Thread;
@@ -14,6 +16,7 @@ use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class PostFormTest
@@ -156,6 +159,22 @@ class PostFormTest extends DbTestCase
         $this->assertFalse($this->podium()->post->create([], Member::findOne(1), Thread::findOne(1))->result);
     }
 
+    public function testFailedCreateValidate(): void
+    {
+        $mock = $this->getMockBuilder(PostForm::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(PostForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, function () {
@@ -219,5 +238,34 @@ class PostFormTest extends DbTestCase
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), [])->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $mock = $this->getMockBuilder(PostForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostForm())->setCategory(Category::findOne(1));
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostForm())->setForum(Forum::findOne(1));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals(['content' => 'post.content'], (new PostForm())->attributeLabels());
     }
 }

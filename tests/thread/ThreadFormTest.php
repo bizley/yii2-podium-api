@@ -5,13 +5,16 @@ declare(strict_types=1);
 namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class ThreadFormTest
@@ -133,6 +136,22 @@ class ThreadFormTest extends DbTestCase
         $this->assertFalse($this->podium()->thread->create([], Member::findOne(1), Forum::findOne(1))->result);
     }
 
+    public function testFailedCreateValidate(): void
+    {
+        $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
+    public function testFailedCreate(): void
+    {
+        $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->create()->result);
+    }
+
     public function testUpdate(): void
     {
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, function () {
@@ -189,5 +208,34 @@ class ThreadFormTest extends DbTestCase
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1), [])->result);
+    }
+
+    public function testFailedEdit(): void
+    {
+        $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ThreadForm())->setCategory(Category::findOne(1));
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ThreadForm())->setThread(Thread::findOne(1));
+    }
+
+    /**
+     * @runInSeparateProcess
+     * Keep last in class
+     */
+    public function testAttributeLabels(): void
+    {
+        $this->assertEquals(['name' => 'thread.name'], (new ThreadForm())->attributeLabels());
     }
 }

@@ -112,6 +112,14 @@ class ThreadLockerTest extends DbTestCase
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
     }
 
+    public function testFailedLock(): void
+    {
+        $mock = $this->getMockBuilder(ThreadLocker::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->lock()->result);
+    }
+
     public function testUnlock(): void
     {
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, function () {
@@ -139,5 +147,13 @@ class ThreadLockerTest extends DbTestCase
         $this->assertEquals(1, ThreadRepo::findOne(2)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);
+    }
+
+    public function testFailedUnlock(): void
+    {
+        $mock = $this->getMockBuilder(ThreadLocker::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->unlock()->result);
     }
 }

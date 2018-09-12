@@ -7,6 +7,8 @@ namespace bizley\podium\tests\poll;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
+use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\poll\PostPollForm;
 use bizley\podium\api\models\thread\Thread;
@@ -17,6 +19,7 @@ use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class PostPollFormTest
@@ -357,9 +360,29 @@ class PostPollFormTest extends DbTestCase
         $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2), $data)->result);
     }
 
-    public function testValidate(): void
+    public function testValidateCreate(): void
     {
-        $this->assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
+        $this->assertFalse($this->podium()->post->create([
+            'type_id' => PostType::POLL,
+            'content' => 'post-updated',
+        ], Member::findOne(1), Thread::findOne(1))->result);
+    }
+
+    public function testValidateUpdate(): void
+    {
+        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1), ['content' => 'post-updated',])->result);
+    }
+
+    public function testCreateNoThread(): void
+    {
+        $postPollForm = new PostPollForm();
+
+        $postPollForm->content = 'post-updated';
+        $postPollForm->question = 'question-updated';
+        $postPollForm->expires_at = 2;
+        $postPollForm->answers = ['answer3'];
+
+        $this->assertFalse($postPollForm->create()->result);
     }
 
     public function testFailedCreate(): void
@@ -374,6 +397,32 @@ class PostPollFormTest extends DbTestCase
         $mock->setThread(Thread::findOne(1));
 
         $this->assertFalse($mock->create()->result);
+    }
+
+    public function testFailedUpdate(): void
+    {
+        $mock = $this->getMockBuilder(PostPollForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->content = 'post-updated';
+        $mock->question = 'question-updated';
+        $mock->expires_at = 2;
+        $mock->answers = ['answer3'];
+        $mock->setThread(Thread::findOne(1));
+
+        $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostPollForm())->setCategory(Category::findOne(1));
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostPollForm())->setForum(Forum::findOne(1));
     }
 
     /**

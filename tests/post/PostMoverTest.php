@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\post\PostMover;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\ForumRepo;
@@ -12,6 +14,7 @@ use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class PostMoverTest
@@ -173,5 +176,33 @@ class PostMoverTest extends DbTestCase
         $forum = ForumRepo::findOne(1);
         $this->assertEquals(10, $forum->posts_count);
         $this->assertEquals(9, $forum->threads_count);
+    }
+
+    public function testFailedMoveValidate(): void
+    {
+        $mock = $this->getMockBuilder(PostMover::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->move()->result);
+    }
+
+    public function testFailedMove(): void
+    {
+        $mock = $this->getMockBuilder(PostMover::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->move()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostMover())->setCategory(Category::findOne(1));
+    }
+
+    public function testSetForum(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new PostMover())->setForum(Forum::findOne(1));
     }
 }

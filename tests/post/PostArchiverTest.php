@@ -172,6 +172,22 @@ class PostArchiverTest extends DbTestCase
         $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
     }
 
+    public function testFailedArchiveValidate(): void
+    {
+        $mock = $this->getMockBuilder(PostArchiver::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->archive()->result);
+    }
+
+    public function testFailedArchive(): void
+    {
+        $mock = $this->getMockBuilder(PostArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->archive()->result);
+    }
+
     public function testRevive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -212,5 +228,25 @@ class PostArchiverTest extends DbTestCase
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(1))->result);
+    }
+
+    public function testFailedReviveValidate(): void
+    {
+        $mock = $this->getMockBuilder(PostArchiver::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->revive()->result);
+    }
+
+    public function testFailedRevive(): void
+    {
+        $mock = $this->getMockBuilder(PostArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->revive()->result);
     }
 }

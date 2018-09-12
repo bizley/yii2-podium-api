@@ -160,4 +160,29 @@ class PostRemoverTest extends DbTestCase
         $this->assertEmpty(PostRepo::findOne(3));
         $this->assertEmpty(ThreadRepo::findOne(2));
     }
+
+    public function testRemoveNonArchived(): void
+    {
+        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(2))->result);
+    }
+
+    public function testFailedRemove(): void
+    {
+        $mock = $this->getMockBuilder(PostRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testExceptionRemove(): void
+    {
+        $mock = $this->getMockBuilder(PostRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

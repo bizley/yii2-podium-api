@@ -142,4 +142,12 @@ class RankFormTest extends DbTestCase
     {
         $this->assertFalse($this->podium()->rank->edit(RankForm::findOne(1), [])->result);
     }
+
+    public function testFailedEdit(): void
+    {
+        $mock = $this->getMockBuilder(RankForm::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->edit()->result);
+    }
 }

@@ -135,6 +135,14 @@ class ThreadSubscribingTest extends DbTestCase
         $this->assertFalse($this->podium()->thread->subscribe(Member::findOne(1), Thread::findOne(2))->result);
     }
 
+    public function testFailedSubscribe(): void
+    {
+        $mock = $this->getMockBuilder(Subscribing::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->subscribe()->result);
+    }
+
     public function testUnsubscribe(): void
     {
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, function () {
@@ -175,5 +183,21 @@ class ThreadSubscribingTest extends DbTestCase
     public function testUnsubscribeAgain(): void
     {
         $this->assertFalse($this->podium()->thread->unsubscribe(Member::findOne(1), Thread::findOne(1))->result);
+    }
+
+    public function testExceptionRemove(): void
+    {
+        $mock = $this->getMockBuilder(Subscribing::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $this->assertFalse($mock->unsubscribe()->result);
+    }
+
+    public function testFailedRemove(): void
+    {
+        $mock = $this->getMockBuilder(Subscribing::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $this->assertFalse($mock->unsubscribe()->result);
     }
 }

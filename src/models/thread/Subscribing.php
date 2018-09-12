@@ -140,15 +140,4 @@ class Subscribing extends SubscriptionRepo implements SubscribingInterface
     {
         $this->trigger(self::EVENT_AFTER_UNSUBSCRIBING);
     }
-
-    /**
-     * @return bool
-     */
-    public function isSubscribing(): bool
-    {
-        return static::find()->where([
-            'member_id' => $this->member_id,
-            'thread_id' => $this->thread_id,
-        ])->exists();
-    }
 }

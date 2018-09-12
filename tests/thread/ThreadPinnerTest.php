@@ -112,6 +112,14 @@ class ThreadPinnerTest extends DbTestCase
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
     }
 
+    public function testFailedPin(): void
+    {
+        $mock = $this->getMockBuilder(ThreadPinner::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->pin()->result);
+    }
+
     public function testUnpin(): void
     {
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, function () {
@@ -139,5 +147,13 @@ class ThreadPinnerTest extends DbTestCase
         $this->assertEquals(1, ThreadRepo::findOne(2)->pinned);
 
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);
+    }
+
+    public function testFailedUnpin(): void
+    {
+        $mock = $this->getMockBuilder(ThreadPinner::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->unpin()->result);
     }
 }

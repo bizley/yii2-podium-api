@@ -5,11 +5,14 @@ declare(strict_types=1);
 namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadMover;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\base\NotSupportedException;
 
 /**
  * Class ThreadMoverTest
@@ -110,5 +113,33 @@ class ThreadMoverTest extends DbTestCase
         $this->assertEquals(1, ThreadRepo::findOne(1)->forum_id);
 
         Event::off(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);
+    }
+
+    public function testFailedMoveValidate(): void
+    {
+        $mock = $this->getMockBuilder(ThreadMover::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->move()->result);
+    }
+
+    public function testFailedMove(): void
+    {
+        $mock = $this->getMockBuilder(ThreadMover::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->move()->result);
+    }
+
+    public function testSetCategory(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ThreadMover())->setCategory(Category::findOne(1));
+    }
+
+    public function testSetThread(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new ThreadMover())->setThread(Thread::findOne(1));
     }
 }

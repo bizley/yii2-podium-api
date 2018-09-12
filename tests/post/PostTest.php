@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\post\Post;
 use bizley\podium\tests\DbTestCase;
+use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -116,5 +118,11 @@ class PostTest extends DbTestCase
         $posts = $this->podium()->post->getPosts($filter);
         $this->assertEquals(1, $posts->getTotalCount());
         $this->assertEquals([2], $posts->getKeys());
+    }
+
+    public function testGetPostsCount(): void
+    {
+        $this->expectException(NotSupportedException::class);
+        (new Post())->getPostsCount();
     }
 }

@@ -134,4 +134,24 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(2))->result);
         $this->assertNotEmpty(ThreadRepo::findOne(2));
     }
+
+    public function testFailedRemove(): void
+    {
+        $mock = $this->getMockBuilder(ThreadRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->willReturn(false);
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
+
+    public function testExceptionRemove(): void
+    {
+        $mock = $this->getMockBuilder(ThreadRemover::class)->setMethods(['delete'])->getMock();
+        $mock->method('delete')->will($this->throwException(new \Exception()));
+
+        $mock->archived = true;
+
+        $this->assertFalse($mock->remove()->result);
+    }
 }

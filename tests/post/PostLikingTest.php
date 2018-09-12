@@ -189,6 +189,22 @@ class PostLikingTest extends DbTestCase
         $this->assertEquals(14, $post->dislikes);
     }
 
+    public function testFailedThumbUpValidate(): void
+    {
+        $mock = $this->getMockBuilder(Liking::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->thumbUp()->result);
+    }
+
+    public function testFailedThumbUp(): void
+    {
+        $mock = $this->getMockBuilder(Liking::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->thumbUp()->result);
+    }
+
     public function testThumbDown(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, function () {
@@ -253,6 +269,22 @@ class PostLikingTest extends DbTestCase
         $this->assertEquals(16, $post->dislikes);
     }
 
+    public function testFailedThumbDownValidate(): void
+    {
+        $mock = $this->getMockBuilder(Liking::class)->setMethods(['validate'])->getMock();
+        $mock->method('validate')->willReturn(false);
+
+        $this->assertFalse($mock->thumbDown()->result);
+    }
+
+    public function testFailedThumbDown(): void
+    {
+        $mock = $this->getMockBuilder(Liking::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->thumbDown()->result);
+    }
+
     public function testThumbResetFromUp(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, function () {
@@ -315,5 +347,13 @@ class PostLikingTest extends DbTestCase
         $post = PostRepo::findOne(1);
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(14, $post->dislikes);
+    }
+
+    public function testExceptionThumbReset(): void
+    {
+        $mock = $this->getMockBuilder(Liking::class)->setMethods(['afterThumbReset'])->getMock();
+        $mock->method('afterThumbReset')->will($this->throwException(new \Exception()));
+
+        $this->assertFalse($mock->ThumbReset()->result);
     }
 }
