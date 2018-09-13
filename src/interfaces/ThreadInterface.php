@@ -123,8 +123,8 @@ interface ThreadInterface
     public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 
     /**
-    * @return BookmarkingInterface
-    */
+     * @return BookmarkingInterface
+     */
     public function getBookmarking(): BookmarkingInterface;
 
     /**

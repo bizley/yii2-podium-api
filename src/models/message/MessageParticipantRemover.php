@@ -48,7 +48,7 @@ class MessageParticipantRemover extends MessageParticipantRepo implements Remova
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if ((int)static::find()->where(['message_id' => $this->message_id])->count() === 1) {
+            if ((int) static::find()->where(['message_id' => $this->message_id])->count() === 1) {
 
                 if ($this->delete() === false) {
                     Yii::error('Error while deleting message participany copy', 'podium');
