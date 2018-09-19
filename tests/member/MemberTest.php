@@ -164,4 +164,10 @@ class MemberTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         (new Member())->isArchived();
     }
+
+    public function testGetUsername(): void
+    {
+        $member = $this->podium()->member->getMemberById(3);
+        $this->assertEquals('member3', $member->getUsername());
+    }
 }

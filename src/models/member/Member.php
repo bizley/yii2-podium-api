@@ -32,6 +32,14 @@ class Member extends MemberRepo implements MembershipInterface
     }
 
     /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
      * @return ModelInterface|null
      * @throws NotSupportedException
      */

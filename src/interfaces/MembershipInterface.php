@@ -16,4 +16,9 @@ interface MembershipInterface extends ModelInterface
      * @return MembershipInterface|null the membership object that matches the given user ID
      */
     public static function findByUserId($userId): ?MembershipInterface;
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string;
 }
