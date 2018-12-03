@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace bizley\podium\api\migrations;
+
 use yii\db\Migration;
 
 class m180106_052800_create_table_podium_acquaintance extends Migration

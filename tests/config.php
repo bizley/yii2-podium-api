@@ -8,7 +8,7 @@ $config = [
         'dsn' => 'mysql:host=localhost;dbname=podiumtest',
         'username' => 'podium',
         'password' => 'podium',
-        'charset' => 'utf8',
+        'charset' => 'utf8mb4',
     ],
 ];
 if (is_file(__DIR__ . '/config.local.php')) {

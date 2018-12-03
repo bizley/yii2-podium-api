@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace bizley\podium\api\migrations;
+
 use yii\db\Migration;
 
 class m180809_200700_create_table_podium_thread extends Migration

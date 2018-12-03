@@ -76,8 +76,10 @@ abstract class DbTestCase extends TestCase
             'controllerMap' => [
                 'migrate' => [
                     'class' => EchoMigrateController::class,
-                    'migrationPath' => __DIR__ . '/../migrations/',
+                    'migrationNamespaces' => ['bizley\podium\api\migrations'],
+                    'migrationPath' => null,
                     'interactive' => false,
+                    'compact' => true,
                 ],
             ],
             'components' => [

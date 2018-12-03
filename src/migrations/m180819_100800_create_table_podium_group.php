@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+namespace bizley\podium\api\migrations;
+
 use yii\db\Migration;
 
-class m180818_095400_create_table_podium_rank extends Migration
+class m180819_100800_create_table_podium_group extends Migration
 {
     public function up(): void
     {
@@ -13,10 +15,9 @@ class m180818_095400_create_table_podium_rank extends Migration
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
-        $this->createTable('{{%podium_rank}}', [
+        $this->createTable('{{%podium_group}}', [
             'id' => $this->primaryKey(),
-            'name' => $this->string(255)->notNull(),
-            'min_posts' => $this->integer()->notNull()->unique(),
+            'name' => $this->string(255)->notNull()->unique(),
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
@@ -24,6 +25,6 @@ class m180818_095400_create_table_podium_rank extends Migration
 
     public function down(): void
     {
-        $this->dropTable('{{%podium_rank}}');
+        $this->dropTable('{{%podium_group}}');
     }
 }
