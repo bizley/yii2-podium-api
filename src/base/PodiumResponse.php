@@ -24,12 +24,21 @@ class PodiumResponse extends Component
     public $errors = [];
 
     /**
+     * @var array
+     */
+    public $data = [];
+
+    /**
      * Returns successful response.
+     * @param array|null $data
      * @return PodiumResponse
      */
-    public static function success(): PodiumResponse
+    public static function success(?array $data = null): PodiumResponse
     {
-        return new static(['result' => true]);
+        return new static([
+            'result' => true,
+            'data' => $data ?? [],
+        ]);
     }
 
     /**

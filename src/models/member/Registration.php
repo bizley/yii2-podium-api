@@ -98,7 +98,7 @@ class Registration extends MemberRepo implements RegistrationInterface
 
         $this->afterRegister();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success(['id' => $this->id]);
     }
 
     public function afterRegister(): void

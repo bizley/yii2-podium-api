@@ -41,7 +41,11 @@ class RegistrationTest extends DbTestCase
             'user_id' => '100',
             'username' => 'testname',
         ];
-        $this->assertTrue($this->podium()->member->register($data)->result);
+
+        $response = $this->podium()->member->register($data);
+
+        $this->assertTrue($response->result);
+        $this->assertNotEmpty($response->data);
 
         $member = MemberRepo::findOne(['username' => 'testname']);
         $this->assertEquals(array_merge($data, [
