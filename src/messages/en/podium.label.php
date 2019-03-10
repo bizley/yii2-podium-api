@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'category.description' => 'Category Description',
     'category.name' => 'Category Name',
     'category.sort' => 'Category Sort Order',
     'category.sort.order' => 'Category Sort Order',

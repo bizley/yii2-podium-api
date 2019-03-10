@@ -54,7 +54,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     {
         return [
             [['name', 'visible', 'sort'], 'required'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'description'], 'string', 'max' => 255],
             [['visible'], 'boolean'],
             [['sort'], 'integer'],
         ];
@@ -67,6 +67,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     {
         return [
             'name' => Yii::t('podium.label', 'category.name'),
+            'description' => Yii::t('podium.label', 'category.description'),
             'visible' => Yii::t('podium.label', 'category.visible'),
             'sort' => Yii::t('podium.label', 'category.sort'),
         ];

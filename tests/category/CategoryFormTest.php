@@ -60,6 +60,7 @@ class CategoryFormTest extends DbTestCase
 
         $data = [
             'name' => 'category-new',
+            'description' => 'desc-new',
             'visible' => 1,
             'sort' => 10,
         ];
@@ -71,6 +72,7 @@ class CategoryFormTest extends DbTestCase
             'author_id' => 1,
         ]), [
             'name' => $category->name,
+            'description' => $category->description,
             'visible' => $category->visible,
             'sort' => $category->sort,
             'slug' => $category->slug,
@@ -183,6 +185,7 @@ class CategoryFormTest extends DbTestCase
             'name' => 'category.name',
             'visible' => 'category.visible',
             'sort' => 'category.sort',
+            'description' => 'category.description',
         ], (new CategoryForm())->attributeLabels());
     }
 }
