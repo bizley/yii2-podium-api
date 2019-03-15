@@ -33,11 +33,11 @@ class PodiumResponse extends Component
      * @param array|null $data
      * @return PodiumResponse
      */
-    public static function success(?array $data = null): PodiumResponse
+    public static function success(array $data = []): PodiumResponse
     {
         return new static([
             'result' => true,
-            'data' => $data ?? [],
+            'data' => $data,
         ]);
     }
 
