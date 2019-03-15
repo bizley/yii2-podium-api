@@ -163,7 +163,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
             $transaction->commit();
 
-            return PodiumResponse::success();
+            return PodiumResponse::success(['id' => $this->id]);
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

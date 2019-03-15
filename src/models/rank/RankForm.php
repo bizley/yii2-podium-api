@@ -90,7 +90,7 @@ class RankForm extends RankRepo implements ModelFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success(['id' => $this->id]);
     }
 
     public function afterCreate(): void

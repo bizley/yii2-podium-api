@@ -145,7 +145,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
             $transaction->commit();
 
-            return PodiumResponse::success();
+            return PodiumResponse::success(['id' => $this->id]);
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

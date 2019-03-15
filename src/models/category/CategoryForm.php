@@ -109,7 +109,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success(['id' => $this->id]);
     }
 
     public function afterCreate(): void

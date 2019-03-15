@@ -118,7 +118,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success(['id' => $this->id]);
     }
 
     public function afterCreate(): void
