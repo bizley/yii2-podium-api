@@ -44,7 +44,17 @@ class GroupFormTest extends DbTestCase
         });
 
         $data = ['name' => 'group-new'];
-        $this->assertTrue($this->podium()->group->create($data)->result);
+
+        $response = $this->podium()->group->create($data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'name' => 'group-new',
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $rank = GroupRepo::findOne(['name' => 'group-new']);
         $this->assertEquals($data, ['name' => $rank->name]);
@@ -88,7 +98,17 @@ class GroupFormTest extends DbTestCase
         });
 
         $data = ['name' => 'group-updated'];
-        $this->assertTrue($this->podium()->group->edit(GroupForm::findOne(1), $data)->result);
+
+        $response = $this->podium()->group->edit(GroupForm::findOne(1), $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'group-updated',
+            'created_at' => 1,
+            'updated_at' => $time,
+        ], $response->data);
 
         $rank = GroupRepo::findOne(['name' => 'group-updated']);
         $this->assertEquals($data, ['name' => $rank->name]);

@@ -160,7 +160,23 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->category->edit(CategoryForm::findOne(1), $data)->result);
+
+        $response = $this->podium()->category->edit(CategoryForm::findOne(1), $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'category-updated',
+            'slug' => 'category1',
+            'description' => null,
+            'visible' => 0,
+            'sort' => 2,
+            'author_id' => 1,
+            'created_at' => 1,
+            'updated_at' => $time,
+            'archived' => 0,
+        ], $response->data);
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
         $this->assertEquals(array_merge($data, [

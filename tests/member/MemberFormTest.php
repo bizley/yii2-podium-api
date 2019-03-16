@@ -48,7 +48,19 @@ class MemberFormTest extends DbTestCase
             $this->eventsRaised[MemberForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->edit(MemberForm::findOne(1), ['username' => 'username-updated'])->result);
+        $response = $this->podium()->member->edit(MemberForm::findOne(1), ['username' => 'username-updated']);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'user_id' => '1',
+            'username' => 'username-updated',
+            'slug' => 'member',
+            'status_id' => MemberStatus::ACTIVE,
+            'created_at' => 1,
+            'updated_at' => $time,
+        ], $response->data);
 
         $member = MemberRepo::findOne(['username' => 'username-updated']);
         $this->assertNotEmpty($member);

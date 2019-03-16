@@ -48,7 +48,18 @@ class RankFormTest extends DbTestCase
             'name' => 'rank-new',
             'min_posts' => 99,
         ];
-        $this->assertTrue($this->podium()->rank->create($data)->result);
+
+        $response = $this->podium()->rank->create($data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'name' => 'rank-new',
+            'min_posts' => 99,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $rank = RankRepo::findOne(['name' => 'rank-new']);
         $this->assertEquals($data, [
@@ -106,7 +117,18 @@ class RankFormTest extends DbTestCase
             'name' => 'rank-updated',
             'min_posts' => 52,
         ];
-        $this->assertTrue($this->podium()->rank->edit(RankForm::findOne(1), $data)->result);
+
+        $response = $this->podium()->rank->edit(RankForm::findOne(1), $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'name' => 'rank-updated',
+            'min_posts' => 52,
+            'created_at' => 1,
+            'updated_at' => $time,
+        ], $response->data);
 
         $rank = RankRepo::findOne(['name' => 'rank-updated']);
         $this->assertEquals($data, [

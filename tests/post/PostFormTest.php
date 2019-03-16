@@ -103,7 +103,22 @@ class PostFormTest extends DbTestCase
         });
 
         $data = ['content' => 'post-new'];
-        $this->assertTrue($this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1))->result);
+
+        $response = $this->podium()->post->create($data, Member::findOne(1), Thread::findOne(1));
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'category_id' => 1,
+            'forum_id' => 1,
+            'thread_id' => 1,
+            'author_id' => 1,
+            'content' => 'post-new',
+            'type_id' => 'post',
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $post = PostRepo::findOne(['content' => 'post-new']);
         $this->assertEquals(array_merge($data, [
@@ -185,7 +200,27 @@ class PostFormTest extends DbTestCase
         });
 
         $data = ['content' => 'post-updated'];
-        $this->assertTrue($this->podium()->post->edit(PostForm::findOne(1),  $data)->result);
+
+        $response = $this->podium()->post->edit(PostForm::findOne(1),  $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'category_id' => 1,
+            'forum_id' => 1,
+            'thread_id' => 1,
+            'author_id' => 1,
+            'content' => 'post-updated',
+            'type_id' => 'post',
+            'created_at' => 1,
+            'updated_at' => $time,
+            'edited' => true,
+            'likes' => 0,
+            'dislikes' => 0,
+            'edited_at' => $time,
+            'archived' => 0,
+        ], $response->data);
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals(array_merge($data, [

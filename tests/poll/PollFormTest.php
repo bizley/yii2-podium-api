@@ -126,7 +126,20 @@ class PollFormTest extends DbTestCase
             'expires_at' => 1,
         ]);
 
-        $this->assertTrue($poll->create()->result);
+        $response = $poll->create();
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 3,
+            'post_id' => 1,
+            'question' => 'question-new',
+            'revealed' => false,
+            'choice_id' => PollChoice::MULTIPLE,
+            'expires_at' => 1,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $pollCreated = PollRepo::findOne(['question' => 'question-new']);
         $this->assertEquals([
@@ -147,7 +160,20 @@ class PollFormTest extends DbTestCase
         $poll = PollForm::findOne(1);
         $poll->question = 'question-updated';
 
-        $this->assertTrue($poll->edit()->result);
+        $response = $poll->edit();
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'post_id' => 1,
+            'question' => 'question-updated',
+            'revealed' => 1,
+            'choice_id' => PollChoice::SINGLE,
+            'expires_at' => null,
+            'created_at' => 1,
+            'updated_at' => $time,
+        ], $response->data);
 
         $pollUpdated = PollRepo::findOne(1);
         $this->assertEquals('question-updated', $pollUpdated->question);

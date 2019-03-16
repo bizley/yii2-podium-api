@@ -148,7 +148,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 
         $this->afterEdit();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterEdit(): void

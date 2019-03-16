@@ -196,7 +196,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
         $this->afterEdit();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterEdit(): void

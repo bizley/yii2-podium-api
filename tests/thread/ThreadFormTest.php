@@ -191,7 +191,28 @@ class ThreadFormTest extends DbTestCase
         });
 
         $data = ['name' => 'thread-updated'];
-        $this->assertTrue($this->podium()->thread->edit(ThreadForm::findOne(1),  $data)->result);
+
+        $response = $this->podium()->thread->edit(ThreadForm::findOne(1), $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'category_id' => 1,
+            'forum_id' => 1,
+            'name' => 'thread-updated',
+            'slug' => 'thread1',
+            'author_id' => 1,
+            'created_at' => 1,
+            'updated_at' => $time,
+            'archived' => 0,
+            'views_count' => 0,
+            'posts_count' => 0,
+            'pinned' => 0,
+            'locked' => 0,
+            'created_post_at' => null,
+            'updated_post_at' => null,
+        ], $response->data);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-updated']);
         $this->assertEquals(array_merge($data, [

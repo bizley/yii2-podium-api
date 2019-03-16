@@ -99,7 +99,7 @@ class MemberForm extends MemberRepo implements ModelFormInterface
 
         $this->afterEdit();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterEdit(): void

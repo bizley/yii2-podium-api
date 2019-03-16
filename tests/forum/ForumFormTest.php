@@ -179,7 +179,26 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertTrue($this->podium()->forum->edit(ForumForm::findOne(1), $data)->result);
+
+        $response = $this->podium()->forum->edit(ForumForm::findOne(1), $data);
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 1,
+            'category_id' => 1,
+            'name' => 'forum-updated',
+            'slug' => 'forum1',
+            'visible' => 0,
+            'sort' => 2,
+            'author_id' => 1,
+            'created_at' => 1,
+            'updated_at' => $time,
+            'archived' => 0,
+            'description' => null,
+            'threads_count' => 0,
+            'posts_count' => 0,
+        ], $response->data);
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
         $this->assertEquals(array_merge($data, [

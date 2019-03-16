@@ -163,7 +163,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
             $transaction->commit();
 
-            return PodiumResponse::success(['id' => $this->id]);
+            return PodiumResponse::success($this->getOldAttributes());
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -211,7 +211,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
         $this->afterEdit();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterEdit(): void

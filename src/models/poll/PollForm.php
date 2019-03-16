@@ -48,7 +48,7 @@ class PollForm extends PollRepo implements ModelFormInterface
             return PodiumResponse::error();
         }
 
-        return PodiumResponse::success(['id' => $this->id]);
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     /**
@@ -67,6 +67,6 @@ class PollForm extends PollRepo implements ModelFormInterface
             return PodiumResponse::error();
         }
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 }

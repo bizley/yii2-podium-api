@@ -86,7 +86,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success(['id' => $this->id]);
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterCreate(): void
@@ -121,7 +121,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
 
         $this->afterEdit();
 
-        return PodiumResponse::success();
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterEdit(): void
