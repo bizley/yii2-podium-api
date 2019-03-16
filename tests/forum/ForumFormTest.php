@@ -78,7 +78,22 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
+
+        $response = $this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1));
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'category_id' => 1,
+            'name' => 'forum-new',
+            'slug' => 'forum-new',
+            'visible' => 1,
+            'sort' => 10,
+            'author_id' => 1,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $forum = ForumRepo::findOne(['name' => 'forum-new']);
         $this->assertEquals(array_merge($data, [
@@ -100,6 +115,25 @@ class ForumFormTest extends DbTestCase
 
         $this->assertArrayHasKey(ForumForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
         $this->assertArrayHasKey(ForumForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+    }
+
+    public function testCreateWithSlug(): void
+    {
+        $data = [
+            'name' => 'forum-new-with-slug',
+            'slug' => 'for-slug',
+            'visible' => 1,
+            'sort' => 10,
+        ];
+        $this->assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
+
+        $forum = ForumRepo::findOne(['name' => 'forum-new-with-slug']);
+        $this->assertEquals($data, [
+            'name' => $forum->name,
+            'slug' => $forum->slug,
+            'visible' => $forum->visible,
+            'sort' => $forum->sort,
+        ]);
     }
 
     public function testCreateEventPreventing(): void
@@ -149,7 +183,7 @@ class ForumFormTest extends DbTestCase
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
         $this->assertEquals(array_merge($data, [
-            'slug' => 'forum-updated',
+            'slug' => 'forum1',
             'author_id' => 1,
             'category_id' => 1,
             'threads_count' => 0,
@@ -222,6 +256,7 @@ class ForumFormTest extends DbTestCase
             'name' => 'forum.name',
             'visible' => 'forum.visible',
             'sort' => 'forum.sort',
+            'slug' => 'forum.slug',
         ], (new ForumForm())->attributeLabels());
     }
 }

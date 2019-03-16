@@ -43,6 +43,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
                 'class' => SluggableBehavior::class,
                 'attribute' => 'name',
                 'ensureUnique' => true,
+                'immutable' => true,
             ],
         ];
     }
@@ -54,9 +55,11 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     {
         return [
             [['name', 'visible', 'sort'], 'required'],
-            [['name', 'description'], 'string', 'max' => 255],
+            [['name', 'description', 'slug'], 'string', 'max' => 255],
             [['visible'], 'boolean'],
             [['sort'], 'integer'],
+            [['slug'], 'match', 'pattern' => '/^[a-zA-Z0-9\-]{0,255}$/'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -70,6 +73,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
             'description' => Yii::t('podium.label', 'category.description'),
             'visible' => Yii::t('podium.label', 'category.visible'),
             'sort' => Yii::t('podium.label', 'category.sort'),
+            'slug' => Yii::t('podium.label', 'category.slug'),
         ];
     }
 
@@ -109,7 +113,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success(['id' => $this->id]);
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterCreate(): void

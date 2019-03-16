@@ -88,7 +88,21 @@ class ThreadFormTest extends DbTestCase
         });
 
         $data = ['name' => 'thread-new'];
-        $this->assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
+
+        $response = $this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1));
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'category_id' => 1,
+            'forum_id' => 1,
+            'name' => 'thread-new',
+            'slug' => 'thread-new',
+            'author_id' => 1,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-new']);
         $this->assertEquals(array_merge($data, [
@@ -112,6 +126,21 @@ class ThreadFormTest extends DbTestCase
 
         $this->assertArrayHasKey(ThreadForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+    }
+
+    public function testCreateWithSlug(): void
+    {
+        $data = [
+            'name' => 'thread-new-with-slug',
+            'slug' => 'thr-slug',
+        ];
+        $this->assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
+
+        $thread = ThreadRepo::findOne(['name' => 'thread-new-with-slug']);
+        $this->assertEquals($data, [
+            'name' => $thread->name,
+            'slug' => $thread->slug,
+        ]);
     }
 
     public function testCreateEventPreventing(): void
@@ -166,7 +195,7 @@ class ThreadFormTest extends DbTestCase
 
         $thread = ThreadRepo::findOne(['name' => 'thread-updated']);
         $this->assertEquals(array_merge($data, [
-            'slug' => 'thread-updated',
+            'slug' => 'thread1',
             'author_id' => 1,
             'category_id' => 1,
             'forum_id' => 1,
@@ -236,6 +265,9 @@ class ThreadFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals(['name' => 'thread.name'], (new ThreadForm())->attributeLabels());
+        $this->assertEquals([
+            'name' => 'thread.name',
+            'slug' => 'thread.slug',
+        ], (new ThreadForm())->attributeLabels());
     }
 }

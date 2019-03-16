@@ -33,6 +33,7 @@ class Registration extends MemberRepo implements RegistrationInterface
                 'class' => SluggableBehavior::class,
                 'attribute' => 'username',
                 'ensureUnique' => true,
+                'immutable' => true,
             ],
         ];
     }
@@ -44,8 +45,10 @@ class Registration extends MemberRepo implements RegistrationInterface
     {
         return [
             [['user_id', 'username'], 'required'],
-            [['user_id', 'username'], 'string', 'max' => 255],
+            [['user_id', 'username', 'slug'], 'string', 'max' => 255],
             [['user_id', 'username'], 'unique'],
+            [['slug'], 'match', 'pattern' => '/^[a-zA-Z0-9\-]{0,255}$/'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -57,6 +60,7 @@ class Registration extends MemberRepo implements RegistrationInterface
         return [
             'user_id' => Yii::t('podium.label', 'registration.user.id'),
             'username' => Yii::t('podium.label', 'registration.username'),
+            'slug' => Yii::t('podium.label', 'registration.slug'),
         ];
     }
 
@@ -98,7 +102,7 @@ class Registration extends MemberRepo implements RegistrationInterface
 
         $this->afterRegister();
 
-        return PodiumResponse::success(['id' => $this->id]);
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterRegister(): void

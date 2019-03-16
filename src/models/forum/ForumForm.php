@@ -53,6 +53,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
                 'class' => SluggableBehavior::class,
                 'attribute' => 'name',
                 'ensureUnique' => true,
+                'immutable' => true,
             ],
         ];
     }
@@ -64,9 +65,11 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
     {
         return [
             [['name', 'visible', 'sort'], 'required'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'slug'], 'string', 'max' => 255],
             [['visible'], 'boolean'],
             [['sort'], 'integer'],
+            [['slug'], 'match', 'pattern' => '/^[a-zA-Z0-9\-]{0,255}$/'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -79,6 +82,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
             'name' => Yii::t('podium.label', 'forum.name'),
             'visible' => Yii::t('podium.label', 'forum.visible'),
             'sort' => Yii::t('podium.label', 'forum.sort'),
+            'slug' => Yii::t('podium.label', 'forum.slug'),
         ];
     }
 
@@ -118,7 +122,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
 
         $this->afterCreate();
 
-        return PodiumResponse::success(['id' => $this->id]);
+        return PodiumResponse::success($this->getOldAttributes());
     }
 
     public function afterCreate(): void

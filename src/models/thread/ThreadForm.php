@@ -75,6 +75,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
                 'class' => SluggableBehavior::class,
                 'attribute' => 'name',
                 'ensureUnique' => true,
+                'immutable' => true,
             ],
         ];
     }
@@ -86,7 +87,9 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
     {
         return [
             [['name'], 'required'],
-            [['name'], 'string', 'max' => 255],
+            [['name', 'slug'], 'string', 'max' => 255],
+            [['slug'], 'match', 'pattern' => '/^[a-zA-Z0-9\-]{0,255}$/'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -95,7 +98,10 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
      */
     public function attributeLabels(): array
     {
-        return ['name' => Yii::t('podium.label', 'thread.name')];
+        return [
+            'name' => Yii::t('podium.label', 'thread.name'),
+            'slug' => Yii::t('podium.label', 'thread.slug'),
+        ];
     }
 
     /**
@@ -145,7 +151,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
             $transaction->commit();
 
-            return PodiumResponse::success(['id' => $this->id]);
+            return PodiumResponse::success($this->getOldAttributes());
 
         } catch (\Throwable $exc) {
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

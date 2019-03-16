@@ -52,7 +52,7 @@ class MemberFormTest extends DbTestCase
 
         $member = MemberRepo::findOne(['username' => 'username-updated']);
         $this->assertNotEmpty($member);
-        $this->assertEquals('username-updated', $member->slug);
+        $this->assertEquals('member', $member->slug);
         $this->assertEmpty(MemberRepo::findOne(['username' => 'member']));
 
         $this->assertArrayHasKey(MemberForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
@@ -99,6 +99,9 @@ class MemberFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals(['username' => 'member.username'], (new MemberForm())->attributeLabels());
+        $this->assertEquals([
+            'username' => 'member.username',
+            'slug' => 'member.slug',
+        ], (new MemberForm())->attributeLabels());
     }
 }

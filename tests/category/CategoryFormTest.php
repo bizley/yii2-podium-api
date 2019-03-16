@@ -64,7 +64,22 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->category->create($data, Member::findOne(1))->result);
+
+        $response = $this->podium()->category->create($data, Member::findOne(1));
+        $time = time();
+
+        $this->assertTrue($response->result);
+        $this->assertEquals([
+            'id' => 2,
+            'name' => 'category-new',
+            'slug' => 'category-new',
+            'description' => 'desc-new',
+            'visible' => 1,
+            'sort' => 10,
+            'author_id' => 1,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $category = CategoryRepo::findOne(['name' => 'category-new']);
         $this->assertEquals(array_merge($data, [
@@ -81,6 +96,25 @@ class CategoryFormTest extends DbTestCase
 
         $this->assertArrayHasKey(CategoryForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
         $this->assertArrayHasKey(CategoryForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+    }
+
+    public function testCreateWithSlug(): void
+    {
+        $data = [
+            'name' => 'category-new-with-slug',
+            'slug' => 'cat-slug',
+            'visible' => 1,
+            'sort' => 10,
+        ];
+        $this->assertTrue($this->podium()->category->create($data, Member::findOne(1))->result);
+
+        $category = CategoryRepo::findOne(['name' => 'category-new-with-slug']);
+        $this->assertEquals($data, [
+            'name' => $category->name,
+            'visible' => $category->visible,
+            'sort' => $category->sort,
+            'slug' => $category->slug,
+        ]);
     }
 
     public function testCreateEventPreventing(): void
@@ -130,7 +164,7 @@ class CategoryFormTest extends DbTestCase
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
         $this->assertEquals(array_merge($data, [
-            'slug' => 'category-updated',
+            'slug' => 'category1',
             'author_id' => 1,
         ]), [
             'name' => $category->name,
@@ -185,6 +219,7 @@ class CategoryFormTest extends DbTestCase
             'name' => 'category.name',
             'visible' => 'category.visible',
             'sort' => 'category.sort',
+            'slug' => 'category.slug',
             'description' => 'category.description',
         ], (new CategoryForm())->attributeLabels());
     }

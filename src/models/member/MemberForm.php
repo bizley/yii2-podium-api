@@ -33,6 +33,7 @@ class MemberForm extends MemberRepo implements ModelFormInterface
                 'class' => SluggableBehavior::class,
                 'attribute' => 'username',
                 'ensureUnique' => true,
+                'immutable' => true,
             ],
         ];
     }
@@ -44,8 +45,10 @@ class MemberForm extends MemberRepo implements ModelFormInterface
     {
         return [
             [['username'], 'required'],
-            [['username'], 'string', 'max' => 255],
+            [['username', 'slug'], 'string', 'max' => 255],
             [['username'], 'unique'],
+            [['slug'], 'match', 'pattern' => '/^[a-zA-Z0-9\-]{0,255}$/'],
+            [['slug'], 'unique'],
         ];
     }
 
@@ -54,7 +57,10 @@ class MemberForm extends MemberRepo implements ModelFormInterface
      */
     public function attributeLabels(): array
     {
-        return ['username' => Yii::t('podium.label', 'member.username')];
+        return [
+            'username' => Yii::t('podium.label', 'member.username'),
+            'slug' => Yii::t('podium.label', 'member.slug'),
+        ];
     }
 
     /**

@@ -43,9 +43,18 @@ class RegistrationTest extends DbTestCase
         ];
 
         $response = $this->podium()->member->register($data);
+        $time = time();
 
         $this->assertTrue($response->result);
-        $this->assertNotEmpty($response->data);
+        $this->assertEquals([
+            'id' => 1,
+            'user_id' => '100',
+            'username' => 'testname',
+            'slug' => 'testname',
+            'status_id' => MemberStatus::REGISTERED,
+            'created_at' => $time,
+            'updated_at' => $time,
+        ], $response->data);
 
         $member = MemberRepo::findOne(['username' => 'testname']);
         $this->assertEquals(array_merge($data, [
@@ -60,6 +69,23 @@ class RegistrationTest extends DbTestCase
 
         $this->assertArrayHasKey(Registration::EVENT_BEFORE_REGISTERING, $this->eventsRaised);
         $this->assertArrayHasKey(Registration::EVENT_AFTER_REGISTERING, $this->eventsRaised);
+    }
+
+    public function testRegisterWithSlug(): void
+    {
+        $data = [
+            'user_id' => '110',
+            'username' => 'member-with-slug',
+            'slug' => 'mem-slug',
+        ];
+        $this->assertTrue($this->podium()->member->register($data)->result);
+
+        $member = MemberRepo::findOne(['username' => 'member-with-slug']);
+        $this->assertEquals($data, [
+            'user_id' => $member->user_id,
+            'username' => $member->username,
+            'slug' => $member->slug,
+        ]);
     }
 
     public function testRegisterEventPreventing(): void
@@ -99,6 +125,7 @@ class RegistrationTest extends DbTestCase
         $this->assertEquals([
             'user_id' => 'registration.user.id',
             'username' => 'registration.username',
+            'slug' => 'registration.slug',
         ], (new Registration())->attributeLabels());
     }
 }
