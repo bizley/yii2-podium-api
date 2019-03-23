@@ -22,6 +22,15 @@ class MessageParticipantArchiver extends MessageParticipantRepo implements Archi
     public const EVENT_AFTER_REVIVING = 'podium.message.participant.reviving.after';
 
     /**
+     * @param int $modelId
+     * @return ArchivableInterface|null
+     */
+    public static function findById(int $modelId): ?ArchivableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return bool
      */
     public function beforeArchive(): bool

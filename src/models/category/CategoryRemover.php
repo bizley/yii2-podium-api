@@ -20,6 +20,15 @@ class CategoryRemover extends CategoryRepo implements RemovableInterface
     public const EVENT_AFTER_REMOVING = 'podium.category.removing.after';
 
     /**
+     * @param int $modelId
+     * @return RemovableInterface|null
+     */
+    public static function findById(int $modelId): ?RemovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return bool
      */
     public function beforeRemove(): bool

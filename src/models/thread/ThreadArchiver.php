@@ -25,6 +25,15 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
 
     /**
+     * @param int $modelId
+     * @return ArchivableInterface|null
+     */
+    public static function findById(int $modelId): ?ArchivableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return ModelInterface|null
      */
     public function getForumModel(): ?ModelInterface

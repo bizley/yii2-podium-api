@@ -13,6 +13,12 @@ use bizley\podium\api\base\PodiumResponse;
 interface ArchivableInterface
 {
     /**
+     * @param int $modelId
+     * @return ArchivableInterface|null
+     */
+    public static function findById(int $modelId): ?ArchivableInterface;
+
+    /**
      * Archives model.
      * @return PodiumResponse
      */

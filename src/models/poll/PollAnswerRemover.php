@@ -16,6 +16,15 @@ use Yii;
 class PollAnswerRemover extends PollAnswerRepo implements RemovableInterface
 {
     /**
+     * @param int $modelId
+     * @return RemovableInterface|null
+     */
+    public static function findById(int $modelId): ?RemovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return PodiumResponse
      */
     public function remove(): PodiumResponse

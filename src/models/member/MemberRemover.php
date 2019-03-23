@@ -20,6 +20,15 @@ class MemberRemover extends MemberRepo implements RemovableInterface
     public const EVENT_AFTER_REMOVING = 'podium.forum.removing.after';
 
     /**
+     * @param int $modelId
+     * @return RemovableInterface|null
+     */
+    public static function findById(int $modelId): ?RemovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return bool
      */
     public function beforeRemove(): bool

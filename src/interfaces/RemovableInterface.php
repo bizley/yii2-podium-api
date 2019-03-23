@@ -13,6 +13,12 @@ use bizley\podium\api\base\PodiumResponse;
 interface RemovableInterface
 {
     /**
+     * @param int $modelId
+     * @return RemovableInterface|null
+     */
+    public static function findById(int $modelId): ?RemovableInterface;
+
+    /**
      * Removes model.
      * @return PodiumResponse
      */

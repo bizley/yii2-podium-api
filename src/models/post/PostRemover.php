@@ -24,6 +24,15 @@ class PostRemover extends PostRepo implements RemovableInterface
     public const EVENT_AFTER_REMOVING = 'podium.post.removing.after';
 
     /**
+     * @param int $modelId
+     * @return RemovableInterface|null
+     */
+    public static function findById(int $modelId): ?RemovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return ModelInterface|null
      */
     public function getThreadModel(): ?ModelInterface
