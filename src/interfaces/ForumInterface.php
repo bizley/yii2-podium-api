@@ -20,7 +20,7 @@ interface ForumInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getForumById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,14 +28,14 @@ interface ForumInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns forum form handler instance.
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForumForm(?int $id = null): ?CategorisedFormInterface;
+    public function getForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates forum.
@@ -54,15 +54,21 @@ interface ForumInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $forumRemover
+     * @param int $id
+     * @return RemovableInterface|null
+     */
+    public function getRemover(int $id): ?RemovableInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $forumRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 
     /**
      * @return SortableInterface
      */
-    public function getForumSorter(): SortableInterface;
+    public function getSorter(): SortableInterface;
 
     /**
      * Sorts forums.
@@ -81,14 +87,20 @@ interface ForumInterface
     public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $forumArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchivableInterface|null
      */
-    public function archive(ArchivableInterface $forumArchiver): PodiumResponse;
+    public function getArchiver(int $id): ?ArchivableInterface;
 
     /**
-     * @param ArchivableInterface $forumArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $forumArchiver): PodiumResponse;
+    public function archive(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function revive(int $id): PodiumResponse;
 }

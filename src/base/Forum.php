@@ -29,19 +29,31 @@ class Forum extends PodiumComponent implements ForumInterface
      * @var string|array|ModelInterface forum handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $forumHandler = \bizley\podium\api\models\forum\Forum::class;
+    public $modelHandler = \bizley\podium\api\models\forum\Forum::class;
 
     /**
      * @var string|array|CategorisedFormInterface forum form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
-    public $forumFormHandler = \bizley\podium\api\models\forum\ForumForm::class;
+    public $formHandler = \bizley\podium\api\models\forum\ForumForm::class;
 
     /**
      * @var string|array|SortableInterface forum sorter handler
      * Component ID, class, configuration array, or instance of SortableInterface.
      */
-    public $forumSorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
+    public $sorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
+
+    /**
+     * @var string|array|RemovableInterface category remover handler
+     * Component ID, class, configuration array, or instance of RemovableInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\forum\ForumRemover::class;
+
+    /**
+     * @var string|array|ArchivableInterface category archiver handler
+     * Component ID, class, configuration array, or instance of ArchivableInterface.
+     */
+    public $archiverHandler = \bizley\podium\api\models\forum\ForumArchiver::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -50,18 +62,20 @@ class Forum extends PodiumComponent implements ForumInterface
     {
         parent::init();
 
-        $this->forumHandler = Instance::ensure($this->forumHandler, ModelInterface::class);
-        $this->forumFormHandler = Instance::ensure($this->forumFormHandler, CategorisedFormInterface::class);
-        $this->forumSorterHandler = Instance::ensure($this->forumSorterHandler, SortableInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
+        $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchivableInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getForumById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $forumClass = $this->forumHandler;
+        $forumClass = $this->modelHandler;
 
         return $forumClass::findById($id);
     }
@@ -72,9 +86,9 @@ class Forum extends PodiumComponent implements ForumInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $forumClass = $this->forumHandler;
+        $forumClass = $this->modelHandler;
 
         return $forumClass::findByFilter($filter, $sort, $pagination);
     }
@@ -83,9 +97,9 @@ class Forum extends PodiumComponent implements ForumInterface
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForumForm(?int $id = null): ?CategorisedFormInterface
+    public function getForm(?int $id = null): ?CategorisedFormInterface
     {
-        $handler = $this->forumFormHandler;
+        $handler = $this->formHandler;
 
         if ($id === null) {
             return new $handler;
@@ -104,7 +118,7 @@ class Forum extends PodiumComponent implements ForumInterface
     public function create(array $data, MembershipInterface $author, ModelInterface $category): PodiumResponse
     {
         /* @var $forumForm CategorisedFormInterface */
-        $forumForm = $this->getForumForm();
+        $forumForm = $this->getForm();
 
         $forumForm->setAuthor($author);
         $forumForm->setCategory($category);
@@ -131,7 +145,7 @@ class Forum extends PodiumComponent implements ForumInterface
             throw new InsufficientDataException('ID key is missing.');
         }
 
-        $forumForm = $this->getForumForm((int)$id);
+        $forumForm = $this->getForm((int)$id);
 
         if ($forumForm === null) {
             throw new ModelNotFoundException('Forum of given ID can not be found.');
@@ -145,21 +159,39 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * Deletes forum.
-     * @param RemovableInterface $forumRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemovableInterface|null
      */
-    public function remove(RemovableInterface $forumRemover): PodiumResponse
+    public function getRemover(int $id): ?RemovableInterface
     {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes forum.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $forumRemover = $this->getRemover($id);
+
+        if ($forumRemover === null) {
+            throw new ModelNotFoundException('Forum of given ID can not be found.');
+        }
+
         return $forumRemover->remove();
     }
 
     /**
      * @return SortableInterface
      */
-    public function getForumSorter(): SortableInterface
+    public function getSorter(): SortableInterface
     {
-        return new $this->forumSorterHandler;
+        return new $this->sorterHandler;
     }
 
     /**
@@ -170,7 +202,7 @@ class Forum extends PodiumComponent implements ForumInterface
      */
     public function sort(ModelInterface $category, array $data = []): PodiumResponse
     {
-        $forumSorter = $this->getForumSorter();
+        $forumSorter = $this->getSorter();
 
         $forumSorter->setCategory($category);
 
@@ -195,22 +227,47 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
-     * Archives forum.
-     * @param ArchivableInterface $forumArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchivableInterface|null
      */
-    public function archive(ArchivableInterface $forumArchiver): PodiumResponse
+    public function getArchiver(int $id): ?ArchivableInterface
     {
+        $handler = $this->archiverHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Archives forum.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function archive(int $id): PodiumResponse
+    {
+        $forumArchiver = $this->getArchiver($id);
+
+        if ($forumArchiver === null) {
+            throw new ModelNotFoundException('Forum of given ID can not be found.');
+        }
+
         return $forumArchiver->archive();
     }
 
     /**
      * Revives forum.
-     * @param ArchivableInterface $forumArchiver
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function revive(ArchivableInterface $forumArchiver): PodiumResponse
+    public function revive(int $id): PodiumResponse
     {
+        $forumArchiver = $this->getArchiver($id);
+
+        if ($forumArchiver === null) {
+            throw new ModelNotFoundException('Forum of given ID can not be found.');
+        }
+
         return $forumArchiver->revive();
     }
 }

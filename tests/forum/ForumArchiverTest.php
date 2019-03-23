@@ -79,7 +79,7 @@ class ForumArchiverTest extends DbTestCase
             static::$eventsRaised[ForumArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->archive(ForumArchiver::findOne(1))->result);
+        $this->assertTrue($this->podium()->forum->archive(1)->result);
 
         $this->assertEquals(true, ForumRepo::findOne(1)->archived);
 
@@ -94,7 +94,7 @@ class ForumArchiverTest extends DbTestCase
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->forum->archive(1)->result);
 
         $this->assertEquals(false, ForumRepo::findOne(1)->archived);
 
@@ -103,15 +103,7 @@ class ForumArchiverTest extends DbTestCase
 
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->forum->archive(ForumArchiver::findOne(2))->result);
-    }
-
-    public function testFailedArchive(): void
-    {
-        $mock = $this->getMockBuilder(ForumArchiver::class)->setMethods(['save'])->getMock();
-        $mock->method('save')->willReturn(false);
-
-        $this->assertFalse($this->podium()->forum->archive($mock)->result);
+        $this->assertFalse($this->podium()->forum->archive(2)->result);
     }
 
     public function testRevive(): void
@@ -123,7 +115,7 @@ class ForumArchiverTest extends DbTestCase
             static::$eventsRaised[ForumArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->revive(ForumArchiver::findOne(2))->result);
+        $this->assertTrue($this->podium()->forum->revive(2)->result);
 
         $this->assertEquals(false, ForumRepo::findOne(2)->archived);
 
@@ -138,7 +130,7 @@ class ForumArchiverTest extends DbTestCase
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->forum->revive(2)->result);
 
         $this->assertEquals(true, ForumRepo::findOne(2)->archived);
 
@@ -147,15 +139,6 @@ class ForumArchiverTest extends DbTestCase
 
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->forum->revive(ForumArchiver::findOne(1))->result);
-    }
-
-    public function testFailedRevive(): void
-    {
-        $mock = $this->getMockBuilder(ForumArchiver::class)->setMethods(['save'])->getMock();
-        $mock->method('save')->willReturn(false);
-        $mock->archived = true;
-
-        $this->assertFalse($this->podium()->forum->revive($mock)->result);
+        $this->assertFalse($this->podium()->forum->revive(1)->result);
     }
 }

@@ -105,7 +105,7 @@ class ForumRemoverTest extends DbTestCase
             static::$eventsRaised[ForumRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->remove(ForumRemover::findOne(1))->result);
+        $this->assertTrue($this->podium()->forum->remove(1)->result);
 
         $this->assertEmpty(ForumRepo::findOne(1));
         $this->assertEmpty(ThreadRepo::findOne(1));
@@ -122,7 +122,7 @@ class ForumRemoverTest extends DbTestCase
         };
         Event::on(ForumRemover::class, ForumRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->remove(ForumRemover::findOne(1))->result);
+        $this->assertFalse($this->podium()->forum->remove(1)->result);
 
         $this->assertNotEmpty(ForumRepo::findOne(1));
         $this->assertNotEmpty(ThreadRepo::findOne(1));
@@ -133,7 +133,7 @@ class ForumRemoverTest extends DbTestCase
 
     public function testNonArchived(): void
     {
-        $this->assertFalse($this->podium()->forum->remove(ForumRemover::findOne(2))->result);
+        $this->assertFalse($this->podium()->forum->remove(2)->result);
         $this->assertNotEmpty(ForumRepo::findOne(2));
     }
 
