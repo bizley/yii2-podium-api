@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -190,9 +192,12 @@ class ThreadFormTest extends DbTestCase
             $this->eventsRaised[ThreadForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $data = ['name' => 'thread-updated'];
+        $data = [
+            'id' => 1,
+            'name' => 'thread-updated',
+        ];
 
-        $response = $this->podium()->thread->edit(ThreadForm::findOne(1), $data);
+        $response = $this->podium()->thread->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -223,6 +228,7 @@ class ThreadFormTest extends DbTestCase
             'views_count' => 0,
             'posts_count' => 0,
         ]), [
+            'id' => $thread->id,
             'name' => $thread->name,
             'slug' => $thread->slug,
             'author_id' => $thread->author_id,
@@ -246,8 +252,11 @@ class ThreadFormTest extends DbTestCase
         };
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
 
-        $data = ['name' => 'thread-updated'];
-        $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1),  $data)->result);
+        $data = [
+            'id' => 1,
+            'name' => 'thread-updated',
+        ];
+        $this->assertFalse($this->podium()->thread->edit($data)->result);
 
         $this->assertNotEmpty(ThreadRepo::findOne(['name' => 'thread1']));
         $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-updated']));
@@ -257,7 +266,7 @@ class ThreadFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->thread->edit(ThreadForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->thread->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -278,6 +287,18 @@ class ThreadFormTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new ThreadForm())->setThread(Thread::findOne(1));
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->thread->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->edit(['id' => 10000]);
     }
 
     /**

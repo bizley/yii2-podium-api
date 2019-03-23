@@ -6,7 +6,6 @@ namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollInterface;
@@ -14,6 +13,7 @@ use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\VotingInterface;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Poll
@@ -58,16 +58,23 @@ class Poll extends PodiumComponent implements PollInterface
     public function getPollByPostId(int $id): ?PollModelInterface
     {
         $pollClass = $this->pollHandler;
+
         return $pollClass::findByPostId($id);
     }
 
     /**
-     * Returns poll form handler.
-     * @return CategorisedFormInterface
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getPollForm(): CategorisedFormInterface
+    public function getPollForm(?int $id = null): ?CategorisedFormInterface
     {
-        return new $this->pollFormHandler;
+        $handler = $this->pollFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -79,27 +86,44 @@ class Poll extends PodiumComponent implements PollInterface
      */
     public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
     {
+        /* @var $pollForm CategorisedFormInterface */
         $pollForm = $this->getPollForm();
+
         $pollForm->setAuthor($author);
         $pollForm->setThread($thread);
 
         if (!$pollForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $pollForm->create();
     }
 
     /**
      * Updates poll post.
-     * @param ModelFormInterface $postPollForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $postPollForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $postPollForm = $this->getPollForm((int)$id);
+
+        if ($postPollForm === null) {
+            throw new ModelNotFoundException('Poll of given ID can not be found.');
+        }
+
         if (!$postPollForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $postPollForm->edit();
     }
 
@@ -131,6 +155,7 @@ class Poll extends PodiumComponent implements PollInterface
     public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): PodiumResponse
     {
         $voting = $this->getVoting();
+
         $voting->setMember($member);
         $voting->setPoll($poll);
         $voting->setAnswers($answers);

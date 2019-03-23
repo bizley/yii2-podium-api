@@ -258,6 +258,8 @@ class PostPollFormTest extends DbTestCase
         });
 
         $data = [
+            'id' => 1,
+            'type_id' => PostType::POLL,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -265,9 +267,9 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertTrue($this->podium()->post->edit(PostPollForm::findOne(1),  $data)->result);
+        $this->assertTrue($this->podium()->post->edit($data)->result);
 
-        $post = PostRepo::findOne(['content' => 'post-updated']);
+        $post = PostRepo::findOne(['id' => 1]);
         $this->assertEquals([
             'author_id' => 1,
             'category_id' => 1,
@@ -321,6 +323,8 @@ class PostPollFormTest extends DbTestCase
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = [
+            'id' => 1,
+            'type_id' => PostType::POLL,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -328,7 +332,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1),  $data)->result);
+        $this->assertFalse($this->podium()->post->edit($data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
@@ -339,6 +343,8 @@ class PostPollFormTest extends DbTestCase
     public function testUpdateAlreadyVoted(): void
     {
         $data = [
+            'id' => 2,
+            'type_id' => PostType::POLL,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -346,6 +352,6 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(2),  $data)->result);
+        $this->assertFalse($this->podium()->post->edit($data)->result);
     }
 }

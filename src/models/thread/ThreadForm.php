@@ -9,6 +9,7 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\ThreadRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -22,6 +23,8 @@ use yii\db\Exception;
  */
 class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.thread.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.thread.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.thread.editing.before';
@@ -102,15 +105,6 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             'name' => Yii::t('podium.label', 'thread.name'),
             'slug' => Yii::t('podium.label', 'thread.slug'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

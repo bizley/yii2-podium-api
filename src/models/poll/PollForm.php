@@ -69,4 +69,14 @@ class PollForm extends PollRepo implements ModelFormInterface
 
         return PodiumResponse::success($this->getOldAttributes());
     }
+
+    /**
+     * @param int $modelFormId
+     * @return ModelFormInterface|null
+     * @throws NotSupportedException
+     */
+    public static function findById(int $modelFormId): ?ModelFormInterface
+    {
+        throw new NotSupportedException('Use PostPollForm to find poll.');
+    }
 }

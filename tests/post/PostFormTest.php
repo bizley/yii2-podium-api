@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\category\Category;
@@ -199,9 +201,12 @@ class PostFormTest extends DbTestCase
             $this->eventsRaised[PostForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $data = ['content' => 'post-updated'];
+        $data = [
+            'id' => 1,
+            'content' => 'post-updated',
+        ];
 
-        $response = $this->podium()->post->edit(PostForm::findOne(1),  $data);
+        $response = $this->podium()->post->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -234,6 +239,7 @@ class PostFormTest extends DbTestCase
             'edited_at' => time(),
             'type_id' => PostType::POST,
         ]), [
+            'id' => $post->id,
             'content' => $post->content,
             'author_id' => $post->author_id,
             'category_id' => $post->category_id,
@@ -261,8 +267,11 @@ class PostFormTest extends DbTestCase
         };
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
 
-        $data = ['content' => 'post-updated'];
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), $data)->result);
+        $data = [
+            'id' => 1,
+            'content' => 'post-updated',
+        ];
+        $this->assertFalse($this->podium()->post->edit($data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
@@ -272,7 +281,7 @@ class PostFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->post->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -281,6 +290,18 @@ class PostFormTest extends DbTestCase
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->post->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->edit(['id' => 10000]);
     }
 
     public function testSetCategory(): void

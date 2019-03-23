@@ -31,10 +31,11 @@ interface GroupInterface
     public function getGroups(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns group form handler.
-     * @return ModelFormInterface
+     * Returns group form handler instance.
+     * @param int|null $id
+     * @return ModelFormInterface|null
      */
-    public function getGroupForm(): ModelFormInterface;
+    public function getGroupForm(?int $id = null): ?ModelFormInterface;
 
     /**
      * Creates group.
@@ -45,11 +46,10 @@ interface GroupInterface
 
     /**
      * Updates group.
-     * @param ModelFormInterface $groupForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $groupForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $rankRemover

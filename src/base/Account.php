@@ -18,8 +18,8 @@ use yii\web\User;
  * Class Account
  * @package bizley\podium\api\base
  *
- * @property null|MembershipInterface $membership
- * @property null|int $id
+ * @property MembershipInterface|null $membership
+ * @property int|null $id
  */
 class Account extends PodiumComponent implements AccountInterface
 {

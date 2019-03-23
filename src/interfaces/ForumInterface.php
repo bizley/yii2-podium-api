@@ -31,10 +31,11 @@ interface ForumInterface
     public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns forum form handler.
-     * @return CategorisedFormInterface
+     * Returns forum form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getForumForm(): CategorisedFormInterface;
+    public function getForumForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates forum.
@@ -47,11 +48,10 @@ interface ForumInterface
 
     /**
      * Updates forum.
-     * @param ModelFormInterface $forumForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $forumForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $forumRemover

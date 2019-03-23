@@ -31,10 +31,11 @@ interface ThreadInterface
     public function getThreads(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns thread form handler.
-     * @return CategorisedFormInterface
+     * Returns thread form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getThreadForm(): CategorisedFormInterface;
+    public function getThreadForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates thread.
@@ -47,11 +48,10 @@ interface ThreadInterface
 
     /**
      * Updates thread.
-     * @param ModelFormInterface $threadForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $threadForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $threadRemover

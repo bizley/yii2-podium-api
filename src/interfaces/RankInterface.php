@@ -31,10 +31,11 @@ interface RankInterface
     public function getRanks(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns rank form handler.
-     * @return ModelFormInterface
+     * Returns rank form handler instance.
+     * @param int|null $id
+     * @return ModelFormInterface|null
      */
-    public function getRankForm(): ModelFormInterface;
+    public function getRankForm(?int $id = null): ?ModelFormInterface;
 
     /**
      * Creates rank.
@@ -45,11 +46,10 @@ interface RankInterface
 
     /**
      * Updates rank.
-     * @param ModelFormInterface $rankForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $rankForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $rankRemover

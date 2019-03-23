@@ -11,6 +11,7 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\PollVoteRepo;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
@@ -28,6 +29,8 @@ use yii\db\Exception;
  */
 class PostPollForm extends PostRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.poll.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.poll.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.poll.editing.before';
@@ -207,15 +210,6 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             'expires_at' => Yii::t('podium.label', 'poll.expires'),
             'answers' => Yii::t('podium.label', 'poll.answers'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

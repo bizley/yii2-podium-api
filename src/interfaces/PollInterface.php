@@ -19,10 +19,11 @@ interface PollInterface
     public function getPollByPostId(int $id): ?PollModelInterface;
 
     /**
-     * Returns poll form handler.
-     * @return CategorisedFormInterface
+     * Returns poll form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getPollForm(): CategorisedFormInterface;
+    public function getPollForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates poll post.
@@ -35,11 +36,10 @@ interface PollInterface
 
     /**
      * Updates poll post.
-     * @param ModelFormInterface $postPollForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postPollForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $pollRemover

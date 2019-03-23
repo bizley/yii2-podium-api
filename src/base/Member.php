@@ -23,12 +23,6 @@ use yii\di\Instance;
 /**
  * Class Member
  * @package bizley\podium\api\base
- *
- * @property FriendshipInterface $friendship
- * @property RegistrationInterface $registration
- * @property MembershipInterface $membership
- * @property GroupingInterface $grouping
- * @property IgnoringInterface $ignoring
  */
 class Member extends PodiumComponent implements MemberInterface
 {

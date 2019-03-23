@@ -11,6 +11,7 @@ use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\SendingInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\MessageRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -23,6 +24,9 @@ use yii\db\Exception;
  */
 class Sending extends MessageRepo implements SendingInterface
 {
+    // TODO check if findById should be not supported
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_SENDING = 'podium.message.sending.before';
     public const EVENT_AFTER_SENDING = 'podium.message.sending.after';
 
@@ -110,15 +114,6 @@ class Sending extends MessageRepo implements SendingInterface
             'content' => Yii::t('podium.label', 'message.content'),
             'subject' => Yii::t('podium.label', 'message.subject'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\category;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\CategoryForm;
 use bizley\podium\api\models\member\Member;
@@ -156,12 +158,13 @@ class CategoryFormTest extends DbTestCase
         });
 
         $data = [
+            'id' => 1,
             'name' => 'category-updated',
             'visible' => 0,
             'sort' => 2,
         ];
 
-        $response = $this->podium()->category->edit(CategoryForm::findOne(1), $data);
+        $response = $this->podium()->category->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -183,6 +186,7 @@ class CategoryFormTest extends DbTestCase
             'slug' => 'category1',
             'author_id' => 1,
         ]), [
+            'id' => $category->id,
             'name' => $category->name,
             'visible' => $category->visible,
             'sort' => $category->sort,
@@ -203,11 +207,12 @@ class CategoryFormTest extends DbTestCase
         Event::on(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = [
+            'id' => 1,
             'name' => 'category-updated',
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1), $data)->result);
+        $this->assertFalse($this->podium()->category->edit($data)->result);
 
         $this->assertNotEmpty(CategoryRepo::findOne(['name' => 'category1']));
         $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-updated']));
@@ -217,12 +222,24 @@ class CategoryFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->category->edit(CategoryForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->category->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
     {
         $this->assertFalse((new CategoryForm())->edit()->result);
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->category->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->category->edit(['id' => 10000]);
     }
 
     /**

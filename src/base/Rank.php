@@ -13,6 +13,7 @@ use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Rank
@@ -50,6 +51,7 @@ class Rank extends PodiumComponent implements RankInterface
     public function getRankById(int $id): ?ModelInterface
     {
         $rankClass = $this->rankHandler;
+
         return $rankClass::findById($id);
     }
 
@@ -62,15 +64,23 @@ class Rank extends PodiumComponent implements RankInterface
     public function getRanks(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $rankClass = $this->rankHandler;
+
         return $rankClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
-     * @return ModelFormInterface
+     * @param int|null $id
+     * @return ModelFormInterface|null
      */
-    public function getRankForm(): ModelFormInterface
+    public function getRankForm(?int $id = null): ?ModelFormInterface
     {
-        return new $this->rankFormHandler;
+        $handler = $this->rankFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -80,25 +90,41 @@ class Rank extends PodiumComponent implements RankInterface
      */
     public function create(array $data): PodiumResponse
     {
+        /* @var $rankForm ModelFormInterface */
         $rankForm = $this->getRankForm();
 
         if (!$rankForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $rankForm->create();
     }
 
     /**
      * Updates rank.
-     * @param ModelFormInterface $rankForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $rankForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $rankForm = $this->getRankForm((int)$id);
+
+        if ($rankForm === null) {
+            throw new ModelNotFoundException('Rank of given ID can not be found.');
+        }
+
         if (!$rankForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $rankForm->edit();
     }
 

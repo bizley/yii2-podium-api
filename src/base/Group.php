@@ -13,6 +13,7 @@ use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Group
@@ -50,6 +51,7 @@ class Group extends PodiumComponent implements GroupInterface
     public function getGroupById(int $id): ?ModelInterface
     {
         $groupClass = $this->groupHandler;
+
         return $groupClass::findById($id);
     }
 
@@ -62,15 +64,23 @@ class Group extends PodiumComponent implements GroupInterface
     public function getGroups(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $groupClass = $this->groupHandler;
+
         return $groupClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
-     * @return ModelFormInterface
+     * @param int|null $id
+     * @return ModelFormInterface|null
      */
-    public function getGroupForm(): ModelFormInterface
+    public function getGroupForm(?int $id = null): ?ModelFormInterface
     {
-        return new $this->groupFormHandler;
+        $handler = $this->groupFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -80,25 +90,41 @@ class Group extends PodiumComponent implements GroupInterface
      */
     public function create(array $data): PodiumResponse
     {
+        /* @var $groupForm ModelFormInterface */
         $groupForm = $this->getGroupForm();
 
         if (!$groupForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $groupForm->create();
     }
 
     /**
      * Updates group.
-     * @param ModelFormInterface $groupForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $groupForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $groupForm = $this->getGroupForm((int)$id);
+
+        if ($groupForm === null) {
+            throw new ModelNotFoundException('Group of given ID can not be found.');
+        }
+
         if (!$groupForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $groupForm->edit();
     }
 

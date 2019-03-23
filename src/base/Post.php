@@ -9,7 +9,6 @@ use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LikingInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\PostInterface;
@@ -71,6 +70,7 @@ class Post extends PodiumComponent implements PostInterface
     public function getPostById(int $id): ?ModelInterface
     {
         $postClass = $this->postHandler;
+
         return $postClass::findById($id);
     }
 
@@ -83,23 +83,38 @@ class Post extends PodiumComponent implements PostInterface
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $postClass = $this->postHandler;
+
         return $postClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
+     * @param int|null $id
      * @return CategorisedFormInterface
      */
-    public function getPostForm(): CategorisedFormInterface
+    public function getPostForm(?int $id = null): ?CategorisedFormInterface
     {
-        return new $this->postFormHandler;
+        $handler = $this->postFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
-     * @return CategorisedFormInterface
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getPollForm(): CategorisedFormInterface
+    public function getPollForm(?int $id = null): ?CategorisedFormInterface
     {
-        return new $this->pollFormHandler;
+        $handler = $this->pollFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -113,27 +128,50 @@ class Post extends PodiumComponent implements PostInterface
     {
         $type = ArrayHelper::remove($data, 'type_id', PostType::POST);
 
-        $postForm = $type === PostType::POLL ? $this->getPollForm() : $this->getPostForm();
-        $postForm->setAuthor($author);
-        $postForm->setThread($thread);
+        /* @var $postOrPollForm CategorisedFormInterface */
+        $postOrPollForm = $type === PostType::POLL ? $this->getPollForm() : $this->getPostForm();
 
-        if (!$postForm->loadData($data)) {
+        $postOrPollForm->setAuthor($author);
+        $postOrPollForm->setThread($thread);
+
+        if (!$postOrPollForm->loadData($data)) {
             return PodiumResponse::error();
         }
-        return $postForm->create();
+
+        return $postOrPollForm->create();
     }
 
     /**
      * Updates standard post or poll post.
-     * @param ModelFormInterface $postOrPollForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $postOrPollForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $type = ArrayHelper::remove($data, 'type_id', PostType::POST);
+
+        $postOrPollForm = $type === PostType::POLL ? $this->getPollForm((int)$id) : $this->getPostForm((int)$id);
+
+        if ($postOrPollForm === null) {
+            if ($type === PostType::POLL) {
+                throw new ModelNotFoundException('Poll of given ID can not be found.');
+            }
+
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
         if (!$postOrPollForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $postOrPollForm->edit();
     }
 
@@ -197,8 +235,10 @@ class Post extends PodiumComponent implements PostInterface
     public function thumbUp(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbUp();
     }
 
@@ -211,8 +251,10 @@ class Post extends PodiumComponent implements PostInterface
     public function thumbDown(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbDown();
     }
 
@@ -225,8 +267,10 @@ class Post extends PodiumComponent implements PostInterface
     public function thumbReset(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
         $liking = $this->getLiking();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbReset();
     }
 }

@@ -264,6 +264,7 @@ class PostPollFormTest extends DbTestCase
         });
 
         $data = [
+            'id' => 1,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -271,7 +272,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertTrue($this->podium()->poll->edit(PostPollForm::findOne(1),  $data)->result);
+        $this->assertTrue($this->podium()->poll->edit($data)->result);
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals([
@@ -327,6 +328,7 @@ class PostPollFormTest extends DbTestCase
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = [
+            'id' => 1,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -334,7 +336,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1), $data)->result);
+        $this->assertFalse($this->podium()->poll->edit($data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
@@ -344,12 +346,13 @@ class PostPollFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->poll->edit(['id' => 1])->result);
     }
 
     public function testUpdateAlreadyVoted(): void
     {
         $data = [
+            'id' => 2,
             'content' => 'post-updated',
             'question' => 'question-updated',
             'revealed' => true,
@@ -357,7 +360,7 @@ class PostPollFormTest extends DbTestCase
             'expires_at' => 2,
             'answers' => ['answer3'],
         ];
-        $this->assertFalse($this->podium()->poll->edit(PostPollForm::findOne(2), $data)->result);
+        $this->assertFalse($this->podium()->poll->edit($data)->result);
     }
 
     public function testValidateCreate(): void
@@ -370,7 +373,7 @@ class PostPollFormTest extends DbTestCase
 
     public function testValidateUpdate(): void
     {
-        $this->assertFalse($this->podium()->post->edit(PostPollForm::findOne(1), ['content' => 'post-updated',])->result);
+        $this->assertFalse($this->podium()->post->edit(['id' => 1])->result);
     }
 
     public function testCreateNoThread(): void

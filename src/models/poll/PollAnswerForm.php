@@ -27,11 +27,11 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
 
     /**
      * Loads form data.
-     * @param array|null $data form data
+     * @param array $data form data
      * @return bool
      * @throws NotSupportedException
      */
-    public function loadData(?array $data = null): bool
+    public function loadData(array $data = []): bool
     {
         throw new NotSupportedException('Use PostPollForm to create poll.');
     }
@@ -58,5 +58,15 @@ class PollAnswerForm extends PollAnswerRepo implements ModelFormInterface
     public function edit(): PodiumResponse
     {
         throw new NotSupportedException('Use PostPollForm to update poll.');
+    }
+
+    /**
+     * @param int $modelFormId
+     * @return ModelFormInterface|null
+     * @throws NotSupportedException
+     */
+    public static function findById(int $modelFormId): ?ModelFormInterface
+    {
+        throw new NotSupportedException('Use PostPollForm to find poll.');
     }
 }

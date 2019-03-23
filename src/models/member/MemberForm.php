@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\MemberRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -19,6 +20,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class MemberForm extends MemberRepo implements ModelFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_EDITING = 'podium.member.editing.before';
     public const EVENT_AFTER_EDITING = 'podium.member.editing.after';
 
@@ -61,15 +64,6 @@ class MemberForm extends MemberRepo implements ModelFormInterface
             'username' => Yii::t('podium.label', 'member.username'),
             'slug' => Yii::t('podium.label', 'member.slug'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

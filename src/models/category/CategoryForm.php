@@ -8,6 +8,7 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\CategoryRepo;
 use Yii;
 use yii\behaviors\SluggableBehavior;
@@ -19,6 +20,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.category.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.category.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.category.editing.before';
@@ -75,15 +78,6 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
             'sort' => Yii::t('podium.label', 'category.sort'),
             'slug' => Yii::t('podium.label', 'category.slug'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

@@ -9,6 +9,7 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\ForumRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -21,6 +22,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class ForumForm extends ForumRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.forum.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.forum.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.forum.editing.before';
@@ -84,15 +87,6 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
             'sort' => Yii::t('podium.label', 'forum.sort'),
             'slug' => Yii::t('podium.label', 'forum.slug'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

@@ -8,7 +8,6 @@ use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\SortableInterface;
@@ -17,13 +16,11 @@ use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Category
  * @package bizley\podium\api\base
- *
- * @property AuthoredFormInterface $categoryForm
- * @property ModelInterface $categoryModel
  */
 class Category extends PodiumComponent implements CategoryInterface
 {
@@ -64,6 +61,7 @@ class Category extends PodiumComponent implements CategoryInterface
     public function getCategoryById(int $id): ?ModelInterface
     {
         $categoryClass = $this->categoryHandler;
+
         return $categoryClass::findById($id);
     }
 
@@ -76,15 +74,23 @@ class Category extends PodiumComponent implements CategoryInterface
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $categoryClass = $this->categoryHandler;
+
         return $categoryClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
-     * @return AuthoredFormInterface
+     * @param int|null $id
+     * @return AuthoredFormInterface|null
      */
-    public function getCategoryForm(): AuthoredFormInterface
+    public function getCategoryForm(?int $id = null): ?AuthoredFormInterface
     {
-        return new $this->categoryFormHandler;
+        $handler = $this->categoryFormHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -95,26 +101,43 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function create(array $data, MembershipInterface $author): PodiumResponse
     {
+        /* @var $categoryForm AuthoredFormInterface */
         $categoryForm = $this->getCategoryForm();
+
         $categoryForm->setAuthor($author);
 
         if (!$categoryForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categoryForm->create();
     }
 
     /**
      * Updates category.
-     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $categoryForm = $this->getCategoryForm((int)$id);
+
+        if ($categoryForm === null) {
+            throw new ModelNotFoundException('Category of given ID can not be found.');
+        }
+
         if (!$categoryForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categoryForm->edit();
     }
 
@@ -148,6 +171,7 @@ class Category extends PodiumComponent implements CategoryInterface
         if (!$categorySorter->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categorySorter->sort();
     }
 

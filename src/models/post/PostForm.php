@@ -10,6 +10,7 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\PostRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -22,6 +23,8 @@ use yii\db\Exception;
  */
 class PostForm extends PostRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.post.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.post.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.post.editing.before';
@@ -109,15 +112,6 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     public function attributeLabels(): array
     {
         return ['content' => Yii::t('podium.label', 'post.content')];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

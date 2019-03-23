@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -175,12 +177,13 @@ class ForumFormTest extends DbTestCase
         });
 
         $data = [
+            'id' => 1,
             'name' => 'forum-updated',
             'visible' => 0,
             'sort' => 2,
         ];
 
-        $response = $this->podium()->forum->edit(ForumForm::findOne(1), $data);
+        $response = $this->podium()->forum->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -208,6 +211,7 @@ class ForumFormTest extends DbTestCase
             'threads_count' => 0,
             'posts_count' => 0,
         ]), [
+            'id' => $forum->id,
             'name' => $forum->name,
             'visible' => $forum->visible,
             'sort' => $forum->sort,
@@ -231,11 +235,12 @@ class ForumFormTest extends DbTestCase
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = [
+            'id' => 1,
             'name' => 'forum-updated',
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1), $data)->result);
+        $this->assertFalse($this->podium()->forum->edit($data)->result);
 
         $this->assertNotEmpty(ForumRepo::findOne(['name' => 'forum1']));
         $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-updated']));
@@ -245,12 +250,24 @@ class ForumFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->forum->edit(ForumForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->forum->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
     {
         $this->assertFalse((new ForumForm())->edit()->result);
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->forum->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->forum->edit(['id' => 10000]);
     }
 
     public function testSetForum(): void

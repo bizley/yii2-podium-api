@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\rank;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\models\rank\RankForm;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
@@ -114,11 +116,12 @@ class RankFormTest extends DbTestCase
         });
 
         $data = [
+            'id' => 1,
             'name' => 'rank-updated',
             'min_posts' => 52,
         ];
 
-        $response = $this->podium()->rank->edit(RankForm::findOne(1), $data);
+        $response = $this->podium()->rank->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -132,6 +135,7 @@ class RankFormTest extends DbTestCase
 
         $rank = RankRepo::findOne(['name' => 'rank-updated']);
         $this->assertEquals($data, [
+            'id' => $rank->id,
             'name' => $rank->name,
             'min_posts' => $rank->min_posts,
         ]);
@@ -149,10 +153,11 @@ class RankFormTest extends DbTestCase
         Event::on(RankForm::class, RankForm::EVENT_BEFORE_EDITING, $handler);
 
         $data = [
+            'id' => 1,
             'name' => 'rank-updated',
             'min_posts' => 52,
         ];
-        $this->assertFalse($this->podium()->rank->edit(RankForm::findOne(1), $data)->result);
+        $this->assertFalse($this->podium()->rank->edit($data)->result);
 
         $this->assertNotEmpty(RankRepo::findOne(['name' => 'rank1']));
         $this->assertEmpty(RankRepo::findOne(['name' => 'rank-updated']));
@@ -162,7 +167,7 @@ class RankFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->rank->edit(RankForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->rank->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -171,5 +176,17 @@ class RankFormTest extends DbTestCase
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->edit()->result);
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->rank->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->rank->edit(['id' => 10000]);
     }
 }

@@ -31,10 +31,18 @@ interface PostInterface
     public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns post form handler.
-     * @return CategorisedFormInterface
+     * Returns post form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getPostForm(): CategorisedFormInterface;
+    public function getPostForm(?int $id = null): ?CategorisedFormInterface;
+
+    /**
+     * Returns poll form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
+     */
+    public function getPollForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates post.
@@ -47,11 +55,10 @@ interface PostInterface
 
     /**
      * Updates post.
-     * @param ModelFormInterface $postForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $postRemover

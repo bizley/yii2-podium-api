@@ -23,18 +23,19 @@ interface CategoryInterface
     public function getCategoryById(int $id): ?ModelInterface;
 
     /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
+     * @param DataFilter|null $filter
+     * @param bool|array|Sort|null $sort
+     * @param bool|array|Pagination|null $pagination
      * @return DataProviderInterface
      */
     public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns category form handler.
-     * @return AuthoredFormInterface
+     * Returns category form handler instance.
+     * @param int|null $id
+     * @return AuthoredFormInterface|null
      */
-    public function getCategoryForm(): AuthoredFormInterface;
+    public function getCategoryForm(?int $id = null): ?AuthoredFormInterface;
 
     /**
      * Creates category.
@@ -46,11 +47,10 @@ interface CategoryInterface
 
     /**
      * Updates category.
-     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * @param RemovableInterface $categoryRemover

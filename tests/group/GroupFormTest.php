@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\group;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\models\group\GroupForm;
 use bizley\podium\api\repos\GroupRepo;
 use bizley\podium\tests\DbTestCase;
@@ -97,9 +99,12 @@ class GroupFormTest extends DbTestCase
             $this->eventsRaised[GroupForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $data = ['name' => 'group-updated'];
+        $data = [
+            'id' => 1,
+            'name' => 'group-updated',
+        ];
 
-        $response = $this->podium()->group->edit(GroupForm::findOne(1), $data);
+        $response = $this->podium()->group->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -111,7 +116,10 @@ class GroupFormTest extends DbTestCase
         ], $response->data);
 
         $rank = GroupRepo::findOne(['name' => 'group-updated']);
-        $this->assertEquals($data, ['name' => $rank->name]);
+        $this->assertEquals($data, [
+            'id' => $rank->id,
+            'name' => $rank->name,
+        ]);
         $this->assertEmpty(GroupRepo::findOne(['name' => 'group1']));
 
         $this->assertArrayHasKey(GroupForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
@@ -125,8 +133,11 @@ class GroupFormTest extends DbTestCase
         };
         Event::on(GroupForm::class, GroupForm::EVENT_BEFORE_EDITING, $handler);
 
-        $data = ['name' => 'group-updated'];
-        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1), $data)->result);
+        $data = [
+            'id' => 1,
+            'name' => 'group-updated',
+        ];
+        $this->assertFalse($this->podium()->group->edit($data)->result);
 
         $this->assertNotEmpty(GroupRepo::findOne(['name' => 'group1']));
         $this->assertEmpty(GroupRepo::findOne(['name' => 'group-updated']));
@@ -136,11 +147,23 @@ class GroupFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->group->edit(GroupForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->group->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
     {
         $this->assertFalse((new GroupForm())->edit()->result);
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->group->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->group->edit(['id' => 10000]);
     }
 }
