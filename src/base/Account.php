@@ -41,6 +41,7 @@ class Account extends PodiumComponent implements AccountInterface
     public function init(): void
     {
         parent::init();
+
         $this->membershipHandler = Instance::ensure($this->membershipHandler, MembershipInterface::class);
         $this->userHandler = Instance::ensure($this->userHandler, User::class);
     }
@@ -57,6 +58,7 @@ class Account extends PodiumComponent implements AccountInterface
             $class = $this->membershipHandler;
             $this->_membership = $class::findByUserId($this->userHandler->id);
         }
+
         return $this->_membership;
     }
 
@@ -66,9 +68,11 @@ class Account extends PodiumComponent implements AccountInterface
     public function getId(): ?int
     {
         $membership = $this->getMembership();
+
         if ($membership === null) {
             return null;
         }
+
         return $membership->getId() ?? null;
     }
 
@@ -79,9 +83,11 @@ class Account extends PodiumComponent implements AccountInterface
     public function ensureMembership(): MembershipInterface
     {
         $member = $this->getMembership();
+
         if ($member === null) {
             throw new NoMembershipException('Membership data missing.');
         }
+
         return $member;
     }
 
@@ -237,7 +243,11 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function send(array $data, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
+    public function send(
+        array $data,
+        MembershipInterface $receiver,
+        ?MessageParticipantModelInterface $replyTo = null
+    ): PodiumResponse
     {
         return $this->podium->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
     }
