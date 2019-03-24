@@ -25,6 +25,15 @@ class ThreadMover extends ThreadRepo implements MovableInterface
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
     /**
+     * @param int $modelId
+     * @return MovableInterface|null
+     */
+    public static function findById(int $modelId): ?MovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @param ModelInterface $forum
      */
     public function setForum(ModelInterface $forum): void

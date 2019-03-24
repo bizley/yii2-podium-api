@@ -13,6 +13,12 @@ use bizley\podium\api\base\PodiumResponse;
 interface MovableInterface
 {
     /**
+     * @param int $modelId
+     * @return MovableInterface|null
+     */
+    public static function findById(int $modelId): ?MovableInterface;
+
+    /**
      * Moves model.
      * @return PodiumResponse
      */

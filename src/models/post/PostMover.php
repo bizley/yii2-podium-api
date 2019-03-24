@@ -27,6 +27,15 @@ class PostMover extends PostRepo implements MovableInterface
     public const EVENT_AFTER_MOVING = 'podium.post.moving.after';
 
     /**
+     * @param int $modelId
+     * @return MovableInterface|null
+     */
+    public static function findById(int $modelId): ?MovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @param ModelInterface $thread
      */
     public function setThread(ModelInterface $thread): void

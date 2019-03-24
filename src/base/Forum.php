@@ -56,6 +56,12 @@ class Forum extends PodiumComponent implements ForumInterface
     public $archiverHandler = \bizley\podium\api\models\forum\ForumArchiver::class;
 
     /**
+     * @var string|array|MovableInterface category mover handler
+     * Component ID, class, configuration array, or instance of MovableInterface.
+     */
+    public $moverHandler = \bizley\podium\api\models\forum\ForumMover::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init(): void
@@ -67,6 +73,7 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchivableInterface::class);
+        $this->moverHandler = Instance::ensure($this->moverHandler, MovableInterface::class);
     }
 
     /**
@@ -214,13 +221,31 @@ class Forum extends PodiumComponent implements ForumInterface
     }
 
     /**
+     * @param int $id
+     * @return MovableInterface|null
+     */
+    public function getMover(int $id): ?MovableInterface
+    {
+        $handler = $this->moverHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
      * Moves forum to different category.
-     * @param MovableInterface $forumMover
+     * @param int $id
      * @param ModelInterface $category
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse
+    public function move(int $id, ModelInterface $category): PodiumResponse
     {
+        $forumMover = $this->getMover($id);
+
+        if ($forumMover === null) {
+            throw new ModelNotFoundException('Forum of given ID can not be found.');
+        }
+
         $forumMover->setCategory($category);
 
         return $forumMover->move();

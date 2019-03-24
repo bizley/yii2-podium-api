@@ -79,12 +79,18 @@ interface ForumInterface
     public function sort(ModelInterface $category, array $data = []): PodiumResponse;
 
     /**
+     * @param int $id
+     * @return MovableInterface|null
+     */
+    public function getMover(int $id): ?MovableInterface;
+
+    /**
      * Moves forum to different category.
-     * @param MovableInterface $forumMover
+     * @param int $id
      * @param ModelInterface $category
      * @return PodiumResponse
      */
-    public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse;
+    public function move(int $id, ModelInterface $category): PodiumResponse;
 
     /**
      * @param int $id

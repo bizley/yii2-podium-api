@@ -23,6 +23,15 @@ class ForumMover extends ForumRepo implements MovableInterface
     public const EVENT_AFTER_MOVING = 'podium.forum.moving.after';
 
     /**
+     * @param int $modelId
+     * @return MovableInterface|null
+     */
+    public static function findById(int $modelId): ?MovableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @param ModelInterface $category
      */
     public function setCategory(ModelInterface $category): void
