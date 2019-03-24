@@ -37,18 +37,18 @@ class GroupTest extends DbTestCase
 
     public function testGetGroupById(): void
     {
-        $group = $this->podium()->group->getGroupById(1);
+        $group = $this->podium()->group->getById(1);
         $this->assertEquals(1, $group->getId());
     }
 
     public function testNonExistingGroup(): void
     {
-        $this->assertEmpty($this->podium()->group->getGroupById(999));
+        $this->assertEmpty($this->podium()->group->getById(999));
     }
 
     public function testGetGroupsByFilterEmpty(): void
     {
-        $groups = $this->podium()->group->getGroups();
+        $groups = $this->podium()->group->getAll();
         $this->assertEquals(2, $groups->getTotalCount());
         $this->assertEquals([1, 2], $groups->getKeys());
     }
@@ -61,7 +61,7 @@ class GroupTest extends DbTestCase
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $groups = $this->podium()->group->getGroups($filter);
+        $groups = $this->podium()->group->getAll($filter);
         $this->assertEquals(1, $groups->getTotalCount());
         $this->assertEquals([2], $groups->getKeys());
     }

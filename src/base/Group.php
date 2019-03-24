@@ -25,13 +25,19 @@ class Group extends PodiumComponent implements GroupInterface
      * @var string|array|ModelInterface group handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $groupHandler = \bizley\podium\api\models\group\Group::class;
+    public $modelHandler = \bizley\podium\api\models\group\Group::class;
 
     /**
      * @var string|array|ModelFormInterface group form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
-    public $groupFormHandler = \bizley\podium\api\models\group\GroupForm::class;
+    public $formHandler = \bizley\podium\api\models\group\GroupForm::class;
+
+    /**
+     * @var string|array|RemovableInterface group remover handler
+     * Component ID, class, configuration array, or instance of RemovableInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -40,17 +46,18 @@ class Group extends PodiumComponent implements GroupInterface
     {
         parent::init();
 
-        $this->groupHandler = Instance::ensure($this->groupHandler, ModelInterface::class);
-        $this->groupFormHandler = Instance::ensure($this->groupFormHandler, ModelFormInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getGroupById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $groupClass = $this->groupHandler;
+        $groupClass = $this->modelHandler;
 
         return $groupClass::findById($id);
     }
@@ -61,9 +68,9 @@ class Group extends PodiumComponent implements GroupInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getGroups(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $groupClass = $this->groupHandler;
+        $groupClass = $this->modelHandler;
 
         return $groupClass::findByFilter($filter, $sort, $pagination);
     }
@@ -72,9 +79,9 @@ class Group extends PodiumComponent implements GroupInterface
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getGroupForm(?int $id = null): ?ModelFormInterface
+    public function getForm(?int $id = null): ?ModelFormInterface
     {
-        $handler = $this->groupFormHandler;
+        $handler = $this->formHandler;
 
         if ($id === null) {
             return new $handler;
@@ -91,7 +98,7 @@ class Group extends PodiumComponent implements GroupInterface
     public function create(array $data): PodiumResponse
     {
         /* @var $groupForm ModelFormInterface */
-        $groupForm = $this->getGroupForm();
+        $groupForm = $this->getForm();
 
         if (!$groupForm->loadData($data)) {
             return PodiumResponse::error();
@@ -115,7 +122,7 @@ class Group extends PodiumComponent implements GroupInterface
             throw new InsufficientDataException('ID key is missing.');
         }
 
-        $groupForm = $this->getGroupForm((int)$id);
+        $groupForm = $this->getForm((int)$id);
 
         if ($groupForm === null) {
             throw new ModelNotFoundException('Group of given ID can not be found.');
@@ -129,12 +136,30 @@ class Group extends PodiumComponent implements GroupInterface
     }
 
     /**
-     * Deletes group.
-     * @param RemovableInterface $groupRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemovableInterface|null
      */
-    public function remove(RemovableInterface $groupRemover): PodiumResponse
+    public function getRemover(int $id): ?RemovableInterface
     {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes group.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $groupRemover = $this->getRemover($id);
+
+        if ($groupRemover === null) {
+            throw new ModelNotFoundException('Group of given ID can not be found.');
+        }
+
         return $groupRemover->remove();
     }
 }

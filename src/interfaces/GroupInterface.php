@@ -20,7 +20,7 @@ interface GroupInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getGroupById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,14 +28,14 @@ interface GroupInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getGroups(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns group form handler instance.
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getGroupForm(?int $id = null): ?ModelFormInterface;
+    public function getForm(?int $id = null): ?ModelFormInterface;
 
     /**
      * Creates group.
@@ -52,8 +52,14 @@ interface GroupInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $rankRemover
+     * @param int $id
+     * @return RemovableInterface|null
+     */
+    public function getRemover(int $id): ?RemovableInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $rankRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 }
