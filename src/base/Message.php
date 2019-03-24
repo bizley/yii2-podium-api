@@ -50,9 +50,10 @@ class Message extends PodiumComponent implements MessageInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getMessageById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
         $messageClass = $this->messageHandler;
+
         return $messageClass::findById($id);
     }
 
@@ -62,9 +63,10 @@ class Message extends PodiumComponent implements MessageInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getMessages(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $messageClass = $this->messageHandler;
+
         return $messageClass::findByFilter($filter, $sort, $pagination);
     }
 
@@ -84,9 +86,15 @@ class Message extends PodiumComponent implements MessageInterface
      * @param MessageParticipantModelInterface $replyTo
      * @return PodiumResponse
      */
-    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
+    public function send(
+        array $data,
+        MembershipInterface $sender,
+        MembershipInterface $receiver,
+        ?MessageParticipantModelInterface $replyTo = null
+    ): PodiumResponse
     {
         $sending = $this->getSending();
+
         $sending->setSender($sender);
         $sending->setReceiver($receiver);
         $sending->setReplyTo($replyTo);
@@ -94,6 +102,7 @@ class Message extends PodiumComponent implements MessageInterface
         if (!$sending->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $sending->send();
     }
 

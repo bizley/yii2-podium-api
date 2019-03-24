@@ -52,18 +52,18 @@ class MessageTest extends DbTestCase
 
     public function testGetMessageById(): void
     {
-        $message = $this->podium()->message->getMessageById(1);
+        $message = $this->podium()->message->getById(1);
         $this->assertEquals(1, $message->getId());
     }
 
     public function testNonExistingMessage(): void
     {
-        $this->assertEmpty($this->podium()->message->getMessageById(999));
+        $this->assertEmpty($this->podium()->message->getById(999));
     }
 
     public function testGetMessagesByFilterEmpty(): void
     {
-        $messages = $this->podium()->message->getMessages();
+        $messages = $this->podium()->message->getAll();
         $this->assertEquals(2, $messages->getTotalCount());
         $this->assertEquals([1, 2], $messages->getKeys());
     }
@@ -76,7 +76,7 @@ class MessageTest extends DbTestCase
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $messages = $this->podium()->message->getMessages($filter);
+        $messages = $this->podium()->message->getAll($filter);
         $this->assertEquals(1, $messages->getTotalCount());
         $this->assertEquals([2], $messages->getKeys());
     }
@@ -89,13 +89,13 @@ class MessageTest extends DbTestCase
 
     public function testGetNoParent(): void
     {
-        $message = $this->podium()->message->getMessageById(1);
+        $message = $this->podium()->message->getById(1);
         $this->assertEmpty($message->getParent());
     }
 
     public function testGetParent(): void
     {
-        $message = $this->podium()->message->getMessageById(2);
+        $message = $this->podium()->message->getById(2);
         $reply = Message::findOne(1);
 
         $this->assertEquals($reply, $message->getParent());
