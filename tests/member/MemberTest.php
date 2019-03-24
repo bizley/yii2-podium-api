@@ -112,24 +112,24 @@ class MemberTest extends DbTestCase
 
     public function testGetMemberById(): void
     {
-        $member = $this->podium()->member->getMemberById(2);
+        $member = $this->podium()->member->getById(2);
         $this->assertEquals(2, $member->getId());
     }
 
     public function testGetMemberByUserId(): void
     {
-        $member = $this->podium()->member->getMemberByUserId('10');
+        $member = $this->podium()->member->getByUserId('10');
         $this->assertEquals(2, $member->getId());
     }
 
     public function testNonExistingMember(): void
     {
-        $this->assertEmpty($this->podium()->member->getMemberById(999));
+        $this->assertEmpty($this->podium()->member->getById(999));
     }
 
     public function testGetMembersByFilterEmpty(): void
     {
-        $members = $this->podium()->member->getMembers();
+        $members = $this->podium()->member->getAll();
         $this->assertEquals(2, $members->getTotalCount());
         $this->assertEquals([2, 3], $members->getKeys());
     }
@@ -142,14 +142,14 @@ class MemberTest extends DbTestCase
             }
         ]);
         $filter->load(['filter' => ['id' => 3]], '');
-        $members = $this->podium()->member->getMembers($filter);
+        $members = $this->podium()->member->getAll($filter);
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
     }
 
     public function testGetPostsCount(): void
     {
-        $member = $this->podium()->member->getMemberById(2);
+        $member = $this->podium()->member->getById(2);
         $this->assertEquals(3, $member->getPostsCount());
     }
 
@@ -167,7 +167,7 @@ class MemberTest extends DbTestCase
 
     public function testGetUsername(): void
     {
-        $member = $this->podium()->member->getMemberById(3);
+        $member = $this->podium()->member->getById(3);
         $this->assertEquals('member3', $member->getUsername());
     }
 }

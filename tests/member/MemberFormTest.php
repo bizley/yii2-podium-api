@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\member;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\MemberForm;
 use bizley\podium\api\repos\MemberRepo;
@@ -48,7 +50,10 @@ class MemberFormTest extends DbTestCase
             $this->eventsRaised[MemberForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $response = $this->podium()->member->edit(MemberForm::findOne(1), ['username' => 'username-updated']);
+        $response = $this->podium()->member->edit([
+            'id' => 1,
+            'username' => 'username-updated',
+        ]);
         $time = time();
 
         $this->assertTrue($response->result);
@@ -78,7 +83,10 @@ class MemberFormTest extends DbTestCase
         };
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
 
-        $this->assertFalse($this->podium()->member->edit(MemberForm::findOne(1), ['username' => 'username-updated'])->result);
+        $this->assertFalse($this->podium()->member->edit([
+            'id' => 1,
+            'username' => 'username-updated',
+        ])->result);
 
         $this->assertNotEmpty(MemberRepo::findOne(['username' => 'member']));
         $this->assertEmpty(MemberRepo::findOne(['username' => 'username-updated']));
@@ -88,7 +96,7 @@ class MemberFormTest extends DbTestCase
 
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->member->edit(MemberForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->member->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -103,6 +111,18 @@ class MemberFormTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new MemberForm())->create();
+    }
+
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->member->edit([]);
+    }
+
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->member->edit(['id' => 10000]);
     }
 
     /**
