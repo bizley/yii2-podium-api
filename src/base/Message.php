@@ -30,10 +30,12 @@ class Message extends PodiumComponent implements MessageInterface
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|SendingInterface sending handler
+     * @var string|array|SendingInterface message mailer handler
      * Component ID, class, configuration array, or instance of SendingInterface.
      */
-    public $sendingHandler = \bizley\podium\api\models\message\Sending::class;
+    public $mailerHandler = \bizley\podium\api\models\message\MessageMailer::class;
+
+    // TODO: remover handler and archiver handler
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -43,7 +45,7 @@ class Message extends PodiumComponent implements MessageInterface
         parent::init();
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
-        $this->sendingHandler = Instance::ensure($this->sendingHandler, SendingInterface::class);
+        $this->mailerHandler = Instance::ensure($this->mailerHandler, SendingInterface::class);
     }
 
     /**
@@ -73,9 +75,9 @@ class Message extends PodiumComponent implements MessageInterface
     /**
      * @return SendingInterface
      */
-    public function getSending(): SendingInterface
+    public function getMailer(): SendingInterface
     {
-        return new $this->sendingHandler;
+        return new $this->mailerHandler;
     }
 
     /**
@@ -93,7 +95,7 @@ class Message extends PodiumComponent implements MessageInterface
         ?MessageParticipantModelInterface $replyTo = null
     ): PodiumResponse
     {
-        $sending = $this->getSending();
+        $sending = $this->getMailer();
 
         $sending->setSender($sender);
         $sending->setReceiver($receiver);

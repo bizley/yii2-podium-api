@@ -49,25 +49,31 @@ class Member extends PodiumComponent implements MemberInterface
      * @var string|array|FriendshipInterface friendship handler
      * Component ID, class, configuration array, or instance of FriendshipInterface.
      */
-    public $friendshipHandler = \bizley\podium\api\models\member\Friendship::class;
+    public $friendshipHandler = \bizley\podium\api\models\member\MemberFriendship::class;
 
     /**
      * @var string|array|IgnoringInterface ignoring handler
      * Component ID, class, configuration array, or instance of IgnoringInterface.
      */
-    public $ignoringHandler = \bizley\podium\api\models\member\Ignoring::class;
+    public $ignorerHandler = \bizley\podium\api\models\member\MemberIgnorer::class;
 
     /**
      * @var string|array|GroupingInterface grouping handler
      * Component ID, class, configuration array, or instance of GroupingInterface.
      */
-    public $groupingHandler = \bizley\podium\api\models\member\Grouping::class;
+    public $grouperHandler = \bizley\podium\api\models\member\MemberGrouper::class;
 
     /**
-     * @var string|array|RemovableInterface group remover handler
+     * @var string|array|RemovableInterface member remover handler
      * Component ID, class, configuration array, or instance of RemovableInterface.
      */
     public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
+
+    /**
+     * @var string|array|BanInterface member banner handler
+     * Component ID, class, configuration array, or instance of BanInterface.
+     */
+    public $bannerHandler = \bizley\podium\api\models\member\MemberBanner::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -80,9 +86,10 @@ class Member extends PodiumComponent implements MemberInterface
         $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
-        $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
-        $this->groupingHandler = Instance::ensure($this->groupingHandler, GroupingInterface::class);
+        $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnoringInterface::class);
+        $this->grouperHandler = Instance::ensure($this->grouperHandler, GroupingInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
+        $this->bannerHandler = Instance::ensure($this->bannerHandler, BanInterface::class);
     }
 
     /**
@@ -230,9 +237,9 @@ class Member extends PodiumComponent implements MemberInterface
     /**
      * @return IgnoringInterface
      */
-    public function getIgnoring(): IgnoringInterface
+    public function getIgnorer(): IgnoringInterface
     {
-        return new $this->ignoringHandler;
+        return new $this->ignorerHandler;
     }
 
     /**
@@ -243,7 +250,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function ignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $ignoring = $this->getIgnoring();
+        $ignoring = $this->getIgnorer();
 
         $ignoring->setMember($member);
         $ignoring->setTarget($target);
@@ -259,7 +266,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $ignoring = $this->getIgnoring();
+        $ignoring = $this->getIgnorer();
 
         $ignoring->setMember($member);
         $ignoring->setTarget($target);
@@ -268,31 +275,56 @@ class Member extends PodiumComponent implements MemberInterface
     }
 
     /**
-     * Bans member.
-     * @param BanInterface $member
-     * @return PodiumResponse
+     * @param int $id
+     * @return BanInterface|null
      */
-    public function ban(BanInterface $member): PodiumResponse
+    public function getBanner(int $id): ?BanInterface
     {
-        return $member->ban();
+        $handler = $this->bannerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Bans member.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function ban(int $id): PodiumResponse
+    {
+        $memberBanner = $this->getBanner($id);
+
+        if ($memberBanner === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        return $memberBanner->ban();
     }
 
     /**
      * Unbans member.
-     * @param BanInterface $member
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function unban(BanInterface $member): PodiumResponse
+    public function unban(int $id): PodiumResponse
     {
-        return $member->unban();
+        $memberBanner = $this->getBanner($id);
+
+        if ($memberBanner === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        return $memberBanner->unban();
     }
 
     /**
      * @return GroupingInterface
      */
-    public function getGrouping(): GroupingInterface
+    public function getGrouper(): GroupingInterface
     {
-        return new $this->groupingHandler;
+        return new $this->grouperHandler;
     }
 
     /**
@@ -303,7 +335,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function join(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouping();
+        $grouping = $this->getGrouper();
 
         $grouping->setMember($member);
         $grouping->setGroup($group);
@@ -319,7 +351,7 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function leave(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouping();
+        $grouping = $this->getGrouper();
 
         $grouping->setMember($member);
         $grouping->setGroup($group);

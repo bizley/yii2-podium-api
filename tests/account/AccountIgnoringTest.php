@@ -6,7 +6,7 @@ namespace bizley\podium\tests\account;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\Ignoring;
+use bizley\podium\api\models\member\MemberIgnorer;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\AccountTestCase;
@@ -87,11 +87,11 @@ class AccountIgnoringTest extends AccountTestCase
 
     public function testIgnore(): void
     {
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_BEFORE_IGNORING] = true;
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, function () {
+            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_IGNORING] = true;
         });
-        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_IGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_AFTER_IGNORING] = true;
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_IGNORING, function () {
+            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_IGNORING] = true;
         });
 
         $this->assertTrue($this->podium()->account->ignore(Member::findOne(11))->result);
@@ -103,8 +103,8 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertNotEmpty($acq);
 
-        $this->assertArrayHasKey(Ignoring::EVENT_BEFORE_IGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(Ignoring::EVENT_AFTER_IGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_IGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_IGNORING, static::$eventsRaised);
     }
 
     public function testIgnoreEventPreventing(): void
@@ -112,7 +112,7 @@ class AccountIgnoringTest extends AccountTestCase
         $handler = function ($event) {
             $event->canIgnore = false;
         };
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, $handler);
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, $handler);
 
         $this->assertFalse($this->podium()->account->ignore(Member::findOne(11))->result);
 
@@ -123,7 +123,7 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertEmpty($acq);
 
-        Event::off(Ignoring::class, Ignoring::EVENT_BEFORE_IGNORING, $handler);
+        Event::off(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, $handler);
     }
 
     public function testIgnoreAgain(): void
@@ -133,11 +133,11 @@ class AccountIgnoringTest extends AccountTestCase
 
     public function testUnignore(): void
     {
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_BEFORE_UNIGNORING] = true;
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, function () {
+            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_UNIGNORING] = true;
         });
-        Event::on(Ignoring::class, Ignoring::EVENT_AFTER_UNIGNORING, function () {
-            static::$eventsRaised[Ignoring::EVENT_AFTER_UNIGNORING] = true;
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_UNIGNORING, function () {
+            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_UNIGNORING] = true;
         });
 
         $this->assertTrue($this->podium()->account->unignore(Member::findOne(12))->result);
@@ -149,8 +149,8 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertEmpty($acq);
 
-        $this->assertArrayHasKey(Ignoring::EVENT_BEFORE_UNIGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(Ignoring::EVENT_AFTER_UNIGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_UNIGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_UNIGNORING, static::$eventsRaised);
     }
 
     public function testUnignoreEventPreventing(): void
@@ -158,7 +158,7 @@ class AccountIgnoringTest extends AccountTestCase
         $handler = function ($event) {
             $event->canUnignore = false;
         };
-        Event::on(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, $handler);
+        Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, $handler);
 
         $this->assertFalse($this->podium()->account->unignore(Member::findOne(12))->result);
 
@@ -169,7 +169,7 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertNotEmpty($acq);
 
-        Event::off(Ignoring::class, Ignoring::EVENT_BEFORE_UNIGNORING, $handler);
+        Event::off(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, $handler);
     }
 
     public function testUnignoreAgain(): void

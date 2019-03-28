@@ -19,10 +19,10 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
 
 /**
- * Class Sending
+ * Class MessageMailer
  * @package bizley\podium\api\models\message
  */
-class Sending extends MessageRepo implements SendingInterface
+class MessageMailer extends MessageRepo implements SendingInterface
 {
     // TODO check if findById should be not supported
     use ModelFormTrait;
@@ -154,6 +154,7 @@ class Sending extends MessageRepo implements SendingInterface
             }
 
             if ($this->reply_to_id !== null) {
+                // TODO: make configurable
                 $repliedMessage = MessageParticipantForm::findOne([
                     'member_id' => $this->getSender(),
                     'message_id' => $this->reply_to_id,

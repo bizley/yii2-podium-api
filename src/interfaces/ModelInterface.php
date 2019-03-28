@@ -23,9 +23,9 @@ interface ModelInterface
     public static function findById(int $modelId): ?ModelInterface;
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getId(): int;
+    public function getId(): ?int;
 
     /**
      * @return int

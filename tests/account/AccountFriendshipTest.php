@@ -6,7 +6,7 @@ namespace bizley\podium\tests\account;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\Friendship;
+use bizley\podium\api\models\member\MemberFriendship;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\AccountTestCase;
@@ -87,11 +87,11 @@ class AccountFriendshipTest extends AccountTestCase
 
     public function testBefriend(): void
     {
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_BEFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, function () {
+            static::$eventsRaised[MemberFriendship::EVENT_BEFORE_BEFRIENDING] = true;
         });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_BEFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_BEFRIENDING, function () {
+            static::$eventsRaised[MemberFriendship::EVENT_AFTER_BEFRIENDING] = true;
         });
 
         $this->assertTrue($this->podium()->account->befriend(Member::findOne(11))->result);
@@ -102,8 +102,8 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(Friendship::EVENT_BEFORE_BEFRIENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(Friendship::EVENT_AFTER_BEFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_BEFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_BEFRIENDING, static::$eventsRaised);
     }
 
     public function testBefriendEventPreventing(): void
@@ -111,7 +111,7 @@ class AccountFriendshipTest extends AccountTestCase
         $handler = function ($event) {
             $event->canBeFriends = false;
         };
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
 
         $this->assertFalse($this->podium()->account->befriend(Member::findOne(11))->result);
 
@@ -121,7 +121,7 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
     }
 
     public function testBefriendAgain(): void
@@ -131,11 +131,11 @@ class AccountFriendshipTest extends AccountTestCase
 
     public function testUnfriend(): void
     {
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_UNFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, function () {
+            static::$eventsRaised[MemberFriendship::EVENT_BEFORE_UNFRIENDING] = true;
         });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_UNFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_UNFRIENDING, function () {
+            static::$eventsRaised[MemberFriendship::EVENT_AFTER_UNFRIENDING] = true;
         });
 
         $this->assertTrue($this->podium()->account->unfriend(Member::findOne(12))->result);
@@ -146,8 +146,8 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(Friendship::EVENT_BEFORE_UNFRIENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(Friendship::EVENT_AFTER_UNFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_UNFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_UNFRIENDING, static::$eventsRaised);
     }
 
     public function testUnfriendEventPreventing(): void
@@ -155,7 +155,7 @@ class AccountFriendshipTest extends AccountTestCase
         $handler = function ($event) {
             $event->canUnfriend = false;
         };
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
 
         $this->assertFalse($this->podium()->account->unfriend(Member::findOne(12))->result);
 
@@ -165,7 +165,7 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
     }
 
     public function testUnfriendAgain(): void

@@ -73,7 +73,7 @@ class Account extends PodiumComponent implements AccountInterface
             return null;
         }
 
-        return $membership->getId() ?? null;
+        return $membership->getId();
     }
 
     /**

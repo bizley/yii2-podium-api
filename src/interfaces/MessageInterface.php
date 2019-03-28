@@ -34,7 +34,7 @@ interface MessageInterface
      * Returns forum form handler.
      * @return SendingInterface
      */
-    public function getSending(): SendingInterface;
+    public function getMailer(): SendingInterface;
 
     /**
      * Sends message.
