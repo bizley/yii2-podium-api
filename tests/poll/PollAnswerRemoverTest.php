@@ -9,6 +9,7 @@ use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\PollAnswerRemover;
 use bizley\podium\api\repos\PollAnswerRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 
 /**
  * Class PollAnswerRemoverTest
@@ -109,7 +110,7 @@ class PollAnswerRemoverTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(PollAnswerRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $this->assertFalse($mock->remove()->result);
     }

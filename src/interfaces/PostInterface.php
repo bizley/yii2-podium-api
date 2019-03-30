@@ -61,10 +61,10 @@ interface PostInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $postRemover
+     * @param RemoverInterface $postRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $postRemover): PodiumResponse;
+    public function remove(RemoverInterface $postRemover): PodiumResponse;
 
     /**
      * Moves post to different thread.

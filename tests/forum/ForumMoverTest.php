@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -71,6 +72,9 @@ class ForumMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMove(): void
     {
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, function () {
@@ -87,9 +91,12 @@ class ForumMoverTest extends DbTestCase
         $this->assertArrayHasKey(ForumMover::EVENT_AFTER_MOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMove = false;
         };
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
@@ -100,12 +107,18 @@ class ForumMoverTest extends DbTestCase
         Event::off(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ForumMover())->setForum(new Forum());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\MemberIgnorer;
@@ -11,7 +12,9 @@ use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountIgnoringTest
@@ -65,19 +68,19 @@ class AccountIgnoringTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '10']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '10']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -85,16 +88,19 @@ class AccountIgnoringTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testIgnore(): void
     {
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_IGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_BEFORE_IGNORING] = true;
         });
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_IGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_IGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_AFTER_IGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->ignore(Member::findOne(11))->result);
+        $this->assertTrue($this->podium()->account->ignoreMember(Member::findOne(11))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -103,18 +109,21 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertNotEmpty($acq);
 
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_IGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_IGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_IGNORING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_IGNORING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testIgnoreEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canIgnore = false;
         };
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, $handler);
 
-        $this->assertFalse($this->podium()->account->ignore(Member::findOne(11))->result);
+        $this->assertFalse($this->podium()->account->ignoreMember(Member::findOne(11))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -126,21 +135,27 @@ class AccountIgnoringTest extends AccountTestCase
         Event::off(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testIgnoreAgain(): void
     {
-        $this->assertFalse($this->podium()->account->ignore(Member::findOne(12))->result);
+        $this->assertFalse($this->podium()->account->ignoreMember(Member::findOne(12))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnignore(): void
     {
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_UNIGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_BEFORE_UNIGNORING] = true;
         });
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_UNIGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_UNIGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_AFTER_UNIGNORING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->unignore(Member::findOne(12))->result);
+        $this->assertTrue($this->podium()->account->unignoreMember(Member::findOne(12))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -149,18 +164,21 @@ class AccountIgnoringTest extends AccountTestCase
         ]);
         $this->assertEmpty($acq);
 
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_UNIGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_UNIGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_UNIGNORING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_UNIGNORING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnignoreEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnignore = false;
         };
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, $handler);
 
-        $this->assertFalse($this->podium()->account->unignore(Member::findOne(12))->result);
+        $this->assertFalse($this->podium()->account->unignoreMember(Member::findOne(12))->result);
 
         $acq = AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -172,8 +190,11 @@ class AccountIgnoringTest extends AccountTestCase
         Event::off(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnignoreAgain(): void
     {
-        $this->assertFalse($this->podium()->account->unignore(Member::findOne(11))->result);
+        $this->assertFalse($this->podium()->account->unignoreMember(Member::findOne(11))->result);
     }
 }

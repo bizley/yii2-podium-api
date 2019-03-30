@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
@@ -14,7 +15,9 @@ use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountSendingTest
@@ -78,19 +81,19 @@ class AccountSendingTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -98,20 +101,23 @@ class AccountSendingTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSend(): void
     {
         Event::on(MessageMailer::class, MessageMailer::EVENT_BEFORE_SENDING, function () {
-            static::$eventsRaised[MessageMailer::EVENT_BEFORE_SENDING] = true;
+            $this->eventsRaised[MessageMailer::EVENT_BEFORE_SENDING] = true;
         });
         Event::on(MessageMailer::class, MessageMailer::EVENT_AFTER_SENDING, function () {
-            static::$eventsRaised[MessageMailer::EVENT_AFTER_SENDING] = true;
+            $this->eventsRaised[MessageMailer::EVENT_AFTER_SENDING] = true;
         });
 
         $data = [
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertTrue($this->podium()->account->send($data, Member::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->sendMessage($data, Member::findOne(2))->result);
 
         $message = MessageRepo::findOne(['subject' => 'new-subject']);
         $this->assertEquals(array_merge($data, [
@@ -150,13 +156,16 @@ class AccountSendingTest extends AccountTestCase
             'archived' => $messageReceiver->archived,
         ]);
 
-        $this->assertArrayHasKey(MessageMailer::EVENT_BEFORE_SENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(MessageMailer::EVENT_AFTER_SENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MessageMailer::EVENT_BEFORE_SENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MessageMailer::EVENT_AFTER_SENDING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSendEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSend = false;
         };
         Event::on(MessageMailer::class, MessageMailer::EVENT_BEFORE_SENDING, $handler);
@@ -165,20 +174,23 @@ class AccountSendingTest extends AccountTestCase
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertFalse($this->podium()->account->send($data, Member::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->sendMessage($data, Member::findOne(2))->result);
 
         $this->assertEmpty(MessageRepo::findOne(['subject' => 'new-subject']));
 
         Event::off(MessageMailer::class, MessageMailer::EVENT_BEFORE_SENDING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSendReply(): void
     {
         $data = [
             'subject' => 'new-subject',
             'content' => 'new-content',
         ];
-        $this->assertTrue($this->podium()->account->send($data, Member::findOne(2), MessageParticipant::findOne([
+        $this->assertTrue($this->podium()->account->sendMessage($data, Member::findOne(2), MessageParticipant::findOne([
             'message_id' => 1,
             'side_id' => MessageSide::SENDER,
         ]))->result);

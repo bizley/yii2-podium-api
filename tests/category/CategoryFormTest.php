@@ -12,6 +12,9 @@ use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\CategoryRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
+use function array_merge;
+use function time;
 
 /**
  * Class CategoryFormTest
@@ -71,6 +74,14 @@ class CategoryFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 2,
             'name' => 'category-new',
@@ -79,9 +90,7 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
             'author_id' => 1,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $category = CategoryRepo::findOne(['name' => 'category-new']);
         $this->assertEquals(array_merge($data, [
@@ -121,7 +130,7 @@ class CategoryFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(CategoryForm::class, CategoryForm::EVENT_BEFORE_CREATING, $handler);
@@ -148,6 +157,10 @@ class CategoryFormTest extends DbTestCase
         $this->assertFalse((new CategoryForm())->create()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, function () {
@@ -168,6 +181,12 @@ class CategoryFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'name' => 'category-updated',
@@ -177,9 +196,8 @@ class CategoryFormTest extends DbTestCase
             'sort' => 2,
             'author_id' => 1,
             'created_at' => 1,
-            'updated_at' => $time,
             'archived' => 0,
-        ], $response->data);
+        ], $responseData);
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
         $this->assertEquals(array_merge($data, [
@@ -199,9 +217,13 @@ class CategoryFormTest extends DbTestCase
         $this->assertArrayHasKey(CategoryForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, $handler);
@@ -220,6 +242,10 @@ class CategoryFormTest extends DbTestCase
         Event::off(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->category->edit(['id' => 1])->result);
@@ -230,12 +256,20 @@ class CategoryFormTest extends DbTestCase
         $this->assertFalse((new CategoryForm())->edit()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateNoId(): void
     {
         $this->expectException(InsufficientDataException::class);
         $this->podium()->category->edit([]);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateWrongId(): void
     {
         $this->expectException(ModelNotFoundException::class);

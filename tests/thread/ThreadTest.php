@@ -6,6 +6,7 @@ namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -96,12 +97,14 @@ class ThreadTest extends DbTestCase
     public function testGetThreadsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $threads = $this->podium()->thread->getThreads($filter);
+
         $this->assertEquals(1, $threads->getTotalCount());
         $this->assertEquals([2], $threads->getKeys());
     }

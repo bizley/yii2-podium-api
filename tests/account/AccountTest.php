@@ -10,6 +10,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
+use yii\db\Exception;
 
 /**
  * Class AccountTest
@@ -35,7 +36,7 @@ class AccountTest extends AccountTestCase
     ];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
@@ -43,7 +44,7 @@ class AccountTest extends AccountTestCase
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -68,6 +69,9 @@ class AccountTest extends AccountTestCase
         $this->assertEquals(10, $this->podium()->account->getId());
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testFailedMembershipEnsure(): void
     {
         $this->expectException(NoMembershipException::class);

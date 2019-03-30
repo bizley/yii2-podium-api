@@ -7,6 +7,7 @@ namespace bizley\podium\tests\rank;
 use bizley\podium\api\models\rank\RankRemover;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -33,28 +34,28 @@ class RankRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testRemove(): void
     {
         Event::on(RankRemover::class, RankRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[RankRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[RankRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(RankRemover::class, RankRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[RankRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[RankRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->rank->remove(RankRemover::findOne(1))->result);
 
         $this->assertEmpty(RankRepo::findOne(1));
 
-        $this->assertArrayHasKey(RankRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(RankRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(RankRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(RankRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(RankRemover::class, RankRemover::EVENT_BEFORE_REMOVING, $handler);
@@ -69,7 +70,7 @@ class RankRemoverTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(RankRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $this->assertFalse($mock->remove()->result);
     }

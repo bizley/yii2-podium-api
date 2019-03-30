@@ -13,7 +13,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -64,7 +64,7 @@ class Member extends PodiumComponent implements MemberInterface
     public $grouperHandler = \bizley\podium\api\models\member\MemberGrouper::class;
 
     /**
-     * @var string|array|RemovableInterface member remover handler
+     * @var string|array|RemoverInterface member remover handler
      * Component ID, class, configuration array, or instance of RemovableInterface.
      */
     public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
@@ -88,7 +88,7 @@ class Member extends PodiumComponent implements MemberInterface
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
         $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnoringInterface::class);
         $this->grouperHandler = Instance::ensure($this->grouperHandler, GroupingInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->bannerHandler = Instance::ensure($this->bannerHandler, BanInterface::class);
     }
 
@@ -361,9 +361,9 @@ class Member extends PodiumComponent implements MemberInterface
 
     /**
      * @param int $id
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public function getRemover(int $id): ?RemovableInterface
+    public function getRemover(int $id): ?RemoverInterface
     {
         $handler = $this->removerHandler;
 

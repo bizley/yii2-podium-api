@@ -111,12 +111,18 @@ class PollAnswerFormTest extends DbTestCase
         $this->assertEquals(1, PollAnswerRepo::findOne(['answer' => 'answer-new'])->poll_id);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testUpdate(): void
     {
         $this->expectException(NotSupportedException::class);
         PollAnswerForm::findOne(1)->edit();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testLoadData(): void
     {
         $this->expectException(NotSupportedException::class);

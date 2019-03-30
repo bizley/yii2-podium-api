@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\Subscribing;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\SubscriptionRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountSubscribingTest
@@ -89,19 +92,19 @@ class AccountSubscribingTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -109,16 +112,19 @@ class AccountSubscribingTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSubscribe(): void
     {
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_BEFORE_SUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_BEFORE_SUBSCRIBING] = true;
         });
         Event::on(Subscribing::class, Subscribing::EVENT_AFTER_SUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->subscribe(Thread::findOne(1))->result);
+        $this->assertTrue($this->podium()->account->subscribeThread(Thread::findOne(1))->result);
 
         $subscription = SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -127,18 +133,21 @@ class AccountSubscribingTest extends AccountTestCase
         $this->assertNotEmpty($subscription);
         $this->assertEquals(true, $subscription->seen);
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_SUBSCRIBING, static::$eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_SUBSCRIBING, static::$eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_SUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_SUBSCRIBING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSubscribeEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSubscribe = false;
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
 
-        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(1))->result);
+        $this->assertFalse($this->podium()->account->subscribeThread(Thread::findOne(1))->result);
 
         $this->assertEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -148,39 +157,48 @@ class AccountSubscribingTest extends AccountTestCase
         Event::off(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testSubscribeAgain(): void
     {
-        $this->assertFalse($this->podium()->account->subscribe(Thread::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->subscribeThread(Thread::findOne(2))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnsubscribe(): void
     {
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_BEFORE_UNSUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_BEFORE_UNSUBSCRIBING] = true;
         });
         Event::on(Subscribing::class, Subscribing::EVENT_AFTER_UNSUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->unsubscribe(Thread::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->unsubscribeThread(Thread::findOne(2))->result);
 
         $this->assertEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
             'thread_id' => 2,
         ]));
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_UNSUBSCRIBING, static::$eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_UNSUBSCRIBING, static::$eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_UNSUBSCRIBING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnsubscribeEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnsubscribe = false;
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
 
-        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->unsubscribeThread(Thread::findOne(2))->result);
 
         $this->assertNotEmpty(SubscriptionRepo::findOne([
             'member_id' => 1,
@@ -190,8 +208,11 @@ class AccountSubscribingTest extends AccountTestCase
         Event::off(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnsubscribeAgain(): void
     {
-        $this->assertFalse($this->podium()->account->unsubscribe(Thread::findOne(1))->result);
+        $this->assertFalse($this->podium()->account->unsubscribeThread(Thread::findOne(1))->result);
     }
 }

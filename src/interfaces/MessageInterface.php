@@ -47,10 +47,18 @@ interface MessageInterface
     public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse;
 
     /**
-     * @param RemovableInterface $messageParticipantRemover
+     * @param int $id
+     * @param string $side
+     * @return MessageRemoverInterface|null
+     */
+    public function getRemover(int $id, string $side): ?MessageRemoverInterface;
+
+    /**
+     * @param int $id
+     * @param string $side
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse;
+    public function remove(int $id, string $side): PodiumResponse;
 
     /**
      * @param ArchivableInterface $messageParticipantArchiver

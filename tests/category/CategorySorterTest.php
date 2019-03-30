@@ -11,6 +11,7 @@ use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\CategoryRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 use yii\base\NotSupportedException;
 
@@ -92,7 +93,7 @@ class CategorySorterTest extends DbTestCase
 
     public function testSortEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSort = false;
         };
         Event::on(CategorySorter::class, CategorySorter::EVENT_BEFORE_SORTING, $handler);
@@ -108,7 +109,7 @@ class CategorySorterTest extends DbTestCase
 
     public function testSortLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->category->sort([])->result);
+        $this->assertFalse($this->podium()->category->sort()->result);
     }
 
     public function testSortWrongDataType(): void
@@ -124,24 +125,33 @@ class CategorySorterTest extends DbTestCase
     public function testExceptionSort(): void
     {
         $mock = $this->getMockBuilder(CategorySorter::class)->setMethods(['afterSort'])->getMock();
-        $mock->method('afterSort')->will($this->throwException(new \Exception()));
+        $mock->method('afterSort')->will($this->throwException(new Exception()));
         $mock->sortOrder = [1];
 
         $this->assertFalse($mock->sort()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new CategorySorter())->setCategory(new Category());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
         (new CategorySorter())->setForum(new Forum());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\poll;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
@@ -226,7 +228,7 @@ class PostPollFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_CREATING, $handler);
@@ -254,6 +256,10 @@ class PostPollFormTest extends DbTestCase
         $this->assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, function () {
@@ -320,9 +326,13 @@ class PostPollFormTest extends DbTestCase
         $this->assertArrayHasKey(PostPollForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
@@ -344,11 +354,19 @@ class PostPollFormTest extends DbTestCase
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->poll->edit(['id' => 1])->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateAlreadyVoted(): void
     {
         $data = [
@@ -371,6 +389,10 @@ class PostPollFormTest extends DbTestCase
         ], Member::findOne(1), Thread::findOne(1))->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testValidateUpdate(): void
     {
         $this->assertFalse($this->podium()->post->edit(['id' => 1])->result);
@@ -416,12 +438,18 @@ class PostPollFormTest extends DbTestCase
         $this->assertFalse($mock->edit()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new PostPollForm())->setCategory(Category::findOne(1));
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);

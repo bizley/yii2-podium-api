@@ -7,6 +7,7 @@ namespace bizley\podium\tests\category;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -74,22 +75,30 @@ class CategoryTest extends DbTestCase
     public function testGetCategoriesByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $categories = $this->podium()->category->getAll($filter);
+
         $this->assertEquals(1, $categories->getTotalCount());
         $this->assertEquals([2], $categories->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Category())->getParent();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);

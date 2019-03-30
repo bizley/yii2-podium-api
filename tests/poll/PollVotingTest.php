@@ -175,15 +175,15 @@ class PollVotingTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testVoteSingle(): void
     {
         Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, function () {
-            static::$eventsRaised[Voting::EVENT_BEFORE_VOTING] = true;
+            $this->eventsRaised[Voting::EVENT_BEFORE_VOTING] = true;
         });
         Event::on(Voting::class, Voting::EVENT_AFTER_VOTING, function () {
-            static::$eventsRaised[Voting::EVENT_AFTER_VOTING] = true;
+            $this->eventsRaised[Voting::EVENT_AFTER_VOTING] = true;
         });
 
         $this->assertTrue($this->podium()->poll->vote(Member::findOne(1), Poll::findOne(1), [PollAnswer::findOne(1)])->result);
@@ -194,13 +194,13 @@ class PollVotingTest extends DbTestCase
             'answer_id' => 1,
         ]));
 
-        $this->assertArrayHasKey(Voting::EVENT_BEFORE_VOTING, static::$eventsRaised);
-        $this->assertArrayHasKey(Voting::EVENT_AFTER_VOTING, static::$eventsRaised);
+        $this->assertArrayHasKey(Voting::EVENT_BEFORE_VOTING, $this->eventsRaised);
+        $this->assertArrayHasKey(Voting::EVENT_AFTER_VOTING, $this->eventsRaised);
     }
 
     public function testVoteEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canVote = false;
         };
         Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);

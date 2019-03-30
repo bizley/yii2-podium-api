@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\forum\ForumRemover;
 use bizley\podium\api\repos\ForumRepo;
@@ -94,15 +95,18 @@ class ForumRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(ForumRemover::class, ForumRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[ForumRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[ForumRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(ForumRemover::class, ForumRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[ForumRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[ForumRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->forum->remove(1)->result);
@@ -111,13 +115,16 @@ class ForumRemoverTest extends DbTestCase
         $this->assertEmpty(ThreadRepo::findOne(1));
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(ForumRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(ForumRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(ForumRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(ForumRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(ForumRemover::class, ForumRemover::EVENT_BEFORE_REMOVING, $handler);
@@ -131,6 +138,9 @@ class ForumRemoverTest extends DbTestCase
         Event::off(ForumRemover::class, ForumRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testNonArchived(): void
     {
         $this->assertFalse($this->podium()->forum->remove(2)->result);

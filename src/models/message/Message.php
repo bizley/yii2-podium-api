@@ -43,7 +43,7 @@ class Message extends MessageRepo implements ModelInterface
      */
     public function getPostsCount(): int
     {
-        throw new NotSupportedException('Post has got no posts.');
+        throw new NotSupportedException('Message has got no posts.');
     }
 
     /**

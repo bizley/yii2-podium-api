@@ -10,7 +10,7 @@ use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -44,7 +44,7 @@ class Forum extends PodiumComponent implements ForumInterface
     public $sorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
 
     /**
-     * @var string|array|RemovableInterface category remover handler
+     * @var string|array|RemoverInterface category remover handler
      * Component ID, class, configuration array, or instance of RemovableInterface.
      */
     public $removerHandler = \bizley\podium\api\models\forum\ForumRemover::class;
@@ -71,7 +71,7 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
         $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchivableInterface::class);
         $this->moverHandler = Instance::ensure($this->moverHandler, MovableInterface::class);
     }
@@ -167,9 +167,9 @@ class Forum extends PodiumComponent implements ForumInterface
 
     /**
      * @param int $id
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public function getRemover(int $id): ?RemovableInterface
+    public function getRemover(int $id): ?RemoverInterface
     {
         $handler = $this->removerHandler;
 

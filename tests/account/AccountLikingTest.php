@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\Liking;
 use bizley\podium\api\models\post\Post;
@@ -11,7 +12,9 @@ use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThumbRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountLikingTest
@@ -129,19 +132,19 @@ class AccountLikingTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -149,16 +152,19 @@ class AccountLikingTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbUp(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, function () {
-            static::$eventsRaised[Liking::EVENT_BEFORE_THUMB_UP] = true;
+            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_UP] = true;
         });
         Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_UP, function () {
-            static::$eventsRaised[Liking::EVENT_AFTER_THUMB_UP] = true;
+            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_UP] = true;
         });
 
-        $this->assertTrue($this->podium()->account->thumbUp(Post::findOne(1))->result);
+        $this->assertTrue($this->podium()->account->thumbUpPost(Post::findOne(1))->result);
 
         $this->assertEquals(1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -169,18 +175,21 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(16, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_UP, static::$eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_UP, static::$eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_UP, $this->eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_UP, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbUpEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canThumbUp = false;
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
 
-        $this->assertFalse($this->podium()->account->thumbUp(Post::findOne(1))->result);
+        $this->assertFalse($this->podium()->account->thumbUpPost(Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -194,14 +203,20 @@ class AccountLikingTest extends AccountTestCase
         Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testAlreadyThumbedUp(): void
     {
-        $this->assertFalse($this->podium()->account->thumbUp(Post::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->thumbUpPost(Post::findOne(2))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testChangeToThumbUp(): void
     {
-        $this->assertTrue($this->podium()->account->thumbUp(Post::findOne(3))->result);
+        $this->assertTrue($this->podium()->account->thumbUpPost(Post::findOne(3))->result);
 
         $this->assertEquals(1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -213,16 +228,19 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(14, $post->dislikes);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbDown(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, function () {
-            static::$eventsRaised[Liking::EVENT_BEFORE_THUMB_DOWN] = true;
+            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_DOWN] = true;
         });
         Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_DOWN, function () {
-            static::$eventsRaised[Liking::EVENT_AFTER_THUMB_DOWN] = true;
+            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_DOWN] = true;
         });
 
-        $this->assertTrue($this->podium()->account->thumbDown(Post::findOne(1))->result);
+        $this->assertTrue($this->podium()->account->thumbDownPost(Post::findOne(1))->result);
 
         $this->assertEquals(-1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -233,18 +251,21 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(16, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_DOWN, static::$eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_DOWN, static::$eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_DOWN, $this->eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_DOWN, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbDownEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canThumbDown = false;
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
 
-        $this->assertFalse($this->podium()->account->thumbDown(Post::findOne(1))->result);
+        $this->assertFalse($this->podium()->account->thumbDownPost(Post::findOne(1))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -258,14 +279,20 @@ class AccountLikingTest extends AccountTestCase
         Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testAlreadyThumbedDown(): void
     {
-        $this->assertFalse($this->podium()->account->thumbDown(Post::findOne(3))->result);
+        $this->assertFalse($this->podium()->account->thumbDownPost(Post::findOne(3))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testChangeToThumbDown(): void
     {
-        $this->assertTrue($this->podium()->account->thumbDown(Post::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->thumbDownPost(Post::findOne(2))->result);
 
         $this->assertEquals(-1, ThumbRepo::findOne([
             'member_id' => 1,
@@ -277,16 +304,19 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(16, $post->dislikes);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbResetFromUp(): void
     {
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, function () {
-            static::$eventsRaised[Liking::EVENT_BEFORE_THUMB_RESET] = true;
+            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_RESET] = true;
         });
         Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_RESET, function () {
-            static::$eventsRaised[Liking::EVENT_AFTER_THUMB_RESET] = true;
+            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_RESET] = true;
         });
 
-        $this->assertTrue($this->podium()->account->thumbReset(Post::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->thumbResetPost(Post::findOne(2))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -297,18 +327,21 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(14, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_RESET, static::$eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_RESET, static::$eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_RESET, $this->eventsRaised);
+        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_RESET, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbResetEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canThumbReset = false;
         };
         Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
 
-        $this->assertFalse($this->podium()->account->thumbReset(Post::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->thumbResetPost(Post::findOne(2))->result);
 
         $this->assertNotEmpty(ThumbRepo::findOne([
             'member_id' => 1,
@@ -322,14 +355,20 @@ class AccountLikingTest extends AccountTestCase
         Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testNoThumbToReset(): void
     {
-        $this->assertFalse($this->podium()->account->thumbReset(Post::findOne(1))->result);
+        $this->assertFalse($this->podium()->account->thumbResetPost(Post::findOne(1))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testThumbResetFromDown(): void
     {
-        $this->assertTrue($this->podium()->account->thumbReset(Post::findOne(3))->result);
+        $this->assertTrue($this->podium()->account->thumbResetPost(Post::findOne(3))->result);
 
         $this->assertEmpty(ThumbRepo::findOne([
             'member_id' => 1,

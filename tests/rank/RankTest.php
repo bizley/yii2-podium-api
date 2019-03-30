@@ -6,6 +6,7 @@ namespace bizley\podium\tests\rank;
 
 use bizley\podium\api\models\rank\Rank;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -58,28 +59,39 @@ class RankTest extends DbTestCase
     public function testGetRanksByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $ranks = $this->podium()->rank->getRanks($filter);
+
         $this->assertEquals(1, $ranks->getTotalCount());
         $this->assertEquals([2], $ranks->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Rank())->getPostsCount();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testIsArchived(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Rank())->isArchived();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -101,7 +101,7 @@ class ThreadPinnerTest extends DbTestCase
 
     public function testPinEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canPin = false;
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
@@ -138,7 +138,7 @@ class ThreadPinnerTest extends DbTestCase
 
     public function testUnpinEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnpin = false;
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);

@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\props;
 
+use yii\base\BaseObject;
+use yii\web\IdentityInterface;
+
 /**
  * Class UserIdentity
  * @package bizley\podium\tests\props
  */
-class UserIdentity extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+class UserIdentity extends BaseObject implements IdentityInterface
 {
     /**
      * @var string
@@ -25,7 +28,7 @@ class UserIdentity extends \yii\base\BaseObject implements \yii\web\IdentityInte
      */
     public static function findIdentity($id)
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return isset(static::$users[$id]) ? new static(static::$users[$id]) : null;
     }
 
     /**

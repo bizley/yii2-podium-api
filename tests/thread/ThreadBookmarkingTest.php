@@ -110,15 +110,15 @@ class ThreadBookmarkingTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testMark(): void
     {
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, function () {
-            static::$eventsRaised[Bookmarking::EVENT_BEFORE_MARKING] = true;
+            $this->eventsRaised[Bookmarking::EVENT_BEFORE_MARKING] = true;
         });
         Event::on(Bookmarking::class, Bookmarking::EVENT_AFTER_MARKING, function () {
-            static::$eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
+            $this->eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
         });
 
         $this->assertTrue($this->podium()->thread->mark(Member::findOne(1), Post::findOne(1))->result);
@@ -130,13 +130,13 @@ class ThreadBookmarkingTest extends DbTestCase
         $this->assertNotEmpty($bookmark);
         $this->assertEquals(1, $bookmark->last_seen);
 
-        $this->assertArrayHasKey(Bookmarking::EVENT_BEFORE_MARKING, static::$eventsRaised);
-        $this->assertArrayHasKey(Bookmarking::EVENT_AFTER_MARKING, static::$eventsRaised);
+        $this->assertArrayHasKey(Bookmarking::EVENT_BEFORE_MARKING, $this->eventsRaised);
+        $this->assertArrayHasKey(Bookmarking::EVENT_AFTER_MARKING, $this->eventsRaised);
     }
 
     public function testMarkEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMark = false;
         };
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);

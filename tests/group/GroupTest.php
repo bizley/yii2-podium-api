@@ -6,6 +6,7 @@ namespace bizley\podium\tests\group;
 
 use bizley\podium\api\models\group\Group;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -56,28 +57,39 @@ class GroupTest extends DbTestCase
     public function testGetGroupsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $groups = $this->podium()->group->getAll($filter);
+
         $this->assertEquals(1, $groups->getTotalCount());
         $this->assertEquals([2], $groups->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Group())->getParent();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Group())->getPostsCount();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testIsArchived(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -12,7 +12,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\PinnableInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscribingInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use yii\data\DataFilter;
@@ -156,10 +156,10 @@ class Thread extends PodiumComponent implements ThreadInterface
 
     /**
      * Deletes thread.
-     * @param RemovableInterface $threadRemover
+     * @param RemoverInterface $threadRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $threadRemover): PodiumResponse
+    public function remove(RemoverInterface $threadRemover): PodiumResponse
     {
         return $threadRemover->remove();
     }

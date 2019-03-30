@@ -6,8 +6,8 @@ namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\MemberIgnorer;
 use bizley\podium\api\models\member\Member;
+use bizley\podium\api\models\member\MemberIgnorer;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
@@ -64,15 +64,15 @@ class MemberIgnoringTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testIgnore(): void
     {
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_IGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_BEFORE_IGNORING] = true;
         });
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_IGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_IGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_AFTER_IGNORING] = true;
         });
 
         $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101))->result);
@@ -83,13 +83,13 @@ class MemberIgnoringTest extends DbTestCase
             'type_id' => AcquaintanceType::IGNORE,
         ]));
 
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_IGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_IGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_IGNORING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_IGNORING, $this->eventsRaised);
     }
 
     public function testIgnoreEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canIgnore = false;
         };
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_IGNORING, $handler);
@@ -121,10 +121,10 @@ class MemberIgnoringTest extends DbTestCase
     public function testUnignore(): void
     {
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_BEFORE_UNIGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_BEFORE_UNIGNORING] = true;
         });
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_AFTER_UNIGNORING, function () {
-            static::$eventsRaised[MemberIgnorer::EVENT_AFTER_UNIGNORING] = true;
+            $this->eventsRaised[MemberIgnorer::EVENT_AFTER_UNIGNORING] = true;
         });
 
         $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102))->result);
@@ -135,13 +135,13 @@ class MemberIgnoringTest extends DbTestCase
             'type_id' => AcquaintanceType::IGNORE,
         ]));
 
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_UNIGNORING, static::$eventsRaised);
-        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_UNIGNORING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_BEFORE_UNIGNORING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberIgnorer::EVENT_AFTER_UNIGNORING, $this->eventsRaised);
     }
 
     public function testUnignoreEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnignore = false;
         };
         Event::on(MemberIgnorer::class, MemberIgnorer::EVENT_BEFORE_UNIGNORING, $handler);

@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\post;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
@@ -18,16 +18,16 @@ use yii\db\Exception;
  * Class PostRemover
  * @package bizley\podium\api\models\post
  */
-class PostRemover extends PostRepo implements RemovableInterface
+class PostRemover extends PostRepo implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.post.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.post.removing.after';
 
     /**
      * @param int $modelId
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public static function findById(int $modelId): ?RemovableInterface
+    public static function findById(int $modelId): ?RemoverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

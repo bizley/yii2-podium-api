@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\category;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\CategoryRepo;
 use Yii;
 
@@ -14,16 +14,16 @@ use Yii;
  * Class ForumRemover
  * @package bizley\podium\api\models\category
  */
-class CategoryRemover extends CategoryRepo implements RemovableInterface
+class CategoryRemover extends CategoryRepo implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.category.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.category.removing.after';
 
     /**
      * @param int $modelId
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public static function findById(int $modelId): ?RemovableInterface
+    public static function findById(int $modelId): ?RemoverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

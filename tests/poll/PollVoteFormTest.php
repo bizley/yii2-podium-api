@@ -127,12 +127,18 @@ class PollVoteFormTest extends DbTestCase
         $this->assertTrue($pollVote->create()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testUpdate(): void
     {
         $this->expectException(NotSupportedException::class);
         PollVoteForm::findOne(1)->edit();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testLoadData(): void
     {
         $this->expectException(NotSupportedException::class);

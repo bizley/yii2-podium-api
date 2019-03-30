@@ -104,7 +104,7 @@ class ThreadMoverTest extends DbTestCase
 
     public function testMoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMove = false;
         };
         Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);
@@ -131,12 +131,18 @@ class ThreadMoverTest extends DbTestCase
         $this->assertFalse($mock->move()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ThreadMover())->setCategory(Category::findOne(1));
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -17,6 +17,9 @@ use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use function array_merge;
+use function time;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ThreadFormTest
@@ -95,6 +98,14 @@ class ThreadFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 2,
             'category_id' => 1,
@@ -102,9 +113,7 @@ class ThreadFormTest extends DbTestCase
             'name' => 'thread-new',
             'slug' => 'thread-new',
             'author_id' => 1,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-new']);
         $this->assertEquals(array_merge($data, [
@@ -147,7 +156,7 @@ class ThreadFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
@@ -183,6 +192,10 @@ class ThreadFormTest extends DbTestCase
         $this->assertFalse($mock->create()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, function () {
@@ -201,6 +214,12 @@ class ThreadFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'category_id' => 1,
@@ -209,7 +228,6 @@ class ThreadFormTest extends DbTestCase
             'slug' => 'thread1',
             'author_id' => 1,
             'created_at' => 1,
-            'updated_at' => $time,
             'archived' => 0,
             'views_count' => 0,
             'posts_count' => 0,
@@ -217,7 +235,7 @@ class ThreadFormTest extends DbTestCase
             'locked' => 0,
             'created_post_at' => null,
             'updated_post_at' => null,
-        ], $response->data);
+        ], $responseData);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-updated']);
         $this->assertEquals(array_merge($data, [
@@ -245,9 +263,13 @@ class ThreadFormTest extends DbTestCase
         $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
@@ -264,6 +286,10 @@ class ThreadFormTest extends DbTestCase
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->thread->edit(['id' => 1])->result);
@@ -277,24 +303,38 @@ class ThreadFormTest extends DbTestCase
         $this->assertFalse($mock->edit()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ThreadForm())->setCategory(Category::findOne(1));
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ThreadForm())->setThread(Thread::findOne(1));
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateNoId(): void
     {
         $this->expectException(InsufficientDataException::class);
         $this->podium()->thread->edit([]);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateWrongId(): void
     {
         $this->expectException(ModelNotFoundException::class);

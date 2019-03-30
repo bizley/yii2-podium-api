@@ -68,4 +68,9 @@ interface ModelInterface
      * @return bool
      */
     public function isArchived(): bool;
+
+    /**
+     * @return int|false
+     */
+    public function delete();
 }

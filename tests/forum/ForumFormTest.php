@@ -16,6 +16,8 @@ use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use function array_merge;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class ForumFormTest
@@ -85,6 +87,14 @@ class ForumFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 2,
             'category_id' => 1,
@@ -93,9 +103,7 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
             'author_id' => 1,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $forum = ForumRepo::findOne(['name' => 'forum-new']);
         $this->assertEquals(array_merge($data, [
@@ -140,7 +148,7 @@ class ForumFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_CREATING, $handler);
@@ -167,6 +175,10 @@ class ForumFormTest extends DbTestCase
         $this->assertFalse((new ForumForm())->create()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, function () {
@@ -187,6 +199,12 @@ class ForumFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'category_id' => 1,
@@ -196,12 +214,11 @@ class ForumFormTest extends DbTestCase
             'sort' => 2,
             'author_id' => 1,
             'created_at' => 1,
-            'updated_at' => $time,
             'archived' => 0,
             'description' => null,
             'threads_count' => 0,
             'posts_count' => 0,
-        ], $response->data);
+        ], $responseData);
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
         $this->assertEquals(array_merge($data, [
@@ -227,9 +244,13 @@ class ForumFormTest extends DbTestCase
         $this->assertArrayHasKey(ForumForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, $handler);
@@ -248,6 +269,10 @@ class ForumFormTest extends DbTestCase
         Event::off(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->forum->edit(['id' => 1])->result);
@@ -258,24 +283,38 @@ class ForumFormTest extends DbTestCase
         $this->assertFalse((new ForumForm())->edit()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateNoId(): void
     {
         $this->expectException(InsufficientDataException::class);
         $this->podium()->forum->edit([]);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateWrongId(): void
     {
         $this->expectException(ModelNotFoundException::class);
         $this->podium()->forum->edit(['id' => 10000]);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ForumForm())->setForum(new Forum());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);

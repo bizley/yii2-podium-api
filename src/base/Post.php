@@ -12,7 +12,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MovableInterface;
 use bizley\podium\api\interfaces\PostInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -177,10 +177,10 @@ class Post extends PodiumComponent implements PostInterface
 
     /**
      * Deletes post.
-     * @param RemovableInterface $postRemover
+     * @param RemoverInterface $postRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $postRemover): PodiumResponse
+    public function remove(RemoverInterface $postRemover): PodiumResponse
     {
         return $postRemover->remove();
     }

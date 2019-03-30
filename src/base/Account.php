@@ -97,7 +97,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function befriend(MembershipInterface $target): PodiumResponse
+    public function befriendMember(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->befriend($this->ensureMembership(), $target);
     }
@@ -108,7 +108,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function unfriend(MembershipInterface $target): PodiumResponse
+    public function unfriendMember(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->unfriend($this->ensureMembership(), $target);
     }
@@ -119,7 +119,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function ignore(MembershipInterface $target): PodiumResponse
+    public function ignoreMember(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->ignore($this->ensureMembership(), $target);
     }
@@ -130,7 +130,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function unignore(MembershipInterface $target): PodiumResponse
+    public function unignoreMember(MembershipInterface $target): PodiumResponse
     {
         return $this->podium->member->unignore($this->ensureMembership(), $target);
     }
@@ -141,7 +141,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function thumbUp(ModelInterface $post): PodiumResponse
+    public function thumbUpPost(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbUp($this->ensureMembership(), $post);
     }
@@ -152,7 +152,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function thumbDown(ModelInterface $post): PodiumResponse
+    public function thumbDownPost(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbDown($this->ensureMembership(), $post);
     }
@@ -163,9 +163,20 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function thumbReset(ModelInterface $post): PodiumResponse
+    public function thumbResetPost(ModelInterface $post): PodiumResponse
     {
         return $this->podium->post->thumbReset($this->ensureMembership(), $post);
+    }
+
+    /**
+     * Marks last seen post in a thread.
+     * @param ModelInterface $post
+     * @return PodiumResponse
+     * @throws NoMembershipException
+     */
+    public function markPost(ModelInterface $post): PodiumResponse
+    {
+        return $this->podium->thread->mark($this->ensureMembership(), $post);
     }
 
     /**
@@ -174,7 +185,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function subscribe(ModelInterface $thread): PodiumResponse
+    public function subscribeThread(ModelInterface $thread): PodiumResponse
     {
         return $this->podium->thread->subscribe($this->ensureMembership(), $thread);
     }
@@ -185,20 +196,9 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function unsubscribe(ModelInterface $thread): PodiumResponse
+    public function unsubscribeThread(ModelInterface $thread): PodiumResponse
     {
         return $this->podium->thread->unsubscribe($this->ensureMembership(), $thread);
-    }
-
-    /**
-     * Marks last seen post in a thread.
-     * @param ModelInterface $post
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function mark(ModelInterface $post): PodiumResponse
-    {
-        return $this->podium->thread->mark($this->ensureMembership(), $post);
     }
 
     /**
@@ -207,7 +207,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function join(ModelInterface $group): PodiumResponse
+    public function joinGroup(ModelInterface $group): PodiumResponse
     {
         return $this->podium->member->join($this->ensureMembership(), $group);
     }
@@ -218,7 +218,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function leave(ModelInterface $group): PodiumResponse
+    public function leaveGroup(ModelInterface $group): PodiumResponse
     {
         return $this->podium->member->leave($this->ensureMembership(), $group);
     }
@@ -230,7 +230,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function vote(PollModelInterface $poll, array $answers): PodiumResponse
+    public function votePoll(PollModelInterface $poll, array $answers): PodiumResponse
     {
         return $this->podium->poll->vote($this->ensureMembership(), $poll, $answers);
     }
@@ -243,7 +243,7 @@ class Account extends PodiumComponent implements AccountInterface
      * @return PodiumResponse
      * @throws NoMembershipException
      */
-    public function send(
+    public function sendMessage(
         array $data,
         MembershipInterface $receiver,
         ?MessageParticipantModelInterface $replyTo = null

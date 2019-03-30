@@ -120,15 +120,15 @@ class PostArchiverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testArchive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_BEFORE_ARCHIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_BEFORE_ARCHIVING] = true;
         });
         Event::on(PostArchiver::class, PostArchiver::EVENT_AFTER_ARCHIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_AFTER_ARCHIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
         $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(1))->result);
@@ -138,13 +138,13 @@ class PostArchiverTest extends DbTestCase
         $this->assertEquals(20, ThreadRepo::findOne(1)->posts_count);
         $this->assertEquals(66, ForumRepo::findOne(1)->posts_count);
 
-        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_ARCHIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_ARCHIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_ARCHIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
     public function testArchiveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canArchive = false;
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, $handler);
@@ -191,10 +191,10 @@ class PostArchiverTest extends DbTestCase
     public function testRevive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_BEFORE_REVIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_BEFORE_REVIVING] = true;
         });
         Event::on(PostArchiver::class, PostArchiver::EVENT_AFTER_REVIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_AFTER_REVIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
         $this->assertTrue($this->podium()->post->revive(PostArchiver::findOne(2))->result);
@@ -204,13 +204,13 @@ class PostArchiverTest extends DbTestCase
         $this->assertEquals(22, ThreadRepo::findOne(1)->posts_count);
         $this->assertEquals(68, ForumRepo::findOne(1)->posts_count);
 
-        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_REVIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_REVIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_REVIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
     public function testReviveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRevive = false;
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, $handler);

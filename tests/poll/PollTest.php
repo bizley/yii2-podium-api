@@ -8,6 +8,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\db\ActiveQuery;
@@ -141,16 +142,21 @@ class PollTest extends DbTestCase
     public function testGetPollsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $polls = Poll::findByFilter($filter);
+
         $this->assertEquals(1, $polls->getTotalCount());
         $this->assertEquals([2], $polls->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);

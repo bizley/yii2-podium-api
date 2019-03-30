@@ -112,15 +112,15 @@ class PollRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testRemove(): void
     {
         Event::on(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[PollRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[PollRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(PollRemover::class, PollRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[PollRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[PollRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->poll->remove(PollRemover::findOne(1))->result);
@@ -130,13 +130,13 @@ class PollRemoverTest extends DbTestCase
         $this->assertEmpty(PollAnswerRepo::findOne(1));
         $this->assertEmpty(PollVoteRepo::findOne(1));
 
-        $this->assertArrayHasKey(PollRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PollRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PollRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PollRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, $handler);

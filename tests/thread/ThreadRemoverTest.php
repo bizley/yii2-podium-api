@@ -9,6 +9,7 @@ use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -94,15 +95,15 @@ class ThreadRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testRemove(): void
     {
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[ThreadRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[ThreadRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1))->result);
@@ -110,13 +111,13 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertEmpty(ThreadRepo::findOne(1));
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
@@ -148,7 +149,7 @@ class ThreadRemoverTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(ThreadRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $mock->archived = true;
 

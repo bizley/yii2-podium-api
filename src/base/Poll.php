@@ -10,7 +10,7 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\VotingInterface;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
@@ -129,10 +129,10 @@ class Poll extends PodiumComponent implements PollInterface
 
     /**
      * Deletes poll.
-     * @param RemovableInterface $pollRemover
+     * @param RemoverInterface $pollRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $pollRemover): PodiumResponse
+    public function remove(RemoverInterface $pollRemover): PodiumResponse
     {
         return $pollRemover->remove();
     }

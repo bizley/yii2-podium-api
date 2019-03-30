@@ -150,7 +150,7 @@ class PostMoverTest extends DbTestCase
 
     public function testMoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMove = false;
         };
         Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
@@ -194,12 +194,18 @@ class PostMoverTest extends DbTestCase
         $this->assertFalse($mock->move()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new PostMover())->setCategory(Category::findOne(1));
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);

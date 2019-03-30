@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\api\models\thread\Bookmarking;
 use bizley\podium\api\repos\BookmarkRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountBookmarkingTest
@@ -101,19 +104,19 @@ class AccountBookmarkingTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -121,34 +124,40 @@ class AccountBookmarkingTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testMark(): void
     {
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, function () {
-            static::$eventsRaised[Bookmarking::EVENT_BEFORE_MARKING] = true;
+            $this->eventsRaised[Bookmarking::EVENT_BEFORE_MARKING] = true;
         });
         Event::on(Bookmarking::class, Bookmarking::EVENT_AFTER_MARKING, function () {
-            static::$eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
+            $this->eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->mark(Post::findOne(2))->result);
+        $this->assertTrue($this->podium()->account->markPost(Post::findOne(2))->result);
 
         $this->assertEquals(100, BookmarkRepo::findOne([
             'member_id' => 1,
             'thread_id' => 1,
         ])->last_seen);
 
-        $this->assertArrayHasKey(Bookmarking::EVENT_BEFORE_MARKING, static::$eventsRaised);
-        $this->assertArrayHasKey(Bookmarking::EVENT_AFTER_MARKING, static::$eventsRaised);
+        $this->assertArrayHasKey(Bookmarking::EVENT_BEFORE_MARKING, $this->eventsRaised);
+        $this->assertArrayHasKey(Bookmarking::EVENT_AFTER_MARKING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testMarkEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMark = false;
         };
         Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
 
-        $this->assertFalse($this->podium()->account->mark(Post::findOne(2))->result);
+        $this->assertFalse($this->podium()->account->markPost(Post::findOne(2))->result);
 
         $this->assertEquals(10, BookmarkRepo::findOne([
             'member_id' => 1,
@@ -158,9 +167,12 @@ class AccountBookmarkingTest extends AccountTestCase
         Event::off(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testNoUpdateMark(): void
     {
-        $this->assertTrue($this->podium()->account->mark(Post::findOne(1))->result);
+        $this->assertTrue($this->podium()->account->markPost(Post::findOne(1))->result);
 
         $this->assertEquals(10, BookmarkRepo::findOne([
             'member_id' => 1,

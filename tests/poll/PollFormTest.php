@@ -11,6 +11,8 @@ use bizley\podium\api\models\poll\PollForm;
 use bizley\podium\api\repos\PollRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\NotSupportedException;
+use function time;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class PollFormTest
@@ -130,6 +132,14 @@ class PollFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 3,
             'post_id' => 1,
@@ -137,9 +147,7 @@ class PollFormTest extends DbTestCase
             'revealed' => false,
             'choice_id' => PollChoice::MULTIPLE,
             'expires_at' => 1,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $pollCreated = PollRepo::findOne(['question' => 'question-new']);
         $this->assertEquals([
@@ -164,6 +172,12 @@ class PollFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'post_id' => 1,
@@ -172,8 +186,7 @@ class PollFormTest extends DbTestCase
             'choice_id' => PollChoice::SINGLE,
             'expires_at' => null,
             'created_at' => 1,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $pollUpdated = PollRepo::findOne(1);
         $this->assertEquals('question-updated', $pollUpdated->question);
@@ -187,6 +200,9 @@ class PollFormTest extends DbTestCase
         $this->assertFalse($poll->edit()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testLoadData(): void
     {
         $this->expectException(NotSupportedException::class);

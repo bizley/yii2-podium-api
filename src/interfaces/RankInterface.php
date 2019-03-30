@@ -52,8 +52,8 @@ interface RankInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $rankRemover
+     * @param RemoverInterface $rankRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $rankRemover): PodiumResponse;
+    public function remove(RemoverInterface $rankRemover): PodiumResponse;
 }

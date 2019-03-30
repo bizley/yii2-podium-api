@@ -8,19 +8,20 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\models\member\Member;
-use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\api\models\message\MessageMailer;
+use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use function array_merge;
 
 /**
  * Class MessageSendingTest
  * @package bizley\podium\tests\message
  */
-class MessageSendingTest extends DbTestCase
+class MessageMailerTest extends DbTestCase
 {
     /**
      * @var array
@@ -78,15 +79,15 @@ class MessageSendingTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testSend(): void
     {
         Event::on(MessageMailer::class, MessageMailer::EVENT_BEFORE_SENDING, function () {
-            static::$eventsRaised[MessageMailer::EVENT_BEFORE_SENDING] = true;
+            $this->eventsRaised[MessageMailer::EVENT_BEFORE_SENDING] = true;
         });
         Event::on(MessageMailer::class, MessageMailer::EVENT_AFTER_SENDING, function () {
-            static::$eventsRaised[MessageMailer::EVENT_AFTER_SENDING] = true;
+            $this->eventsRaised[MessageMailer::EVENT_AFTER_SENDING] = true;
         });
 
         $data = [
@@ -132,13 +133,13 @@ class MessageSendingTest extends DbTestCase
             'archived' => $messageReceiver->archived,
         ]);
 
-        $this->assertArrayHasKey(MessageMailer::EVENT_BEFORE_SENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(MessageMailer::EVENT_AFTER_SENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MessageMailer::EVENT_BEFORE_SENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MessageMailer::EVENT_AFTER_SENDING, $this->eventsRaised);
     }
 
     public function testSendEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSend = false;
         };
         Event::on(MessageMailer::class, MessageMailer::EVENT_BEFORE_SENDING, $handler);
@@ -242,12 +243,18 @@ class MessageSendingTest extends DbTestCase
         $this->assertFalse($mock->send()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testCreate(): void
     {
         $this->expectException(NotSupportedException::class);
         (new MessageMailer())->create();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testEdit(): void
     {
         $this->expectException(NotSupportedException::class);

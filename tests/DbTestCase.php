@@ -7,10 +7,16 @@ namespace bizley\podium\tests;
 use bizley\podium\api\Podium;
 use bizley\podium\tests\props\EchoMigrateController;
 use Yii;
+use yii\base\InvalidRouteException;
 use yii\console\Application;
 use yii\console\ExitCode;
 use yii\db\Connection;
 use yii\helpers\ArrayHelper;
+use yii\i18n\PhpMessageSource;
+use function fwrite;
+use function ob_end_clean;
+use function ob_end_flush;
+use function ob_start;
 
 /**
  * Class TestCase
@@ -48,11 +54,12 @@ abstract class DbTestCase extends TestCase
         if (static::$params === null) {
             static::$params = require __DIR__ . '/config.php';
         }
+
         return static::$params[$name] ?? $default;
     }
 
     /**
-     * @throws \yii\base\InvalidRouteException
+     * @throws InvalidRouteException
      * @throws \yii\console\Exception
      * @throws \yii\db\Exception
      */
@@ -90,7 +97,7 @@ abstract class DbTestCase extends TestCase
                 'i18n' => [
                     'translations' => [
                         'podium.*' => [
-                            'class' => \yii\i18n\PhpMessageSource::class,
+                            'class' => PhpMessageSource::class,
                             'sourceLanguage' => 'en',
                             'forceTranslation' => true,
                             'basePath' => '@app/messages',
@@ -104,12 +111,13 @@ abstract class DbTestCase extends TestCase
     /**
      * @param string $route
      * @param array $params
-     * @throws \yii\base\InvalidRouteException
+     * @throws InvalidRouteException
      * @throws \yii\console\Exception
      */
     protected static function runSilentMigration(string $route, array $params = []): void
     {
         ob_start();
+
         if (Yii::$app->runAction($route, $params) === ExitCode::OK) {
             ob_end_clean();
         } else {
@@ -119,15 +127,17 @@ abstract class DbTestCase extends TestCase
     }
 
     /**
-     * @throws \yii\base\InvalidRouteException
+     * @throws InvalidRouteException
      * @throws \yii\console\Exception
      */
     public static function tearDownAfterClass(): void
     {
         static::runSilentMigration('migrate/down', ['all']);
+
         if (static::$db) {
             static::$db->close();
         }
+
         Yii::$app = null;
     }
 
@@ -138,22 +148,29 @@ abstract class DbTestCase extends TestCase
     public static function getConnection(): Connection
     {
         static::$database = static::getParam(static::$driverName);
+
         if (static::$db === null) {
             $db = new Connection();
+
             $db->dsn = static::$database['dsn'];
             $db->charset = static::$database['charset'];
+
             if (isset(static::$database['username'])) {
                 $db->username = static::$database['username'];
                 $db->password = static::$database['password'];
             }
+
             if (isset(static::$database['attributes'])) {
                 $db->attributes = static::$database['attributes'];
             }
+
             if (!$db->isActive) {
                 $db->open();
             }
+
             static::$db = $db;
         }
+
         return static::$db;
     }
 
@@ -182,9 +199,11 @@ abstract class DbTestCase extends TestCase
     public function fixturesDown(): void
     {
         static::$db->createCommand('SET FOREIGN_KEY_CHECKS=0;')->execute();
+
         foreach ($this->fixtures as $table => $data) {
             static::$db->createCommand()->truncateTable($table)->execute();
         }
+
         static::$db->createCommand('SET FOREIGN_KEY_CHECKS=1;')->execute();
     }
 

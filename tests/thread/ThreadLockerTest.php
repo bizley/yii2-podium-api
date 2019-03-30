@@ -101,7 +101,7 @@ class ThreadLockerTest extends DbTestCase
 
     public function testLockEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canLock = false;
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
@@ -138,7 +138,7 @@ class ThreadLockerTest extends DbTestCase
 
     public function testUnlockEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnlock = false;
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);

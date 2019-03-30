@@ -7,7 +7,7 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -34,7 +34,7 @@ class Group extends PodiumComponent implements GroupInterface
     public $formHandler = \bizley\podium\api\models\group\GroupForm::class;
 
     /**
-     * @var string|array|RemovableInterface group remover handler
+     * @var string|array|RemoverInterface group remover handler
      * Component ID, class, configuration array, or instance of RemovableInterface.
      */
     public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
@@ -48,7 +48,7 @@ class Group extends PodiumComponent implements GroupInterface
 
         $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemovableInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
     }
 
     /**
@@ -137,9 +137,9 @@ class Group extends PodiumComponent implements GroupInterface
 
     /**
      * @param int $id
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public function getRemover(int $id): ?RemovableInterface
+    public function getRemover(int $id): ?RemoverInterface
     {
         $handler = $this->removerHandler;
 

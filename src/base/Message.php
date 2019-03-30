@@ -8,8 +8,9 @@ use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
+use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SendingInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -35,7 +36,11 @@ class Message extends PodiumComponent implements MessageInterface
      */
     public $mailerHandler = \bizley\podium\api\models\message\MessageMailer::class;
 
-    // TODO: remover handler and archiver handler
+    /**
+     * @var string|array|MessageRemoverInterface message remover handler
+     * Component ID, class, configuration array, or instance of MessageRemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\message\MessageRemover::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -46,6 +51,7 @@ class Message extends PodiumComponent implements MessageInterface
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
         $this->mailerHandler = Instance::ensure($this->mailerHandler, SendingInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, MessageRemoverInterface::class);
     }
 
     /**
@@ -109,13 +115,35 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * Deletes message copy.
-     * @param RemovableInterface $messageParticipantRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @param string $side
+     * @return MessageRemoverInterface|null
      */
-    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse
+    public function getRemover(int $id, string $side): ?MessageRemoverInterface
     {
-        return $messageParticipantRemover->remove();
+        $handler = $this->removerHandler;
+
+        return $handler::findByMessageIdAndSide($id, $side);
+    }
+
+    /**
+     * Deletes message copy.
+     * @param int $id
+     * @param string $side
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id, string $side): PodiumResponse
+    {
+        $messageRemover = $this->getRemover($id, $side);
+
+        if ($messageRemover === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        $messageRemover->setMessageHandler($this->messageHandler);
+
+        return $messageRemover->remove();
     }
 
     /**

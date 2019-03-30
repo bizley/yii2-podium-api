@@ -120,28 +120,28 @@ class PostRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testRemove(): void
     {
         Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[PostRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[PostRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(PostRemover::class, PostRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1))->result);
 
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);

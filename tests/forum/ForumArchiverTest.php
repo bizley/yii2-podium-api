@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\forum\ForumArchiver;
 use bizley\podium\api\repos\ForumRepo;
@@ -68,28 +69,34 @@ class ForumArchiverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchive(): void
     {
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_ARCHIVING, function () {
-            static::$eventsRaised[ForumArchiver::EVENT_BEFORE_ARCHIVING] = true;
+            $this->eventsRaised[ForumArchiver::EVENT_BEFORE_ARCHIVING] = true;
         });
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_AFTER_ARCHIVING, function () {
-            static::$eventsRaised[ForumArchiver::EVENT_AFTER_ARCHIVING] = true;
+            $this->eventsRaised[ForumArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
         $this->assertTrue($this->podium()->forum->archive(1)->result);
 
         $this->assertEquals(true, ForumRepo::findOne(1)->archived);
 
-        $this->assertArrayHasKey(ForumArchiver::EVENT_BEFORE_ARCHIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(ForumArchiver::EVENT_AFTER_ARCHIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(ForumArchiver::EVENT_BEFORE_ARCHIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(ForumArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canArchive = false;
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_ARCHIVING, $handler);
@@ -101,31 +108,40 @@ class ForumArchiverTest extends DbTestCase
         Event::off(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyArchived(): void
     {
         $this->assertFalse($this->podium()->forum->archive(2)->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, function () {
-            static::$eventsRaised[ForumArchiver::EVENT_BEFORE_REVIVING] = true;
+            $this->eventsRaised[ForumArchiver::EVENT_BEFORE_REVIVING] = true;
         });
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_AFTER_REVIVING, function () {
-            static::$eventsRaised[ForumArchiver::EVENT_AFTER_REVIVING] = true;
+            $this->eventsRaised[ForumArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
         $this->assertTrue($this->podium()->forum->revive(2)->result);
 
         $this->assertEquals(false, ForumRepo::findOne(2)->archived);
 
-        $this->assertArrayHasKey(ForumArchiver::EVENT_BEFORE_REVIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(ForumArchiver::EVENT_AFTER_REVIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(ForumArchiver::EVENT_BEFORE_REVIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(ForumArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testReviveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRevive = false;
         };
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, $handler);
@@ -137,6 +153,9 @@ class ForumArchiverTest extends DbTestCase
         Event::off(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->forum->revive(1)->result);

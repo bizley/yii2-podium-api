@@ -51,9 +51,9 @@ interface MemberInterface
 
     /**
      * @param int $id
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public function getRemover(int $id): ?RemovableInterface;
+    public function getRemover(int $id): ?RemoverInterface;
 
     /**
      * @param int $id

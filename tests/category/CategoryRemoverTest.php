@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\category;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\CategoryRemover;
 use bizley\podium\api\repos\CategoryRepo;
@@ -11,6 +12,7 @@ use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -94,15 +96,18 @@ class CategoryRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[CategoryRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[CategoryRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(CategoryRemover::class, CategoryRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[CategoryRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[CategoryRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         $this->assertTrue($this->podium()->category->remove(1)->result);
@@ -112,13 +117,16 @@ class CategoryRemoverTest extends DbTestCase
         $this->assertEmpty(ThreadRepo::findOne(1));
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(CategoryRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(CategoryRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(CategoryRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(CategoryRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
@@ -133,6 +141,9 @@ class CategoryRemoverTest extends DbTestCase
         Event::off(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testNonArchived(): void
     {
         $this->assertFalse($this->podium()->category->remove(2)->result);
@@ -151,7 +162,7 @@ class CategoryRemoverTest extends DbTestCase
     public function testExceptionDelete(): void
     {
         $mock = $this->getMockBuilder(CategoryRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
         $mock->archived = true;
 
         $this->assertFalse($mock->remove()->result);

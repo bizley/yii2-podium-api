@@ -12,6 +12,8 @@ use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use function time;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class MemberFormTest
@@ -41,6 +43,10 @@ class MemberFormTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, function () {
@@ -57,6 +63,12 @@ class MemberFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'user_id' => '1',
@@ -64,8 +76,7 @@ class MemberFormTest extends DbTestCase
             'slug' => 'member',
             'status_id' => MemberStatus::ACTIVE,
             'created_at' => 1,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $member = MemberRepo::findOne(['username' => 'username-updated']);
         $this->assertNotEmpty($member);
@@ -76,9 +87,13 @@ class MemberFormTest extends DbTestCase
         $this->assertArrayHasKey(MemberForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
@@ -94,6 +109,10 @@ class MemberFormTest extends DbTestCase
         Event::off(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->member->edit(['id' => 1])->result);
@@ -107,18 +126,29 @@ class MemberFormTest extends DbTestCase
         $this->assertFalse($mock->edit()->result);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testCreate(): void
     {
         $this->expectException(NotSupportedException::class);
         (new MemberForm())->create();
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateNoId(): void
     {
         $this->expectException(InsufficientDataException::class);
         $this->podium()->member->edit([]);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateWrongId(): void
     {
         $this->expectException(ModelNotFoundException::class);

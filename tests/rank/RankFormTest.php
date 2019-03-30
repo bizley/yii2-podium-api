@@ -10,6 +10,8 @@ use bizley\podium\api\models\rank\RankForm;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use function time;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class RankFormTest
@@ -55,13 +57,19 @@ class RankFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 2,
             'name' => 'rank-new',
             'min_posts' => 99,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $rank = RankRepo::findOne(['name' => 'rank-new']);
         $this->assertEquals($data, [
@@ -75,7 +83,7 @@ class RankFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(RankForm::class, RankForm::EVENT_BEFORE_CREATING, $handler);
@@ -106,6 +114,10 @@ class RankFormTest extends DbTestCase
         $this->assertEmpty(RankRepo::findOne(['name' => 'rank-new']));
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(RankForm::class, RankForm::EVENT_BEFORE_EDITING, function () {
@@ -125,13 +137,18 @@ class RankFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'name' => 'rank-updated',
             'min_posts' => 52,
             'created_at' => 1,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $rank = RankRepo::findOne(['name' => 'rank-updated']);
         $this->assertEquals($data, [
@@ -145,9 +162,13 @@ class RankFormTest extends DbTestCase
         $this->assertArrayHasKey(RankForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(RankForm::class, RankForm::EVENT_BEFORE_EDITING, $handler);
@@ -165,6 +186,10 @@ class RankFormTest extends DbTestCase
         Event::off(RankForm::class, RankForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
         $this->assertFalse($this->podium()->rank->edit(['id' => 1])->result);
@@ -178,12 +203,20 @@ class RankFormTest extends DbTestCase
         $this->assertFalse($mock->edit()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateNoId(): void
     {
         $this->expectException(InsufficientDataException::class);
         $this->podium()->rank->edit([]);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateWrongId(): void
     {
         $this->expectException(ModelNotFoundException::class);

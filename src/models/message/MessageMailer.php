@@ -155,7 +155,7 @@ class MessageMailer extends MessageRepo implements SendingInterface
 
             if ($this->reply_to_id !== null) {
                 // TODO: make configurable
-                $repliedMessage = MessageParticipantForm::findOne([
+                $repliedMessage = MessageForm::findOne([
                     'member_id' => $this->getSender(),
                     'message_id' => $this->reply_to_id,
                 ]);
@@ -167,7 +167,7 @@ class MessageMailer extends MessageRepo implements SendingInterface
                 }
             }
 
-            $senderCopy = new MessageParticipantForm([
+            $senderCopy = new MessageForm([
                 'member_id' => $this->getSender(),
                 'message_id' => $this->id,
                 'status_id' => MessageStatus::READ,
@@ -177,7 +177,7 @@ class MessageMailer extends MessageRepo implements SendingInterface
                 throw new Exception('Error while creating sender message copy!');
             }
 
-            $receiverCopy = new MessageParticipantForm([
+            $receiverCopy = new MessageForm([
                 'member_id' => $this->getReceiver(),
                 'message_id' => $this->id,
                 'status_id' => MessageStatus::NEW,

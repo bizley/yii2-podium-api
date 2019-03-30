@@ -6,6 +6,7 @@ namespace bizley\podium\tests;
 
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
+use yii\base\InvalidRouteException;
 use yii\web\User;
 
 /**
@@ -15,7 +16,7 @@ use yii\web\User;
 abstract class AccountTestCase extends DbTestCase
 {
     /**
-     * @throws \yii\base\InvalidRouteException
+     * @throws InvalidRouteException
      * @throws \yii\console\Exception
      * @throws \yii\db\Exception
      */

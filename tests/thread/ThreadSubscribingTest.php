@@ -10,6 +10,7 @@ use bizley\podium\api\models\thread\Subscribing;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\SubscriptionRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -89,15 +90,15 @@ class ThreadSubscribingTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testSubscribe(): void
     {
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_BEFORE_SUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_BEFORE_SUBSCRIBING] = true;
         });
         Event::on(Subscribing::class, Subscribing::EVENT_AFTER_SUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
         });
 
         $this->assertTrue($this->podium()->thread->subscribe(Member::findOne(1), Thread::findOne(1))->result);
@@ -109,13 +110,13 @@ class ThreadSubscribingTest extends DbTestCase
         $this->assertNotEmpty($subscription);
         $this->assertEquals(true, $subscription->seen);
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_SUBSCRIBING, static::$eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_SUBSCRIBING, static::$eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_SUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_SUBSCRIBING, $this->eventsRaised);
     }
 
     public function testSubscribeEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSubscribe = false;
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
@@ -146,10 +147,10 @@ class ThreadSubscribingTest extends DbTestCase
     public function testUnsubscribe(): void
     {
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_BEFORE_UNSUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_BEFORE_UNSUBSCRIBING] = true;
         });
         Event::on(Subscribing::class, Subscribing::EVENT_AFTER_UNSUBSCRIBING, function () {
-            static::$eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
+            $this->eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
         });
 
         $this->assertTrue($this->podium()->thread->unsubscribe(Member::findOne(1), Thread::findOne(2))->result);
@@ -159,13 +160,13 @@ class ThreadSubscribingTest extends DbTestCase
             'thread_id' => 2,
         ]));
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_UNSUBSCRIBING, static::$eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_UNSUBSCRIBING, static::$eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_UNSUBSCRIBING, $this->eventsRaised);
     }
 
     public function testUnsubscribeEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnsubscribe = false;
         };
         Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
@@ -188,7 +189,7 @@ class ThreadSubscribingTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(Subscribing::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $this->assertFalse($mock->unsubscribe()->result);
     }

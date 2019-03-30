@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\poll;
 
 use bizley\podium\api\base\PodiumResponse;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PollAnswerRepo;
 use Yii;
 
@@ -13,13 +13,13 @@ use Yii;
  * Class PollAnswerRemover
  * @package bizley\podium\api\models\poll
  */
-class PollAnswerRemover extends PollAnswerRepo implements RemovableInterface
+class PollAnswerRemover extends PollAnswerRepo implements RemoverInterface
 {
     /**
      * @param int $modelId
-     * @return RemovableInterface|null
+     * @return RemoverInterface|null
      */
-    public static function findById(int $modelId): ?RemovableInterface
+    public static function findById(int $modelId): ?RemoverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

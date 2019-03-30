@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
@@ -224,7 +226,7 @@ class PostPollFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_CREATING, $handler);
@@ -248,6 +250,10 @@ class PostPollFormTest extends DbTestCase
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_CREATING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, function () {
@@ -315,9 +321,13 @@ class PostPollFormTest extends DbTestCase
         $this->assertArrayHasKey(PostPollForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
@@ -340,6 +350,10 @@ class PostPollFormTest extends DbTestCase
         Event::off(PostPollForm::class, PostPollForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateAlreadyVoted(): void
     {
         $data = [

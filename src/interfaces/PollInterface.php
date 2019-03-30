@@ -42,10 +42,10 @@ interface PollInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $pollRemover
+     * @param RemoverInterface $pollRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $pollRemover): PodiumResponse;
+    public function remove(RemoverInterface $pollRemover): PodiumResponse;
 
     /**
      * Returns voting handler.

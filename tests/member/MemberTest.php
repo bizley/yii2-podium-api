@@ -7,6 +7,7 @@ namespace bizley\podium\tests\member;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -137,12 +138,14 @@ class MemberTest extends DbTestCase
     public function testGetMembersByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 3]], '');
+
         $members = $this->podium()->member->getAll($filter);
+
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
     }
@@ -153,12 +156,18 @@ class MemberTest extends DbTestCase
         $this->assertEquals(3, $member->getPostsCount());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Member())->getParent();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testIsArchived(): void
     {
         $this->expectException(NotSupportedException::class);

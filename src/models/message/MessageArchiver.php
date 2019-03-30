@@ -14,7 +14,7 @@ use Yii;
  * Class MessageParticipantArchiver
  * @package bizley\podium\api\models\message
  */
-class MessageParticipantArchiver extends MessageParticipantRepo implements ArchivableInterface
+class MessageArchiver extends MessageParticipantRepo implements ArchivableInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.message.participant.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.message.participant.archiving.after';

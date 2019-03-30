@@ -7,7 +7,7 @@ namespace bizley\podium\tests\message;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
-use bizley\podium\api\models\message\MessageParticipantForm;
+use bizley\podium\api\models\message\MessageForm;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\NotSupportedException;
@@ -64,7 +64,7 @@ class MessageParticipantFormTest extends DbTestCase
 
     public function testCreate(): void
     {
-        $messageParticipant = new MessageParticipantForm([
+        $messageParticipant = new MessageForm([
             'message_id' => 1,
             'member_id' => 2,
             'side_id' => MessageSide::RECEIVER,
@@ -82,24 +82,30 @@ class MessageParticipantFormTest extends DbTestCase
         $this->assertEquals(MessageStatus::READ, $messageParticipantCreated->status_id);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testUpdate(): void
     {
         $this->expectException(NotSupportedException::class);
-        MessageParticipantForm::findOne([
+        MessageForm::findOne([
             'member_id' => 1,
             'message_id' => 1,
         ])->edit();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testLoadData(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new MessageParticipantForm())->loadData();
+        (new MessageForm())->loadData();
     }
 
     public function testFailedCreate(): void
     {
-        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MessageForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->create()->result);
@@ -107,7 +113,7 @@ class MessageParticipantFormTest extends DbTestCase
 
     public function testMarkRead(): void
     {
-        $messageParticipant = MessageParticipantForm::findOne([
+        $messageParticipant = MessageForm::findOne([
             'message_id' => 1,
             'member_id' => 1,
         ]);
@@ -118,7 +124,7 @@ class MessageParticipantFormTest extends DbTestCase
 
     public function testFailedMarkRead(): void
     {
-        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MessageForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->markRead()->result);
@@ -126,7 +132,7 @@ class MessageParticipantFormTest extends DbTestCase
 
     public function testFailedMarkReplied(): void
     {
-        $mock = $this->getMockBuilder(MessageParticipantForm::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MessageForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->markReplied()->result);

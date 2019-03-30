@@ -7,7 +7,7 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RankInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -130,10 +130,10 @@ class Rank extends PodiumComponent implements RankInterface
 
     /**
      * Deletes rank.
-     * @param RemovableInterface $rankRemover
+     * @param RemoverInterface $rankRemover
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $rankRemover): PodiumResponse
+    public function remove(RemoverInterface $rankRemover): PodiumResponse
     {
         return $rankRemover->remove();
     }

@@ -17,7 +17,7 @@ use yii\behaviors\TimestampBehavior;
  * Class PollAnswerForm
  * @package bizley\podium\api\models\message
  */
-class MessageParticipantForm extends MessageParticipantRepo implements ModelFormInterface
+class MessageForm extends MessageParticipantRepo implements ModelFormInterface
 {
     // TODO check if findById should be not supported
     use ModelFormTrait;
