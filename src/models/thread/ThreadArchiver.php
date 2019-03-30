@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\repos\ThreadRepo;
@@ -17,7 +17,7 @@ use yii\db\Exception;
  * Class ThreadRemover
  * @package bizley\podium\api\models\thread
  */
-class ThreadArchiver extends ThreadRepo implements ArchivableInterface
+class ThreadArchiver extends ThreadRepo implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.thread.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.thread.archiving.after';
@@ -26,9 +26,9 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
 
     /**
      * @param int $modelId
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public static function findById(int $modelId): ?ArchivableInterface
+    public static function findById(int $modelId): ?ArchiverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

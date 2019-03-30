@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadArchiver;
@@ -18,7 +18,7 @@ use yii\db\Exception;
  * Class PostArchiver
  * @package bizley\podium\api\models\post
  */
-class PostArchiver extends PostRepo implements ArchivableInterface
+class PostArchiver extends PostRepo implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.post.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.post.archiving.after';
@@ -27,9 +27,9 @@ class PostArchiver extends PostRepo implements ArchivableInterface
 
     /**
      * @param int $modelId
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public static function findById(int $modelId): ?ArchivableInterface
+    public static function findById(int $modelId): ?ArchiverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

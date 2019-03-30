@@ -92,16 +92,16 @@ interface ThreadInterface
     public function unlock(LockableInterface $threadLocker): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $threadArchiver
+     * @param ArchiverInterface $threadArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $threadArchiver): PodiumResponse;
+    public function archive(ArchiverInterface $threadArchiver): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $threadArchiver
+     * @param ArchiverInterface $threadArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $threadArchiver): PodiumResponse;
+    public function revive(ArchiverInterface $threadArchiver): PodiumResponse;
 
     /**
      * @return SubscribingInterface

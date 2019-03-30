@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\repos\ForumRepo;
 use Yii;
 
@@ -14,7 +14,7 @@ use Yii;
  * Class ForumArchiver
  * @package bizley\podium\api\models\forum
  */
-class ForumArchiver extends ForumRepo implements ArchivableInterface
+class ForumArchiver extends ForumRepo implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.forum.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.forum.archiving.after';
@@ -23,9 +23,9 @@ class ForumArchiver extends ForumRepo implements ArchivableInterface
 
     /**
      * @param int $modelId
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public static function findById(int $modelId): ?ArchivableInterface
+    public static function findById(int $modelId): ?ArchiverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

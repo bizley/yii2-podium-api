@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\enums\PostType;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LikingInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -200,20 +200,20 @@ class Post extends PodiumComponent implements PostInterface
 
     /**
      * Archives post.
-     * @param ArchivableInterface $postArchiver
+     * @param ArchiverInterface $postArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): PodiumResponse
+    public function archive(ArchiverInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->archive();
     }
 
     /**
      * Revives post.
-     * @param ArchivableInterface $postArchiver
+     * @param ArchiverInterface $postArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): PodiumResponse
+    public function revive(ArchiverInterface $postArchiver): PodiumResponse
     {
         return $postArchiver->revive();
     }

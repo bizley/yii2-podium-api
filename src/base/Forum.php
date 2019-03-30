@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -50,7 +50,7 @@ class Forum extends PodiumComponent implements ForumInterface
     public $removerHandler = \bizley\podium\api\models\forum\ForumRemover::class;
 
     /**
-     * @var string|array|ArchivableInterface category archiver handler
+     * @var string|array|ArchiverInterface category archiver handler
      * Component ID, class, configuration array, or instance of ArchivableInterface.
      */
     public $archiverHandler = \bizley\podium\api\models\forum\ForumArchiver::class;
@@ -72,7 +72,7 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
         $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchivableInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
         $this->moverHandler = Instance::ensure($this->moverHandler, MovableInterface::class);
     }
 
@@ -253,9 +253,9 @@ class Forum extends PodiumComponent implements ForumInterface
 
     /**
      * @param int $id
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public function getArchiver(int $id): ?ArchivableInterface
+    public function getArchiver(int $id): ?ArchiverInterface
     {
         $handler = $this->archiverHandler;
 

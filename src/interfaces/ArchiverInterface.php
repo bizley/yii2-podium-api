@@ -10,13 +10,13 @@ use bizley\podium\api\base\PodiumResponse;
  * Interface RemovableInterface
  * @package bizley\podium\api\interfaces
  */
-interface ArchivableInterface
+interface ArchiverInterface
 {
     /**
      * @param int $modelId
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public static function findById(int $modelId): ?ArchivableInterface;
+    public static function findById(int $modelId): ?ArchiverInterface;
 
     /**
      * Archives model.

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\message;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\models\message\MessageArchiver;
@@ -75,6 +76,9 @@ class MessageArchiverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchive(): void
     {
         Event::on(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_ARCHIVING, function () {
@@ -84,10 +88,7 @@ class MessageArchiverTest extends DbTestCase
             $this->eventsRaised[MessageArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->message->archive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 1,
-        ]))->result);
+        $this->assertTrue($this->podium()->message->archive(1, MessageSide::SENDER)->result);
 
         $this->assertEquals(true, MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -98,6 +99,9 @@ class MessageArchiverTest extends DbTestCase
         $this->assertArrayHasKey(MessageArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -105,10 +109,7 @@ class MessageArchiverTest extends DbTestCase
         };
         Event::on(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->message->archive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 1,
-        ]))->result);
+        $this->assertFalse($this->podium()->message->archive(1, MessageSide::SENDER)->result);
 
         $this->assertEquals(false, MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -118,12 +119,12 @@ class MessageArchiverTest extends DbTestCase
         Event::off(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->message->archive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 2,
-        ]))->result);
+        $this->assertFalse($this->podium()->message->archive(1, MessageSide::RECEIVER)->result);
     }
 
     public function testFailedArchive(): void
@@ -134,6 +135,9 @@ class MessageArchiverTest extends DbTestCase
         $this->assertFalse($mock->archive()->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -143,10 +147,7 @@ class MessageArchiverTest extends DbTestCase
             $this->eventsRaised[MessageArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->message->revive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 2,
-        ]))->result);
+        $this->assertTrue($this->podium()->message->revive(1, MessageSide::RECEIVER)->result);
 
         $this->assertEquals(false, MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -157,6 +158,9 @@ class MessageArchiverTest extends DbTestCase
         $this->assertArrayHasKey(MessageArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testReviveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -164,10 +168,7 @@ class MessageArchiverTest extends DbTestCase
         };
         Event::on(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->message->revive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 2,
-        ]))->result);
+        $this->assertFalse($this->podium()->message->revive(1, MessageSide::RECEIVER)->result);
 
         $this->assertEquals(true, MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -177,12 +178,12 @@ class MessageArchiverTest extends DbTestCase
         Event::off(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_REVIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->message->revive(MessageArchiver::findOne([
-            'message_id' => 1,
-            'member_id' => 1,
-        ]))->result);
+        $this->assertFalse($this->podium()->message->revive(1, MessageSide::SENDER)->result);
     }
 
     public function testFailedRevive(): void

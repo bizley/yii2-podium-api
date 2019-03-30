@@ -94,9 +94,9 @@ interface ForumInterface
 
     /**
      * @param int $id
-     * @return ArchivableInterface|null
+     * @return ArchiverInterface|null
      */
-    public function getArchiver(int $id): ?ArchivableInterface;
+    public function getArchiver(int $id): ?ArchiverInterface;
 
     /**
      * @param int $id

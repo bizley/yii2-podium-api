@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use yii\base\Event;
 
 /**
@@ -24,7 +24,7 @@ class ArchiveEvent extends Event
     public $canRevive = true;
 
     /**
-     * @var ArchivableInterface
+     * @var ArchiverInterface
      */
     public $model;
 }

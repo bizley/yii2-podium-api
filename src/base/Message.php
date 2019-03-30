@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MessageArchiverInterface;
 use bizley\podium\api\interfaces\MessageInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SendingInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -43,6 +43,12 @@ class Message extends PodiumComponent implements MessageInterface
     public $removerHandler = \bizley\podium\api\models\message\MessageRemover::class;
 
     /**
+     * @var string|array|MessageArchiverInterface message archiver handler
+     * Component ID, class, configuration array, or instance of MessageArchiverInterface.
+     */
+    public $archiverHandler = \bizley\podium\api\models\message\MessageArchiver::class;
+
+    /**
      * @throws \yii\base\InvalidConfigException
      */
     public function init(): void
@@ -52,6 +58,7 @@ class Message extends PodiumComponent implements MessageInterface
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
         $this->mailerHandler = Instance::ensure($this->mailerHandler, SendingInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, MessageRemoverInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, MessageArchiverInterface::class);
     }
 
     /**
@@ -98,7 +105,7 @@ class Message extends PodiumComponent implements MessageInterface
         array $data,
         MembershipInterface $sender,
         MembershipInterface $receiver,
-        ?MessageParticipantModelInterface $replyTo = null
+        ?MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
     ): PodiumResponse
     {
         $sending = $this->getMailer();
@@ -147,22 +154,50 @@ class Message extends PodiumComponent implements MessageInterface
     }
 
     /**
-     * Archives message copy.
-     * @param ArchivableInterface $messageParticipantArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @param string $side
+     * @return MessageArchiverInterface|null
      */
-    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
+    public function getArchiver(int $id, string $side): ?MessageArchiverInterface
     {
-        return $messageParticipantArchiver->archive();
+        $handler = $this->archiverHandler;
+
+        return $handler::findByMessageIdAndSide($id, $side);
+    }
+
+    /**
+     * Archives message copy.
+     * @param int $id
+     * @param string $side
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function archive(int $id, string $side): PodiumResponse
+    {
+        $messageArchiver = $this->getArchiver($id, $side);
+
+        if ($messageArchiver === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        return $messageArchiver->archive();
     }
 
     /**
      * Revives message copy.
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param string $side
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
+    public function revive(int $id, string $side): PodiumResponse
     {
-        return $messageParticipantArchiver->revive();
+        $messageArchiver = $this->getArchiver($id, $side);
+
+        if ($messageArchiver === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        return $messageArchiver->revive();
     }
 }

@@ -19,9 +19,9 @@ use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use yii\helpers\ArrayHelper;
 use function array_merge;
 use function time;
-use yii\helpers\ArrayHelper;
 
 /**
  * Class PostFormTest

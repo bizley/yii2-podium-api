@@ -61,14 +61,23 @@ interface MessageInterface
     public function remove(int $id, string $side): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $messageParticipantArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @param string $side
+     * @return MessageArchiverInterface|null
      */
-    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
+    public function getArchiver(int $id, string $side): ?MessageArchiverInterface;
 
     /**
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param string $side
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
+    public function archive(int $id, string $side): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @param string $side
+     * @return PodiumResponse
+     */
+    public function revive(int $id, string $side): PodiumResponse;
 }

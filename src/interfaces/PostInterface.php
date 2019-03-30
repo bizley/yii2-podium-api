@@ -75,16 +75,16 @@ interface PostInterface
     public function move(MovableInterface $postMover, ModelInterface $thread): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param ArchiverInterface $postArchiver
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): PodiumResponse;
+    public function archive(ArchiverInterface $postArchiver): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param ArchiverInterface $postArchiver
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): PodiumResponse;
+    public function revive(ArchiverInterface $postArchiver): PodiumResponse;
 
     /**
      * @return LikingInterface
