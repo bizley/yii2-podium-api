@@ -279,12 +279,9 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while creating poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while poll creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }
@@ -366,18 +363,14 @@ class PostPollForm extends PostRepo implements CategorisedFormInterface
             }
 
             $this->afterEdit();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
         } catch (\Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while editing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while poll editing transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

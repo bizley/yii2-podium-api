@@ -12,6 +12,7 @@ use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -146,18 +147,14 @@ class PostMover extends PostRepo implements MovableInterface
             }
 
             $this->afterMove();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while moving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while post moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

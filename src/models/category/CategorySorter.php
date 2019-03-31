@@ -9,6 +9,7 @@ use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use bizley\podium\api\repos\CategoryRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 
@@ -52,6 +53,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
         if (!empty($data)) {
             $data = ['sortOrder' => $data];
         }
+
         return $this->load($data, '');
     }
 
@@ -98,13 +100,10 @@ class CategorySorter extends CategoryRepo implements SortableInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while sorting categories', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while categories sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error($this);
         }
     }

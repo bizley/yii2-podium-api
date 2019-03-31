@@ -11,6 +11,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\ThreadRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
@@ -142,18 +143,14 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             }
 
             $this->afterCreate();
-
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

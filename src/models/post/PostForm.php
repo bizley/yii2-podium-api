@@ -12,10 +12,12 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\PostRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use function time;
 
 /**
  * Class PostForm
@@ -154,18 +156,14 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             }
 
             $this->afterCreate();
-
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

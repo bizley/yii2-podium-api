@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\VotingInterface;
 use bizley\podium\api\repos\PollVoteRepo;
+use Throwable;
 use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
@@ -128,18 +129,14 @@ class Voting extends Model implements VotingInterface
             }
 
             $this->afterVote();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while voting', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while voting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }
