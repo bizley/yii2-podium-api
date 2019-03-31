@@ -20,7 +20,7 @@ interface RankInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getRankById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,14 +28,14 @@ interface RankInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getRanks(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns rank form handler instance.
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getRankForm(?int $id = null): ?ModelFormInterface;
+    public function getForm(?int $id = null): ?ModelFormInterface;
 
     /**
      * Creates rank.
@@ -52,8 +52,14 @@ interface RankInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemoverInterface $rankRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemoverInterface $rankRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 }

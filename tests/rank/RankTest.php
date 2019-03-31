@@ -40,18 +40,18 @@ class RankTest extends DbTestCase
 
     public function testGetRankById(): void
     {
-        $rank = $this->podium()->rank->getRankById(1);
+        $rank = $this->podium()->rank->getById(1);
         $this->assertEquals(1, $rank->getId());
     }
 
     public function testNonExistingRank(): void
     {
-        $this->assertEmpty($this->podium()->rank->getRankById(999));
+        $this->assertEmpty($this->podium()->rank->getById(999));
     }
 
     public function testGetRanksByFilterEmpty(): void
     {
-        $ranks = $this->podium()->rank->getRanks();
+        $ranks = $this->podium()->rank->getAll();
         $this->assertEquals(2, $ranks->getTotalCount());
         $this->assertEquals([1, 2], $ranks->getKeys());
     }
@@ -65,7 +65,7 @@ class RankTest extends DbTestCase
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
 
-        $ranks = $this->podium()->rank->getRanks($filter);
+        $ranks = $this->podium()->rank->getAll($filter);
 
         $this->assertEquals(1, $ranks->getTotalCount());
         $this->assertEquals([2], $ranks->getKeys());

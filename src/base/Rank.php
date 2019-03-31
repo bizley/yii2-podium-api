@@ -25,13 +25,19 @@ class Rank extends PodiumComponent implements RankInterface
      * @var string|array|ModelInterface rank handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $rankHandler = \bizley\podium\api\models\rank\Rank::class;
+    public $modelHandler = \bizley\podium\api\models\rank\Rank::class;
 
     /**
      * @var string|array|ModelFormInterface rank form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
-    public $rankFormHandler = \bizley\podium\api\models\rank\RankForm::class;
+    public $formHandler = \bizley\podium\api\models\rank\RankForm::class;
+
+    /**
+     * @var string|array|RemoverInterface rank remover handler
+     * Component ID, class, configuration array, or instance of RemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\rank\RankRemover::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -40,17 +46,18 @@ class Rank extends PodiumComponent implements RankInterface
     {
         parent::init();
 
-        $this->rankHandler = Instance::ensure($this->rankHandler, ModelInterface::class);
-        $this->rankFormHandler = Instance::ensure($this->rankFormHandler, ModelFormInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getRankById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $rankClass = $this->rankHandler;
+        $rankClass = $this->modelHandler;
 
         return $rankClass::findById($id);
     }
@@ -61,9 +68,9 @@ class Rank extends PodiumComponent implements RankInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getRanks(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $rankClass = $this->rankHandler;
+        $rankClass = $this->modelHandler;
 
         return $rankClass::findByFilter($filter, $sort, $pagination);
     }
@@ -72,9 +79,9 @@ class Rank extends PodiumComponent implements RankInterface
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getRankForm(?int $id = null): ?ModelFormInterface
+    public function getForm(?int $id = null): ?ModelFormInterface
     {
-        $handler = $this->rankFormHandler;
+        $handler = $this->formHandler;
 
         if ($id === null) {
             return new $handler;
@@ -91,7 +98,7 @@ class Rank extends PodiumComponent implements RankInterface
     public function create(array $data): PodiumResponse
     {
         /* @var $rankForm ModelFormInterface */
-        $rankForm = $this->getRankForm();
+        $rankForm = $this->getForm();
 
         if (!$rankForm->loadData($data)) {
             return PodiumResponse::error();
@@ -115,7 +122,7 @@ class Rank extends PodiumComponent implements RankInterface
             throw new InsufficientDataException('ID key is missing.');
         }
 
-        $rankForm = $this->getRankForm((int)$id);
+        $rankForm = $this->getForm((int)$id);
 
         if ($rankForm === null) {
             throw new ModelNotFoundException('Rank of given ID can not be found.');
@@ -129,12 +136,30 @@ class Rank extends PodiumComponent implements RankInterface
     }
 
     /**
-     * Deletes rank.
-     * @param RemoverInterface $rankRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemoverInterface|null
      */
-    public function remove(RemoverInterface $rankRemover): PodiumResponse
+    public function getRemover(int $id): ?RemoverInterface
     {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes rank.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $rankRemover = $this->getRemover($id);
+
+        if ($rankRemover === null) {
+            throw new ModelNotFoundException('Rank of given ID can not be found.');
+        }
+
         return $rankRemover->remove();
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\rank;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\models\rank\RankRemover;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
@@ -36,6 +37,9 @@ class RankRemoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(RankRemover::class, RankRemover::EVENT_BEFORE_REMOVING, function () {
@@ -45,7 +49,7 @@ class RankRemoverTest extends DbTestCase
             $this->eventsRaised[RankRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->rank->remove(RankRemover::findOne(1))->result);
+        $this->assertTrue($this->podium()->rank->remove(1)->result);
 
         $this->assertEmpty(RankRepo::findOne(1));
 
@@ -53,6 +57,9 @@ class RankRemoverTest extends DbTestCase
         $this->assertArrayHasKey(RankRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -60,7 +67,7 @@ class RankRemoverTest extends DbTestCase
         };
         Event::on(RankRemover::class, RankRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->rank->remove(RankRemover::findOne(1))->result);
+        $this->assertFalse($this->podium()->rank->remove(1)->result);
 
         $this->assertNotEmpty(RankRepo::findOne(1));
 

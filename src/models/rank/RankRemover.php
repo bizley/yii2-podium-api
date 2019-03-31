@@ -8,6 +8,7 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\RankRepo;
+use Throwable;
 use Yii;
 
 /**
@@ -58,8 +59,9 @@ class RankRemover extends RankRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing rank', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
