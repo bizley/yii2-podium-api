@@ -45,7 +45,7 @@ class Forum extends PodiumComponent implements ForumInterface
 
     /**
      * @var string|array|RemoverInterface category remover handler
-     * Component ID, class, configuration array, or instance of RemovableInterface.
+     * Component ID, class, configuration array, or instance of RemoverInterface.
      */
     public $removerHandler = \bizley\podium\api\models\forum\ForumRemover::class;
 

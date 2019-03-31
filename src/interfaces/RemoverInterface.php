@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface RemovableInterface
+ * Interface RemoverInterface
  * @package bizley\podium\api\interfaces
  */
 interface RemoverInterface

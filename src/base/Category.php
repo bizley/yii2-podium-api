@@ -44,7 +44,7 @@ class Category extends PodiumComponent implements CategoryInterface
 
     /**
      * @var string|array|RemoverInterface category remover handler
-     * Component ID, class, configuration array, or instance of RemovableInterface.
+     * Component ID, class, configuration array, or instance of RemoverInterface.
      */
     public $removerHandler = \bizley\podium\api\models\category\CategoryRemover::class;
 

@@ -54,7 +54,7 @@ class Thread extends PodiumComponent implements ThreadInterface
 
     /**
      * @var string|array|RemoverInterface thread remover handler
-     * Component ID, class, configuration array, or instance of RemovableInterface.
+     * Component ID, class, configuration array, or instance of RemoverInterface.
      */
     public $removerHandler = \bizley\podium\api\models\thread\ThreadRemover::class;
 

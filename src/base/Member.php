@@ -65,7 +65,7 @@ class Member extends PodiumComponent implements MemberInterface
 
     /**
      * @var string|array|RemoverInterface member remover handler
-     * Component ID, class, configuration array, or instance of RemovableInterface.
+     * Component ID, class, configuration array, or instance of RemoverInterface.
      */
     public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
 
