@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadLocker;
 use bizley\podium\api\repos\ThreadRepo;
@@ -83,6 +84,9 @@ class ThreadLockerTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testLock(): void
     {
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, function () {
@@ -92,13 +96,16 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_LOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->lock(ThreadLocker::findOne(1))->result);
+        $this->assertTrue($this->podium()->thread->lock(1)->result);
         $this->assertEquals(1, ThreadRepo::findOne(1)->locked);
 
         $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_LOCKING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadLocker::EVENT_AFTER_LOCKING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testLockEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -106,7 +113,7 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->lock(ThreadLocker::findOne(1))->result);
+        $this->assertFalse($this->podium()->thread->lock(1)->result);
         $this->assertEquals(0, ThreadRepo::findOne(1)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
@@ -120,6 +127,9 @@ class ThreadLockerTest extends DbTestCase
         $this->assertFalse($mock->lock()->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnlock(): void
     {
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, function () {
@@ -129,13 +139,16 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_UNLOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->unlock(ThreadLocker::findOne(2))->result);
+        $this->assertTrue($this->podium()->thread->unlock(2)->result);
         $this->assertEquals(0, ThreadRepo::findOne(2)->locked);
 
         $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_UNLOCKING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadLocker::EVENT_AFTER_UNLOCKING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnlockEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -143,7 +156,7 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->unlock(ThreadLocker::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->unlock(2)->result);
         $this->assertEquals(1, ThreadRepo::findOne(2)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);

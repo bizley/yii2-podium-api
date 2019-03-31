@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -84,6 +85,9 @@ class ThreadMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMove(): void
     {
         Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, function () {
@@ -93,7 +97,7 @@ class ThreadMoverTest extends DbTestCase
             $this->eventsRaised[ThreadMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->move(ThreadMover::findOne(1), Forum::findOne(2))->result);
+        $this->assertTrue($this->podium()->thread->move(1, Forum::findOne(2))->result);
         $thread = ThreadRepo::findOne(1);
         $this->assertEquals(1, $thread->category_id);
         $this->assertEquals(2, $thread->forum_id);
@@ -102,6 +106,9 @@ class ThreadMoverTest extends DbTestCase
         $this->assertArrayHasKey(ThreadMover::EVENT_AFTER_MOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -109,7 +116,7 @@ class ThreadMoverTest extends DbTestCase
         };
         Event::on(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->move(ThreadMover::findOne(1), Forum::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->move(1, Forum::findOne(2))->result);
         $this->assertEquals(1, ThreadRepo::findOne(1)->forum_id);
 
         Event::off(ThreadMover::class, ThreadMover::EVENT_BEFORE_MOVING, $handler);

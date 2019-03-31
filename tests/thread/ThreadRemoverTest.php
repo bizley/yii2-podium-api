@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\repos\PostRepo;
@@ -97,6 +98,9 @@ class ThreadRemoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, function () {
@@ -106,7 +110,7 @@ class ThreadRemoverTest extends DbTestCase
             $this->eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->remove(ThreadRemover::findOne(1))->result);
+        $this->assertTrue($this->podium()->thread->remove(1)->result);
 
         $this->assertEmpty(ThreadRepo::findOne(1));
         $this->assertEmpty(PostRepo::findOne(1));
@@ -115,6 +119,9 @@ class ThreadRemoverTest extends DbTestCase
         $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -122,7 +129,7 @@ class ThreadRemoverTest extends DbTestCase
         };
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(1))->result);
+        $this->assertFalse($this->podium()->thread->remove(1)->result);
 
         $this->assertNotEmpty(ThreadRepo::findOne(1));
         $this->assertNotEmpty(PostRepo::findOne(1));
@@ -130,9 +137,12 @@ class ThreadRemoverTest extends DbTestCase
         Event::off(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testNonArchived(): void
     {
-        $this->assertFalse($this->podium()->thread->remove(ThreadRemover::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->remove(2)->result);
         $this->assertNotEmpty(ThreadRepo::findOne(2));
     }
 

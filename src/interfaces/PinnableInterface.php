@@ -13,6 +13,12 @@ use bizley\podium\api\base\PodiumResponse;
 interface PinnableInterface
 {
     /**
+     * @param int $modelId
+     * @return PinnableInterface|null
+     */
+    public static function findById(int $modelId): ?PinnableInterface;
+
+    /**
      * Pins model.
      * @return PodiumResponse
      */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\repos\ForumRepo;
@@ -87,6 +88,9 @@ class ThreadArchiverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchive(): void
     {
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_ARCHIVING, function () {
@@ -96,7 +100,7 @@ class ThreadArchiverTest extends DbTestCase
             $this->eventsRaised[ThreadArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->archive(ThreadArchiver::findOne(1))->result);
+        $this->assertTrue($this->podium()->thread->archive(1)->result);
 
         $this->assertEquals(true, ThreadRepo::findOne(1)->archived);
 
@@ -108,6 +112,9 @@ class ThreadArchiverTest extends DbTestCase
         $this->assertArrayHasKey(ThreadArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -115,7 +122,7 @@ class ThreadArchiverTest extends DbTestCase
         };
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->thread->archive(1)->result);
 
         $this->assertEquals(false, ThreadRepo::findOne(1)->archived);
 
@@ -126,9 +133,12 @@ class ThreadArchiverTest extends DbTestCase
         Event::off(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->thread->archive(ThreadArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->archive(2)->result);
     }
 
     public function testFailedArchiveValidate(): void
@@ -147,6 +157,9 @@ class ThreadArchiverTest extends DbTestCase
         $this->assertFalse($mock->archive()->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -156,7 +169,7 @@ class ThreadArchiverTest extends DbTestCase
             $this->eventsRaised[ThreadArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->revive(ThreadArchiver::findOne(2))->result);
+        $this->assertTrue($this->podium()->thread->revive(2)->result);
 
         $this->assertEquals(false, ThreadRepo::findOne(2)->archived);
 
@@ -168,6 +181,9 @@ class ThreadArchiverTest extends DbTestCase
         $this->assertArrayHasKey(ThreadArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testReviveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -175,7 +191,7 @@ class ThreadArchiverTest extends DbTestCase
         };
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->revive(2)->result);
 
         $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
 
@@ -186,9 +202,12 @@ class ThreadArchiverTest extends DbTestCase
         Event::off(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_REVIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->thread->revive(ThreadArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->thread->revive(1)->result);
     }
 
     public function testFailedReviveValidate(): void

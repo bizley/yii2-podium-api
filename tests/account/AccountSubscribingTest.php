@@ -6,7 +6,7 @@ namespace bizley\podium\tests\account;
 
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\thread\Subscribing;
+use bizley\podium\api\models\thread\ThreadSubscriber;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\SubscriptionRepo;
 use bizley\podium\tests\AccountTestCase;
@@ -117,11 +117,11 @@ class AccountSubscribingTest extends AccountTestCase
      */
     public function testSubscribe(): void
     {
-        Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, function () {
-            $this->eventsRaised[Subscribing::EVENT_BEFORE_SUBSCRIBING] = true;
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_SUBSCRIBING, function () {
+            $this->eventsRaised[ThreadSubscriber::EVENT_BEFORE_SUBSCRIBING] = true;
         });
-        Event::on(Subscribing::class, Subscribing::EVENT_AFTER_SUBSCRIBING, function () {
-            $this->eventsRaised[Subscribing::EVENT_AFTER_SUBSCRIBING] = true;
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_AFTER_SUBSCRIBING, function () {
+            $this->eventsRaised[ThreadSubscriber::EVENT_AFTER_SUBSCRIBING] = true;
         });
 
         $this->assertTrue($this->podium()->account->subscribeThread(Thread::findOne(1))->result);
@@ -133,8 +133,8 @@ class AccountSubscribingTest extends AccountTestCase
         $this->assertNotEmpty($subscription);
         $this->assertEquals(true, $subscription->seen);
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_SUBSCRIBING, $this->eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_SUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadSubscriber::EVENT_BEFORE_SUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadSubscriber::EVENT_AFTER_SUBSCRIBING, $this->eventsRaised);
     }
 
     /**
@@ -145,7 +145,7 @@ class AccountSubscribingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canSubscribe = false;
         };
-        Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_SUBSCRIBING, $handler);
 
         $this->assertFalse($this->podium()->account->subscribeThread(Thread::findOne(1))->result);
 
@@ -154,7 +154,7 @@ class AccountSubscribingTest extends AccountTestCase
             'thread_id' => 1,
         ]));
 
-        Event::off(Subscribing::class, Subscribing::EVENT_BEFORE_SUBSCRIBING, $handler);
+        Event::off(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_SUBSCRIBING, $handler);
     }
 
     /**
@@ -170,11 +170,11 @@ class AccountSubscribingTest extends AccountTestCase
      */
     public function testUnsubscribe(): void
     {
-        Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, function () {
-            $this->eventsRaised[Subscribing::EVENT_BEFORE_UNSUBSCRIBING] = true;
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_UNSUBSCRIBING, function () {
+            $this->eventsRaised[ThreadSubscriber::EVENT_BEFORE_UNSUBSCRIBING] = true;
         });
-        Event::on(Subscribing::class, Subscribing::EVENT_AFTER_UNSUBSCRIBING, function () {
-            $this->eventsRaised[Subscribing::EVENT_AFTER_UNSUBSCRIBING] = true;
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_AFTER_UNSUBSCRIBING, function () {
+            $this->eventsRaised[ThreadSubscriber::EVENT_AFTER_UNSUBSCRIBING] = true;
         });
 
         $this->assertTrue($this->podium()->account->unsubscribeThread(Thread::findOne(2))->result);
@@ -184,8 +184,8 @@ class AccountSubscribingTest extends AccountTestCase
             'thread_id' => 2,
         ]));
 
-        $this->assertArrayHasKey(Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $this->eventsRaised);
-        $this->assertArrayHasKey(Subscribing::EVENT_AFTER_UNSUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadSubscriber::EVENT_BEFORE_UNSUBSCRIBING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadSubscriber::EVENT_AFTER_UNSUBSCRIBING, $this->eventsRaised);
     }
 
     /**
@@ -196,7 +196,7 @@ class AccountSubscribingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canUnsubscribe = false;
         };
-        Event::on(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
+        Event::on(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_UNSUBSCRIBING, $handler);
 
         $this->assertFalse($this->podium()->account->unsubscribeThread(Thread::findOne(2))->result);
 
@@ -205,7 +205,7 @@ class AccountSubscribingTest extends AccountTestCase
             'thread_id' => 2,
         ]));
 
-        Event::off(Subscribing::class, Subscribing::EVENT_BEFORE_UNSUBSCRIBING, $handler);
+        Event::off(ThreadSubscriber::class, ThreadSubscriber::EVENT_BEFORE_UNSUBSCRIBING, $handler);
     }
 
     /**

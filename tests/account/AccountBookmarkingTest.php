@@ -7,7 +7,7 @@ namespace bizley\podium\tests\account;
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\Post;
-use bizley\podium\api\models\thread\Bookmarking;
+use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\repos\BookmarkRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
@@ -129,11 +129,11 @@ class AccountBookmarkingTest extends AccountTestCase
      */
     public function testMark(): void
     {
-        Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, function () {
-            $this->eventsRaised[Bookmarking::EVENT_BEFORE_MARKING] = true;
+        Event::on(ThreadBookmarker::class, ThreadBookmarker::EVENT_BEFORE_MARKING, function () {
+            $this->eventsRaised[ThreadBookmarker::EVENT_BEFORE_MARKING] = true;
         });
-        Event::on(Bookmarking::class, Bookmarking::EVENT_AFTER_MARKING, function () {
-            $this->eventsRaised[Bookmarking::EVENT_AFTER_MARKING] = true;
+        Event::on(ThreadBookmarker::class, ThreadBookmarker::EVENT_AFTER_MARKING, function () {
+            $this->eventsRaised[ThreadBookmarker::EVENT_AFTER_MARKING] = true;
         });
 
         $this->assertTrue($this->podium()->account->markPost(Post::findOne(2))->result);
@@ -143,8 +143,8 @@ class AccountBookmarkingTest extends AccountTestCase
             'thread_id' => 1,
         ])->last_seen);
 
-        $this->assertArrayHasKey(Bookmarking::EVENT_BEFORE_MARKING, $this->eventsRaised);
-        $this->assertArrayHasKey(Bookmarking::EVENT_AFTER_MARKING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadBookmarker::EVENT_BEFORE_MARKING, $this->eventsRaised);
+        $this->assertArrayHasKey(ThreadBookmarker::EVENT_AFTER_MARKING, $this->eventsRaised);
     }
 
     /**
@@ -155,7 +155,7 @@ class AccountBookmarkingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canMark = false;
         };
-        Event::on(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
+        Event::on(ThreadBookmarker::class, ThreadBookmarker::EVENT_BEFORE_MARKING, $handler);
 
         $this->assertFalse($this->podium()->account->markPost(Post::findOne(2))->result);
 
@@ -164,7 +164,7 @@ class AccountBookmarkingTest extends AccountTestCase
             'thread_id' => 1,
         ])->last_seen);
 
-        Event::off(Bookmarking::class, Bookmarking::EVENT_BEFORE_MARKING, $handler);
+        Event::off(ThreadBookmarker::class, ThreadBookmarker::EVENT_BEFORE_MARKING, $handler);
     }
 
     /**

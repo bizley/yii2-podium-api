@@ -31,6 +31,15 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
     }
 
     /**
+     * @param int $modelId
+     * @return LockableInterface|null
+     */
+    public static function findById(int $modelId): ?LockableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return bool
      */
     public function beforeLock(): bool
