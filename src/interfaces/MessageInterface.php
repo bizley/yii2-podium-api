@@ -48,36 +48,36 @@ interface MessageInterface
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return MessageRemoverInterface|null
      */
-    public function getRemover(int $id, string $side): ?MessageRemoverInterface;
+    public function getRemover(int $id, MembershipInterface $participant): ?MessageRemoverInterface;
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      */
-    public function remove(int $id, string $side): PodiumResponse;
+    public function remove(int $id, MembershipInterface $participant): PodiumResponse;
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return MessageArchiverInterface|null
      */
-    public function getArchiver(int $id, string $side): ?MessageArchiverInterface;
+    public function getArchiver(int $id, MembershipInterface $participant): ?MessageArchiverInterface;
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      */
-    public function archive(int $id, string $side): PodiumResponse;
+    public function archive(int $id, MembershipInterface $participant): PodiumResponse;
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      */
-    public function revive(int $id, string $side): PodiumResponse;
+    public function revive(int $id, MembershipInterface $participant): PodiumResponse;
 }

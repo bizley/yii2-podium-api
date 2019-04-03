@@ -122,26 +122,26 @@ class Message extends PodiumComponent implements MessageInterface
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return MessageRemoverInterface|null
      */
-    public function getRemover(int $id, string $side): ?MessageRemoverInterface
+    public function getRemover(int $id, MembershipInterface $participant): ?MessageRemoverInterface
     {
         $handler = $this->removerHandler;
 
-        return $handler::findByMessageIdAndSide($id, $side);
+        return $handler::findByMessageIdAndParticipant($id, $participant);
     }
 
     /**
      * Deletes message copy.
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      * @throws ModelNotFoundException
      */
-    public function remove(int $id, string $side): PodiumResponse
+    public function remove(int $id, MembershipInterface $participant): PodiumResponse
     {
-        $messageRemover = $this->getRemover($id, $side);
+        $messageRemover = $this->getRemover($id, $participant);
 
         if ($messageRemover === null) {
             throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
@@ -154,26 +154,26 @@ class Message extends PodiumComponent implements MessageInterface
 
     /**
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return MessageArchiverInterface|null
      */
-    public function getArchiver(int $id, string $side): ?MessageArchiverInterface
+    public function getArchiver(int $id, MembershipInterface $participant): ?MessageArchiverInterface
     {
         $handler = $this->archiverHandler;
 
-        return $handler::findByMessageIdAndSide($id, $side);
+        return $handler::findByMessageIdAndParticipant($id, $participant);
     }
 
     /**
      * Archives message copy.
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      * @throws ModelNotFoundException
      */
-    public function archive(int $id, string $side): PodiumResponse
+    public function archive(int $id, MembershipInterface $participant): PodiumResponse
     {
-        $messageArchiver = $this->getArchiver($id, $side);
+        $messageArchiver = $this->getArchiver($id, $participant);
 
         if ($messageArchiver === null) {
             throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
@@ -185,13 +185,13 @@ class Message extends PodiumComponent implements MessageInterface
     /**
      * Revives message copy.
      * @param int $id
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      * @throws ModelNotFoundException
      */
-    public function revive(int $id, string $side): PodiumResponse
+    public function revive(int $id, MembershipInterface $participant): PodiumResponse
     {
-        $messageArchiver = $this->getArchiver($id, $side);
+        $messageArchiver = $this->getArchiver($id, $participant);
 
         if ($messageArchiver === null) {
             throw new ModelNotFoundException('Message copy of given ID and side can not be found.');

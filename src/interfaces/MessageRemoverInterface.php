@@ -12,10 +12,10 @@ interface MessageRemoverInterface extends RemoverInterface
 {
     /**
      * @param int $messageId
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return RemoverInterface|null
      */
-    public static function findByMessageIdAndSide(int $messageId, string $side): ?MessageRemoverInterface;
+    public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageRemoverInterface;
 
     /**
      * @param ModelInterface $messageHandler

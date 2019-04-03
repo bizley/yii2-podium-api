@@ -7,6 +7,7 @@ namespace bizley\podium\tests\message;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
+use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\message\MessageRemover;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;
@@ -105,7 +106,7 @@ class MessageRemoverTest extends DbTestCase
             $this->eventsRaised[MessageRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->message->remove(1, MessageSide::SENDER)->result);
+        $this->assertTrue($this->podium()->message->remove(1, Member::findByUserId(1))->result);
 
         $this->assertEmpty(MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -133,7 +134,7 @@ class MessageRemoverTest extends DbTestCase
         };
         Event::on(MessageRemover::class, MessageRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->message->remove(1, MessageSide::SENDER)->result);
+        $this->assertFalse($this->podium()->message->remove(1, Member::findByUserId(1))->result);
 
         $this->assertNotEmpty(MessageParticipantRepo::findOne([
             'message_id' => 1,
@@ -148,7 +149,7 @@ class MessageRemoverTest extends DbTestCase
      */
     public function testRemoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->message->remove(2, MessageSide::SENDER)->result);
+        $this->assertTrue($this->podium()->message->remove(2, Member::findByUserId(1))->result);
 
         $this->assertEmpty(MessageParticipantRepo::findOne([
             'message_id' => 2,
@@ -162,7 +163,7 @@ class MessageRemoverTest extends DbTestCase
      */
     public function testRemoveNonArchived(): void
     {
-        $this->assertFalse($this->podium()->message->remove(1, MessageSide::RECEIVER)->result);
+        $this->assertFalse($this->podium()->message->remove(1, Member::findByUserId(2))->result);
 
         $this->assertNotEmpty(MessageParticipantRepo::findOne([
             'message_id' => 1,

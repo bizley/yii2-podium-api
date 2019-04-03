@@ -5,14 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\base\PodiumResponse;
-use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
+use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use Yii;
-use yii\base\InvalidArgumentException;
-use function in_array;
 
 /**
  * Class MessageParticipantArchiver
@@ -36,20 +34,14 @@ class MessageArchiver extends MessageParticipantRepo implements MessageArchiverI
 
     /**
      * @param int $messageId
-     * @param string $side
+     * @param MembershipInterface $participant
      * @return MessageArchiverInterface|null
      */
-    public static function findByMessageIdAndSide(int $messageId, string $side): ?MessageArchiverInterface
+    public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageArchiverInterface
     {
-        if (!in_array($side, MessageSide::keys(), true)) {
-            throw new InvalidArgumentException(
-                'Provided "side" argument is invalid. Use either "' . MessageSide::SENDER . '" or "' . MessageSide::RECEIVER . '".'
-            );
-        }
-
         return static::findOne([
             'message_id' => $messageId,
-            'side_id' => $side,
+            'member_id' => $participant->getId(),
         ]);
     }
 
