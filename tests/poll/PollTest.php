@@ -123,7 +123,7 @@ class PollTest extends DbTestCase
 
     public function testGetComponentPollByPostId(): void
     {
-        $poll = $this->podium()->poll->getPollByPostId(2);
+        $poll = $this->podium()->poll->getByPostId(2);
         $this->assertEquals(2, $poll->getId());
     }
 
@@ -165,17 +165,17 @@ class PollTest extends DbTestCase
 
     public function testIsArchived(): void
     {
-        $this->assertTrue($this->podium()->poll->getPollByPostId(2)->isArchived());
-        $this->assertFalse($this->podium()->poll->getPollByPostId(1)->isArchived());
+        $this->assertTrue($this->podium()->poll->getByPostId(2)->isArchived());
+        $this->assertFalse($this->podium()->poll->getByPostId(1)->isArchived());
     }
 
     public function testGetParent(): void
     {
-        $this->assertEquals(Post::findOne(2), $this->podium()->poll->getPollByPostId(2)->getParent());
+        $this->assertEquals(Post::findOne(2), $this->podium()->poll->getByPostId(2)->getParent());
     }
 
     public function testGetPost(): void
     {
-        $this->assertInstanceOf(ActiveQuery::class, $this->podium()->poll->getPollByPostId(1)->getPost());
+        $this->assertInstanceOf(ActiveQuery::class, $this->podium()->poll->getByPostId(1)->getPost());
     }
 }

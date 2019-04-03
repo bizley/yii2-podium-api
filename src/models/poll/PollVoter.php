@@ -10,7 +10,7 @@ use bizley\podium\api\events\VoteEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
-use bizley\podium\api\interfaces\VotingInterface;
+use bizley\podium\api\interfaces\VoterInterface;
 use bizley\podium\api\repos\PollVoteRepo;
 use Throwable;
 use Yii;
@@ -19,10 +19,10 @@ use yii\base\Model;
 use yii\db\Exception;
 
 /**
- * Class Voting
+ * Class PollVoter
  * @package bizley\podium\api\models\poll
  */
-class Voting extends Model implements VotingInterface
+class PollVoter extends Model implements VoterInterface
 {
     public const EVENT_BEFORE_VOTING = 'podium.poll.voting.before';
     public const EVENT_AFTER_VOTING = 'podium.poll.voting.after';

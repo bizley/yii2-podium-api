@@ -10,7 +10,7 @@ use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
-use bizley\podium\api\models\poll\Voting;
+use bizley\podium\api\models\poll\PollVoter;
 use bizley\podium\api\repos\PollVoteRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
@@ -203,11 +203,11 @@ class AccountVotingTest extends AccountTestCase
      */
     public function testVoteSingle(): void
     {
-        Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, function () {
-            $this->eventsRaised[Voting::EVENT_BEFORE_VOTING] = true;
+        Event::on(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, function () {
+            $this->eventsRaised[PollVoter::EVENT_BEFORE_VOTING] = true;
         });
-        Event::on(Voting::class, Voting::EVENT_AFTER_VOTING, function () {
-            $this->eventsRaised[Voting::EVENT_AFTER_VOTING] = true;
+        Event::on(PollVoter::class, PollVoter::EVENT_AFTER_VOTING, function () {
+            $this->eventsRaised[PollVoter::EVENT_AFTER_VOTING] = true;
         });
 
         $this->assertTrue($this->podium()->account->votePoll(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
@@ -218,8 +218,8 @@ class AccountVotingTest extends AccountTestCase
             'answer_id' => 1,
         ]));
 
-        $this->assertArrayHasKey(Voting::EVENT_BEFORE_VOTING, $this->eventsRaised);
-        $this->assertArrayHasKey(Voting::EVENT_AFTER_VOTING, $this->eventsRaised);
+        $this->assertArrayHasKey(PollVoter::EVENT_BEFORE_VOTING, $this->eventsRaised);
+        $this->assertArrayHasKey(PollVoter::EVENT_AFTER_VOTING, $this->eventsRaised);
     }
 
     /**
@@ -230,7 +230,7 @@ class AccountVotingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canVote = false;
         };
-        Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);
+        Event::on(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, $handler);
 
         $this->assertFalse($this->podium()->account->votePoll(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
 
@@ -240,7 +240,7 @@ class AccountVotingTest extends AccountTestCase
             'answer_id' => 1,
         ]));
 
-        Event::off(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);
+        Event::off(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, $handler);
     }
 
     /**

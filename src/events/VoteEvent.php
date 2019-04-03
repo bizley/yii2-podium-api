@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\VotingInterface;
+use bizley\podium\api\interfaces\VoterInterface;
 use yii\base\Event;
 
 /**
@@ -19,7 +19,7 @@ class VoteEvent extends Event
     public $canVote = true;
 
     /**
-     * @var VotingInterface
+     * @var VoterInterface
      */
     public $model;
 }
