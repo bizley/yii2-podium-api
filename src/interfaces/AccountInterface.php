@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
@@ -100,4 +102,24 @@ interface AccountInterface
      * @return PodiumResponse
      */
     public function votePoll(PollModelInterface $poll, array $answers): PodiumResponse;
+
+    /**
+     * Sends message.
+     * @param array $data
+     * @param MembershipInterface $receiver
+     * @param MessageParticipantModelInterface $replyTo
+     * @return PodiumResponse
+     */
+    public function sendMessage(
+        array $data,
+        MembershipInterface $receiver,
+        ?MessageParticipantModelInterface $replyTo = null
+    ): PodiumResponse;
+
+    /**
+     * Deletes message.
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function removeMessage(int $id): PodiumResponse;
 }

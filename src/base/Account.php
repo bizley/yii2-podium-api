@@ -251,4 +251,16 @@ class Account extends PodiumComponent implements AccountInterface
     {
         return $this->podium->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
     }
+
+    /**
+     * Deletes message.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws NoMembershipException
+     * @throws ModelNotFoundException
+     */
+    public function removeMessage(int $id): PodiumResponse
+    {
+        return $this->podium->message->remove($id, $this->ensureMembership());
+    }
 }
