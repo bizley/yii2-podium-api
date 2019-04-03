@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\thread;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\repos\ThreadRepo;
 use Throwable;
@@ -20,16 +20,16 @@ use yii\db\Exception;
  * Class ThreadMover
  * @package bizley\podium\api\models\thread
  */
-class ThreadMover extends ThreadRepo implements MovableInterface
+class ThreadMover extends ThreadRepo implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.thread.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
     /**
      * @param int $modelId
-     * @return MovableInterface|null
+     * @return MoverInterface|null
      */
-    public static function findById(int $modelId): ?MovableInterface
+    public static function findById(int $modelId): ?MoverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ThumbEvent;
-use bizley\podium\api\interfaces\LikingInterface;
+use bizley\podium\api\interfaces\LikerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\repos\ThumbRepo;
@@ -16,10 +16,10 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
 
 /**
- * Class Liking
+ * Class PostLiker
  * @package bizley\podium\api\models\post
  */
-class Liking extends ThumbRepo implements LikingInterface
+class PostLiker extends ThumbRepo implements LikerInterface
 {
     public const EVENT_BEFORE_THUMB_UP = 'podium.thumb.up.before';
     public const EVENT_AFTER_THUMB_UP = 'podium.thumb.up.after';

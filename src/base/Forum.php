@@ -9,7 +9,7 @@ use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
@@ -56,7 +56,7 @@ class Forum extends PodiumComponent implements ForumInterface
     public $archiverHandler = \bizley\podium\api\models\forum\ForumArchiver::class;
 
     /**
-     * @var string|array|MovableInterface category mover handler
+     * @var string|array|MoverInterface category mover handler
      * Component ID, class, configuration array, or instance of MovableInterface.
      */
     public $moverHandler = \bizley\podium\api\models\forum\ForumMover::class;
@@ -73,7 +73,7 @@ class Forum extends PodiumComponent implements ForumInterface
         $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
-        $this->moverHandler = Instance::ensure($this->moverHandler, MovableInterface::class);
+        $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
     }
 
     /**
@@ -222,9 +222,9 @@ class Forum extends PodiumComponent implements ForumInterface
 
     /**
      * @param int $id
-     * @return MovableInterface|null
+     * @return MoverInterface|null
      */
-    public function getMover(int $id): ?MovableInterface
+    public function getMover(int $id): ?MoverInterface
     {
         $handler = $this->moverHandler;
 

@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\post;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadRemover;
@@ -22,16 +22,16 @@ use yii\db\Exception;
  * Class PostMover
  * @package bizley\podium\api\models\post
  */
-class PostMover extends PostRepo implements MovableInterface
+class PostMover extends PostRepo implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.post.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.post.moving.after';
 
     /**
      * @param int $modelId
-     * @return MovableInterface|null
+     * @return MoverInterface|null
      */
-    public static function findById(int $modelId): ?MovableInterface
+    public static function findById(int $modelId): ?MoverInterface
     {
         return static::findOne(['id' => $modelId]);
     }

@@ -67,9 +67,9 @@ interface ThreadInterface
 
     /**
      * @param int $id
-     * @return MovableInterface|null
+     * @return MoverInterface|null
      */
-    public function getMover(int $id): ?MovableInterface;
+    public function getMover(int $id): ?MoverInterface;
 
     /**
      * Moves thread to different forum.

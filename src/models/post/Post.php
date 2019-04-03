@@ -52,6 +52,6 @@ class Post extends PostRepo implements ModelInterface
      */
     public function isArchived(): bool
     {
-        return (bool) $this->archived;
+        return (bool)$this->archived;
     }
 }

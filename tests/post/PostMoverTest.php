@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -124,6 +125,9 @@ class PostMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMove(): void
     {
         Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, function () {
@@ -133,7 +137,7 @@ class PostMoverTest extends DbTestCase
             $this->eventsRaised[PostMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2))->result);
+        $this->assertTrue($this->podium()->post->move(1, Thread::findOne(2))->result);
 
         $post = PostRepo::findOne(1);
         $this->assertEquals(1, $post->category_id);
@@ -148,6 +152,9 @@ class PostMoverTest extends DbTestCase
         $this->assertArrayHasKey(PostMover::EVENT_AFTER_MOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -155,15 +162,18 @@ class PostMoverTest extends DbTestCase
         };
         Event::on(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->post->move(PostMover::findOne(1), Thread::findOne(2))->result);
+        $this->assertFalse($this->podium()->post->move(1, Thread::findOne(2))->result);
         $this->assertEquals(1, PostRepo::findOne(1)->thread_id);
 
         Event::off(PostMover::class, PostMover::EVENT_BEFORE_MOVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->move(PostMover::findOne(2), Thread::findOne(1))->result);
+        $this->assertTrue($this->podium()->post->move(2, Thread::findOne(1))->result);
 
         $post = PostRepo::findOne(2);
         $this->assertEquals(1, $post->category_id);

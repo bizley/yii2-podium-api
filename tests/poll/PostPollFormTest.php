@@ -380,15 +380,7 @@ class PostPollFormTest extends DbTestCase
         ];
         $this->assertFalse($this->podium()->poll->edit($data)->result);
     }
-
-    public function testValidateCreate(): void
-    {
-        $this->assertFalse($this->podium()->post->create([
-            'type_id' => PostType::POLL,
-            'content' => 'post-updated',
-        ], Member::findOne(1), Thread::findOne(1))->result);
-    }
-
+    
     /**
      * @throws InsufficientDataException
      * @throws ModelNotFoundException

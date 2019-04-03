@@ -92,18 +92,18 @@ class PostTest extends DbTestCase
 
     public function testGetPostById(): void
     {
-        $post = $this->podium()->post->getPostById(1);
+        $post = $this->podium()->post->getById(1);
         $this->assertEquals(1, $post->getId());
     }
 
     public function testNonExistingPost(): void
     {
-        $this->assertEmpty($this->podium()->post->getPostById(999));
+        $this->assertEmpty($this->podium()->post->getById(999));
     }
 
     public function testGetPostsByFilterEmpty(): void
     {
-        $posts = $this->podium()->post->getPosts();
+        $posts = $this->podium()->post->getAll();
         $this->assertEquals(2, $posts->getTotalCount());
         $this->assertEquals([1, 2], $posts->getKeys());
     }
@@ -117,7 +117,7 @@ class PostTest extends DbTestCase
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
 
-        $posts = $this->podium()->post->getPosts($filter);
+        $posts = $this->podium()->post->getAll($filter);
 
         $this->assertEquals(1, $posts->getTotalCount());
         $this->assertEquals([2], $posts->getKeys());

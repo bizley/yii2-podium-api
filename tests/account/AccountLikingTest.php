@@ -6,7 +6,7 @@ namespace bizley\podium\tests\account;
 
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\post\Liking;
+use bizley\podium\api\models\post\PostLiker;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThumbRepo;
@@ -157,11 +157,11 @@ class AccountLikingTest extends AccountTestCase
      */
     public function testThumbUp(): void
     {
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, function () {
-            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_UP] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_UP, function () {
+            $this->eventsRaised[PostLiker::EVENT_BEFORE_THUMB_UP] = true;
         });
-        Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_UP, function () {
-            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_UP] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_AFTER_THUMB_UP, function () {
+            $this->eventsRaised[PostLiker::EVENT_AFTER_THUMB_UP] = true;
         });
 
         $this->assertTrue($this->podium()->account->thumbUpPost(Post::findOne(1))->result);
@@ -175,8 +175,8 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(16, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_UP, $this->eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_UP, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_BEFORE_THUMB_UP, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_AFTER_THUMB_UP, $this->eventsRaised);
     }
 
     /**
@@ -187,7 +187,7 @@ class AccountLikingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canThumbUp = false;
         };
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_UP, $handler);
 
         $this->assertFalse($this->podium()->account->thumbUpPost(Post::findOne(1))->result);
 
@@ -200,7 +200,7 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_UP, $handler);
+        Event::off(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_UP, $handler);
     }
 
     /**
@@ -233,11 +233,11 @@ class AccountLikingTest extends AccountTestCase
      */
     public function testThumbDown(): void
     {
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, function () {
-            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_DOWN] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_DOWN, function () {
+            $this->eventsRaised[PostLiker::EVENT_BEFORE_THUMB_DOWN] = true;
         });
-        Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_DOWN, function () {
-            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_DOWN] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_AFTER_THUMB_DOWN, function () {
+            $this->eventsRaised[PostLiker::EVENT_AFTER_THUMB_DOWN] = true;
         });
 
         $this->assertTrue($this->podium()->account->thumbDownPost(Post::findOne(1))->result);
@@ -251,8 +251,8 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(16, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_DOWN, $this->eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_DOWN, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_BEFORE_THUMB_DOWN, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_AFTER_THUMB_DOWN, $this->eventsRaised);
     }
 
     /**
@@ -263,7 +263,7 @@ class AccountLikingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canThumbDown = false;
         };
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_DOWN, $handler);
 
         $this->assertFalse($this->podium()->account->thumbDownPost(Post::findOne(1))->result);
 
@@ -276,7 +276,7 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_DOWN, $handler);
+        Event::off(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_DOWN, $handler);
     }
 
     /**
@@ -309,11 +309,11 @@ class AccountLikingTest extends AccountTestCase
      */
     public function testThumbResetFromUp(): void
     {
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, function () {
-            $this->eventsRaised[Liking::EVENT_BEFORE_THUMB_RESET] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_RESET, function () {
+            $this->eventsRaised[PostLiker::EVENT_BEFORE_THUMB_RESET] = true;
         });
-        Event::on(Liking::class, Liking::EVENT_AFTER_THUMB_RESET, function () {
-            $this->eventsRaised[Liking::EVENT_AFTER_THUMB_RESET] = true;
+        Event::on(PostLiker::class, PostLiker::EVENT_AFTER_THUMB_RESET, function () {
+            $this->eventsRaised[PostLiker::EVENT_AFTER_THUMB_RESET] = true;
         });
 
         $this->assertTrue($this->podium()->account->thumbResetPost(Post::findOne(2))->result);
@@ -327,8 +327,8 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(14, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        $this->assertArrayHasKey(Liking::EVENT_BEFORE_THUMB_RESET, $this->eventsRaised);
-        $this->assertArrayHasKey(Liking::EVENT_AFTER_THUMB_RESET, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_BEFORE_THUMB_RESET, $this->eventsRaised);
+        $this->assertArrayHasKey(PostLiker::EVENT_AFTER_THUMB_RESET, $this->eventsRaised);
     }
 
     /**
@@ -339,7 +339,7 @@ class AccountLikingTest extends AccountTestCase
         $handler = static function ($event) {
             $event->canThumbReset = false;
         };
-        Event::on(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
+        Event::on(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_RESET, $handler);
 
         $this->assertFalse($this->podium()->account->thumbResetPost(Post::findOne(2))->result);
 
@@ -352,7 +352,7 @@ class AccountLikingTest extends AccountTestCase
         $this->assertEquals(15, $post->likes);
         $this->assertEquals(15, $post->dislikes);
 
-        Event::off(Liking::class, Liking::EVENT_BEFORE_THUMB_RESET, $handler);
+        Event::off(PostLiker::class, PostLiker::EVENT_BEFORE_THUMB_RESET, $handler);
     }
 
     /**

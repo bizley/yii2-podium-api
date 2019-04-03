@@ -10,7 +10,7 @@ use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\LockableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PinnableInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscribingInterface;
@@ -65,7 +65,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     public $archiverHandler = \bizley\podium\api\models\thread\ThreadArchiver::class;
 
     /**
-     * @var string|array|MovableInterface thread mover handler
+     * @var string|array|MoverInterface thread mover handler
      * Component ID, class, configuration array, or instance of MovableInterface.
      */
     public $moverHandler = \bizley\podium\api\models\thread\ThreadMover::class;
@@ -95,7 +95,7 @@ class Thread extends PodiumComponent implements ThreadInterface
         $this->bookmarkerHandler = Instance::ensure($this->bookmarkerHandler, BookmarkingInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
-        $this->moverHandler = Instance::ensure($this->moverHandler, MovableInterface::class);
+        $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
         $this->lockerHandler = Instance::ensure($this->lockerHandler, LockableInterface::class);
         $this->pinnerHandler = Instance::ensure($this->pinnerHandler, PinnableInterface::class);
     }
@@ -219,9 +219,9 @@ class Thread extends PodiumComponent implements ThreadInterface
 
     /**
      * @param int $id
-     * @return MovableInterface|null
+     * @return MoverInterface|null
      */
-    public function getMover(int $id): ?MovableInterface
+    public function getMover(int $id): ?MoverInterface
     {
         $handler = $this->moverHandler;
 
