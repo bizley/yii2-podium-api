@@ -8,6 +8,7 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PollRepo;
+use Throwable;
 use Yii;
 
 /**
@@ -58,7 +59,7 @@ class PollRemover extends PollRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }

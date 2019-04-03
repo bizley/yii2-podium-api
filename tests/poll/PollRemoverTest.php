@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\poll;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\PollRemover;
 use bizley\podium\api\repos\PollAnswerRepo;
@@ -114,6 +115,9 @@ class PollRemoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, function () {
@@ -123,7 +127,7 @@ class PollRemoverTest extends DbTestCase
             $this->eventsRaised[PollRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->poll->remove(PollRemover::findOne(1))->result);
+        $this->assertTrue($this->podium()->poll->remove(1)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
         $this->assertEmpty(PollRepo::findOne(1));
@@ -134,6 +138,9 @@ class PollRemoverTest extends DbTestCase
         $this->assertArrayHasKey(PollRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -141,7 +148,7 @@ class PollRemoverTest extends DbTestCase
         };
         Event::on(PollRemover::class, PollRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->poll->remove(PollRemover::findOne(1))->result);
+        $this->assertFalse($this->podium()->poll->remove(1)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
         $this->assertNotEmpty(PollRepo::findOne(1));
