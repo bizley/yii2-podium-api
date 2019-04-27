@@ -10,7 +10,6 @@ use bizley\podium\api\models\poll\PollRemover;
 use bizley\podium\api\repos\PollAnswerRepo;
 use bizley\podium\api\repos\PollRepo;
 use bizley\podium\api\repos\PollVoteRepo;
-use bizley\podium\api\repos\PostRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 

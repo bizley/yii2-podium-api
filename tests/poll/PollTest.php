@@ -6,12 +6,10 @@ namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\Poll;
-use bizley\podium\api\models\post\Post;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
-use yii\db\ActiveQuery;
 
 /**
  * Class PollTest
