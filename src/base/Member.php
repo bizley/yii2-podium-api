@@ -14,6 +14,8 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -25,7 +27,7 @@ use yii\helpers\ArrayHelper;
  * Class Member
  * @package bizley\podium\api\base
  */
-class Member extends PodiumComponent implements MemberInterface
+class Member extends Component implements MemberInterface
 {
     /**
      * @var string|array|MembershipInterface member handler
@@ -76,7 +78,7 @@ class Member extends PodiumComponent implements MemberInterface
     public $bannerHandler = \bizley\podium\api\models\member\MemberBanner::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

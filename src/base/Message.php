@@ -11,6 +11,8 @@ use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SendingInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -21,7 +23,7 @@ use yii\di\Instance;
  * Class Message
  * @package bizley\podium\api\base
  */
-class Message extends PodiumComponent implements MessageInterface
+class Message extends Component implements MessageInterface
 {
     /**
      * @var string|array|ModelInterface message handler
@@ -48,7 +50,7 @@ class Message extends PodiumComponent implements MessageInterface
     public $archiverHandler = \bizley\podium\api\models\message\MessageArchiver::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

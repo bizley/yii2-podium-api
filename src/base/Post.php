@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -24,7 +25,7 @@ use yii\helpers\ArrayHelper;
  * Class Post
  * @package bizley\podium\api\base
  */
-class Post extends PodiumComponent implements PostInterface
+class Post extends Component implements PostInterface
 {
     /**
      * @var string|array|ModelInterface post handler

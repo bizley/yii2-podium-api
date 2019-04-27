@@ -8,6 +8,8 @@ use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -19,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * Class Group
  * @package bizley\podium\api\base
  */
-class Group extends PodiumComponent implements GroupInterface
+class Group extends Component implements GroupInterface
 {
     /**
      * @var string|array|ModelInterface group handler
@@ -40,7 +42,7 @@ class Group extends PodiumComponent implements GroupInterface
     public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

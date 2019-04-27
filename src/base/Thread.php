@@ -15,6 +15,8 @@ use bizley\podium\api\interfaces\PinnableInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscribingInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -26,7 +28,7 @@ use yii\helpers\ArrayHelper;
  * Class Thread
  * @package bizley\podium\api\base
  */
-class Thread extends PodiumComponent implements ThreadInterface
+class Thread extends Component implements ThreadInterface
 {
     /**
      * @var string|array|ModelInterface thread handler
@@ -83,7 +85,7 @@ class Thread extends PodiumComponent implements ThreadInterface
     public $pinnerHandler = \bizley\podium\api\models\thread\ThreadPinner::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

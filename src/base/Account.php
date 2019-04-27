@@ -10,6 +10,8 @@ use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
+use bizley\podium\api\Podium;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\web\User;
@@ -21,7 +23,7 @@ use yii\web\User;
  * @property MembershipInterface|null $membership
  * @property int|null $id
  */
-class Account extends PodiumComponent implements AccountInterface
+class Account extends Component implements AccountInterface
 {
     /**
      * @var string|array|MembershipInterface membership handler
@@ -44,6 +46,24 @@ class Account extends PodiumComponent implements AccountInterface
 
         $this->membershipHandler = Instance::ensure($this->membershipHandler, MembershipInterface::class);
         $this->userHandler = Instance::ensure($this->userHandler, User::class);
+    }
+
+    private $_podium;
+
+    /**
+     * @param Podium $podium
+     */
+    public function setPodium(Podium $podium): void
+    {
+        $this->_podium = $podium;
+    }
+
+    /**
+     * @return Podium
+     */
+    public function getPodium(): Podium
+    {
+        return $this->_podium;
     }
 
     private $_membership;
@@ -99,7 +119,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function befriendMember(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->befriend($this->ensureMembership(), $target);
+        return $this->getPodium()->member->befriend($this->ensureMembership(), $target);
     }
 
     /**
@@ -110,7 +130,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function unfriendMember(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->unfriend($this->ensureMembership(), $target);
+        return $this->getPodium()->member->unfriend($this->ensureMembership(), $target);
     }
 
     /**
@@ -121,7 +141,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function ignoreMember(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->ignore($this->ensureMembership(), $target);
+        return $this->getPodium()->member->ignore($this->ensureMembership(), $target);
     }
 
     /**
@@ -132,7 +152,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function unignoreMember(MembershipInterface $target): PodiumResponse
     {
-        return $this->podium->member->unignore($this->ensureMembership(), $target);
+        return $this->getPodium()->member->unignore($this->ensureMembership(), $target);
     }
 
     /**
@@ -143,7 +163,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function thumbUpPost(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbUp($this->ensureMembership(), $post);
+        return $this->getPodium()->post->thumbUp($this->ensureMembership(), $post);
     }
 
     /**
@@ -154,7 +174,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function thumbDownPost(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbDown($this->ensureMembership(), $post);
+        return $this->getPodium()->post->thumbDown($this->ensureMembership(), $post);
     }
 
     /**
@@ -165,7 +185,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function thumbResetPost(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->post->thumbReset($this->ensureMembership(), $post);
+        return $this->getPodium()->post->thumbReset($this->ensureMembership(), $post);
     }
 
     /**
@@ -176,7 +196,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function markPost(ModelInterface $post): PodiumResponse
     {
-        return $this->podium->thread->mark($this->ensureMembership(), $post);
+        return $this->getPodium()->thread->mark($this->ensureMembership(), $post);
     }
 
     /**
@@ -187,7 +207,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function subscribeThread(ModelInterface $thread): PodiumResponse
     {
-        return $this->podium->thread->subscribe($this->ensureMembership(), $thread);
+        return $this->getPodium()->thread->subscribe($this->ensureMembership(), $thread);
     }
 
     /**
@@ -198,7 +218,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function unsubscribeThread(ModelInterface $thread): PodiumResponse
     {
-        return $this->podium->thread->unsubscribe($this->ensureMembership(), $thread);
+        return $this->getPodium()->thread->unsubscribe($this->ensureMembership(), $thread);
     }
 
     /**
@@ -209,7 +229,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function joinGroup(ModelInterface $group): PodiumResponse
     {
-        return $this->podium->member->join($this->ensureMembership(), $group);
+        return $this->getPodium()->member->join($this->ensureMembership(), $group);
     }
 
     /**
@@ -220,7 +240,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function leaveGroup(ModelInterface $group): PodiumResponse
     {
-        return $this->podium->member->leave($this->ensureMembership(), $group);
+        return $this->getPodium()->member->leave($this->ensureMembership(), $group);
     }
 
     /**
@@ -232,7 +252,7 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function votePoll(PollModelInterface $poll, array $answers): PodiumResponse
     {
-        return $this->podium->poll->vote($this->ensureMembership(), $poll, $answers);
+        return $this->getPodium()->poll->vote($this->ensureMembership(), $poll, $answers);
     }
 
     /**
@@ -249,7 +269,7 @@ class Account extends PodiumComponent implements AccountInterface
         ?MessageParticipantModelInterface $replyTo = null
     ): PodiumResponse
     {
-        return $this->podium->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
+        return $this->getPodium()->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
     }
 
     /**
@@ -261,6 +281,6 @@ class Account extends PodiumComponent implements AccountInterface
      */
     public function removeMessage(int $id): PodiumResponse
     {
-        return $this->podium->message->remove($id, $this->ensureMembership());
+        return $this->getPodium()->message->remove($id, $this->ensureMembership());
     }
 }

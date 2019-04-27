@@ -14,9 +14,11 @@ use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
 use bizley\podium\api\base\Thread;
+use Yii;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\i18n\PhpMessageSource;
+use function is_array;
 
 /**
  * Podium API
@@ -62,26 +64,28 @@ class Podium extends ServiceLocator
         return $this->_version;
     }
 
+    /**
+     * Podium constructor.
+     * @param array $config
+     */
     public function __construct($config = [])
     {
         foreach ($this->coreComponents() as $id => $component) {
             if (!isset($config['components'][$id])) {
                 $config['components'][$id] = $component;
-            } elseif (\is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
+            } elseif (is_array($config['components'][$id]) && !isset($config['components'][$id]['class'])) {
                 $config['components'][$id]['class'] = $component['class'];
             }
         }
+
         parent::__construct($config);
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
-    public function init(): void
+    public function init() // BC signature
     {
         parent::init();
+
         $this->prepareTranslations();
-        $this->completeComponents();
     }
 
     /**
@@ -90,7 +94,10 @@ class Podium extends ServiceLocator
     public function coreComponents(): array
     {
         return [
-            'account' => ['class' => Account::class],
+            'account' => [
+                'class' => Account::class,
+                'podium' => $this,
+            ],
             'category' => ['class' => Category::class],
             'forum' => ['class' => Forum::class],
             'group' => ['class' => Group::class],
@@ -205,25 +212,11 @@ class Podium extends ServiceLocator
 
     public function prepareTranslations(): void
     {
-        \Yii::$app->getI18n()->translations['podium.*'] = [
+        Yii::$app->getI18n()->translations['podium.*'] = [
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
             'basePath' => __DIR__ . '/messages',
         ];
-    }
-
-    /**
-     * Sets Podium reference for custom components.
-     * Custom component should be child of PodiumComponent class.
-     * @throws InvalidConfigException
-     */
-    public function completeComponents(): void
-    {
-        $components = $this->getComponents();
-        foreach ($components as $id => $component) {
-            $component['podium'] = $this;
-            $this->set($id, $component);
-        }
     }
 }

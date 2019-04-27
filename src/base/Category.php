@@ -11,6 +11,8 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SortableInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -22,7 +24,7 @@ use yii\helpers\ArrayHelper;
  * Class Category
  * @package bizley\podium\api\base
  */
-class Category extends PodiumComponent implements CategoryInterface
+class Category extends Component implements CategoryInterface
 {
     /**
      * @var string|array|ModelInterface category handler
@@ -55,9 +57,9 @@ class Category extends PodiumComponent implements CategoryInterface
     public $archiverHandler = \bizley\podium\api\models\category\CategoryArchiver::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function init()
+    public function init() // BC signature
     {
         parent::init();
 

@@ -8,6 +8,8 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RankInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -19,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * Class Rank
  * @package bizley\podium\api\base
  */
-class Rank extends PodiumComponent implements RankInterface
+class Rank extends Component implements RankInterface
 {
     /**
      * @var string|array|ModelInterface rank handler
@@ -40,7 +42,7 @@ class Rank extends PodiumComponent implements RankInterface
     public $removerHandler = \bizley\podium\api\models\rank\RankRemover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

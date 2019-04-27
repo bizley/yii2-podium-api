@@ -12,6 +12,8 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SortableInterface;
+use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -23,7 +25,7 @@ use yii\helpers\ArrayHelper;
  * Class Forum
  * @package bizley\podium\api\base
  */
-class Forum extends PodiumComponent implements ForumInterface
+class Forum extends Component implements ForumInterface
 {
     /**
      * @var string|array|ModelInterface forum handler
@@ -62,7 +64,7 @@ class Forum extends PodiumComponent implements ForumInterface
     public $moverHandler = \bizley\podium\api\models\forum\ForumMover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

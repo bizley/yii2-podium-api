@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\VoterInterface;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
@@ -20,7 +21,7 @@ use yii\helpers\ArrayHelper;
  * Class Poll
  * @package bizley\podium\api\base
  */
-class Poll extends PodiumComponent implements PollInterface
+class Poll extends Component implements PollInterface
 {
     /**
      * @var string|array|PollModelInterface poll handler
