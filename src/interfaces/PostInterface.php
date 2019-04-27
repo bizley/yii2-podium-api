@@ -20,7 +20,7 @@ interface PostInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getPostById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,13 +28,14 @@ interface PostInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns post form handler.
-     * @return CategorisedFormInterface
+     * Returns post form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getPostForm(): CategorisedFormInterface;
+    public function getForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates post.
@@ -47,42 +48,59 @@ interface PostInterface
 
     /**
      * Updates post.
-     * @param ModelFormInterface $postForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $postRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $postRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return MoverInterface|null
+     */
+    public function getMover(int $id): ?MoverInterface;
 
     /**
      * Moves post to different thread.
-     * @param MovableInterface $postMover
+     * @param int $id
      * @param ModelInterface $thread
      * @return PodiumResponse
      */
-    public function move(MovableInterface $postMover, ModelInterface $thread): PodiumResponse;
+    public function move(int $id, ModelInterface $thread): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param int $id
+     * @return ArchiverInterface|null
+     */
+    public function getArchiver(int $id): ?ArchiverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $postArchiver): PodiumResponse;
+    public function archive(int $id): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $postArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $postArchiver): PodiumResponse;
+    public function revive(int $id): PodiumResponse;
 
     /**
-     * @return LikingInterface
+     * @return LikerInterface
      */
-    public function getLiking(): LikingInterface;
+    public function getLiker(): LikerInterface;
 
     /**
      * @param MembershipInterface $member

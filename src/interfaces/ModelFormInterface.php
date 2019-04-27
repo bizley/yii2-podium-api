@@ -13,11 +13,17 @@ use bizley\podium\api\base\PodiumResponse;
 interface ModelFormInterface
 {
     /**
+     * @param int $modelFormId
+     * @return ModelFormInterface|null
+     */
+    public static function findById(int $modelFormId): ?ModelFormInterface;
+
+    /**
      * Loads form data.
      * @param array|null $data form data
      * @return bool
      */
-    public function loadData(?array $data = null): bool;
+    public function loadData(array $data = []): bool;
 
     /**
      * Creates new model.

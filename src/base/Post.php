@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\enums\PostType;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
-use bizley\podium\api\interfaces\LikingInterface;
+use bizley\podium\api\interfaces\LikerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -31,46 +30,61 @@ class Post extends PodiumComponent implements PostInterface
      * @var string|array|ModelInterface post handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $postHandler = \bizley\podium\api\models\post\Post::class;
+    public $modelHandler = \bizley\podium\api\models\post\Post::class;
 
     /**
      * @var string|array|CategorisedFormInterface post form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
-    public $postFormHandler = \bizley\podium\api\models\post\PostForm::class;
+    public $formHandler = \bizley\podium\api\models\post\PostForm::class;
 
     /**
-     * @var string|array|CategorisedFormInterface poll form handler
-     * Component ID, class, configuration array, or instance of CategorisedFormInterface.
+     * @var string|array|LikerInterface liking handler
+     * Component ID, class, configuration array, or instance of LikerInterface.
      */
-    public $pollFormHandler = \bizley\podium\api\models\poll\PostPollForm::class;
+    public $likerHandler = \bizley\podium\api\models\post\PostLiker::class;
 
     /**
-     * @var string|array|LikingInterface liking handler
-     * Component ID, class, configuration array, or instance of LikingInterface.
+     * @var string|array|RemoverInterface post remover handler
+     * Component ID, class, configuration array, or instance of RemoverInterface.
      */
-    public $likingHandler = \bizley\podium\api\models\post\Liking::class;
+    public $removerHandler = \bizley\podium\api\models\post\PostRemover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @var string|array|ArchiverInterface post archiver handler
+     * Component ID, class, configuration array, or instance of ArchiverInterface.
+     */
+    public $archiverHandler = \bizley\podium\api\models\post\PostArchiver::class;
+
+    /**
+     * @var string|array|MoverInterface post mover handler
+     * Component ID, class, configuration array, or instance of MoverInterface.
+     */
+    public $moverHandler = \bizley\podium\api\models\post\PostMover::class;
+
+    /**
+     * @throws InvalidConfigException
      */
     public function init(): void
     {
         parent::init();
 
-        $this->postHandler = Instance::ensure($this->postHandler, ModelInterface::class);
-        $this->postFormHandler = Instance::ensure($this->postFormHandler, CategorisedFormInterface::class);
-        $this->pollFormHandler = Instance::ensure($this->pollFormHandler, CategorisedFormInterface::class);
-        $this->likingHandler = Instance::ensure($this->likingHandler, LikingInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
+        $this->likerHandler = Instance::ensure($this->likerHandler, LikerInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
+        $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getPostById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $postClass = $this->postHandler;
+        $postClass = $this->modelHandler;
+
         return $postClass::findById($id);
     }
 
@@ -80,30 +94,30 @@ class Post extends PodiumComponent implements PostInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getPosts(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $postClass = $this->postHandler;
+        $postClass = $this->modelHandler;
+
         return $postClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
+     * @param int|null $id
      * @return CategorisedFormInterface
      */
-    public function getPostForm(): CategorisedFormInterface
+    public function getForm(?int $id = null): ?CategorisedFormInterface
     {
-        return new $this->postFormHandler;
+        $handler = $this->formHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
-     * @return CategorisedFormInterface
-     */
-    public function getPollForm(): CategorisedFormInterface
-    {
-        return new $this->pollFormHandler;
-    }
-
-    /**
-     * Creates standard post or poll post.
+     * Creates post.
      * @param array $data
      * @param MembershipInterface $author
      * @param ModelInterface $thread
@@ -111,81 +125,157 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
     {
-        $type = ArrayHelper::remove($data, 'type_id', PostType::POST);
+        /* @var $postForm CategorisedFormInterface */
+        $postForm = $this->getForm();
 
-        $postForm = $type === PostType::POLL ? $this->getPollForm() : $this->getPostForm();
         $postForm->setAuthor($author);
         $postForm->setThread($thread);
 
         if (!$postForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $postForm->create();
     }
 
     /**
-     * Updates standard post or poll post.
-     * @param ModelFormInterface $postOrPollForm
+     * Updates post.
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $postOrPollForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
-        if (!$postOrPollForm->loadData($data)) {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $postForm = $this->getForm((int)$id);
+
+        if ($postForm === null) {
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
+        if (!$postForm->loadData($data)) {
             return PodiumResponse::error();
         }
-        return $postOrPollForm->edit();
+
+        return $postForm->edit();
+    }
+
+    /**
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface
+    {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
     }
 
     /**
      * Deletes post.
-     * @param RemovableInterface $postRemover
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function remove(RemovableInterface $postRemover): PodiumResponse
+    public function remove(int $id): PodiumResponse
     {
+        $postRemover = $this->getRemover($id);
+
+        if ($postRemover === null) {
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
         return $postRemover->remove();
     }
 
     /**
+     * @param int $id
+     * @return MoverInterface|null
+     */
+    public function getMover(int $id): ?MoverInterface
+    {
+        $handler = $this->moverHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
      * Moves post.
-     * @param MovableInterface $postMover
+     * @param int $id
      * @param ModelInterface $thread
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function move(MovableInterface $postMover, ModelInterface $thread): PodiumResponse
+    public function move(int $id, ModelInterface $thread): PodiumResponse
     {
+        $postMover = $this->getMover($id);
+
+        if ($postMover === null) {
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
         $postMover->setThread($thread);
 
         return $postMover->move();
     }
 
     /**
-     * Archives post.
-     * @param ArchivableInterface $postArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchiverInterface|null
      */
-    public function archive(ArchivableInterface $postArchiver): PodiumResponse
+    public function getArchiver(int $id): ?ArchiverInterface
     {
+        $handler = $this->archiverHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Archives post.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function archive(int $id): PodiumResponse
+    {
+        $postArchiver = $this->getArchiver($id);
+
+        if ($postArchiver === null) {
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
         return $postArchiver->archive();
     }
 
     /**
      * Revives post.
-     * @param ArchivableInterface $postArchiver
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function revive(ArchivableInterface $postArchiver): PodiumResponse
+    public function revive(int $id): PodiumResponse
     {
+        $postArchiver = $this->getArchiver($id);
+
+        if ($postArchiver === null) {
+            throw new ModelNotFoundException('Post of given ID can not be found.');
+        }
+
         return $postArchiver->revive();
     }
 
     /**
-     * @return LikingInterface
+     * @return LikerInterface
      */
-    public function getLiking(): LikingInterface
+    public function getLiker(): LikerInterface
     {
-        return new $this->likingHandler;
+        return new $this->likerHandler;
     }
 
     /**
@@ -196,9 +286,11 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function thumbUp(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
-        $liking = $this->getLiking();
+        $liking = $this->getLiker();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbUp();
     }
 
@@ -210,9 +302,11 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function thumbDown(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
-        $liking = $this->getLiking();
+        $liking = $this->getLiker();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbDown();
     }
 
@@ -224,9 +318,11 @@ class Post extends PodiumComponent implements PostInterface
      */
     public function thumbReset(MembershipInterface $member, ModelInterface $post): PodiumResponse
     {
-        $liking = $this->getLiking();
+        $liking = $this->getLiker();
+
         $liking->setMember($member);
         $liking->setPost($post);
+
         return $liking->thumbReset();
     }
 }

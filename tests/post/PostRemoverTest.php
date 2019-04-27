@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\PostRemover;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -120,50 +122,62 @@ class PostRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[PostRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[PostRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(PostRemover::class, PostRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[PostRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(1))->result);
+        $this->assertTrue($this->podium()->post->remove(1)->result);
 
         $this->assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(1))->result);
+        $this->assertFalse($this->podium()->post->remove(1)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(PostRemover::class, PostRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->remove(PostRemover::findOne(3))->result);
+        $this->assertTrue($this->podium()->post->remove(3)->result);
 
         $this->assertEmpty(PostRepo::findOne(3));
         $this->assertEmpty(ThreadRepo::findOne(2));
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveNonArchived(): void
     {
-        $this->assertFalse($this->podium()->post->remove(PostRemover::findOne(2))->result);
+        $this->assertFalse($this->podium()->post->remove(2)->result);
     }
 
     public function testFailedRemove(): void
@@ -179,7 +193,7 @@ class PostRemoverTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(PostRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $mock->archived = true;
 

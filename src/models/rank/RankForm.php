@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\rank;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\RankRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -17,6 +18,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class RankForm extends RankRepo implements ModelFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.rank.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.rank.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.rank.editing.before';
@@ -52,15 +55,6 @@ class RankForm extends RankRepo implements ModelFormInterface
             'name' => Yii::t('podium.label', 'rank.name'),
             'min_posts' => Yii::t('podium.label', 'rank.minimum.posts'),
         ];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

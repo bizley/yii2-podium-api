@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\ArchivableInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MessageArchiverInterface;
 use bizley\podium\api\interfaces\MessageInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
+use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
 use bizley\podium\api\interfaces\SendingInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
@@ -30,10 +30,22 @@ class Message extends PodiumComponent implements MessageInterface
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|SendingInterface sending handler
+     * @var string|array|SendingInterface message mailer handler
      * Component ID, class, configuration array, or instance of SendingInterface.
      */
-    public $sendingHandler = \bizley\podium\api\models\message\Sending::class;
+    public $mailerHandler = \bizley\podium\api\models\message\MessageMailer::class;
+
+    /**
+     * @var string|array|MessageRemoverInterface message remover handler
+     * Component ID, class, configuration array, or instance of MessageRemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\message\MessageRemover::class;
+
+    /**
+     * @var string|array|MessageArchiverInterface message archiver handler
+     * Component ID, class, configuration array, or instance of MessageArchiverInterface.
+     */
+    public $archiverHandler = \bizley\podium\api\models\message\MessageArchiver::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -43,16 +55,19 @@ class Message extends PodiumComponent implements MessageInterface
         parent::init();
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
-        $this->sendingHandler = Instance::ensure($this->sendingHandler, SendingInterface::class);
+        $this->mailerHandler = Instance::ensure($this->mailerHandler, SendingInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, MessageRemoverInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, MessageArchiverInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getMessageById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
         $messageClass = $this->messageHandler;
+
         return $messageClass::findById($id);
     }
 
@@ -62,18 +77,19 @@ class Message extends PodiumComponent implements MessageInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getMessages(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $messageClass = $this->messageHandler;
+
         return $messageClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
      * @return SendingInterface
      */
-    public function getSending(): SendingInterface
+    public function getMailer(): SendingInterface
     {
-        return new $this->sendingHandler;
+        return new $this->mailerHandler;
     }
 
     /**
@@ -84,9 +100,15 @@ class Message extends PodiumComponent implements MessageInterface
      * @param MessageParticipantModelInterface $replyTo
      * @return PodiumResponse
      */
-    public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse
+    public function send(
+        array $data,
+        MembershipInterface $sender,
+        MembershipInterface $receiver,
+        ?MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
+    ): PodiumResponse
     {
-        $sending = $this->getSending();
+        $sending = $this->getMailer();
+
         $sending->setSender($sender);
         $sending->setReceiver($receiver);
         $sending->setReplyTo($replyTo);
@@ -94,36 +116,87 @@ class Message extends PodiumComponent implements MessageInterface
         if (!$sending->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $sending->send();
     }
 
     /**
-     * Deletes message copy.
-     * @param RemovableInterface $messageParticipantRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return MessageRemoverInterface|null
      */
-    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse
+    public function getRemover(int $id, MembershipInterface $participant): ?MessageRemoverInterface
     {
-        return $messageParticipantRemover->remove();
+        $handler = $this->removerHandler;
+
+        return $handler::findByMessageIdAndParticipant($id, $participant);
+    }
+
+    /**
+     * Deletes message copy.
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id, MembershipInterface $participant): PodiumResponse
+    {
+        $messageRemover = $this->getRemover($id, $participant);
+
+        if ($messageRemover === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        $messageRemover->setMessageHandler($this->messageHandler);
+
+        return $messageRemover->remove();
+    }
+
+    /**
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return MessageArchiverInterface|null
+     */
+    public function getArchiver(int $id, MembershipInterface $participant): ?MessageArchiverInterface
+    {
+        $handler = $this->archiverHandler;
+
+        return $handler::findByMessageIdAndParticipant($id, $participant);
     }
 
     /**
      * Archives message copy.
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param MembershipInterface $participant
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
+    public function archive(int $id, MembershipInterface $participant): PodiumResponse
     {
-        return $messageParticipantArchiver->archive();
+        $messageArchiver = $this->getArchiver($id, $participant);
+
+        if ($messageArchiver === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        return $messageArchiver->archive();
     }
 
     /**
      * Revives message copy.
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param MembershipInterface $participant
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse
+    public function revive(int $id, MembershipInterface $participant): PodiumResponse
     {
-        return $messageParticipantArchiver->revive();
+        $messageArchiver = $this->getArchiver($id, $participant);
+
+        if ($messageArchiver === null) {
+            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
+        }
+
+        return $messageArchiver->revive();
     }
 }

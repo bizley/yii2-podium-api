@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\Friendship;
+use bizley\podium\api\models\member\MemberFriendship;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class MemberFriendshipTest
@@ -65,19 +68,19 @@ class AccountFriendshipTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '10']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '10']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -85,16 +88,19 @@ class AccountFriendshipTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testBefriend(): void
     {
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_BEFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, function () {
+            $this->eventsRaised[MemberFriendship::EVENT_BEFORE_BEFRIENDING] = true;
         });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_BEFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_BEFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_BEFRIENDING, function () {
+            $this->eventsRaised[MemberFriendship::EVENT_AFTER_BEFRIENDING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->befriend(Member::findOne(11))->result);
+        $this->assertTrue($this->podium()->account->befriendMember(Member::findOne(11))->result);
 
         $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -102,18 +108,21 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(Friendship::EVENT_BEFORE_BEFRIENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(Friendship::EVENT_AFTER_BEFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_BEFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_BEFRIENDING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testBefriendEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canBeFriends = false;
         };
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
 
-        $this->assertFalse($this->podium()->account->befriend(Member::findOne(11))->result);
+        $this->assertFalse($this->podium()->account->befriendMember(Member::findOne(11))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -121,24 +130,30 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(Friendship::class, Friendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testBefriendAgain(): void
     {
-        $this->assertFalse($this->podium()->account->befriend(Member::findOne(12))->result);
+        $this->assertFalse($this->podium()->account->befriendMember(Member::findOne(12))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnfriend(): void
     {
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_BEFORE_UNFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, function () {
+            $this->eventsRaised[MemberFriendship::EVENT_BEFORE_UNFRIENDING] = true;
         });
-        Event::on(Friendship::class, Friendship::EVENT_AFTER_UNFRIENDING, function () {
-            static::$eventsRaised[Friendship::EVENT_AFTER_UNFRIENDING] = true;
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_UNFRIENDING, function () {
+            $this->eventsRaised[MemberFriendship::EVENT_AFTER_UNFRIENDING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->unfriend(Member::findOne(12))->result);
+        $this->assertTrue($this->podium()->account->unfriendMember(Member::findOne(12))->result);
 
         $this->assertEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -146,18 +161,21 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(Friendship::EVENT_BEFORE_UNFRIENDING, static::$eventsRaised);
-        $this->assertArrayHasKey(Friendship::EVENT_AFTER_UNFRIENDING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_UNFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_UNFRIENDING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnfriendEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnfriend = false;
         };
-        Event::on(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
 
-        $this->assertFalse($this->podium()->account->unfriend(Member::findOne(12))->result);
+        $this->assertFalse($this->podium()->account->unfriendMember(Member::findOne(12))->result);
 
         $this->assertNotEmpty(AcquaintanceRepo::findOne([
             'member_id' => 10,
@@ -165,11 +183,14 @@ class AccountFriendshipTest extends AccountTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(Friendship::class, Friendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testUnfriendAgain(): void
     {
-        $this->assertFalse($this->podium()->account->unfriend(Member::findOne(11))->result);
+        $this->assertFalse($this->podium()->account->unfriendMember(Member::findOne(11))->result);
     }
 }

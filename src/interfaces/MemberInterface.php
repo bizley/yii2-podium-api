@@ -20,13 +20,13 @@ interface MemberInterface
      * @param int $id
      * @return MembershipInterface|null
      */
-    public function getMemberById(int $id): ?MembershipInterface;
+    public function getById(int $id): ?MembershipInterface;
 
     /**
      * @param int|string $id
      * @return MembershipInterface|null
      */
-    public function getMemberByUserId($id): ?MembershipInterface;
+    public function getByUserId($id): ?MembershipInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -34,7 +34,7 @@ interface MemberInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns registration handler.
@@ -50,17 +50,22 @@ interface MemberInterface
     public function register(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $memberRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemoverInterface|null
      */
-    public function remove(RemovableInterface $memberRemover): PodiumResponse;
+    public function getRemover(int $id): ?RemoverInterface;
 
     /**
-     * @param ModelFormInterface $member
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function remove(int $id): PodiumResponse;
+
+    /**
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $member, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
      * Returns friendship handler.
@@ -88,7 +93,7 @@ interface MemberInterface
      * Returns ignoring handler.
      * @return IgnoringInterface
      */
-    public function getIgnoring(): IgnoringInterface;
+    public function getIgnorer(): IgnoringInterface;
 
     /**
      * Sets target as ignored by member.
@@ -107,14 +112,20 @@ interface MemberInterface
     public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse;
 
     /**
-     * @param BanInterface $member
-     * @return PodiumResponse
+     * @param int $id
+     * @return BanInterface|null
      */
-    public function ban(BanInterface $member): PodiumResponse;
+    public function getBanner(int $id): ?BanInterface;
 
     /**
-     * @param BanInterface $member
+     * @param int $id
      * @return PodiumResponse
      */
-    public function unban(BanInterface $member): PodiumResponse;
+    public function ban(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function unban(int $id): PodiumResponse;
 }

@@ -6,10 +6,11 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\repos\ThreadRepo;
+use Throwable;
 use Yii;
 use yii\db\Exception;
 
@@ -17,12 +18,21 @@ use yii\db\Exception;
  * Class ThreadRemover
  * @package bizley\podium\api\models\thread
  */
-class ThreadArchiver extends ThreadRepo implements ArchivableInterface
+class ThreadArchiver extends ThreadRepo implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.thread.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.thread.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.thread.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
+
+    /**
+     * @param int $modelId
+     * @return ArchiverInterface|null
+     */
+    public static function findById(int $modelId): ?ArchiverInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
 
     /**
      * @return ModelInterface|null
@@ -81,18 +91,14 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             }
 
             $this->afterArchive();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while archiving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while thread archiving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }
@@ -147,18 +153,14 @@ class ThreadArchiver extends ThreadRepo implements ArchivableInterface
             }
 
             $this->afterRevive();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while reviving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while thread reviving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

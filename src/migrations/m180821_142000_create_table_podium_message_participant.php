@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use bizley\podium\api\enums\MessageStatus;
 use yii\db\Migration;
 
 class m180821_142000_create_table_podium_message_participant extends Migration
@@ -16,7 +17,7 @@ class m180821_142000_create_table_podium_message_participant extends Migration
             $statusId = 'ENUM("new","read","replied") NOT NULL DEFAULT "new"';
             $sideId = 'ENUM("sender","receiver") NOT NULL';
         } else {
-            $statusId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\MessageStatus::NEW);
+            $statusId = $this->string(45)->notNull()->defaultValue(MessageStatus::NEW);
             $sideId = $this->string(45)->notNull();
         }
 

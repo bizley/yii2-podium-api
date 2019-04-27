@@ -7,12 +7,13 @@ namespace bizley\podium\api\base;
 use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Group
@@ -24,13 +25,19 @@ class Group extends PodiumComponent implements GroupInterface
      * @var string|array|ModelInterface group handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $groupHandler = \bizley\podium\api\models\group\Group::class;
+    public $modelHandler = \bizley\podium\api\models\group\Group::class;
 
     /**
      * @var string|array|ModelFormInterface group form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
-    public $groupFormHandler = \bizley\podium\api\models\group\GroupForm::class;
+    public $formHandler = \bizley\podium\api\models\group\GroupForm::class;
+
+    /**
+     * @var string|array|RemoverInterface group remover handler
+     * Component ID, class, configuration array, or instance of RemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -39,17 +46,19 @@ class Group extends PodiumComponent implements GroupInterface
     {
         parent::init();
 
-        $this->groupHandler = Instance::ensure($this->groupHandler, ModelInterface::class);
-        $this->groupFormHandler = Instance::ensure($this->groupFormHandler, ModelFormInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getGroupById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $groupClass = $this->groupHandler;
+        $groupClass = $this->modelHandler;
+
         return $groupClass::findById($id);
     }
 
@@ -59,18 +68,26 @@ class Group extends PodiumComponent implements GroupInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getGroups(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $groupClass = $this->groupHandler;
+        $groupClass = $this->modelHandler;
+
         return $groupClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
-     * @return ModelFormInterface
+     * @param int|null $id
+     * @return ModelFormInterface|null
      */
-    public function getGroupForm(): ModelFormInterface
+    public function getForm(?int $id = null): ?ModelFormInterface
     {
-        return new $this->groupFormHandler;
+        $handler = $this->formHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -80,35 +97,69 @@ class Group extends PodiumComponent implements GroupInterface
      */
     public function create(array $data): PodiumResponse
     {
-        $groupForm = $this->getGroupForm();
+        /* @var $groupForm ModelFormInterface */
+        $groupForm = $this->getForm();
 
         if (!$groupForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $groupForm->create();
     }
 
     /**
      * Updates group.
-     * @param ModelFormInterface $groupForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $groupForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $groupForm = $this->getForm((int)$id);
+
+        if ($groupForm === null) {
+            throw new ModelNotFoundException('Group of given ID can not be found.');
+        }
+
         if (!$groupForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $groupForm->edit();
     }
 
     /**
-     * Deletes group.
-     * @param RemovableInterface $groupRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemoverInterface|null
      */
-    public function remove(RemovableInterface $groupRemover): PodiumResponse
+    public function getRemover(int $id): ?RemoverInterface
     {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes group.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $groupRemover = $this->getRemover($id);
+
+        if ($groupRemover === null) {
+            throw new ModelNotFoundException('Group of given ID can not be found.');
+        }
+
         return $groupRemover->remove();
     }
 }

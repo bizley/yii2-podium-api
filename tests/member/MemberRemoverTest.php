@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\member;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\MemberRemover;
 use bizley\podium\api\repos\MemberRepo;
@@ -36,33 +37,39 @@ class MemberRemoverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemove(): void
     {
         Event::on(MemberRemover::class, MemberRemover::EVENT_BEFORE_REMOVING, function () {
-            static::$eventsRaised[MemberRemover::EVENT_BEFORE_REMOVING] = true;
+            $this->eventsRaised[MemberRemover::EVENT_BEFORE_REMOVING] = true;
         });
         Event::on(MemberRemover::class, MemberRemover::EVENT_AFTER_REMOVING, function () {
-            static::$eventsRaised[MemberRemover::EVENT_AFTER_REMOVING] = true;
+            $this->eventsRaised[MemberRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->member->remove(MemberRemover::findOne(100))->result);
+        $this->assertTrue($this->podium()->member->remove(100)->result);
 
         $this->assertEmpty(MemberRepo::findOne(100));
 
-        $this->assertArrayHasKey(MemberRemover::EVENT_BEFORE_REMOVING, static::$eventsRaised);
-        $this->assertArrayHasKey(MemberRemover::EVENT_AFTER_REMOVING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRemoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRemove = false;
         };
         Event::on(MemberRemover::class, MemberRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->member->remove(MemberRemover::findOne(100))->result);
+        $this->assertFalse($this->podium()->member->remove(100)->result);
 
         $this->assertNotEmpty(MemberRepo::findOne(100));
 

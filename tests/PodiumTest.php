@@ -18,6 +18,7 @@ use bizley\podium\api\base\Thread;
 use bizley\podium\api\Podium;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use yii\web\User;
@@ -97,7 +98,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetAccount(): void
     {
@@ -115,7 +116,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetCategory(): void
     {
@@ -124,7 +125,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetForum(): void
     {
@@ -133,7 +134,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetMember(): void
     {
@@ -142,7 +143,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetPost(): void
     {
@@ -151,7 +152,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetThread(): void
     {
@@ -160,7 +161,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetRank(): void
     {
@@ -169,7 +170,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetMessage(): void
     {
@@ -178,7 +179,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetGroup(): void
     {
@@ -187,7 +188,7 @@ class PodiumTest extends DbTestCase
     }
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function testGetPoll(): void
     {

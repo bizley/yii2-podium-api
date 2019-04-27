@@ -6,10 +6,11 @@ namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\group\Group;
-use bizley\podium\api\models\member\Grouping;
 use bizley\podium\api\models\member\Member;
+use bizley\podium\api\models\member\MemberGrouper;
 use bizley\podium\api\repos\GroupMemberRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -62,15 +63,15 @@ class MemberGroupingTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     public function testJoin(): void
     {
-        Event::on(Grouping::class, Grouping::EVENT_BEFORE_JOINING, function () {
-            static::$eventsRaised[Grouping::EVENT_BEFORE_JOINING] = true;
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_JOINING, function () {
+            $this->eventsRaised[MemberGrouper::EVENT_BEFORE_JOINING] = true;
         });
-        Event::on(Grouping::class, Grouping::EVENT_AFTER_JOINING, function () {
-            static::$eventsRaised[Grouping::EVENT_AFTER_JOINING] = true;
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_AFTER_JOINING, function () {
+            $this->eventsRaised[MemberGrouper::EVENT_AFTER_JOINING] = true;
         });
 
         $this->assertTrue($this->podium()->member->join(Member::findOne(1), Group::findOne(1))->result);
@@ -80,16 +81,16 @@ class MemberGroupingTest extends DbTestCase
             'group_id' => 1,
         ]));
 
-        $this->assertArrayHasKey(Grouping::EVENT_BEFORE_JOINING, static::$eventsRaised);
-        $this->assertArrayHasKey(Grouping::EVENT_AFTER_JOINING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberGrouper::EVENT_BEFORE_JOINING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberGrouper::EVENT_AFTER_JOINING, $this->eventsRaised);
     }
 
     public function testJoinEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canJoin = false;
         };
-        Event::on(Grouping::class, Grouping::EVENT_BEFORE_JOINING, $handler);
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_JOINING, $handler);
 
         $this->assertFalse($this->podium()->member->join(Member::findOne(1), Group::findOne(1))->result);
 
@@ -98,7 +99,7 @@ class MemberGroupingTest extends DbTestCase
             'group_id' => 1,
         ]));
 
-        Event::off(Grouping::class, Grouping::EVENT_BEFORE_JOINING, $handler);
+        Event::off(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_JOINING, $handler);
     }
 
     public function testJoinAgain(): void
@@ -108,7 +109,7 @@ class MemberGroupingTest extends DbTestCase
 
     public function testFailedJoin(): void
     {
-        $mock = $this->getMockBuilder(Grouping::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MemberGrouper::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->join()->result);
@@ -116,11 +117,11 @@ class MemberGroupingTest extends DbTestCase
 
     public function testLeave(): void
     {
-        Event::on(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, function () {
-            static::$eventsRaised[Grouping::EVENT_BEFORE_LEAVING] = true;
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_LEAVING, function () {
+            $this->eventsRaised[MemberGrouper::EVENT_BEFORE_LEAVING] = true;
         });
-        Event::on(Grouping::class, Grouping::EVENT_AFTER_LEAVING, function () {
-            static::$eventsRaised[Grouping::EVENT_AFTER_LEAVING] = true;
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_AFTER_LEAVING, function () {
+            $this->eventsRaised[MemberGrouper::EVENT_AFTER_LEAVING] = true;
         });
 
         $this->assertTrue($this->podium()->member->leave(Member::findOne(2), Group::findOne(1))->result);
@@ -130,16 +131,16 @@ class MemberGroupingTest extends DbTestCase
             'group_id' => 1,
         ]));
 
-        $this->assertArrayHasKey(Grouping::EVENT_BEFORE_LEAVING, static::$eventsRaised);
-        $this->assertArrayHasKey(Grouping::EVENT_AFTER_LEAVING, static::$eventsRaised);
+        $this->assertArrayHasKey(MemberGrouper::EVENT_BEFORE_LEAVING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberGrouper::EVENT_AFTER_LEAVING, $this->eventsRaised);
     }
 
     public function testLeaveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canLeave = false;
         };
-        Event::on(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, $handler);
+        Event::on(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_LEAVING, $handler);
 
         $this->assertFalse($this->podium()->member->leave(Member::findOne(2), Group::findOne(1))->result);
 
@@ -148,7 +149,7 @@ class MemberGroupingTest extends DbTestCase
             'group_id' => 1,
         ]));
 
-        Event::off(Grouping::class, Grouping::EVENT_BEFORE_LEAVING, $handler);
+        Event::off(MemberGrouper::class, MemberGrouper::EVENT_BEFORE_LEAVING, $handler);
     }
 
     public function testLeaveAgain(): void
@@ -158,8 +159,8 @@ class MemberGroupingTest extends DbTestCase
 
     public function testExceptionLeave(): void
     {
-        $mock = $this->getMockBuilder(Grouping::class)->setMethods(['afterLeave'])->getMock();
-        $mock->method('afterLeave')->will($this->throwException(new \Exception()));
+        $mock = $this->getMockBuilder(MemberGrouper::class)->setMethods(['afterLeave'])->getMock();
+        $mock->method('afterLeave')->will($this->throwException(new Exception()));
 
         $mock->setMember(Member::findOne(2));
         $mock->setGroup(Group::findOne(1));

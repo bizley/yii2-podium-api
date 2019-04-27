@@ -20,7 +20,7 @@ interface ThreadInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getThreadById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,13 +28,14 @@ interface ThreadInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getThreads(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns thread form handler.
-     * @return CategorisedFormInterface
+     * Returns thread form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getThreadForm(): CategorisedFormInterface;
+    public function getForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates thread.
@@ -47,66 +48,89 @@ interface ThreadInterface
 
     /**
      * Updates thread.
-     * @param ModelFormInterface $threadForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $threadForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $threadRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $threadRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return MoverInterface|null
+     */
+    public function getMover(int $id): ?MoverInterface;
 
     /**
      * Moves thread to different forum.
-     * @param MovableInterface $threadMover
+     * @param int $id
      * @param ModelInterface $forum
      * @return PodiumResponse
      */
-    public function move(MovableInterface $threadMover, ModelInterface $forum): PodiumResponse;
+    public function move(int $id, ModelInterface $forum): PodiumResponse;
 
     /**
-     * @param PinnableInterface $threadPinner
-     * @return PodiumResponse
+     * @param int $id
+     * @return PinnableInterface|null
      */
-    public function pin(PinnableInterface $threadPinner): PodiumResponse;
+    public function getPinner(int $id): ?PinnableInterface;
 
     /**
-     * @param PinnableInterface $threadPinner
+     * @param int $id
      * @return PodiumResponse
      */
-    public function unpin(PinnableInterface $threadPinner): PodiumResponse;
+    public function pin(int $id): PodiumResponse;
 
     /**
-     * @param LockableInterface $threadLocker
+     * @param int $id
      * @return PodiumResponse
      */
-    public function lock(LockableInterface $threadLocker): PodiumResponse;
+    public function unpin(int $id): PodiumResponse;
 
     /**
-     * @param LockableInterface $threadLocker
-     * @return PodiumResponse
+     * @param int $id
+     * @return LockableInterface|null
      */
-    public function unlock(LockableInterface $threadLocker): PodiumResponse;
+    public function getLocker(int $id): ?LockableInterface;
 
     /**
-     * @param ArchivableInterface $threadArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $threadArchiver): PodiumResponse;
+    public function lock(int $id): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $threadArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $threadArchiver): PodiumResponse;
+    public function unlock(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function archive(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function revive(int $id): PodiumResponse;
 
     /**
      * @return SubscribingInterface
      */
-    public function getSubscribing(): SubscribingInterface;
+    public function getSubscriber(): SubscribingInterface;
 
     /**
      * @param MembershipInterface $member
@@ -125,7 +149,7 @@ interface ThreadInterface
     /**
      * @return BookmarkingInterface
      */
-    public function getBookmarking(): BookmarkingInterface;
+    public function getBookmarker(): BookmarkingInterface;
 
     /**
      * @param MembershipInterface $member

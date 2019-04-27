@@ -9,6 +9,7 @@ use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use bizley\podium\api\repos\ForumRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 
@@ -60,6 +61,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
         if (!empty($data)) {
             $data = ['sortOrder' => $data];
         }
+
         return $this->load($data, '');
     }
 
@@ -109,13 +111,10 @@ class ForumSorter extends ForumRepo implements SortableInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while forums sorting transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

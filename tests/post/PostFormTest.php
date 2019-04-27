@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\InsufficientDataException;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
@@ -17,6 +18,9 @@ use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+use yii\helpers\ArrayHelper;
+use function array_merge;
+use function time;
 
 /**
  * Class PostFormTest
@@ -108,6 +112,14 @@ class PostFormTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 2,
             'category_id' => 1,
@@ -115,10 +127,7 @@ class PostFormTest extends DbTestCase
             'thread_id' => 1,
             'author_id' => 1,
             'content' => 'post-new',
-            'type_id' => 'post',
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $post = PostRepo::findOne(['content' => 'post-new']);
         $this->assertEquals(array_merge($data, [
@@ -130,7 +139,6 @@ class PostFormTest extends DbTestCase
             'likes' => 0,
             'dislikes' => 0,
             'edited_at' => null,
-            'type_id' => PostType::POST,
         ]), [
             'content' => $post->content,
             'author_id' => $post->author_id,
@@ -141,7 +149,6 @@ class PostFormTest extends DbTestCase
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
             'edited_at' => $post->edited_at,
-            'type_id' => $post->type_id,
         ]);
 
         $this->assertEquals(3, ThreadRepo::findOne(1)->posts_count);
@@ -153,7 +160,7 @@ class PostFormTest extends DbTestCase
 
     public function testCreateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canCreate = false;
         };
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_CREATING, $handler);
@@ -190,6 +197,10 @@ class PostFormTest extends DbTestCase
         $this->assertFalse($mock->create()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdate(): void
     {
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, function () {
@@ -199,12 +210,23 @@ class PostFormTest extends DbTestCase
             $this->eventsRaised[PostForm::EVENT_AFTER_EDITING] = true;
         });
 
-        $data = ['content' => 'post-updated'];
+        $data = [
+            'id' => 1,
+            'content' => 'post-updated',
+        ];
 
-        $response = $this->podium()->post->edit(PostForm::findOne(1),  $data);
+        $response = $this->podium()->post->edit($data);
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $editedAt = ArrayHelper::remove($responseData, 'edited_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $editedAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'category_id' => 1,
@@ -212,15 +234,12 @@ class PostFormTest extends DbTestCase
             'thread_id' => 1,
             'author_id' => 1,
             'content' => 'post-updated',
-            'type_id' => 'post',
             'created_at' => 1,
-            'updated_at' => $time,
             'edited' => true,
             'likes' => 0,
             'dislikes' => 0,
-            'edited_at' => $time,
             'archived' => 0,
-        ], $response->data);
+        ], $responseData);
 
         $post = PostRepo::findOne(['content' => 'post-updated']);
         $this->assertEquals(array_merge($data, [
@@ -228,12 +247,11 @@ class PostFormTest extends DbTestCase
             'category_id' => 1,
             'forum_id' => 1,
             'thread_id' => 1,
-            'edited' => true,
+            'edited' => 1,
             'likes' => 0,
             'dislikes' => 0,
-            'edited_at' => time(),
-            'type_id' => PostType::POST,
         ]), [
+            'id' => $post->id,
             'content' => $post->content,
             'author_id' => $post->author_id,
             'category_id' => $post->category_id,
@@ -242,8 +260,6 @@ class PostFormTest extends DbTestCase
             'edited' => $post->edited,
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
-            'edited_at' => $post->edited_at,
-            'type_id' => $post->type_id,
         ]);
         $this->assertEmpty(PostRepo::findOne(['content' => 'post1']));
 
@@ -254,15 +270,22 @@ class PostFormTest extends DbTestCase
         $this->assertArrayHasKey(PostForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canEdit = false;
         };
         Event::on(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
 
-        $data = ['content' => 'post-updated'];
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), $data)->result);
+        $data = [
+            'id' => 1,
+            'content' => 'post-updated',
+        ];
+        $this->assertFalse($this->podium()->post->edit($data)->result);
 
         $this->assertNotEmpty(PostRepo::findOne(['content' => 'post1']));
         $this->assertEmpty(PostRepo::findOne(['content' => 'post-updated']));
@@ -270,9 +293,13 @@ class PostFormTest extends DbTestCase
         Event::off(PostForm::class, PostForm::EVENT_BEFORE_EDITING, $handler);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->post->edit(PostForm::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->post->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -283,12 +310,38 @@ class PostFormTest extends DbTestCase
         $this->assertFalse($mock->edit()->result);
     }
 
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
+    public function testUpdateNoId(): void
+    {
+        $this->expectException(InsufficientDataException::class);
+        $this->podium()->post->edit([]);
+    }
+
+    /**
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
+    public function testUpdateWrongId(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->edit(['id' => 10000]);
+    }
+
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
         (new PostForm())->setCategory(Category::findOne(1));
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);

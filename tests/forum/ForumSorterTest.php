@@ -125,7 +125,7 @@ class ForumSorterTest extends DbTestCase
 
     public function testSortEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canSort = false;
         };
         Event::on(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, $handler);
@@ -141,7 +141,7 @@ class ForumSorterTest extends DbTestCase
 
     public function testSortLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [])->result);
+        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1))->result);
     }
 
     public function testSortWrongDataType(): void
@@ -172,12 +172,18 @@ class ForumSorterTest extends DbTestCase
         $this->assertEquals(100, ForumRepo::findOne(4)->sort);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ForumSorter())->setForum(new Forum());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);

@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\group;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\GroupRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -17,6 +18,8 @@ use yii\behaviors\TimestampBehavior;
  */
 class GroupForm extends GroupRepo implements ModelFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.group.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.group.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.group.editing.before';
@@ -48,15 +51,6 @@ class GroupForm extends GroupRepo implements ModelFormInterface
     public function attributeLabels(): array
     {
         return ['name' => Yii::t('podium.label', 'group.name')];
-    }
-
-    /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
     }
 
     /**

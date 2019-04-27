@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
@@ -71,6 +72,9 @@ class ForumMoverTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMove(): void
     {
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, function () {
@@ -80,43 +84,44 @@ class ForumMoverTest extends DbTestCase
             $this->eventsRaised[ForumMover::EVENT_AFTER_MOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2))->result);
+        $this->assertTrue($this->podium()->forum->move(1, Category::findOne(2))->result);
         $this->assertEquals(2, ForumRepo::findOne(1)->category_id);
 
         $this->assertArrayHasKey(ForumMover::EVENT_BEFORE_MOVING, $this->eventsRaised);
         $this->assertArrayHasKey(ForumMover::EVENT_AFTER_MOVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testMoveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canMove = false;
         };
         Event::on(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
 
-        $this->assertFalse($this->podium()->forum->move(ForumMover::findOne(1), Category::findOne(2))->result);
+        $this->assertFalse($this->podium()->forum->move(1, Category::findOne(2))->result);
         $this->assertEquals(1, ForumRepo::findOne(1)->category_id);
 
         Event::off(ForumMover::class, ForumMover::EVENT_BEFORE_MOVING, $handler);
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ForumMover())->setForum(new Forum());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);
         (new ForumMover())->setThread(new Thread());
-    }
-
-    public function testFailedMove(): void
-    {
-        $mock = $this->getMockBuilder(ForumMover::class)->setMethods(['save'])->getMock();
-        $mock->method('save')->willReturn(false);
-
-        $this->assertFalse($this->podium()->forum->move($mock, Category::findById(1))->result);
     }
 }

@@ -8,6 +8,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -90,16 +91,21 @@ class MessageParticipantTest extends DbTestCase
     public function testGetMessagesByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['member_id']))->addRule('member_id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['member_id']))->addRule('member_id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['member_id' => 2]], '');
+
         $messageParticipants = MessageParticipant::findByFilter($filter);
+
         $this->assertEquals(1, $messageParticipants->getTotalCount());
         $this->assertEquals([['message_id' => 1, 'member_id' => 2]], $messageParticipants->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -118,6 +124,9 @@ class MessageParticipantTest extends DbTestCase
         ])->isArchived());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetId(): void
     {
         $this->expectException(NotSupportedException::class);

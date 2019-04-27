@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
@@ -22,76 +24,76 @@ interface AccountInterface
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
-    public function befriend(MembershipInterface $target): PodiumResponse;
+    public function befriendMember(MembershipInterface $target): PodiumResponse;
 
     /**
      * Makes target a friend no more.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
-    public function unfriend(MembershipInterface $target): PodiumResponse;
+    public function unfriendMember(MembershipInterface $target): PodiumResponse;
 
     /**
      * Sets target as ignored.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
-    public function ignore(MembershipInterface $target): PodiumResponse;
+    public function ignoreMember(MembershipInterface $target): PodiumResponse;
 
     /**
      * Sets target as unignored.
      * @param MembershipInterface $target
      * @return PodiumResponse
      */
-    public function unignore(MembershipInterface $target): PodiumResponse;
+    public function unignoreMember(MembershipInterface $target): PodiumResponse;
 
     /**
      * @param ModelInterface $post
      * @return PodiumResponse
      */
-    public function thumbUp(ModelInterface $post): PodiumResponse;
+    public function thumbUpPost(ModelInterface $post): PodiumResponse;
 
     /**
      * @param ModelInterface $post
      * @return PodiumResponse
      */
-    public function thumbDown(ModelInterface $post): PodiumResponse;
+    public function thumbDownPost(ModelInterface $post): PodiumResponse;
 
     /**
      * @param ModelInterface $post
      * @return PodiumResponse
      */
-    public function thumbReset(ModelInterface $post): PodiumResponse;
+    public function thumbResetPost(ModelInterface $post): PodiumResponse;
 
     /**
      * @param ModelInterface $thread
      * @return PodiumResponse
      */
-    public function subscribe(ModelInterface $thread): PodiumResponse;
+    public function subscribeThread(ModelInterface $thread): PodiumResponse;
 
     /**
      * @param ModelInterface $thread
      * @return PodiumResponse
      */
-    public function unsubscribe(ModelInterface $thread): PodiumResponse;
+    public function unsubscribeThread(ModelInterface $thread): PodiumResponse;
 
     /**
      * @param ModelInterface $post
      * @return PodiumResponse
      */
-    public function mark(ModelInterface $post): PodiumResponse;
+    public function markPost(ModelInterface $post): PodiumResponse;
 
     /**
      * @param ModelInterface $group
      * @return PodiumResponse
      */
-    public function join(ModelInterface $group): PodiumResponse;
+    public function joinGroup(ModelInterface $group): PodiumResponse;
 
     /**
      * @param ModelInterface $group
      * @return PodiumResponse
      */
-    public function leave(ModelInterface $group): PodiumResponse;
+    public function leaveGroup(ModelInterface $group): PodiumResponse;
 
     /**
      * Votes in poll.
@@ -99,5 +101,25 @@ interface AccountInterface
      * @param PollAnswerModelInterface[] $answers
      * @return PodiumResponse
      */
-    public function vote(PollModelInterface $poll, array $answers): PodiumResponse;
+    public function votePoll(PollModelInterface $poll, array $answers): PodiumResponse;
+
+    /**
+     * Sends message.
+     * @param array $data
+     * @param MembershipInterface $receiver
+     * @param MessageParticipantModelInterface $replyTo
+     * @return PodiumResponse
+     */
+    public function sendMessage(
+        array $data,
+        MembershipInterface $receiver,
+        ?MessageParticipantModelInterface $replyTo = null
+    ): PodiumResponse;
+
+    /**
+     * Deletes message.
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function removeMessage(int $id): PodiumResponse;
 }

@@ -6,6 +6,7 @@ namespace bizley\podium\tests\forum;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -68,18 +69,18 @@ class ForumTest extends DbTestCase
 
     public function testGetForumById(): void
     {
-        $forum = $this->podium()->forum->getForumById(1);
+        $forum = $this->podium()->forum->getById(1);
         $this->assertEquals(1, $forum->getId());
     }
 
     public function testNonExistingForum(): void
     {
-        $this->assertEmpty($this->podium()->forum->getForumById(999));
+        $this->assertEmpty($this->podium()->forum->getById(999));
     }
 
     public function testGetForumsByFilterEmpty(): void
     {
-        $forums = $this->podium()->forum->getForums();
+        $forums = $this->podium()->forum->getAll();
         $this->assertEquals(2, $forums->getTotalCount());
         $this->assertEquals([1, 2], $forums->getKeys());
     }
@@ -87,24 +88,26 @@ class ForumTest extends DbTestCase
     public function testGetForumsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $forums = $this->podium()->forum->getForums($filter);
+
+        $forums = $this->podium()->forum->getAll($filter);
+
         $this->assertEquals(1, $forums->getTotalCount());
         $this->assertEquals([2], $forums->getKeys());
     }
 
     public function testGetPostsCount(): void
     {
-        $this->assertEquals(5, $this->podium()->forum->getForumById(1)->getPostsCount());
+        $this->assertEquals(5, $this->podium()->forum->getById(1)->getPostsCount());
     }
 
     public function testIsArchived(): void
     {
-        $this->assertFalse($this->podium()->forum->getForumById(1)->isArchived());
-        $this->assertTrue($this->podium()->forum->getForumById(2)->isArchived());
+        $this->assertFalse($this->podium()->forum->getById(1)->isArchived());
+        $this->assertTrue($this->podium()->forum->getById(2)->isArchived());
     }
 }

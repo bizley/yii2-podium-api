@@ -9,7 +9,9 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\ThreadRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
@@ -22,6 +24,8 @@ use yii\db\Exception;
  */
 class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.thread.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.thread.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.thread.editing.before';
@@ -105,15 +109,6 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
     }
 
     /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
-    }
-
-    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -148,18 +143,14 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             }
 
             $this->afterCreate();
-
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while thread creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

@@ -20,21 +20,22 @@ interface CategoryInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getCategoryById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
+     * @param DataFilter|null $filter
+     * @param bool|array|Sort|null $sort
+     * @param bool|array|Pagination|null $pagination
      * @return DataProviderInterface
      */
-    public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns category form handler.
-     * @return AuthoredFormInterface
+     * Returns category form handler instance.
+     * @param int|null $id
+     * @return AuthoredFormInterface|null
      */
-    public function getCategoryForm(): AuthoredFormInterface;
+    public function getForm(?int $id = null): ?AuthoredFormInterface;
 
     /**
      * Creates category.
@@ -46,22 +47,27 @@ interface CategoryInterface
 
     /**
      * Updates category.
-     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $categoryRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $categoryRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 
     /**
      * @return SortableInterface
      */
-    public function getCategorySorter(): SortableInterface;
+    public function getSorter(): SortableInterface;
 
     /**
      * Sorts categories.
@@ -71,14 +77,20 @@ interface CategoryInterface
     public function sort(array $data = []): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $categoryArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchiverInterface|null
      */
-    public function archive(ArchivableInterface $categoryArchiver): PodiumResponse;
+    public function getArchiver(int $id): ?ArchiverInterface;
 
     /**
-     * @param ArchivableInterface $categoryArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $categoryArchiver): PodiumResponse;
+    public function archive(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function revive(int $id): PodiumResponse;
 }

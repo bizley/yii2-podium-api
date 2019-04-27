@@ -13,6 +13,4 @@ return [
     'message.status.replied' => 'Replied',
     'poll.choice.multiple' => 'Multiple',
     'poll.choice.single' => 'Single',
-    'post.type.poll' => 'Poll',
-    'post.type.post' => 'Post',
 ];

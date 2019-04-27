@@ -7,6 +7,7 @@ namespace bizley\podium\tests\post;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\Post;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -91,18 +92,18 @@ class PostTest extends DbTestCase
 
     public function testGetPostById(): void
     {
-        $post = $this->podium()->post->getPostById(1);
+        $post = $this->podium()->post->getById(1);
         $this->assertEquals(1, $post->getId());
     }
 
     public function testNonExistingPost(): void
     {
-        $this->assertEmpty($this->podium()->post->getPostById(999));
+        $this->assertEmpty($this->podium()->post->getById(999));
     }
 
     public function testGetPostsByFilterEmpty(): void
     {
-        $posts = $this->podium()->post->getPosts();
+        $posts = $this->podium()->post->getAll();
         $this->assertEquals(2, $posts->getTotalCount());
         $this->assertEquals([1, 2], $posts->getKeys());
     }
@@ -110,16 +111,21 @@ class PostTest extends DbTestCase
     public function testGetPostsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $posts = $this->podium()->post->getPosts($filter);
+
+        $posts = $this->podium()->post->getAll($filter);
+
         $this->assertEquals(1, $posts->getTotalCount());
         $this->assertEquals([2], $posts->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);

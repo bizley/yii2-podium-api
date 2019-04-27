@@ -10,7 +10,8 @@ use yii\db\ActiveRecord;
  * Poll Active Record.
  *
  * @property int $id
- * @property int $post_id
+ * @property int $thread_id
+ * @property int $author_id
  * @property string $question
  * @property bool $revealed
  * @property string $choice_id

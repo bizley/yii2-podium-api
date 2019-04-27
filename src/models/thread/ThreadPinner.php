@@ -23,6 +23,15 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
     public const EVENT_AFTER_UNPINNING = 'podium.thread.unpinning.after';
 
     /**
+     * @param int $modelId
+     * @return PinnableInterface|null
+     */
+    public static function findById(int $modelId): ?PinnableInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
+
+    /**
      * @return array
      */
     public function behaviors(): array

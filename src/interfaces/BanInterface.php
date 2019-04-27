@@ -13,6 +13,12 @@ use bizley\podium\api\base\PodiumResponse;
 interface BanInterface
 {
     /**
+     * @param int $modelId
+     * @return BanInterface|null
+     */
+    public static function findById(int $modelId): ?BanInterface;
+
+    /**
      * @return PodiumResponse
      */
     public function ban(): PodiumResponse;

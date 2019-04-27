@@ -4,16 +4,18 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
+use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
-use bizley\podium\api\models\poll\Voting;
+use bizley\podium\api\models\poll\PollVoter;
 use bizley\podium\api\repos\PollVoteRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
+use Yii;
 use yii\base\Event;
+use yii\db\Exception;
 
 /**
  * Class AccountVotingTest
@@ -71,45 +73,11 @@ class AccountVotingTest extends AccountTestCase
                 'updated_at' => 1,
             ],
         ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post2',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-            [
-                'id' => 3,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post3',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-        ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
@@ -117,7 +85,8 @@ class AccountVotingTest extends AccountTestCase
             ],
             [
                 'id' => 2,
-                'post_id' => 2,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question2',
                 'choice_id' => PollChoice::MULTIPLE,
                 'created_at' => 1,
@@ -125,11 +94,13 @@ class AccountVotingTest extends AccountTestCase
             ],
             [
                 'id' => 3,
-                'post_id' => 3,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question3',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
                 'updated_at' => 1,
+
             ],
         ],
         'podium_poll_answer' => [
@@ -175,19 +146,19 @@ class AccountVotingTest extends AccountTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function setUp(): void
     {
         $this->fixturesUp();
-        \Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
+        Yii::$app->user->setIdentity(new UserIdentity(['id' => '1']));
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws Exception
      */
     protected function tearDown(): void
     {
@@ -195,16 +166,19 @@ class AccountVotingTest extends AccountTestCase
         parent::tearDown();
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteSingle(): void
     {
-        Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, function () {
-            static::$eventsRaised[Voting::EVENT_BEFORE_VOTING] = true;
+        Event::on(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, function () {
+            $this->eventsRaised[PollVoter::EVENT_BEFORE_VOTING] = true;
         });
-        Event::on(Voting::class, Voting::EVENT_AFTER_VOTING, function () {
-            static::$eventsRaised[Voting::EVENT_AFTER_VOTING] = true;
+        Event::on(PollVoter::class, PollVoter::EVENT_AFTER_VOTING, function () {
+            $this->eventsRaised[PollVoter::EVENT_AFTER_VOTING] = true;
         });
 
-        $this->assertTrue($this->podium()->account->vote(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
+        $this->assertTrue($this->podium()->account->votePoll(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
 
         $this->assertNotEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -212,18 +186,21 @@ class AccountVotingTest extends AccountTestCase
             'answer_id' => 1,
         ]));
 
-        $this->assertArrayHasKey(Voting::EVENT_BEFORE_VOTING, static::$eventsRaised);
-        $this->assertArrayHasKey(Voting::EVENT_AFTER_VOTING, static::$eventsRaised);
+        $this->assertArrayHasKey(PollVoter::EVENT_BEFORE_VOTING, $this->eventsRaised);
+        $this->assertArrayHasKey(PollVoter::EVENT_AFTER_VOTING, $this->eventsRaised);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canVote = false;
         };
-        Event::on(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);
+        Event::on(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, $handler);
 
-        $this->assertFalse($this->podium()->account->vote(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
+        $this->assertFalse($this->podium()->account->votePoll(Poll::findOne(1), [PollAnswer::findOne(1)])->result);
 
         $this->assertEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -231,17 +208,23 @@ class AccountVotingTest extends AccountTestCase
             'answer_id' => 1,
         ]));
 
-        Event::off(Voting::class, Voting::EVENT_BEFORE_VOTING, $handler);
+        Event::off(PollVoter::class, PollVoter::EVENT_BEFORE_VOTING, $handler);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteAgain(): void
     {
-        $this->assertFalse($this->podium()->account->vote(Poll::findOne(3), [PollAnswer::findOne(4)])->result);
+        $this->assertFalse($this->podium()->account->votePoll(Poll::findOne(3), [PollAnswer::findOne(4)])->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteMultiple(): void
     {
-        $this->assertTrue($this->podium()->account->vote(Poll::findOne(2), PollAnswer::findAll(['poll_id' => 2]))->result);
+        $this->assertTrue($this->podium()->account->votePoll(Poll::findOne(2), PollAnswer::findAll(['poll_id' => 2]))->result);
 
         $this->assertNotEmpty(PollVoteRepo::findOne([
             'member_id' => 1,
@@ -255,13 +238,19 @@ class AccountVotingTest extends AccountTestCase
         ]));
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteMultipleInSingleChoicePoll(): void
     {
-        $this->assertFalse($this->podium()->account->vote(Poll::findOne(1), PollAnswer::findAll(['poll_id' => 2]))->result);
+        $this->assertFalse($this->podium()->account->votePoll(Poll::findOne(1), PollAnswer::findAll(['poll_id' => 2]))->result);
     }
 
+    /**
+     * @throws NoMembershipException
+     */
     public function testVoteWrongAnswer(): void
     {
-        $this->assertFalse($this->podium()->account->vote(Poll::findOne(1), [PollAnswer::findOne(4)])->result);
+        $this->assertFalse($this->podium()->account->votePoll(Poll::findOne(1), [PollAnswer::findOne(4)])->result);
     }
 }

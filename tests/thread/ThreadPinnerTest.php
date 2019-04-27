@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadPinner;
 use bizley\podium\api\repos\ThreadRepo;
@@ -83,6 +84,9 @@ class ThreadPinnerTest extends DbTestCase
      */
     protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testPin(): void
     {
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, function () {
@@ -92,21 +96,24 @@ class ThreadPinnerTest extends DbTestCase
             $this->eventsRaised[ThreadPinner::EVENT_AFTER_PINNING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->pin(ThreadPinner::findOne(1))->result);
+        $this->assertTrue($this->podium()->thread->pin(1)->result);
         $this->assertEquals(1, ThreadRepo::findOne(1)->pinned);
 
         $this->assertArrayHasKey(ThreadPinner::EVENT_BEFORE_PINNING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadPinner::EVENT_AFTER_PINNING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testPinEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canPin = false;
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
 
-        $this->assertFalse($this->podium()->thread->pin(ThreadPinner::findOne(1))->result);
+        $this->assertFalse($this->podium()->thread->pin(1)->result);
         $this->assertEquals(0, ThreadRepo::findOne(1)->pinned);
 
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_PINNING, $handler);
@@ -120,6 +127,9 @@ class ThreadPinnerTest extends DbTestCase
         $this->assertFalse($mock->pin()->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnpin(): void
     {
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, function () {
@@ -129,21 +139,24 @@ class ThreadPinnerTest extends DbTestCase
             $this->eventsRaised[ThreadPinner::EVENT_AFTER_UNPINNING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->unpin(ThreadPinner::findOne(2))->result);
+        $this->assertTrue($this->podium()->thread->unpin(2)->result);
         $this->assertEquals(0, ThreadRepo::findOne(2)->pinned);
 
         $this->assertArrayHasKey(ThreadPinner::EVENT_BEFORE_UNPINNING, $this->eventsRaised);
         $this->assertArrayHasKey(ThreadPinner::EVENT_AFTER_UNPINNING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnpinEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canUnpin = false;
         };
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);
 
-        $this->assertFalse($this->podium()->thread->unpin(ThreadPinner::findOne(2))->result);
+        $this->assertFalse($this->podium()->thread->unpin(2)->result);
         $this->assertEquals(1, ThreadRepo::findOne(2)->pinned);
 
         Event::off(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, $handler);

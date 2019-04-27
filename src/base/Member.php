@@ -13,22 +13,17 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RegistrationInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Member
  * @package bizley\podium\api\base
- *
- * @property FriendshipInterface $friendship
- * @property RegistrationInterface $registration
- * @property MembershipInterface $membership
- * @property GroupingInterface $grouping
- * @property IgnoringInterface $ignoring
  */
 class Member extends PodiumComponent implements MemberInterface
 {
@@ -36,7 +31,13 @@ class Member extends PodiumComponent implements MemberInterface
      * @var string|array|MembershipInterface member handler
      * Component ID, class, configuration array, or instance of MembershipInterface.
      */
-    public $memberHandler = \bizley\podium\api\models\member\Member::class;
+    public $modelHandler = \bizley\podium\api\models\member\Member::class;
+
+    /**
+     * @var string|array|ModelFormInterface member form handler
+     * Component ID, class, configuration array, or instance of ModelFormInterface.
+     */
+    public $formHandler = \bizley\podium\api\models\member\MemberForm::class;
 
     /**
      * @var string|array|RegistrationInterface registration handler
@@ -48,19 +49,31 @@ class Member extends PodiumComponent implements MemberInterface
      * @var string|array|FriendshipInterface friendship handler
      * Component ID, class, configuration array, or instance of FriendshipInterface.
      */
-    public $friendshipHandler = \bizley\podium\api\models\member\Friendship::class;
+    public $friendshipHandler = \bizley\podium\api\models\member\MemberFriendship::class;
 
     /**
      * @var string|array|IgnoringInterface ignoring handler
      * Component ID, class, configuration array, or instance of IgnoringInterface.
      */
-    public $ignoringHandler = \bizley\podium\api\models\member\Ignoring::class;
+    public $ignorerHandler = \bizley\podium\api\models\member\MemberIgnorer::class;
 
     /**
      * @var string|array|GroupingInterface grouping handler
      * Component ID, class, configuration array, or instance of GroupingInterface.
      */
-    public $groupingHandler = \bizley\podium\api\models\member\Grouping::class;
+    public $grouperHandler = \bizley\podium\api\models\member\MemberGrouper::class;
+
+    /**
+     * @var string|array|RemoverInterface member remover handler
+     * Component ID, class, configuration array, or instance of RemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
+
+    /**
+     * @var string|array|BanInterface member banner handler
+     * Component ID, class, configuration array, or instance of BanInterface.
+     */
+    public $bannerHandler = \bizley\podium\api\models\member\MemberBanner::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -69,11 +82,116 @@ class Member extends PodiumComponent implements MemberInterface
     {
         parent::init();
 
-        $this->memberHandler = Instance::ensure($this->memberHandler, MembershipInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, MembershipInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
         $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
         $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
-        $this->ignoringHandler = Instance::ensure($this->ignoringHandler, IgnoringInterface::class);
-        $this->groupingHandler = Instance::ensure($this->groupingHandler, GroupingInterface::class);
+        $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnoringInterface::class);
+        $this->grouperHandler = Instance::ensure($this->grouperHandler, GroupingInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        $this->bannerHandler = Instance::ensure($this->bannerHandler, BanInterface::class);
+    }
+
+    /**
+     * @return RegistrationInterface
+     */
+    public function getRegistration(): RegistrationInterface
+    {
+        return new $this->registrationHandler;
+    }
+
+    /**
+     * Registers member.
+     * @param array $data
+     * @return PodiumResponse
+     */
+    public function register(array $data): PodiumResponse
+    {
+        $registration = $this->getRegistration();
+
+        if (!$registration->loadData($data)) {
+            return PodiumResponse::error();
+        }
+
+        return $registration->register();
+    }
+
+    /**
+     * @param int $id
+     * @return MembershipInterface|null
+     */
+    public function getById(int $id): ?MembershipInterface
+    {
+        $membership = $this->modelHandler;
+
+        return $membership::findById($id);
+    }
+
+    /**
+     * @param int|string $id
+     * @return MembershipInterface|null
+     */
+    public function getByUserId($id): ?MembershipInterface
+    {
+        $membership = $this->modelHandler;
+
+        return $membership::findByUserId($id);
+    }
+
+    /**
+     * @param null|DataFilter $filter
+     * @param null|bool|array|Sort $sort
+     * @param null|bool|array|Pagination $pagination
+     * @return DataProviderInterface
+     */
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    {
+        $membership = $this->modelHandler;
+
+        return $membership::findByFilter($filter, $sort, $pagination);
+    }
+
+    /**
+     * @param int|null $id
+     * @return ModelFormInterface|null
+     */
+    public function getForm(?int $id = null): ?ModelFormInterface
+    {
+        $handler = $this->formHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Updates member.
+     * @param array $data
+     * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
+     */
+    public function edit(array $data): PodiumResponse
+    {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $memberForm = $this->getForm((int)$id);
+
+        if ($memberForm === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        if (!$memberForm->loadData($data)) {
+            return PodiumResponse::error();
+        }
+
+        return $memberForm->edit();
     }
 
     /**
@@ -93,8 +211,10 @@ class Member extends PodiumComponent implements MemberInterface
     public function befriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $friendship = $this->getFriendship();
+
         $friendship->setMember($member);
         $friendship->setTarget($target);
+
         return $friendship->befriend();
     }
 
@@ -107,17 +227,19 @@ class Member extends PodiumComponent implements MemberInterface
     public function unfriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
         $friendship = $this->getFriendship();
+
         $friendship->setMember($member);
         $friendship->setTarget($target);
+
         return $friendship->unfriend();
     }
 
     /**
      * @return IgnoringInterface
      */
-    public function getIgnoring(): IgnoringInterface
+    public function getIgnorer(): IgnoringInterface
     {
-        return new $this->ignoringHandler;
+        return new $this->ignorerHandler;
     }
 
     /**
@@ -128,9 +250,11 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function ignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $ignoring = $this->getIgnoring();
+        $ignoring = $this->getIgnorer();
+
         $ignoring->setMember($member);
         $ignoring->setTarget($target);
+
         return $ignoring->ignore();
     }
 
@@ -142,116 +266,65 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $ignoring = $this->getIgnoring();
+        $ignoring = $this->getIgnorer();
+
         $ignoring->setMember($member);
         $ignoring->setTarget($target);
+
         return $ignoring->unignore();
     }
 
     /**
-     * @return RegistrationInterface
-     */
-    public function getRegistration(): RegistrationInterface
-    {
-        return new $this->registrationHandler;
-    }
-
-    /**
-     * Registers member.
-     * @param array $data
-     * @return PodiumResponse
-     */
-    public function register(array $data): PodiumResponse
-    {
-        $registration = $this->getRegistration();
-        if (!$registration->loadData($data)) {
-            return PodiumResponse::error();
-        }
-        return $registration->register();
-    }
-
-    /**
-     * Deletes member.
-     * @param RemovableInterface $memberRemover
-     * @return PodiumResponse
-     */
-    public function remove(RemovableInterface $memberRemover): PodiumResponse
-    {
-        return $memberRemover->remove();
-    }
-
-    /**
      * @param int $id
-     * @return MembershipInterface|null
+     * @return BanInterface|null
      */
-    public function getMemberById(int $id): ?MembershipInterface
+    public function getBanner(int $id): ?BanInterface
     {
-        $membership = $this->memberHandler;
-        return $membership::findById($id);
-    }
+        $handler = $this->bannerHandler;
 
-    /**
-     * @param int|string $id
-     * @return MembershipInterface|null
-     */
-    public function getMemberByUserId($id): ?MembershipInterface
-    {
-        $membership = $this->memberHandler;
-        return $membership::findByUserId($id);
-    }
-
-    /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
-     */
-    public function getMembers(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        $membership = $this->memberHandler;
-        return $membership::findByFilter($filter, $sort, $pagination);
-    }
-
-    /**
-     * Updates member.
-     * @param ModelFormInterface $memberForm
-     * @param array $data
-     * @return PodiumResponse
-     */
-    public function edit(ModelFormInterface $memberForm, array $data): PodiumResponse
-    {
-        if (!$memberForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-        return $memberForm->edit();
+        return $handler::findById($id);
     }
 
     /**
      * Bans member.
-     * @param BanInterface $member
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function ban(BanInterface $member): PodiumResponse
+    public function ban(int $id): PodiumResponse
     {
-        return $member->ban();
+        $memberBanner = $this->getBanner($id);
+
+        if ($memberBanner === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        return $memberBanner->ban();
     }
 
     /**
      * Unbans member.
-     * @param BanInterface $member
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function unban(BanInterface $member): PodiumResponse
+    public function unban(int $id): PodiumResponse
     {
-        return $member->unban();
+        $memberBanner = $this->getBanner($id);
+
+        if ($memberBanner === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        return $memberBanner->unban();
     }
 
     /**
      * @return GroupingInterface
      */
-    public function getGrouping(): GroupingInterface
+    public function getGrouper(): GroupingInterface
     {
-        return new $this->groupingHandler;
+        return new $this->grouperHandler;
     }
 
     /**
@@ -262,7 +335,8 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function join(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouping();
+        $grouping = $this->getGrouper();
+
         $grouping->setMember($member);
         $grouping->setGroup($group);
 
@@ -277,10 +351,39 @@ class Member extends PodiumComponent implements MemberInterface
      */
     public function leave(MembershipInterface $member, ModelInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouping();
+        $grouping = $this->getGrouper();
+
         $grouping->setMember($member);
         $grouping->setGroup($group);
 
         return $grouping->leave();
+    }
+
+    /**
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface
+    {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes member.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $memberRemover = $this->getRemover($id);
+
+        if ($memberRemover === null) {
+            throw new ModelNotFoundException('Member of given ID can not be found.');
+        }
+
+        return $memberRemover->remove();
     }
 }

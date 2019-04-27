@@ -8,6 +8,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -66,22 +67,11 @@ class PollAnswerTest extends DbTestCase
                 'updated_at' => 1,
             ],
         ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
-        ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -126,16 +116,21 @@ class PollAnswerTest extends DbTestCase
     public function testGetPollsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
+
         $pollAnswers = PollAnswer::findByFilter($filter);
+
         $this->assertEquals(1, $pollAnswers->getTotalCount());
         $this->assertEquals([2], $pollAnswers->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);

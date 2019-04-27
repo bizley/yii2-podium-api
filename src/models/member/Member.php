@@ -55,10 +55,12 @@ class Member extends MemberRepo implements MembershipInterface
     public function getPostsCount(): int
     {
         $counter = PostRepo::find()->where(['author_id' => $this->getId()])->count();
+
         if ($counter > PHP_INT_MAX) {
             throw new NotSupportedException('Your system can not handle integer that big.');
         }
-        return (int) $counter;
+
+        return (int)$counter;
     }
 
     /**

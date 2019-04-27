@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\forum;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\repos\ForumRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -17,10 +17,19 @@ use yii\behaviors\TimestampBehavior;
  * Class ForumMover
  * @package bizley\podium\api\models\forum
  */
-class ForumMover extends ForumRepo implements MovableInterface
+class ForumMover extends ForumRepo implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.forum.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.forum.moving.after';
+
+    /**
+     * @param int $modelId
+     * @return MoverInterface|null
+     */
+    public static function findById(int $modelId): ?MoverInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
 
     /**
      * @param ModelInterface $category

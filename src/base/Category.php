@@ -4,26 +4,23 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\ArchivableInterface;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SortableInterface;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 use yii\di\Instance;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class Category
  * @package bizley\podium\api\base
- *
- * @property AuthoredFormInterface $categoryForm
- * @property ModelInterface $categoryModel
  */
 class Category extends PodiumComponent implements CategoryInterface
 {
@@ -31,19 +28,31 @@ class Category extends PodiumComponent implements CategoryInterface
      * @var string|array|ModelInterface category handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $categoryHandler = \bizley\podium\api\models\category\Category::class;
+    public $modelHandler = \bizley\podium\api\models\category\Category::class;
 
     /**
      * @var string|array|AuthoredFormInterface category form handler
      * Component ID, class, configuration array, or instance of AuthoredFormInterface.
      */
-    public $categoryFormHandler = \bizley\podium\api\models\category\CategoryForm::class;
+    public $formHandler = \bizley\podium\api\models\category\CategoryForm::class;
 
     /**
      * @var string|array|SortableInterface category sorter handler
      * Component ID, class, configuration array, or instance of SortableInterface.
      */
-    public $categorySorterHandler = \bizley\podium\api\models\category\CategorySorter::class;
+    public $sorterHandler = \bizley\podium\api\models\category\CategorySorter::class;
+
+    /**
+     * @var string|array|RemoverInterface category remover handler
+     * Component ID, class, configuration array, or instance of RemoverInterface.
+     */
+    public $removerHandler = \bizley\podium\api\models\category\CategoryRemover::class;
+
+    /**
+     * @var string|array|ArchiverInterface category archiver handler
+     * Component ID, class, configuration array, or instance of ArchivableInterface.
+     */
+    public $archiverHandler = \bizley\podium\api\models\category\CategoryArchiver::class;
 
     /**
      * @throws \yii\base\InvalidConfigException
@@ -52,18 +61,21 @@ class Category extends PodiumComponent implements CategoryInterface
     {
         parent::init();
 
-        $this->categoryHandler = Instance::ensure($this->categoryHandler, ModelInterface::class);
-        $this->categoryFormHandler = Instance::ensure($this->categoryFormHandler, AuthoredFormInterface::class);
-        $this->categorySorterHandler = Instance::ensure($this->categorySorterHandler, SortableInterface::class);
+        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
+        $this->formHandler = Instance::ensure($this->formHandler, AuthoredFormInterface::class);
+        $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
+        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
     }
 
     /**
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getCategoryById(int $id): ?ModelInterface
+    public function getById(int $id): ?ModelInterface
     {
-        $categoryClass = $this->categoryHandler;
+        $categoryClass = $this->modelHandler;
+
         return $categoryClass::findById($id);
     }
 
@@ -73,18 +85,26 @@ class Category extends PodiumComponent implements CategoryInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getCategories(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $categoryClass = $this->categoryHandler;
+        $categoryClass = $this->modelHandler;
+
         return $categoryClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
-     * @return AuthoredFormInterface
+     * @param int|null $id
+     * @return AuthoredFormInterface|null
      */
-    public function getCategoryForm(): AuthoredFormInterface
+    public function getForm(?int $id = null): ?AuthoredFormInterface
     {
-        return new $this->categoryFormHandler;
+        $handler = $this->formHandler;
+
+        if ($id === null) {
+            return new $handler;
+        }
+
+        return $handler::findById($id);
     }
 
     /**
@@ -95,45 +115,80 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function create(array $data, MembershipInterface $author): PodiumResponse
     {
-        $categoryForm = $this->getCategoryForm();
+        /* @var $categoryForm AuthoredFormInterface */
+        $categoryForm = $this->getForm();
+
         $categoryForm->setAuthor($author);
 
         if (!$categoryForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categoryForm->create();
     }
 
     /**
      * Updates category.
-     * @param ModelFormInterface $categoryForm
      * @param array $data
      * @return PodiumResponse
+     * @throws InsufficientDataException
+     * @throws ModelNotFoundException
      */
-    public function edit(ModelFormInterface $categoryForm, array $data): PodiumResponse
+    public function edit(array $data): PodiumResponse
     {
+        $id = ArrayHelper::remove($data, 'id');
+
+        if ($id === null) {
+            throw new InsufficientDataException('ID key is missing.');
+        }
+
+        $categoryForm = $this->getForm((int)$id);
+
+        if ($categoryForm === null) {
+            throw new ModelNotFoundException('Category of given ID can not be found.');
+        }
+
         if (!$categoryForm->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categoryForm->edit();
     }
 
     /**
-     * Deletes category.
-     * @param RemovableInterface $categoryRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @return RemoverInterface|null
      */
-    public function remove(RemovableInterface $categoryRemover): PodiumResponse
+    public function getRemover(int $id): ?RemoverInterface
     {
+        $handler = $this->removerHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Deletes category.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function remove(int $id): PodiumResponse
+    {
+        $categoryRemover = $this->getRemover($id);
+
+        if ($categoryRemover === null) {
+            throw new ModelNotFoundException('Category of given ID can not be found.');
+        }
+
         return $categoryRemover->remove();
     }
 
     /**
      * @return SortableInterface
      */
-    public function getCategorySorter(): SortableInterface
+    public function getSorter(): SortableInterface
     {
-        return new $this->categorySorterHandler;
+        return new $this->sorterHandler;
     }
 
     /**
@@ -143,31 +198,57 @@ class Category extends PodiumComponent implements CategoryInterface
      */
     public function sort(array $data = []): PodiumResponse
     {
-        $categorySorter = $this->getCategorySorter();
+        $categorySorter = $this->getSorter();
 
         if (!$categorySorter->loadData($data)) {
             return PodiumResponse::error();
         }
+
         return $categorySorter->sort();
     }
 
     /**
-     * Archives category.
-     * @param ArchivableInterface $categoryArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchiverInterface|null
      */
-    public function archive(ArchivableInterface $categoryArchiver): PodiumResponse
+    public function getArchiver(int $id): ?ArchiverInterface
     {
+        $handler = $this->archiverHandler;
+
+        return $handler::findById($id);
+    }
+
+    /**
+     * Archives category.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws ModelNotFoundException
+     */
+    public function archive(int $id): PodiumResponse
+    {
+        $categoryArchiver = $this->getArchiver($id);
+
+        if ($categoryArchiver === null) {
+            throw new ModelNotFoundException('Category of given ID can not be found.');
+        }
+
         return $categoryArchiver->archive();
     }
 
     /**
      * Revives category.
-     * @param ArchivableInterface $categoryArchiver
+     * @param int $id
      * @return PodiumResponse
+     * @throws ModelNotFoundException
      */
-    public function revive(ArchivableInterface $categoryArchiver): PodiumResponse
+    public function revive(int $id): PodiumResponse
     {
+        $categoryArchiver = $this->getArchiver($id);
+
+        if ($categoryArchiver === null) {
+            throw new ModelNotFoundException('Category of given ID can not be found.');
+        }
+
         return $categoryArchiver->revive();
     }
 }

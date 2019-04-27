@@ -16,13 +16,20 @@ interface PollInterface
      * @param int $id
      * @return PollModelInterface|null
      */
-    public function getPollByPostId(int $id): ?PollModelInterface;
+    public function getById(int $id): ?PollModelInterface;
 
     /**
-     * Returns poll form handler.
-     * @return CategorisedFormInterface
+     * @param int $threadId
+     * @return PollModelInterface|null
      */
-    public function getPollForm(): CategorisedFormInterface;
+    public function getByThreadId(int $threadId): ?PollModelInterface;
+
+    /**
+     * Returns poll form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
+     */
+    public function getForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates poll post.
@@ -35,23 +42,28 @@ interface PollInterface
 
     /**
      * Updates poll post.
-     * @param ModelFormInterface $postPollForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $postPollForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $pollRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $pollRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 
     /**
      * Returns voting handler.
-     * @return VotingInterface
+     * @return VoterInterface
      */
-    public function getVoting(): VotingInterface;
+    public function getVoter(): VoterInterface;
 
     /**
      * Votes in poll.

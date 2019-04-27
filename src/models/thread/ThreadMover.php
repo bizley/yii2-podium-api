@@ -7,9 +7,10 @@ namespace bizley\podium\api\models\thread;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\MovableInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\repos\ThreadRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -19,10 +20,19 @@ use yii\db\Exception;
  * Class ThreadMover
  * @package bizley\podium\api\models\thread
  */
-class ThreadMover extends ThreadRepo implements MovableInterface
+class ThreadMover extends ThreadRepo implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.thread.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
+
+    /**
+     * @param int $modelId
+     * @return MoverInterface|null
+     */
+    public static function findById(int $modelId): ?MoverInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
 
     /**
      * @param ModelInterface $forum
@@ -122,18 +132,14 @@ class ThreadMover extends ThreadRepo implements MovableInterface
             }
 
             $this->afterMove();
-
             $transaction->commit();
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while thread moving transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\PostRepo;
+use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use function time;
 
 /**
  * Class PostForm
@@ -22,6 +24,8 @@ use yii\db\Exception;
  */
 class PostForm extends PostRepo implements CategorisedFormInterface
 {
+    use ModelFormTrait;
+
     public const EVENT_BEFORE_CREATING = 'podium.post.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.post.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.post.editing.before';
@@ -112,15 +116,6 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     }
 
     /**
-     * @param array|null $data
-     * @return bool
-     */
-    public function loadData(?array $data = null): bool
-    {
-        return $this->load($data, '');
-    }
-
-    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -140,8 +135,6 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             return PodiumResponse::error();
         }
 
-        $this->type_id = PostType::POST;
-
         if (!$this->validate()) {
             return PodiumResponse::error($this);
         }
@@ -160,18 +153,14 @@ class PostForm extends PostRepo implements CategorisedFormInterface
             }
 
             $this->afterCreate();
-
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-            try {
-                $transaction->rollBack();
-            } catch (\Throwable $excTrans) {
-                Yii::error(['Exception while post creating transaction rollback', $excTrans->getMessage(), $excTrans->getTraceAsString()], 'podium');
-            }
+
             return PodiumResponse::error();
         }
     }

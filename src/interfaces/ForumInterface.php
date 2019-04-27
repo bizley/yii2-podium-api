@@ -20,7 +20,7 @@ interface ForumInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getForumById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,13 +28,14 @@ interface ForumInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getForums(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
-     * Returns forum form handler.
-     * @return CategorisedFormInterface
+     * Returns forum form handler instance.
+     * @param int|null $id
+     * @return CategorisedFormInterface|null
      */
-    public function getForumForm(): CategorisedFormInterface;
+    public function getForm(?int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates forum.
@@ -47,22 +48,27 @@ interface ForumInterface
 
     /**
      * Updates forum.
-     * @param ModelFormInterface $forumForm
      * @param array $data
      * @return PodiumResponse
      */
-    public function edit(ModelFormInterface $forumForm, array $data): PodiumResponse;
+    public function edit(array $data): PodiumResponse;
 
     /**
-     * @param RemovableInterface $forumRemover
+     * @param int $id
+     * @return RemoverInterface|null
+     */
+    public function getRemover(int $id): ?RemoverInterface;
+
+    /**
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(RemovableInterface $forumRemover): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 
     /**
      * @return SortableInterface
      */
-    public function getForumSorter(): SortableInterface;
+    public function getSorter(): SortableInterface;
 
     /**
      * Sorts forums.
@@ -73,22 +79,34 @@ interface ForumInterface
     public function sort(ModelInterface $category, array $data = []): PodiumResponse;
 
     /**
+     * @param int $id
+     * @return MoverInterface|null
+     */
+    public function getMover(int $id): ?MoverInterface;
+
+    /**
      * Moves forum to different category.
-     * @param MovableInterface $forumMover
+     * @param int $id
      * @param ModelInterface $category
      * @return PodiumResponse
      */
-    public function move(MovableInterface $forumMover, ModelInterface $category): PodiumResponse;
+    public function move(int $id, ModelInterface $category): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $forumArchiver
-     * @return PodiumResponse
+     * @param int $id
+     * @return ArchiverInterface|null
      */
-    public function archive(ArchivableInterface $forumArchiver): PodiumResponse;
+    public function getArchiver(int $id): ?ArchiverInterface;
 
     /**
-     * @param ArchivableInterface $forumArchiver
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $forumArchiver): PodiumResponse;
+    public function archive(int $id): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function revive(int $id): PodiumResponse;
 }

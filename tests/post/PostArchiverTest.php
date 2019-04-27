@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\post;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\PostArchiver;
 use bizley\podium\api\repos\ForumRepo;
@@ -120,36 +121,42 @@ class PostArchiverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_BEFORE_ARCHIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_BEFORE_ARCHIVING] = true;
         });
         Event::on(PostArchiver::class, PostArchiver::EVENT_AFTER_ARCHIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_AFTER_ARCHIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(1))->result);
+        $this->assertTrue($this->podium()->post->archive(1)->result);
 
         $this->assertEquals(true, PostRepo::findOne(1)->archived);
 
         $this->assertEquals(20, ThreadRepo::findOne(1)->posts_count);
         $this->assertEquals(66, ForumRepo::findOne(1)->posts_count);
 
-        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_ARCHIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_ARCHIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_ARCHIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canArchive = false;
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->post->archive(1)->result);
 
         $this->assertEquals(false, PostRepo::findOne(1)->archived);
 
@@ -159,14 +166,20 @@ class PostArchiverTest extends DbTestCase
         Event::off(PostArchiver::class, PostArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->post->archive(PostArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->post->archive(2)->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveLastOne(): void
     {
-        $this->assertTrue($this->podium()->post->archive(PostArchiver::findOne(3))->result);
+        $this->assertTrue($this->podium()->post->archive(3)->result);
 
         $this->assertEquals(true, PostRepo::findOne(3)->archived);
         $this->assertEquals(true, ThreadRepo::findOne(2)->archived);
@@ -188,34 +201,40 @@ class PostArchiverTest extends DbTestCase
         $this->assertFalse($mock->archive()->result);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_BEFORE_REVIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_BEFORE_REVIVING] = true;
         });
         Event::on(PostArchiver::class, PostArchiver::EVENT_AFTER_REVIVING, function () {
-            static::$eventsRaised[PostArchiver::EVENT_AFTER_REVIVING] = true;
+            $this->eventsRaised[PostArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->post->revive(PostArchiver::findOne(2))->result);
+        $this->assertTrue($this->podium()->post->revive(2)->result);
 
         $this->assertEquals(false, PostRepo::findOne(2)->archived);
 
         $this->assertEquals(22, ThreadRepo::findOne(1)->posts_count);
         $this->assertEquals(68, ForumRepo::findOne(1)->posts_count);
 
-        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_REVIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_REVIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_BEFORE_REVIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(PostArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testReviveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRevive = false;
         };
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->post->revive(2)->result);
 
         $this->assertEquals(true, PostRepo::findOne(2)->archived);
 
@@ -225,9 +244,12 @@ class PostArchiverTest extends DbTestCase
         Event::off(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->post->revive(PostArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->post->revive(1)->result);
     }
 
     public function testFailedReviveValidate(): void

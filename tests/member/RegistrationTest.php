@@ -9,6 +9,9 @@ use bizley\podium\api\models\member\Registration;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use function array_merge;
+use function time;
+use yii\helpers\ArrayHelper;
 
 /**
  * Class RegistrationTest
@@ -46,15 +49,21 @@ class RegistrationTest extends DbTestCase
         $time = time();
 
         $this->assertTrue($response->result);
+
+        $responseData = $response->data;
+        $createdAt = ArrayHelper::remove($responseData, 'created_at');
+        $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
+
+        $this->assertLessThanOrEqual($time, $createdAt);
+        $this->assertLessThanOrEqual($time, $updatedAt);
+
         $this->assertEquals([
             'id' => 1,
             'user_id' => '100',
             'username' => 'testname',
             'slug' => 'testname',
             'status_id' => MemberStatus::REGISTERED,
-            'created_at' => $time,
-            'updated_at' => $time,
-        ], $response->data);
+        ], $responseData);
 
         $member = MemberRepo::findOne(['username' => 'testname']);
         $this->assertEquals(array_merge($data, [
@@ -90,7 +99,7 @@ class RegistrationTest extends DbTestCase
 
     public function testRegisterEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRegister = false;
         };
         Event::on(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
@@ -101,7 +110,7 @@ class RegistrationTest extends DbTestCase
         ];
         $this->assertFalse($this->podium()->member->register($data)->result);
 
-        $this->assertEmpty( MemberRepo::findOne(['username' => 'notestname']));
+        $this->assertEmpty(MemberRepo::findOne(['username' => 'notestname']));
 
         Event::off(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
     }

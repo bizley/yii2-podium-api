@@ -6,6 +6,7 @@ namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -77,18 +78,18 @@ class ThreadTest extends DbTestCase
 
     public function testGetThreadById(): void
     {
-        $thread = $this->podium()->thread->getThreadById(1);
+        $thread = $this->podium()->thread->getById(1);
         $this->assertEquals(1, $thread->getId());
     }
 
     public function testNonExistingThread(): void
     {
-        $this->assertEmpty($this->podium()->thread->getThreadById(999));
+        $this->assertEmpty($this->podium()->thread->getById(999));
     }
 
     public function testGetThreadsByFilterEmpty(): void
     {
-        $threads = $this->podium()->thread->getThreads();
+        $threads = $this->podium()->thread->getAll();
         $this->assertEquals(2, $threads->getTotalCount());
         $this->assertEquals([1, 2], $threads->getKeys());
     }
@@ -96,12 +97,14 @@ class ThreadTest extends DbTestCase
     public function testGetThreadsByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $threads = $this->podium()->thread->getThreads($filter);
+
+        $threads = $this->podium()->thread->getAll($filter);
+
         $this->assertEquals(1, $threads->getTotalCount());
         $this->assertEquals([2], $threads->getKeys());
     }

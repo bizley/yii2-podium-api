@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\group;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\GroupRepo;
 use Yii;
 
@@ -14,10 +14,19 @@ use Yii;
  * Class GroupRemover
  * @package bizley\podium\api\models\group
  */
-class GroupRemover extends GroupRepo implements RemovableInterface
+class GroupRemover extends GroupRepo implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.group.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.group.removing.after';
+
+    /**
+     * @param int $modelId
+     * @return RemoverInterface|null
+     */
+    public static function findById(int $modelId): ?RemoverInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
 
     /**
      * @return bool

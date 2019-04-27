@@ -7,6 +7,7 @@ namespace bizley\podium\tests\category;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -55,18 +56,18 @@ class CategoryTest extends DbTestCase
 
     public function testGetCategoryById(): void
     {
-        $category = $this->podium()->category->getCategoryById(1);
+        $category = $this->podium()->category->getById(1);
         $this->assertEquals(1, $category->getId());
     }
 
     public function testNonExistingCategory(): void
     {
-        $this->assertEmpty($this->podium()->category->getCategoryById(999));
+        $this->assertEmpty($this->podium()->category->getById(999));
     }
 
     public function testGetCategoriesByFilterEmpty(): void
     {
-        $categories = $this->podium()->category->getCategories();
+        $categories = $this->podium()->category->getAll();
         $this->assertEquals(2, $categories->getTotalCount());
         $this->assertEquals([1, 2], $categories->getKeys());
     }
@@ -74,22 +75,30 @@ class CategoryTest extends DbTestCase
     public function testGetCategoriesByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 2]], '');
-        $categories = $this->podium()->category->getCategories($filter);
+
+        $categories = $this->podium()->category->getAll($filter);
+
         $this->assertEquals(1, $categories->getTotalCount());
         $this->assertEquals([2], $categories->getKeys());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Category())->getParent();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetPostsCount(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -98,7 +107,7 @@ class CategoryTest extends DbTestCase
 
     public function testIsArchived(): void
     {
-        $this->assertTrue($this->podium()->category->getCategoryById(1)->isArchived());
-        $this->assertFalse($this->podium()->category->getCategoryById(2)->isArchived());
+        $this->assertTrue($this->podium()->category->getById(1)->isArchived());
+        $this->assertFalse($this->podium()->category->getById(2)->isArchived());
     }
 }

@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\message;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\models\ModelFormTrait;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -16,8 +17,11 @@ use yii\behaviors\TimestampBehavior;
  * Class PollAnswerForm
  * @package bizley\podium\api\models\message
  */
-class MessageParticipantForm extends MessageParticipantRepo implements ModelFormInterface
+class MessageForm extends MessageParticipantRepo implements ModelFormInterface
 {
+    // TODO check if findById should be not supported
+    use ModelFormTrait;
+
     /**
      * @return array
      */

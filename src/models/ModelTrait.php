@@ -30,9 +30,16 @@ trait ModelTrait
     }
 
     /**
-     * @return int
+     * By default this will be inherited from \yii\db\BaseActiveRecord
+     * @param mixed $condition
+     * @return ModelInterface|static|null
      */
-    public function getId(): int
+    abstract public static function findOne($condition);
+
+    /**
+     * @return int|null
+     */
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -76,6 +83,7 @@ trait ModelTrait
     }
 
     /**
+     * TODO: check if still needed
      * @param string $targetClass
      * @return mixed
      * @throws InvalidArgumentException
@@ -96,8 +104,8 @@ trait ModelTrait
     }
 
     /**
-     * Returns the old attribute values.
-     * @return array the old attribute values (name-value pairs)
+     * By default this will be inherited from \yii\db\BaseActiveRecord
+     * @return array
      */
     abstract public function getOldAttributes(); // BC declaration
 }

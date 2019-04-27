@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\category;
 
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\CategoryArchiver;
 use bizley\podium\api\repos\CategoryRepo;
@@ -56,94 +57,95 @@ class CategoryArchiverTest extends DbTestCase
     /**
      * @var array
      */
-    protected static $eventsRaised = [];
+    protected $eventsRaised = [];
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchive(): void
     {
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_ARCHIVING, function () {
-            static::$eventsRaised[CategoryArchiver::EVENT_BEFORE_ARCHIVING] = true;
+            $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_ARCHIVING] = true;
         });
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_AFTER_ARCHIVING, function () {
-            static::$eventsRaised[CategoryArchiver::EVENT_AFTER_ARCHIVING] = true;
+            $this->eventsRaised[CategoryArchiver::EVENT_AFTER_ARCHIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->archive(CategoryArchiver::findOne(1))->result);
+        $this->assertTrue($this->podium()->category->archive(1)->result);
 
         $this->assertEquals(true, CategoryRepo::findOne(1)->archived);
 
-        $this->assertArrayHasKey(CategoryArchiver::EVENT_BEFORE_ARCHIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(CategoryArchiver::EVENT_AFTER_ARCHIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(CategoryArchiver::EVENT_BEFORE_ARCHIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(CategoryArchiver::EVENT_AFTER_ARCHIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testArchiveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canArchive = false;
         };
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_ARCHIVING, $handler);
 
-        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(1))->result);
+        $this->assertFalse($this->podium()->category->archive(1)->result);
 
         $this->assertEquals(false, CategoryRepo::findOne(1)->archived);
 
         Event::off(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyArchived(): void
     {
-        $this->assertFalse($this->podium()->category->archive(CategoryArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->category->archive(2)->result);
     }
 
-    public function testFailedArchive(): void
-    {
-        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
-        $mock->method('save')->willReturn(false);
-
-        $this->assertFalse($this->podium()->category->archive($mock)->result);
-    }
-
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_REVIVING, function () {
-            static::$eventsRaised[CategoryArchiver::EVENT_BEFORE_REVIVING] = true;
+            $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_REVIVING] = true;
         });
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_AFTER_REVIVING, function () {
-            static::$eventsRaised[CategoryArchiver::EVENT_AFTER_REVIVING] = true;
+            $this->eventsRaised[CategoryArchiver::EVENT_AFTER_REVIVING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->revive(CategoryArchiver::findOne(2))->result);
+        $this->assertTrue($this->podium()->category->revive(2)->result);
 
         $this->assertEquals(false, CategoryRepo::findOne(2)->archived);
 
-        $this->assertArrayHasKey(CategoryArchiver::EVENT_BEFORE_REVIVING, static::$eventsRaised);
-        $this->assertArrayHasKey(CategoryArchiver::EVENT_AFTER_REVIVING, static::$eventsRaised);
+        $this->assertArrayHasKey(CategoryArchiver::EVENT_BEFORE_REVIVING, $this->eventsRaised);
+        $this->assertArrayHasKey(CategoryArchiver::EVENT_AFTER_REVIVING, $this->eventsRaised);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testReviveEventPreventing(): void
     {
-        $handler = function ($event) {
+        $handler = static function ($event) {
             $event->canRevive = false;
         };
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_REVIVING, $handler);
 
-        $this->assertFalse($this->podium()->category->revive(CategoryArchiver::findOne(2))->result);
+        $this->assertFalse($this->podium()->category->revive(2)->result);
 
         $this->assertEquals(true, CategoryRepo::findOne(2)->archived);
 
         Event::off(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_REVIVING, $handler);
     }
 
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testAlreadyRevived(): void
     {
-        $this->assertFalse($this->podium()->category->revive(CategoryArchiver::findOne(1))->result);
-    }
-
-    public function testFailedRevive(): void
-    {
-        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
-        $mock->method('save')->willReturn(false);
-        $mock->archived = true;
-
-        $this->assertFalse($this->podium()->category->revive($mock)->result);
+        $this->assertFalse($this->podium()->category->revive(1)->result);
     }
 }

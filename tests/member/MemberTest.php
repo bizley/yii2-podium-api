@@ -7,6 +7,7 @@ namespace bizley\podium\tests\member;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\tests\DbTestCase;
+use yii\base\DynamicModel;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -112,24 +113,24 @@ class MemberTest extends DbTestCase
 
     public function testGetMemberById(): void
     {
-        $member = $this->podium()->member->getMemberById(2);
+        $member = $this->podium()->member->getById(2);
         $this->assertEquals(2, $member->getId());
     }
 
     public function testGetMemberByUserId(): void
     {
-        $member = $this->podium()->member->getMemberByUserId('10');
+        $member = $this->podium()->member->getByUserId('10');
         $this->assertEquals(2, $member->getId());
     }
 
     public function testNonExistingMember(): void
     {
-        $this->assertEmpty($this->podium()->member->getMemberById(999));
+        $this->assertEmpty($this->podium()->member->getById(999));
     }
 
     public function testGetMembersByFilterEmpty(): void
     {
-        $members = $this->podium()->member->getMembers();
+        $members = $this->podium()->member->getAll();
         $this->assertEquals(2, $members->getTotalCount());
         $this->assertEquals([2, 3], $members->getKeys());
     }
@@ -137,28 +138,36 @@ class MemberTest extends DbTestCase
     public function testGetMembersByFilter(): void
     {
         $filter = new ActiveDataFilter([
-            'searchModel' => function () {
-                return (new \yii\base\DynamicModel(['id']))->addRule('id', 'integer');
+            'searchModel' => static function () {
+                return (new DynamicModel(['id']))->addRule('id', 'integer');
             }
         ]);
         $filter->load(['filter' => ['id' => 3]], '');
-        $members = $this->podium()->member->getMembers($filter);
+
+        $members = $this->podium()->member->getAll($filter);
+
         $this->assertEquals(1, $members->getTotalCount());
         $this->assertEquals([3], $members->getKeys());
     }
 
     public function testGetPostsCount(): void
     {
-        $member = $this->podium()->member->getMemberById(2);
+        $member = $this->podium()->member->getById(2);
         $this->assertEquals(3, $member->getPostsCount());
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testGetParent(): void
     {
         $this->expectException(NotSupportedException::class);
         (new Member())->getParent();
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function testIsArchived(): void
     {
         $this->expectException(NotSupportedException::class);
@@ -167,7 +176,7 @@ class MemberTest extends DbTestCase
 
     public function testGetUsername(): void
     {
-        $member = $this->podium()->member->getMemberById(3);
+        $member = $this->podium()->member->getById(3);
         $this->assertEquals('member3', $member->getUsername());
     }
 }

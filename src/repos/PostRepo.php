@@ -18,7 +18,6 @@ use yii\db\ActiveRecord;
  * @property bool $edited
  * @property int $likes
  * @property int $dislikes
- * @property string $type_id
  * @property int $created_at
  * @property int $updated_at
  * @property int $edited_at

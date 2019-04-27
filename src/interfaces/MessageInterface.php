@@ -20,7 +20,7 @@ interface MessageInterface
      * @param int $id
      * @return ModelInterface|null
      */
-    public function getMessageById(int $id): ?ModelInterface;
+    public function getById(int $id): ?ModelInterface;
 
     /**
      * @param null|DataFilter $filter
@@ -28,13 +28,13 @@ interface MessageInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getMessages(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns forum form handler.
      * @return SendingInterface
      */
-    public function getSending(): SendingInterface;
+    public function getMailer(): SendingInterface;
 
     /**
      * Sends message.
@@ -47,20 +47,37 @@ interface MessageInterface
     public function send(array $data, MembershipInterface $sender, MembershipInterface $receiver, ?MessageParticipantModelInterface $replyTo = null): PodiumResponse;
 
     /**
-     * @param RemovableInterface $messageParticipantRemover
-     * @return PodiumResponse
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return MessageRemoverInterface|null
      */
-    public function remove(RemovableInterface $messageParticipantRemover): PodiumResponse;
+    public function getRemover(int $id, MembershipInterface $participant): ?MessageRemoverInterface;
 
     /**
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      */
-    public function archive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
+    public function remove(int $id, MembershipInterface $participant): PodiumResponse;
 
     /**
-     * @param ArchivableInterface $messageParticipantArchiver
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return MessageArchiverInterface|null
+     */
+    public function getArchiver(int $id, MembershipInterface $participant): ?MessageArchiverInterface;
+
+    /**
+     * @param int $id
+     * @param MembershipInterface $participant
      * @return PodiumResponse
      */
-    public function revive(ArchivableInterface $messageParticipantArchiver): PodiumResponse;
+    public function archive(int $id, MembershipInterface $participant): PodiumResponse;
+
+    /**
+     * @param int $id
+     * @param MembershipInterface $participant
+     * @return PodiumResponse
+     */
+    public function revive(int $id, MembershipInterface $participant): PodiumResponse;
 }

@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
-use bizley\podium\api\interfaces\RemovableInterface;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\ThreadRepo;
 use Yii;
 
@@ -14,10 +14,19 @@ use Yii;
  * Class ThreadRemover
  * @package bizley\podium\api\models\thread
  */
-class ThreadRemover extends ThreadRepo implements RemovableInterface
+class ThreadRemover extends ThreadRepo implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.thread.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.thread.removing.after';
+
+    /**
+     * @param int $modelId
+     * @return RemoverInterface|null
+     */
+    public static function findById(int $modelId): ?RemoverInterface
+    {
+        return static::findOne(['id' => $modelId]);
+    }
 
     /**
      * @return bool
