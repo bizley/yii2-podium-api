@@ -58,6 +58,7 @@ class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
         if ($poll === null) {
             throw new InvalidValueException('Floating poll answer detected!');
         }
+
         $post = $poll->getParent();
         if ($post === null) {
             throw new InvalidValueException('Floating poll detected!');

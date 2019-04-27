@@ -68,40 +68,19 @@ class PollTest extends DbTestCase
                 'updated_at' => 1,
             ],
         ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-            ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post2',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'archived' => true,
-            ],
-        ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
             [
                 'id' => 2,
-                'post_id' => 2,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question2',
                 'created_at' => 1,
                 'updated_at' => 1,
@@ -113,18 +92,6 @@ class PollTest extends DbTestCase
     {
         $poll = Poll::findById(1);
         $this->assertEquals(1, $poll->getId());
-    }
-
-    public function testGetPollByPostId(): void
-    {
-        $poll = Poll::findByPostId(2);
-        $this->assertEquals(2, $poll->getId());
-    }
-
-    public function testGetComponentPollByPostId(): void
-    {
-        $poll = $this->podium()->poll->getByPostId(2);
-        $this->assertEquals(2, $poll->getId());
     }
 
     public function testNonExistingPoll(): void
@@ -161,21 +128,5 @@ class PollTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Poll())->getPostsCount();
-    }
-
-    public function testIsArchived(): void
-    {
-        $this->assertTrue($this->podium()->poll->getByPostId(2)->isArchived());
-        $this->assertFalse($this->podium()->poll->getByPostId(1)->isArchived());
-    }
-
-    public function testGetParent(): void
-    {
-        $this->assertEquals(Post::findOne(2), $this->podium()->poll->getByPostId(2)->getParent());
-    }
-
-    public function testGetPost(): void
-    {
-        $this->assertInstanceOf(ActiveQuery::class, $this->podium()->poll->getByPostId(1)->getPost());
     }
 }

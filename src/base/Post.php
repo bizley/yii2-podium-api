@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -62,7 +63,7 @@ class Post extends PodiumComponent implements PostInterface
     public $moverHandler = \bizley\podium\api\models\post\PostMover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {

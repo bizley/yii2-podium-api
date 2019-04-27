@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\poll;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PollAnswerRepo;
+use Throwable;
 use Yii;
 
 /**
@@ -32,13 +33,15 @@ class PollAnswerRemover extends PollAnswerRepo implements RemoverInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting poll answer', 'podium');
+
                 return PodiumResponse::error();
             }
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing poll answer', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

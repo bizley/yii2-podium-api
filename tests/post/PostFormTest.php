@@ -7,7 +7,6 @@ namespace bizley\podium\tests\post;
 use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
@@ -128,7 +127,6 @@ class PostFormTest extends DbTestCase
             'thread_id' => 1,
             'author_id' => 1,
             'content' => 'post-new',
-            'type_id' => 'post',
         ], $responseData);
 
         $post = PostRepo::findOne(['content' => 'post-new']);
@@ -141,7 +139,6 @@ class PostFormTest extends DbTestCase
             'likes' => 0,
             'dislikes' => 0,
             'edited_at' => null,
-            'type_id' => PostType::POST,
         ]), [
             'content' => $post->content,
             'author_id' => $post->author_id,
@@ -152,7 +149,6 @@ class PostFormTest extends DbTestCase
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
             'edited_at' => $post->edited_at,
-            'type_id' => $post->type_id,
         ]);
 
         $this->assertEquals(3, ThreadRepo::findOne(1)->posts_count);
@@ -238,7 +234,6 @@ class PostFormTest extends DbTestCase
             'thread_id' => 1,
             'author_id' => 1,
             'content' => 'post-updated',
-            'type_id' => 'post',
             'created_at' => 1,
             'edited' => true,
             'likes' => 0,
@@ -255,7 +250,6 @@ class PostFormTest extends DbTestCase
             'edited' => 1,
             'likes' => 0,
             'dislikes' => 0,
-            'type_id' => PostType::POST,
         ]), [
             'id' => $post->id,
             'content' => $post->content,
@@ -266,7 +260,6 @@ class PostFormTest extends DbTestCase
             'edited' => $post->edited,
             'likes' => $post->likes,
             'dislikes' => $post->dislikes,
-            'type_id' => $post->type_id,
         ]);
         $this->assertEmpty(PostRepo::findOne(['content' => 'post1']));
 

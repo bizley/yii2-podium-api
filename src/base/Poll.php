@@ -12,6 +12,7 @@ use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\VoterInterface;
+use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
@@ -31,7 +32,7 @@ class Poll extends PodiumComponent implements PollInterface
      * @var string|array|CategorisedFormInterface poll form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
-    public $formHandler = \bizley\podium\api\models\poll\PostPollForm::class;
+    public $formHandler = \bizley\podium\api\models\poll\PollForm::class;
 
     /**
      * @var string|array|VoterInterface voter handler
@@ -46,7 +47,7 @@ class Poll extends PodiumComponent implements PollInterface
     public $removerHandler = \bizley\podium\api\models\poll\PollRemover::class;
 
     /**
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
     public function init(): void
     {
@@ -62,11 +63,22 @@ class Poll extends PodiumComponent implements PollInterface
      * @param int $id
      * @return PollModelInterface|null
      */
-    public function getByPostId(int $id): ?PollModelInterface
+    public function getById(int $id): ?PollModelInterface
+    {
+        $postClass = $this->modelHandler;
+
+        return $postClass::findById($id);
+    }
+
+    /**
+     * @param int $threadId
+     * @return PollModelInterface|null
+     */
+    public function getByThreadId(int $threadId): ?PollModelInterface
     {
         $pollClass = $this->modelHandler;
 
-        return $pollClass::findByPostId($id);
+        return $pollClass::getByThreadId($threadId);
     }
 
     /**

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use bizley\podium\api\enums\PollChoice;
 use yii\db\Migration;
 
 class m180819_165300_create_table_podium_poll extends Migration
@@ -15,12 +16,13 @@ class m180819_165300_create_table_podium_poll extends Migration
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $choiceId = 'ENUM("single","multiple") NOT NULL DEFAULT "single"';
         } else {
-            $choiceId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\PollChoice::SINGLE);
+            $choiceId = $this->string(45)->notNull()->defaultValue(PollChoice::SINGLE);
         }
 
         $this->createTable('{{%podium_poll}}', [
             'id' => $this->primaryKey(),
-            'post_id' => $this->integer()->notNull(),
+            'thread_id' => $this->integer()->notNull(),
+            'author_id' => $this->integer()->notNull(),
             'question' => $this->string(255)->notNull(),
             'revealed' => $this->boolean()->notNull()->defaultValue(true),
             'choice_id' => $choiceId,
@@ -30,10 +32,15 @@ class m180819_165300_create_table_podium_poll extends Migration
         ], $tableOptions);
 
         $this->addForeignKey(
-            'fk-podium_poll-post_id',
-            '{{%podium_poll}}', 'post_id',
-            '{{%podium_post}}', 'id',
+            'fk-podium_poll-thread_id',
+            '{{%podium_poll}}', 'thread_id',
+            '{{%podium_thread}}', 'id',
             'CASCADE', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_poll-author_id',
+            '{{%podium_poll}}', 'author_id',
+            '{{%podium_member}}', 'id',
+            'NO ACTION', 'CASCADE');
     }
 
     public function down(): void

@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\PollAnswerForm;
 use bizley\podium\api\repos\PollAnswerRepo;
 use bizley\podium\tests\DbTestCase;
@@ -67,23 +66,11 @@ class PollAnswerFormTest extends DbTestCase
                 'updated_at' => 1,
             ],
         ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-        ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'created_at' => 1,
                 'updated_at' => 1,

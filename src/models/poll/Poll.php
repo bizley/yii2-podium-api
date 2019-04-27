@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\poll;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\models\ModelTrait;
-use bizley\podium\api\models\post\Post;
+use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\repos\PollRepo;
 use yii\base\InvalidValueException;
 use yii\base\NotSupportedException;
@@ -18,7 +18,7 @@ use yii\db\ActiveQuery;
  * @package bizley\podium\api\models\poll
  *
  * @property ModelInterface $parent
- * @property Post $post
+ * @property Thread $thread
  * @property int $choiceId
  */
 class Poll extends PollRepo implements PollModelInterface
@@ -27,11 +27,11 @@ class Poll extends PollRepo implements PollModelInterface
 
     /**
      * @param int $modelId
-     * @return ModelInterface|null
+     * @return PollModelInterface|null
      */
-    public static function findByPostId(int $modelId): ?ModelInterface
+    public static function getByThreadId(int $modelId): ?PollModelInterface
     {
-        return static::findOne(['post_id' => $modelId]);
+        return static::findOne(['thread_id' => $modelId]);
     }
 
     /**
@@ -39,15 +39,15 @@ class Poll extends PollRepo implements PollModelInterface
      */
     public function getParent(): ?ModelInterface
     {
-        return $this->post;
+        return $this->thread;
     }
 
     /**
      * @return ActiveQuery
      */
-    public function getPost(): ActiveQuery
+    public function getThread(): ActiveQuery
     {
-        return $this->hasOne(Post::class, ['id' => 'post_id']);
+        return $this->hasOne(Thread::class, ['id' => 'thread_id']);
     }
 
     /**

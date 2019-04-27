@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use bizley\podium\api\enums\MemberStatus;
 use yii\db\Migration;
 
 class m170604_094100_create_table_podium_member extends Migration
@@ -15,7 +16,7 @@ class m170604_094100_create_table_podium_member extends Migration
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $statusId = 'ENUM("registered","active","banned") NOT NULL DEFAULT "registered"';
         } else {
-            $statusId = $this->string(45)->notNull()->defaultValue(\bizley\podium\api\enums\MemberStatus::REGISTERED);
+            $statusId = $this->string(45)->notNull()->defaultValue(MemberStatus::REGISTERED);
         }
 
         $this->createTable('{{%podium_member}}', [

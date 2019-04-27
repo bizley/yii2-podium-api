@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -135,8 +134,6 @@ class PostForm extends PostRepo implements CategorisedFormInterface
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
         }
-
-        $this->type_id = PostType::POST;
 
         if (!$this->validate()) {
             return PodiumResponse::error($this);

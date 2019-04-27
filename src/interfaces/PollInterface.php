@@ -16,7 +16,13 @@ interface PollInterface
      * @param int $id
      * @return PollModelInterface|null
      */
-    public function getByPostId(int $id): ?PollModelInterface;
+    public function getById(int $id): ?PollModelInterface;
+
+    /**
+     * @param int $threadId
+     * @return PollModelInterface|null
+     */
+    public function getByThreadId(int $threadId): ?PollModelInterface;
 
     /**
      * Returns poll form handler instance.

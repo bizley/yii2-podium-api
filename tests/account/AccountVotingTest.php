@@ -7,7 +7,6 @@ namespace bizley\podium\tests\account;
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
 use bizley\podium\api\models\poll\PollVoter;
@@ -74,45 +73,11 @@ class AccountVotingTest extends AccountTestCase
                 'updated_at' => 1,
             ],
         ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-            [
-                'id' => 2,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post2',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-            [
-                'id' => 3,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post3',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
-        ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
@@ -120,7 +85,8 @@ class AccountVotingTest extends AccountTestCase
             ],
             [
                 'id' => 2,
-                'post_id' => 2,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question2',
                 'choice_id' => PollChoice::MULTIPLE,
                 'created_at' => 1,
@@ -128,11 +94,13 @@ class AccountVotingTest extends AccountTestCase
             ],
             [
                 'id' => 3,
-                'post_id' => 3,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question3',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
                 'updated_at' => 1,
+
             ],
         ],
         'podium_poll_answer' => [

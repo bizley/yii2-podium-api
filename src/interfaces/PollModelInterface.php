@@ -17,7 +17,7 @@ interface PollModelInterface extends ModelInterface
 
     /**
      * @param int $modelId
-     * @return ModelInterface|null
+     * @return PollModelInterface|null
      */
-    public static function findByPostId(int $modelId): ?ModelInterface;
+    public static function getByThreadId(int $modelId): ?PollModelInterface;
 }

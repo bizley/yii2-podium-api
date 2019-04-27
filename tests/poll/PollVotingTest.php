@@ -6,7 +6,6 @@ namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
-use bizley\podium\api\enums\PostType;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\poll\Poll;
 use bizley\podium\api\models\poll\PollAnswer;
@@ -70,46 +69,34 @@ class PollVotingTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
-        ],
-        'podium_post' => [
-            [
-                'id' => 1,
-                'category_id' => 1,
-                'forum_id' => 1,
-                'thread_id' => 1,
-                'author_id' => 1,
-                'content' => 'post1',
-                'created_at' => 1,
-                'updated_at' => 1,
-                'type_id' => PostType::POLL,
-            ],
             [
                 'id' => 2,
                 'category_id' => 1,
                 'forum_id' => 1,
-                'thread_id' => 1,
                 'author_id' => 1,
-                'content' => 'post2',
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'posts_count' => 2,
                 'created_at' => 1,
                 'updated_at' => 1,
-                'type_id' => PostType::POLL,
             ],
             [
                 'id' => 3,
                 'category_id' => 1,
                 'forum_id' => 1,
-                'thread_id' => 1,
                 'author_id' => 1,
-                'content' => 'post3',
+                'name' => 'thread3',
+                'slug' => 'thread3',
+                'posts_count' => 2,
                 'created_at' => 1,
                 'updated_at' => 1,
-                'type_id' => PostType::POLL,
             ],
         ],
         'podium_poll' => [
             [
                 'id' => 1,
-                'post_id' => 1,
+                'thread_id' => 1,
+                'author_id' => 1,
                 'question' => 'question1',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
@@ -117,7 +104,8 @@ class PollVotingTest extends DbTestCase
             ],
             [
                 'id' => 2,
-                'post_id' => 2,
+                'thread_id' => 2,
+                'author_id' => 1,
                 'question' => 'question2',
                 'choice_id' => PollChoice::MULTIPLE,
                 'created_at' => 1,
@@ -125,7 +113,8 @@ class PollVotingTest extends DbTestCase
             ],
             [
                 'id' => 3,
-                'post_id' => 3,
+                'thread_id' => 3,
+                'author_id' => 1,
                 'question' => 'question3',
                 'choice_id' => PollChoice::SINGLE,
                 'created_at' => 1,
