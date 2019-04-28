@@ -17,6 +17,7 @@ use bizley\podium\api\base\Thread;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
+use yii\helpers\ArrayHelper;
 use yii\i18n\PhpMessageSource;
 use function is_array;
 
@@ -81,11 +82,15 @@ class Podium extends ServiceLocator
         parent::__construct($config);
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function init() // BC signature
     {
         parent::init();
 
         $this->prepareTranslations();
+        $this->completeComponents();
     }
 
     /**
@@ -96,7 +101,7 @@ class Podium extends ServiceLocator
         return [
             'account' => [
                 'class' => Account::class,
-                'podium' => $this,
+                'podiumBridge' => true,
             ],
             'category' => ['class' => Category::class],
             'forum' => ['class' => Forum::class],
@@ -218,5 +223,22 @@ class Podium extends ServiceLocator
             'forceTranslation' => true,
             'basePath' => __DIR__ . '/messages',
         ];
+    }
+
+    /**
+     * Sets Podium reference for custom components.
+     * Custom component should be child of PodiumComponent class.
+     * @throws InvalidConfigException
+     */
+    public function completeComponents(): void
+    {
+        $components = $this->getComponents();
+
+        foreach ($components as $id => $component) {
+            if (ArrayHelper::remove($component, 'podiumBridge', false)) {
+                $component['podium'] = $this;
+                $this->set($id, $component);
+            }
+        }
     }
 }

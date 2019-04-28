@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-use bizley\podium\api\base\ModelNotFoundException;
-use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\Podium;
 
 /**
  * Interface AccountInterface
@@ -14,6 +13,21 @@ use bizley\podium\api\base\PodiumResponse;
  */
 interface AccountInterface
 {
+    /**
+     * @param Podium $podium
+     */
+    public function setPodium(Podium $podium): void;
+
+    /**
+     * @return Podium
+     */
+    public function getPodium(): Podium;
+
+    /**
+     * @return MembershipInterface|null
+     */
+    public function getMembership(): ?MembershipInterface;
+
     /**
      * @return int|null
      */

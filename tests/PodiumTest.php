@@ -18,6 +18,7 @@ use bizley\podium\api\base\Thread;
 use bizley\podium\api\Podium;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
+use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
@@ -95,6 +96,24 @@ class PodiumTest extends DbTestCase
             ],
         ]);
         $this->assertEquals(Account::class, $this->podium()->getComponents()['account']['class']);
+    }
+
+    public function testAddBridgeToComponentConfig(): void
+    {
+        static::mockApplication([
+            'components' => [
+                'podium' => [
+                    'class' => Podium::class,
+                    'components' => [
+                        'test' => [
+                            'class' => Component::class,
+                            'podiumBridge' => true,
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+        $this->assertInstanceOf(Podium::class, $this->podium()->getComponents()['test']['podium']);
     }
 
     /**
