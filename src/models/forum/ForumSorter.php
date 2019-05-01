@@ -87,6 +87,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
 
         if (!$this->validate()) {
             Yii::warning(['Forums sort validation failed', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -94,13 +95,15 @@ class ForumSorter extends ForumRepo implements SortableInterface
         try {
             $nextOrder = 0;
             foreach ($this->sortOrder as $forumId) {
-                if (static::updateAll([
+                if (
+                    static::updateAll([
                         'sort' => $nextOrder,
                         'updated_at' => time(),
                     ], [
                         'id' => $forumId,
                         'category_id' => $this->category_id
-                    ]) > 0) {
+                    ]) > 0
+                ) {
                     $nextOrder++;
                 }
             }

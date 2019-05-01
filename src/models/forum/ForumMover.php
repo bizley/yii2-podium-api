@@ -8,7 +8,6 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
-use bizley\podium\api\repos\ForumRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -17,19 +16,10 @@ use yii\behaviors\TimestampBehavior;
  * Class ForumMover
  * @package bizley\podium\api\models\forum
  */
-class ForumMover extends ForumRepo implements MoverInterface
+class ForumMover extends Forum implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.forum.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.forum.moving.after';
-
-    /**
-     * @param int $modelId
-     * @return MoverInterface|null
-     */
-    public static function findById(int $modelId): ?MoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @param ModelInterface $category
@@ -69,6 +59,7 @@ class ForumMover extends ForumRepo implements MoverInterface
 
         if (!$this->save()) {
             Yii::error(['Error while moving forum', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

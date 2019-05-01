@@ -7,26 +7,17 @@ namespace bizley\podium\api\models\forum;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\ForumRepo;
+use Throwable;
 use Yii;
 
 /**
  * Class ForumRemover
  * @package bizley\podium\api\models\forum
  */
-class ForumRemover extends ForumRepo implements RemoverInterface
+class ForumRemover extends Forum implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.forum.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.forum.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -48,14 +39,16 @@ class ForumRemover extends ForumRepo implements RemoverInterface
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'forum.must.be.archived'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting forum', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -63,8 +56,9 @@ class ForumRemover extends ForumRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

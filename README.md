@@ -9,7 +9,7 @@
 - [x] Member
 - [ ] Account - other components need to be connected 
 - [x] Category
-- [ ] Forum
+- [x] Forum
 - [ ] Thread
 - [ ] Post
 - [ ] Rank

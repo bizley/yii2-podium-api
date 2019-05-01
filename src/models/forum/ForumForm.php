@@ -9,8 +9,6 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\ForumRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
@@ -20,10 +18,8 @@ use yii\behaviors\TimestampBehavior;
  * Class ForumForm
  * @package bizley\podium\api\models\forum
  */
-class ForumForm extends ForumRepo implements CategorisedFormInterface
+class ForumForm extends Forum implements CategorisedFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.forum.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.forum.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.forum.editing.before';
@@ -90,6 +86,15 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -111,6 +116,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while creating forum', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -146,6 +152,7 @@ class ForumForm extends ForumRepo implements CategorisedFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing forum', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
