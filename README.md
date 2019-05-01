@@ -12,7 +12,7 @@
 - [x] Forum
 - [x] Thread
 - [x] Post
-- [ ] Rank
+- [x] Rank
 - [ ] Group
 - [ ] Poll
 - [ ] Message

@@ -7,8 +7,6 @@ namespace bizley\podium\api\models\rank;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\RankRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -16,10 +14,8 @@ use yii\behaviors\TimestampBehavior;
  * Class RankForm
  * @package bizley\podium\api\models\rank
  */
-class RankForm extends RankRepo implements ModelFormInterface
+class RankForm extends Rank implements ModelFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.rank.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.rank.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.rank.editing.before';
@@ -58,6 +54,15 @@ class RankForm extends RankRepo implements ModelFormInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -79,6 +84,7 @@ class RankForm extends RankRepo implements ModelFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while creating rank', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -114,6 +120,7 @@ class RankForm extends RankRepo implements ModelFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing rank', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
