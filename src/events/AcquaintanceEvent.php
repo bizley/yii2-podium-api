@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\FriendshipInterface;
-use bizley\podium\api\interfaces\IgnoringInterface;
+use bizley\podium\api\interfaces\BefrienderInterface;
+use bizley\podium\api\interfaces\IgnorerInterface;
 use yii\base\Event;
 
 /**
@@ -35,7 +35,7 @@ class AcquaintanceEvent extends Event
     public $canUnignore = true;
 
     /**
-     * @var FriendshipInterface|IgnoringInterface
+     * @var BefrienderInterface|IgnorerInterface
      */
     public $model;
 }

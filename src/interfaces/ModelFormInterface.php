@@ -16,7 +16,7 @@ interface ModelFormInterface
      * @param int $modelFormId
      * @return ModelFormInterface|null
      */
-    public static function findById(int $modelFormId): ?ModelFormInterface;
+    public static function findById(int $modelFormId): ?ModelInterface;
 
     /**
      * Loads form data.

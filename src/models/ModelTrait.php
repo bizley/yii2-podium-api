@@ -83,7 +83,6 @@ trait ModelTrait
     }
 
     /**
-     * TODO: check if still needed
      * @param string $targetClass
      * @return mixed
      * @throws InvalidArgumentException

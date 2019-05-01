@@ -38,9 +38,9 @@ interface MemberInterface
 
     /**
      * Returns registration handler.
-     * @return RegistrationInterface
+     * @return RegistererInterface
      */
-    public function getRegistration(): RegistrationInterface;
+    public function getRegisterer(): RegistererInterface;
 
     /**
      * Registers account.
@@ -69,9 +69,9 @@ interface MemberInterface
 
     /**
      * Returns friendship handler.
-     * @return FriendshipInterface
+     * @return BefrienderInterface
      */
-    public function getFriendship(): FriendshipInterface;
+    public function getBefriender(): BefrienderInterface;
 
     /**
      * Makes target friend of member.
@@ -91,9 +91,9 @@ interface MemberInterface
 
     /**
      * Returns ignoring handler.
-     * @return IgnoringInterface
+     * @return IgnorerInterface
      */
-    public function getIgnorer(): IgnoringInterface;
+    public function getIgnorer(): IgnorerInterface;
 
     /**
      * Sets target as ignored by member.
@@ -113,9 +113,9 @@ interface MemberInterface
 
     /**
      * @param int $id
-     * @return BanInterface|null
+     * @return BanisherInterface|null
      */
-    public function getBanner(int $id): ?BanInterface;
+    public function getBanisher(int $id): ?BanisherInterface;
 
     /**
      * @param int $id

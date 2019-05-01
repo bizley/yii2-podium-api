@@ -7,16 +7,16 @@ namespace bizley\podium\tests\member;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
-use bizley\podium\api\models\member\MemberFriendship;
+use bizley\podium\api\models\member\MemberBefriender;
 use bizley\podium\api\repos\AcquaintanceRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
 /**
- * Class MemberFriendshipTest
+ * Class MemberBefrienderTest
  * @package bizley\podium\tests\member
  */
-class MemberFriendshipTest extends DbTestCase
+class MemberBefrienderTest extends DbTestCase
 {
     /**
      * @var array
@@ -68,11 +68,11 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testBefriend(): void
     {
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, function () {
-            $this->eventsRaised[MemberFriendship::EVENT_BEFORE_BEFRIENDING] = true;
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_BEFRIENDING, function () {
+            $this->eventsRaised[MemberBefriender::EVENT_BEFORE_BEFRIENDING] = true;
         });
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_BEFRIENDING, function () {
-            $this->eventsRaised[MemberFriendship::EVENT_AFTER_BEFRIENDING] = true;
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_AFTER_BEFRIENDING, function () {
+            $this->eventsRaised[MemberBefriender::EVENT_AFTER_BEFRIENDING] = true;
         });
 
         $this->assertTrue($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101))->result);
@@ -83,8 +83,8 @@ class MemberFriendshipTest extends DbTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_BEFRIENDING, $this->eventsRaised);
-        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_BEFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBefriender::EVENT_BEFORE_BEFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBefriender::EVENT_AFTER_BEFRIENDING, $this->eventsRaised);
     }
 
     public function testBefriendEventPreventing(): void
@@ -92,7 +92,7 @@ class MemberFriendshipTest extends DbTestCase
         $handler = static function ($event) {
             $event->canBeFriends = false;
         };
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_BEFRIENDING, $handler);
 
         $this->assertFalse($this->podium()->member->befriend(Member::findOne(100), Member::findOne(101))->result);
 
@@ -102,7 +102,7 @@ class MemberFriendshipTest extends DbTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_BEFRIENDING, $handler);
+        Event::off(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_BEFRIENDING, $handler);
     }
 
     public function testBefriendAgain(): void
@@ -112,7 +112,7 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testFailedBefriend(): void
     {
-        $mock = $this->getMockBuilder(MemberFriendship::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MemberBefriender::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->befriend()->result);
@@ -120,11 +120,11 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testUnfriend(): void
     {
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, function () {
-            $this->eventsRaised[MemberFriendship::EVENT_BEFORE_UNFRIENDING] = true;
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_UNFRIENDING, function () {
+            $this->eventsRaised[MemberBefriender::EVENT_BEFORE_UNFRIENDING] = true;
         });
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_AFTER_UNFRIENDING, function () {
-            $this->eventsRaised[MemberFriendship::EVENT_AFTER_UNFRIENDING] = true;
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_AFTER_UNFRIENDING, function () {
+            $this->eventsRaised[MemberBefriender::EVENT_AFTER_UNFRIENDING] = true;
         });
 
         $this->assertTrue($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102))->result);
@@ -135,8 +135,8 @@ class MemberFriendshipTest extends DbTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        $this->assertArrayHasKey(MemberFriendship::EVENT_BEFORE_UNFRIENDING, $this->eventsRaised);
-        $this->assertArrayHasKey(MemberFriendship::EVENT_AFTER_UNFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBefriender::EVENT_BEFORE_UNFRIENDING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBefriender::EVENT_AFTER_UNFRIENDING, $this->eventsRaised);
     }
 
     public function testUnfriendEventPreventing(): void
@@ -144,7 +144,7 @@ class MemberFriendshipTest extends DbTestCase
         $handler = static function ($event) {
             $event->canUnfriend = false;
         };
-        Event::on(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::on(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_UNFRIENDING, $handler);
 
         $this->assertFalse($this->podium()->member->unfriend(Member::findOne(101), Member::findOne(102))->result);
 
@@ -154,7 +154,7 @@ class MemberFriendshipTest extends DbTestCase
             'type_id' => AcquaintanceType::FRIEND,
         ]));
 
-        Event::off(MemberFriendship::class, MemberFriendship::EVENT_BEFORE_UNFRIENDING, $handler);
+        Event::off(MemberBefriender::class, MemberBefriender::EVENT_BEFORE_UNFRIENDING, $handler);
     }
 
     public function testUnfriendAgain(): void
@@ -164,7 +164,7 @@ class MemberFriendshipTest extends DbTestCase
 
     public function testExceptionUnfriend(): void
     {
-        $mock = $this->getMockBuilder(MemberFriendship::class)->setMethods(['afterUnfriend'])->getMock();
+        $mock = $this->getMockBuilder(MemberBefriender::class)->setMethods(['afterUnfriend'])->getMock();
         $mock->method('afterUnfriend')->will($this->throwException(new \Exception()));
 
         $mock->setMember(Member::findOne(101));

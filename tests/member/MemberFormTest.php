@@ -12,8 +12,8 @@ use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
-use function time;
 use yii\helpers\ArrayHelper;
+use function time;
 
 /**
  * Class MemberFormTest

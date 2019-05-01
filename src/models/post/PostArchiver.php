@@ -7,10 +7,7 @@ namespace bizley\podium\api\models\post;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadArchiver;
-use bizley\podium\api\repos\PostRepo;
 use Throwable;
 use Yii;
 use yii\db\Exception;
@@ -19,29 +16,12 @@ use yii\db\Exception;
  * Class PostArchiver
  * @package bizley\podium\api\models\post
  */
-class PostArchiver extends PostRepo implements ArchiverInterface
+class PostArchiver extends Post implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.post.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.post.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.post.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.post.reviving.after';
-
-    /**
-     * @param int $modelId
-     * @return ArchiverInterface|null
-     */
-    public static function findById(int $modelId): ?ArchiverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
-
-    /**
-     * @return ModelInterface|null
-     */
-    public function getThreadModel(): ?ModelInterface
-    {
-        return Thread::findById($this->thread_id);
-    }
 
     /**
      * @return bool
@@ -63,8 +43,9 @@ class PostArchiver extends PostRepo implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if ($this->archived) {
+        if ($this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'post.already.archived'));
+
             return PodiumResponse::error($this);
         }
 
@@ -80,20 +61,24 @@ class PostArchiver extends PostRepo implements ArchiverInterface
                 throw new Exception('Error while archiving post!');
             }
 
-            $thread = $this->getThreadModel();
+            $thread = $this->getParent();
             if ($thread === null) {
                 throw new Exception('Can not find parent thread!');
             }
+
             if (!$thread->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating thread counters!');
             }
+
             $forum = $thread->getParent();
             if ($forum === null) {
                 throw new Exception('Can not find parent forum!');
             }
+
             if (!$forum->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating forum counters!');
             }
+
             if ($thread->getPostsCount() === 0 && !$thread->isArchived() && !$thread->convert(ThreadArchiver::class)->archive()) {
                 throw new Exception('Error while archiving thread!');
             }
@@ -153,11 +138,21 @@ class PostArchiver extends PostRepo implements ArchiverInterface
                 throw new Exception('Error while reviving post!');
             }
 
-            $thread = $this->getThreadModel();
+            $thread = $this->getParent();
+            if ($thread === null) {
+                throw new Exception('Can not find parent thread!');
+            }
+
             if (!$thread->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if (!$thread->getParent()->updateCounters(['posts_count' => 1])) {
+
+            $forum = $thread->getParent();
+            if ($forum === null) {
+                throw new Exception('Can not find parent forum!');
+            }
+
+            if (!$forum->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating forum counters!');
             }
 

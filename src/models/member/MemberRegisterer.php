@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\events\RegistrationEvent;
-use bizley\podium\api\interfaces\RegistrationInterface;
+use bizley\podium\api\interfaces\RegistererInterface;
 use bizley\podium\api\repos\MemberRepo;
 use Yii;
 use yii\behaviors\SluggableBehavior;
@@ -17,7 +17,7 @@ use yii\behaviors\TimestampBehavior;
  * Class Registration
  * @package bizley\podium\api\models\member
  */
-class Registration extends MemberRepo implements RegistrationInterface
+class MemberRegisterer extends MemberRepo implements RegistererInterface
 {
     public const EVENT_BEFORE_REGISTERING = 'podium.member.registering.before';
     public const EVENT_AFTER_REGISTERING = 'podium.member.registering.after';
@@ -97,6 +97,7 @@ class Registration extends MemberRepo implements RegistrationInterface
 
         if (!$this->save()) {
             Yii::error(['Error while registering member', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

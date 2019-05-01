@@ -7,9 +7,6 @@ namespace bizley\podium\api\models\thread;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\models\forum\Forum;
-use bizley\podium\api\repos\ThreadRepo;
 use Throwable;
 use Yii;
 use yii\db\Exception;
@@ -18,29 +15,12 @@ use yii\db\Exception;
  * Class ThreadRemover
  * @package bizley\podium\api\models\thread
  */
-class ThreadArchiver extends ThreadRepo implements ArchiverInterface
+class ThreadArchiver extends Thread implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.thread.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.thread.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.thread.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
-
-    /**
-     * @param int $modelId
-     * @return ArchiverInterface|null
-     */
-    public static function findById(int $modelId): ?ArchiverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
-
-    /**
-     * @return ModelInterface|null
-     */
-    public function getForumModel(): ?ModelInterface
-    {
-        return Forum::findById($this->forum_id);
-    }
 
     /**
      * @return bool
@@ -62,8 +42,9 @@ class ThreadArchiver extends ThreadRepo implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if ($this->archived) {
+        if ($this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'thread.already.archived'));
+
             return PodiumResponse::error($this);
         }
 
@@ -75,10 +56,11 @@ class ThreadArchiver extends ThreadRepo implements ArchiverInterface
 
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $forum = $this->getForumModel();
+            $forum = $this->getParent();
             if ($forum === null) {
                 throw new Exception('Can not find parent forum!');
             }
+
             if (!$forum->updateCounters([
                 'threads_count' => -1,
                 'posts_count' => -$this->posts_count,
@@ -128,8 +110,9 @@ class ThreadArchiver extends ThreadRepo implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'thread.not.archived'));
+
             return PodiumResponse::error($this);
         }
 
@@ -145,7 +128,12 @@ class ThreadArchiver extends ThreadRepo implements ArchiverInterface
                 throw new Exception('Error while reviving thread');
             }
 
-            if (!$this->getForumModel()->updateCounters([
+            $forum = $this->getParent();
+            if ($forum === null) {
+                throw new Exception('Can not find parent forum!');
+            }
+
+            if (!$forum->updateCounters([
                 'threads_count' => 1,
                 'posts_count' => $this->posts_count,
             ])) {

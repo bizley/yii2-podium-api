@@ -14,9 +14,9 @@ interface RemoverInterface
 {
     /**
      * @param int $modelId
-     * @return RemoverInterface|null
+     * @return ModelInterface|null
      */
-    public static function findById(int $modelId): ?RemoverInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
      * Removes model.

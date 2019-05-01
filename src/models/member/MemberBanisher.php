@@ -7,8 +7,7 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\events\BanEvent;
-use bizley\podium\api\interfaces\BanInterface;
-use bizley\podium\api\repos\MemberRepo;
+use bizley\podium\api\interfaces\BanisherInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -16,21 +15,12 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberBanner
  * @package bizley\podium\api\models\member
  */
-class MemberBanner extends MemberRepo implements BanInterface
+class MemberBanisher extends Member implements BanisherInterface
 {
     public const EVENT_BEFORE_BANNING = 'podium.member.banning.before';
     public const EVENT_AFTER_BANNING = 'podium.member.banning.after';
     public const EVENT_BEFORE_UNBANNING = 'podium.member.unbanning.before';
     public const EVENT_AFTER_UNBANNING = 'podium.member.unbanning.after';
-
-    /**
-     * @param int $modelId
-     * @return BanInterface|null
-     */
-    public static function findById(int $modelId): ?BanInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return array
@@ -62,6 +52,7 @@ class MemberBanner extends MemberRepo implements BanInterface
 
         if ($this->status_id === MemberStatus::BANNED) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.banned'));
+
             return PodiumResponse::error($this);
         }
 
@@ -69,6 +60,7 @@ class MemberBanner extends MemberRepo implements BanInterface
 
         if (!$this->save(false)) {
             Yii::error('Error while banning member', 'podium');
+
             return PodiumResponse::error();
         }
 
@@ -104,6 +96,7 @@ class MemberBanner extends MemberRepo implements BanInterface
 
         if ($this->status_id === MemberStatus::ACTIVE) {
             $this->addError('status_id', Yii::t('podium.error', 'member.already.active'));
+
             return PodiumResponse::error($this);
         }
 
@@ -111,6 +104,7 @@ class MemberBanner extends MemberRepo implements BanInterface
 
         if (!$this->save(false)) {
             Yii::error('Error while unbanning member', 'podium');
+
             return PodiumResponse::error();
         }
 

@@ -13,10 +13,10 @@ use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
 /**
- * Class MemberIgnoringTest
+ * Class MemberIgnorerTest
  * @package bizley\podium\tests\member
  */
-class MemberIgnoringTest extends DbTestCase
+class MemberIgnorerTest extends DbTestCase
 {
     /**
      * @var array

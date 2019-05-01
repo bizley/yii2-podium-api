@@ -14,10 +14,10 @@ use Exception;
 use yii\base\Event;
 
 /**
- * Class MemberGroupingTest
+ * Class MemberGrouperTest
  * @package bizley\podium\tests\member
  */
-class MemberGroupingTest extends DbTestCase
+class MemberGrouperTest extends DbTestCase
 {
     /**
      * @var array

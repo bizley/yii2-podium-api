@@ -7,26 +7,17 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\MemberRepo;
+use Throwable;
 use Yii;
 
 /**
  * Class MemberRemover
  * @package bizley\podium\api\models\member
  */
-class MemberRemover extends MemberRepo implements RemoverInterface
+class MemberRemover extends Member implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.forum.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.forum.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -51,6 +42,7 @@ class MemberRemover extends MemberRepo implements RemoverInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting member', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -58,7 +50,7 @@ class MemberRemover extends MemberRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }

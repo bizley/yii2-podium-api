@@ -10,13 +10,13 @@ use bizley\podium\api\base\PodiumResponse;
  * Interface BanInterface
  * @package bizley\podium\api\interfaces
  */
-interface BanInterface
+interface BanisherInterface
 {
     /**
      * @param int $modelId
-     * @return BanInterface|null
+     * @return ModelInterface|null
      */
-    public static function findById(int $modelId): ?BanInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
      * @return PodiumResponse

@@ -6,13 +6,13 @@
 
 ## COMPONENTS:
 
-- Account
-- Member
-- Category
-- Forum
-- Thread
-- Post
-- Rank
-- Group
-- Poll
-- Message
+- [ ] Account - other components need to be connected 
+- [x] Member
+- [ ] Category
+- [ ] Forum
+- [ ] Thread
+- [ ] Post
+- [ ] Rank
+- [ ] Group
+- [ ] Poll
+- [ ] Message

@@ -7,8 +7,6 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\MemberRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
@@ -18,10 +16,8 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberForm
  * @package bizley\podium\api\models\member
  */
-class MemberForm extends MemberRepo implements ModelFormInterface
+class MemberForm extends Member implements ModelFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_EDITING = 'podium.member.editing.before';
     public const EVENT_AFTER_EDITING = 'podium.member.editing.after';
 
@@ -67,6 +63,15 @@ class MemberForm extends MemberRepo implements ModelFormInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeEdit(): bool
@@ -108,6 +113,6 @@ class MemberForm extends MemberRepo implements ModelFormInterface
      */
     public function create(): PodiumResponse
     {
-        throw new NotSupportedException('Member must not be created using this form. Use bizley\podium\api\models\member\Registration.');
+        throw new NotSupportedException('Member must not be created using this form. Use bizley\podium\api\models\member\MemberRegisterer.');
     }
 }

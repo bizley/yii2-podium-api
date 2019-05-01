@@ -6,10 +6,11 @@ namespace bizley\podium\api\models\member;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\GroupEvent;
-use bizley\podium\api\interfaces\GroupingInterface;
+use bizley\podium\api\interfaces\GrouperInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\repos\GroupMemberRepo;
+use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -17,7 +18,7 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberGrouper
  * @package bizley\podium\api\models\member
  */
-class MemberGrouper extends GroupMemberRepo implements GroupingInterface
+class MemberGrouper extends GroupMemberRepo implements GrouperInterface
 {
     public const EVENT_BEFORE_JOINING = 'podium.group.joining.before';
     public const EVENT_AFTER_JOINING = 'podium.group.joining.after';
@@ -73,16 +74,20 @@ class MemberGrouper extends GroupMemberRepo implements GroupingInterface
             return PodiumResponse::error();
         }
 
-        if (static::find()->where([
+        if (
+            static::find()->where([
                 'member_id' => $this->member_id,
                 'group_id' => $this->group_id,
-            ])->exists()) {
+            ])->exists()
+        ) {
             $this->addError('group_id', Yii::t('podium.error', 'group.already.joined'));
+
             return PodiumResponse::error($this);
         }
 
         if (!$this->save()) {
             Yii::error(['Error while joining group', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -122,12 +127,14 @@ class MemberGrouper extends GroupMemberRepo implements GroupingInterface
         ])->one();
         if ($groupMember === null) {
             $this->addError('group_id', Yii::t('podium.error', 'group.not.joined'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($groupMember->delete() === false) {
                 Yii::error('Error while leaving group', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -135,8 +142,9 @@ class MemberGrouper extends GroupMemberRepo implements GroupingInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while leaving group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
