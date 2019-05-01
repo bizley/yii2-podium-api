@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\interfaces;
 
 /**
- * Interface CategoryFormInterface
+ * Interface AuthoredFormInterface
  * @package bizley\podium\api\interfaces
  */
 interface AuthoredFormInterface extends ModelFormInterface

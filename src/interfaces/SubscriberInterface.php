@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface SubscribingInterface
+ * Interface SubscriberInterface
  * @package bizley\podium\api\interfaces
  */
 interface SubscriberInterface

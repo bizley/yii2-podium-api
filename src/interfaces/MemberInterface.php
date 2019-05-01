@@ -11,7 +11,7 @@ use yii\data\Pagination;
 use yii\data\Sort;
 
 /**
- * Interface MemberComponentInterface
+ * Interface MemberInterface
  * @package bizley\podium\api\interfaces
  */
 interface MemberInterface

@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface LockableInterface
+ * Interface LockerInterface
  * @package bizley\podium\api\interfaces
  */
 interface LockerInterface

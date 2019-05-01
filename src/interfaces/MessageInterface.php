@@ -32,9 +32,9 @@ interface MessageInterface
 
     /**
      * Returns forum form handler.
-     * @return SendingInterface
+     * @return MessengerInterface
      */
-    public function getMailer(): SendingInterface;
+    public function getMessenger(): MessengerInterface;
 
     /**
      * Sends message.

@@ -10,7 +10,7 @@ use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
-use bizley\podium\api\interfaces\SendingInterface;
+use bizley\podium\api\interfaces\MessengerInterface;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -18,10 +18,10 @@ use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
 
 /**
- * Class MessageMailer
+ * Class MessageMessenger
  * @package bizley\podium\api\models\message
  */
-class MessageMailer extends Message implements SendingInterface
+class MessageMessenger extends Message implements MessengerInterface
 {
     public const EVENT_BEFORE_SENDING = 'podium.message.sending.before';
     public const EVENT_AFTER_SENDING = 'podium.message.sending.after';

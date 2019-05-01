@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\category;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\SortableInterface;
+use bizley\podium\api\interfaces\SorterInterface;
 use bizley\podium\api\repos\CategoryRepo;
 use Throwable;
 use Yii;
@@ -17,7 +17,7 @@ use yii\base\NotSupportedException;
  * Class CategorySorter
  * @package bizley\podium\api\models\category
  */
-class CategorySorter extends CategoryRepo implements SortableInterface
+class CategorySorter extends CategoryRepo implements SorterInterface
 {
     public const EVENT_BEFORE_SORTING = 'podium.category.sorting.before';
     public const EVENT_AFTER_SORTING = 'podium.category.sorting.after';

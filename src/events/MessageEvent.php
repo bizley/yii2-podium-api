@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\SendingInterface;
+use bizley\podium\api\interfaces\MessengerInterface;
 use yii\base\Event;
 
 /**
@@ -19,7 +19,7 @@ class MessageEvent extends Event
     public $canSend = true;
 
     /**
-     * @var SendingInterface
+     * @var MessengerInterface
      */
     public $model;
 }

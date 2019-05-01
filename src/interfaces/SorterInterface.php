@@ -4,12 +4,27 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
+use bizley\podium\api\base\PodiumResponse;
+
 /**
- * Interface CategorisedFormInterface
+ * Interface SorterInterface
  * @package bizley\podium\api\interfaces
  */
-interface CategorisedFormInterface extends AuthoredFormInterface
+interface SorterInterface
 {
+    /**
+     * Loads sorter data.
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool;
+
+    /**
+     * Sorts models.
+     * @return PodiumResponse
+     */
+    public function sort(): PodiumResponse;
+
     /**
      * @param ModelInterface $category
      */

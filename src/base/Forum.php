@@ -11,7 +11,7 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\interfaces\SortableInterface;
+use bizley\podium\api\interfaces\SorterInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
@@ -40,8 +40,8 @@ class Forum extends Component implements ForumInterface
     public $formHandler = \bizley\podium\api\models\forum\ForumForm::class;
 
     /**
-     * @var string|array|SortableInterface forum sorter handler
-     * Component ID, class, configuration array, or instance of SortableInterface.
+     * @var string|array|SorterInterface forum sorter handler
+     * Component ID, class, configuration array, or instance of SorterInterface.
      */
     public $sorterHandler = \bizley\podium\api\models\forum\ForumSorter::class;
 
@@ -72,7 +72,7 @@ class Forum extends Component implements ForumInterface
 
         $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
+        $this->sorterHandler = Instance::ensure($this->sorterHandler, SorterInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
         $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
@@ -196,9 +196,9 @@ class Forum extends Component implements ForumInterface
     }
 
     /**
-     * @return SortableInterface
+     * @return SorterInterface
      */
-    public function getSorter(): SortableInterface
+    public function getSorter(): SorterInterface
     {
         return new $this->sorterHandler;
     }

@@ -10,7 +10,7 @@ use bizley\podium\api\interfaces\MessageInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\SendingInterface;
+use bizley\podium\api\interfaces\MessengerInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
@@ -32,10 +32,10 @@ class Message extends Component implements MessageInterface
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @var string|array|SendingInterface message mailer handler
-     * Component ID, class, configuration array, or instance of SendingInterface.
+     * @var string|array|MessengerInterface message mailer handler
+     * Component ID, class, configuration array, or instance of MessengerInterface.
      */
-    public $mailerHandler = \bizley\podium\api\models\message\MessageMailer::class;
+    public $messengerHandler = \bizley\podium\api\models\message\MessageMessenger::class;
 
     /**
      * @var string|array|MessageRemoverInterface message remover handler
@@ -57,7 +57,7 @@ class Message extends Component implements MessageInterface
         parent::init();
 
         $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
-        $this->mailerHandler = Instance::ensure($this->mailerHandler, SendingInterface::class);
+        $this->messengerHandler = Instance::ensure($this->messengerHandler, MessengerInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, MessageRemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, MessageArchiverInterface::class);
     }
@@ -87,11 +87,11 @@ class Message extends Component implements MessageInterface
     }
 
     /**
-     * @return SendingInterface
+     * @return MessengerInterface
      */
-    public function getMailer(): SendingInterface
+    public function getMessenger(): MessengerInterface
     {
-        return new $this->mailerHandler;
+        return new $this->messengerHandler;
     }
 
     /**
@@ -109,7 +109,7 @@ class Message extends Component implements MessageInterface
         ?MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
     ): PodiumResponse
     {
-        $sending = $this->getMailer();
+        $sending = $this->getMessenger();
 
         $sending->setSender($sender);
         $sending->setReceiver($receiver);

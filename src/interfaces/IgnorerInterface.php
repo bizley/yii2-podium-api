@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface IgnoringInterface
+ * Interface IgnorerInterface
  * @package bizley\podium\api\interfaces
  */
 interface IgnorerInterface

@@ -10,7 +10,7 @@ use bizley\podium\api\interfaces\CategoryInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\interfaces\SortableInterface;
+use bizley\podium\api\interfaces\SorterInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
@@ -39,8 +39,8 @@ class Category extends Component implements CategoryInterface
     public $formHandler = \bizley\podium\api\models\category\CategoryForm::class;
 
     /**
-     * @var string|array|SortableInterface category sorter handler
-     * Component ID, class, configuration array, or instance of SortableInterface.
+     * @var string|array|SorterInterface category sorter handler
+     * Component ID, class, configuration array, or instance of SorterInterface.
      */
     public $sorterHandler = \bizley\podium\api\models\category\CategorySorter::class;
 
@@ -65,7 +65,7 @@ class Category extends Component implements CategoryInterface
 
         $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, AuthoredFormInterface::class);
-        $this->sorterHandler = Instance::ensure($this->sorterHandler, SortableInterface::class);
+        $this->sorterHandler = Instance::ensure($this->sorterHandler, SorterInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
     }
@@ -186,9 +186,9 @@ class Category extends Component implements CategoryInterface
     }
 
     /**
-     * @return SortableInterface
+     * @return SorterInterface
      */
-    public function getSorter(): SortableInterface
+    public function getSorter(): SorterInterface
     {
         return new $this->sorterHandler;
     }

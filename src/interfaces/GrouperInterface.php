@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface GroupingInterface
+ * Interface GrouperInterface
  * @package bizley\podium\api\interfaces
  */
 interface GrouperInterface

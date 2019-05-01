@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface BookmarkingInterface
+ * Interface BookmarkerInterface
  * @package bizley\podium\api\interfaces
  */
 interface BookmarkerInterface

@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\forum;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\SortableInterface;
+use bizley\podium\api\interfaces\SorterInterface;
 use bizley\podium\api\repos\ForumRepo;
 use Throwable;
 use Yii;
@@ -17,7 +17,7 @@ use yii\base\NotSupportedException;
  * Class ForumSorter
  * @package bizley\podium\api\models\forum
  */
-class ForumSorter extends ForumRepo implements SortableInterface
+class ForumSorter extends ForumRepo implements SorterInterface
 {
     public const EVENT_BEFORE_SORTING = 'podium.forum.sorting.before';
     public const EVENT_AFTER_SORTING = 'podium.forum.sorting.after';
