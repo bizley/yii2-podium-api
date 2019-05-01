@@ -7,26 +7,17 @@ namespace bizley\podium\api\models\group;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\GroupRepo;
+use Throwable;
 use Yii;
 
 /**
  * Class GroupRemover
  * @package bizley\podium\api\models\group
  */
-class GroupRemover extends GroupRepo implements RemoverInterface
+class GroupRemover extends Group implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.group.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.group.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -51,6 +42,7 @@ class GroupRemover extends GroupRepo implements RemoverInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting group', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -58,8 +50,9 @@ class GroupRemover extends GroupRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

@@ -13,6 +13,6 @@
 - [x] Thread
 - [x] Post
 - [x] Rank
-- [ ] Group
+- [x] Group
 - [ ] Poll
 - [ ] Message
