@@ -6,8 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\PinEvent;
-use bizley\podium\api\interfaces\PinnableInterface;
-use bizley\podium\api\repos\ThreadRepo;
+use bizley\podium\api\interfaces\PinnerInterface;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -15,21 +14,12 @@ use yii\behaviors\TimestampBehavior;
  * Class ThreadPinner
  * @package bizley\podium\api\models\thread
  */
-class ThreadPinner extends ThreadRepo implements PinnableInterface
+class ThreadPinner extends Thread implements PinnerInterface
 {
     public const EVENT_BEFORE_PINNING = 'podium.thread.pinning.before';
     public const EVENT_AFTER_PINNING = 'podium.thread.pinning.after';
     public const EVENT_BEFORE_UNPINNING = 'podium.thread.unpinning.before';
     public const EVENT_AFTER_UNPINNING = 'podium.thread.unpinning.after';
-
-    /**
-     * @param int $modelId
-     * @return PinnableInterface|null
-     */
-    public static function findById(int $modelId): ?PinnableInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return array
@@ -63,6 +53,7 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
 
         if (!$this->save()) {
             Yii::error(['Error while pinning thread', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -100,6 +91,7 @@ class ThreadPinner extends ThreadRepo implements PinnableInterface
 
         if (!$this->save()) {
             Yii::error(['Error while unpinning thread', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

@@ -6,18 +6,19 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\BookmarkEvent;
-use bizley\podium\api\interfaces\BookmarkingInterface;
+use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\repos\BookmarkRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
+use yii\db\Exception;
 
 /**
  * Class ThreadBookmarker
  * @package bizley\podium\api\models\thread
  */
-class ThreadBookmarker extends BookmarkRepo implements BookmarkingInterface
+class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
 {
     public const EVENT_BEFORE_MARKING = 'podium.bookmark.marking.before';
     public const EVENT_AFTER_MARKING = 'podium.bookmark.marking.after';
@@ -45,12 +46,18 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkingInterface
 
     /**
      * @param ModelInterface $post
+     * @throws Exception
      */
     public function setPost(ModelInterface $post): void
     {
         $this->setPostModel($post);
 
-        $this->thread_id = $post->getParent()->getId();
+        $thread = $post->getParent();
+        if ($thread === null) {
+            throw new Exception('Can not find parent thread!');
+        }
+
+        $this->thread_id = $thread->getId();
     }
 
     private $_post;
@@ -114,6 +121,7 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkingInterface
 
         if (!$bookmark->save()) {
             Yii::error(['Error while bookmarking thread', $bookmark->errors], 'podium');
+
             return PodiumResponse::error($bookmark);
         }
 

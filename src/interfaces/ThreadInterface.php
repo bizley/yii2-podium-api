@@ -81,9 +81,9 @@ interface ThreadInterface
 
     /**
      * @param int $id
-     * @return PinnableInterface|null
+     * @return PinnerInterface|null
      */
-    public function getPinner(int $id): ?PinnableInterface;
+    public function getPinner(int $id): ?PinnerInterface;
 
     /**
      * @param int $id
@@ -99,9 +99,9 @@ interface ThreadInterface
 
     /**
      * @param int $id
-     * @return LockableInterface|null
+     * @return LockerInterface|null
      */
-    public function getLocker(int $id): ?LockableInterface;
+    public function getLocker(int $id): ?LockerInterface;
 
     /**
      * @param int $id
@@ -128,9 +128,9 @@ interface ThreadInterface
     public function revive(int $id): PodiumResponse;
 
     /**
-     * @return SubscribingInterface
+     * @return SubscriberInterface
      */
-    public function getSubscriber(): SubscribingInterface;
+    public function getSubscriber(): SubscriberInterface;
 
     /**
      * @param MembershipInterface $member
@@ -147,9 +147,9 @@ interface ThreadInterface
     public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 
     /**
-     * @return BookmarkingInterface
+     * @return BookmarkerInterface
      */
-    public function getBookmarker(): BookmarkingInterface;
+    public function getBookmarker(): BookmarkerInterface;
 
     /**
      * @param MembershipInterface $member

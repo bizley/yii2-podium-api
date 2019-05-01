@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\PinnableInterface;
+use bizley\podium\api\interfaces\PinnerInterface;
 use yii\base\Event;
 
 /**
@@ -24,7 +24,7 @@ class LockEvent extends Event
     public $canUnlock = true;
 
     /**
-     * @var PinnableInterface
+     * @var PinnerInterface
      */
     public $model;
 }

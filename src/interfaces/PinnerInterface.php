@@ -10,13 +10,13 @@ use bizley\podium\api\base\PodiumResponse;
  * Interface PinnableInterface
  * @package bizley\podium\api\interfaces
  */
-interface PinnableInterface
+interface PinnerInterface
 {
     /**
      * @param int $modelId
-     * @return PinnableInterface|null
+     * @return ModelInterface|null
      */
-    public static function findById(int $modelId): ?PinnableInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
      * Pins model.

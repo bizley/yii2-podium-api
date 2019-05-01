@@ -6,7 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\LockEvent;
-use bizley\podium\api\interfaces\LockableInterface;
+use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\repos\ThreadRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -15,7 +15,7 @@ use yii\behaviors\TimestampBehavior;
  * Class ThreadLocker
  * @package bizley\podium\api\models\thread
  */
-class ThreadLocker extends ThreadRepo implements LockableInterface
+class ThreadLocker extends ThreadRepo implements LockerInterface
 {
     public const EVENT_BEFORE_LOCKING = 'podium.thread.locking.before';
     public const EVENT_AFTER_LOCKING = 'podium.thread.locking.after';
@@ -32,9 +32,9 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
 
     /**
      * @param int $modelId
-     * @return LockableInterface|null
+     * @return LockerInterface|null
      */
-    public static function findById(int $modelId): ?LockableInterface
+    public static function findById(int $modelId): ?LockerInterface
     {
         return static::findOne(['id' => $modelId]);
     }
@@ -63,6 +63,7 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
 
         if (!$this->save()) {
             Yii::error(['Error while locking thread', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -100,6 +101,7 @@ class ThreadLocker extends ThreadRepo implements LockableInterface
 
         if (!$this->save()) {
             Yii::error(['Error while unlocking thread', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

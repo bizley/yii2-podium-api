@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\BookmarkingInterface;
+use bizley\podium\api\interfaces\BookmarkerInterface;
 use yii\base\Event;
 
 /**
@@ -19,7 +19,7 @@ class BookmarkEvent extends Event
     public $canMark = true;
 
     /**
-     * @var BookmarkingInterface
+     * @var BookmarkerInterface
      */
     public $model;
 }

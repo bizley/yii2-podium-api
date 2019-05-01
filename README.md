@@ -10,7 +10,7 @@
 - [ ] Account - other components need to be connected 
 - [x] Category
 - [x] Forum
-- [ ] Thread
+- [x] Thread
 - [ ] Post
 - [ ] Rank
 - [ ] Group

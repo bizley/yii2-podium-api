@@ -9,7 +9,6 @@ use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\forum\Forum;
-use bizley\podium\api\repos\ThreadRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -20,22 +19,14 @@ use yii\db\Exception;
  * Class ThreadMover
  * @package bizley\podium\api\models\thread
  */
-class ThreadMover extends ThreadRepo implements MoverInterface
+class ThreadMover extends Thread implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.thread.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
     /**
-     * @param int $modelId
-     * @return MoverInterface|null
-     */
-    public static function findById(int $modelId): ?MoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
-
-    /**
      * @param ModelInterface $forum
+     * @throws Exception
      */
     public function setForum(ModelInterface $forum): void
     {
@@ -43,7 +34,12 @@ class ThreadMover extends ThreadRepo implements MoverInterface
         $this->setNewForumModel($forum);
 
         $this->forum_id = $forum->getId();
-        $this->category_id = $forum->getParent()->getId();
+
+        $category = $forum->getParent();
+        if ($category === null) {
+            throw new Exception('Can not find parent category!');
+        }
+        $this->category_id = $category->getId();
     }
 
     private $_newForum;
