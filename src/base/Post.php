@@ -221,7 +221,7 @@ class Post extends Component implements PostInterface
             throw new ModelNotFoundException('Post of given ID can not be found.');
         }
 
-        $postMover->setThread($thread);
+        $postMover->prepareThread($thread);
 
         return $postMover->move();
     }

@@ -7,7 +7,6 @@ namespace bizley\podium\api\models\rank;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\RankRepo;
 use Throwable;
 use Yii;
 
@@ -15,19 +14,10 @@ use Yii;
  * Class RankRemover
  * @package bizley\podium\api\models\rank
  */
-class RankRemover extends RankRepo implements RemoverInterface
+class RankRemover extends Rank implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.rank.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.rank.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -52,6 +42,7 @@ class RankRemover extends RankRepo implements RemoverInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting rank', 'podium');
+
                 return PodiumResponse::error();
             }
 

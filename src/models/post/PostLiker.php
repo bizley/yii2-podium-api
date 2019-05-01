@@ -123,10 +123,12 @@ class PostLiker extends ThumbRepo implements LikerInterface
                 if (!$this->getPostModel()->updateCounters(['likes' => 1])) {
                     throw new Exception('Error while updating post likes!');
                 }
-            } elseif (!$this->getPostModel()->updateCounters([
+            } elseif (
+                !$this->getPostModel()->updateCounters([
                     'likes' => 1,
                     'dislikes' => -1,
-                ])) {
+                ])
+            ) {
                 throw new Exception('Error while updating post likes!');
             }
 
@@ -177,6 +179,7 @@ class PostLiker extends ThumbRepo implements LikerInterface
             $model = $this;
         } elseif ($rate->thumb === -1) {
             $this->addError('post_id', Yii::t('podium.error', 'post.already.disliked'));
+
             return PodiumResponse::error($this);
         } else {
             $model = $rate;
@@ -198,10 +201,12 @@ class PostLiker extends ThumbRepo implements LikerInterface
                 if (!$this->getPostModel()->updateCounters(['dislikes' => 1])) {
                     throw new Exception('Error while updating post likes!');
                 }
-            } elseif (!$this->getPostModel()->updateCounters([
-                'likes' => -1,
-                'dislikes' => 1,
-            ])) {
+            } elseif (
+                !$this->getPostModel()->updateCounters([
+                    'likes' => -1,
+                    'dislikes' => 1,
+                ])
+            ) {
                 throw new Exception('Error while updating post likes!');
             }
 
@@ -251,6 +256,7 @@ class PostLiker extends ThumbRepo implements LikerInterface
 
         if ($rate === null) {
             $this->addError('post_id', Yii::t('podium.error', 'post.not.rated'));
+
             return PodiumResponse::error($this);
         }
 
@@ -269,7 +275,6 @@ class PostLiker extends ThumbRepo implements LikerInterface
             }
 
             $this->afterThumbReset();
-
             $transaction->commit();
 
             return PodiumResponse::success();

@@ -7,9 +7,10 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
-use bizley\podium\api\interfaces\IgnoringInterface;
+use bizley\podium\api\interfaces\IgnorerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
+use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -17,7 +18,7 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberIgnorer
  * @package bizley\podium\api\models\member
  */
-class MemberIgnorer extends AcquaintanceRepo implements IgnoringInterface
+class MemberIgnorer extends AcquaintanceRepo implements IgnorerInterface
 {
     public const EVENT_BEFORE_IGNORING = 'podium.acquaintance.ignoring.before';
     public const EVENT_AFTER_IGNORING = 'podium.acquaintance.ignoring.after';
@@ -73,11 +74,14 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnoringInterface
             return PodiumResponse::error();
         }
 
-        if (static::find()->where([
+        if (
+            static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-            ])->exists()) {
+            ])->exists()
+        ) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
+
             return PodiumResponse::error($this);
         }
 
@@ -85,6 +89,7 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnoringInterface
 
         if (!$this->save()) {
             Yii::error(['Error while ignoring member', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -125,12 +130,14 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnoringInterface
         ])->one();
         if ($ignoring === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.ignored'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($ignoring->delete() === false) {
                 Yii::error('Error while unignoring member', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -138,8 +145,9 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnoringInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

@@ -7,16 +7,16 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface LockableInterface
+ * Interface LockerInterface
  * @package bizley\podium\api\interfaces
  */
-interface LockableInterface
+interface LockerInterface
 {
     /**
      * @param int $modelId
-     * @return LockableInterface|null
+     * @return LockerInterface|null
      */
-    public static function findById(int $modelId): ?LockableInterface;
+    public static function findById(int $modelId): ?LockerInterface;
 
     /**
      * Locks model.

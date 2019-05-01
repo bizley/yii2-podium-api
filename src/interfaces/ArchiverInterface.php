@@ -14,9 +14,9 @@ interface ArchiverInterface
 {
     /**
      * @param int $modelId
-     * @return ArchiverInterface|null
+     * @return ModelInterface|null
      */
-    public static function findById(int $modelId): ?ArchiverInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
      * Archives model.

@@ -10,8 +10,8 @@ use bizley\podium\api\models\group\GroupForm;
 use bizley\podium\api\repos\GroupRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
-use function time;
 use yii\helpers\ArrayHelper;
+use function time;
 
 /**
  * Class GroupFormTest

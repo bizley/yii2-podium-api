@@ -7,24 +7,26 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface BanInterface
+ * Interface PinnerInterface
  * @package bizley\podium\api\interfaces
  */
-interface BanInterface
+interface PinnerInterface
 {
     /**
      * @param int $modelId
-     * @return BanInterface|null
+     * @return ModelInterface|null
      */
-    public static function findById(int $modelId): ?BanInterface;
+    public static function findById(int $modelId): ?ModelInterface;
 
     /**
+     * Pins model.
      * @return PodiumResponse
      */
-    public function ban(): PodiumResponse;
+    public function pin(): PodiumResponse;
 
     /**
+     * Unpins model.
      * @return PodiumResponse
      */
-    public function unban(): PodiumResponse;
+    public function unpin(): PodiumResponse;
 }

@@ -7,7 +7,7 @@ namespace bizley\podium\api\models\forum;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\SortableInterface;
+use bizley\podium\api\interfaces\SorterInterface;
 use bizley\podium\api\repos\ForumRepo;
 use Throwable;
 use Yii;
@@ -17,7 +17,7 @@ use yii\base\NotSupportedException;
  * Class ForumSorter
  * @package bizley\podium\api\models\forum
  */
-class ForumSorter extends ForumRepo implements SortableInterface
+class ForumSorter extends ForumRepo implements SorterInterface
 {
     public const EVENT_BEFORE_SORTING = 'podium.forum.sorting.before';
     public const EVENT_AFTER_SORTING = 'podium.forum.sorting.after';
@@ -87,6 +87,7 @@ class ForumSorter extends ForumRepo implements SortableInterface
 
         if (!$this->validate()) {
             Yii::warning(['Forums sort validation failed', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -94,13 +95,15 @@ class ForumSorter extends ForumRepo implements SortableInterface
         try {
             $nextOrder = 0;
             foreach ($this->sortOrder as $forumId) {
-                if (static::updateAll([
+                if (
+                    static::updateAll([
                         'sort' => $nextOrder,
                         'updated_at' => time(),
                     ], [
                         'id' => $forumId,
                         'category_id' => $this->category_id
-                    ]) > 0) {
+                    ]) > 0
+                ) {
                     $nextOrder++;
                 }
             }

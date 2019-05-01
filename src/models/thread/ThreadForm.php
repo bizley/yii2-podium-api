@@ -9,8 +9,6 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\ThreadRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -22,10 +20,8 @@ use yii\db\Exception;
  * Class ThreadForm
  * @package bizley\podium\api\models\thread
  */
-class ThreadForm extends ThreadRepo implements CategorisedFormInterface
+class ThreadForm extends Thread implements CategorisedFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.thread.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.thread.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.thread.editing.before';
@@ -41,13 +37,20 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
     /**
      * @param ModelInterface $forum
+     * @throws Exception
      */
     public function setForum(ModelInterface $forum): void
     {
         $this->setForumModel($forum);
 
         $this->forum_id = $forum->getId();
-        $this->category_id = $forum->getParent()->getId();
+
+        $category = $forum->getParent();
+        if ($category === null) {
+            throw new Exception('Can not find parent category!');
+        }
+
+        $this->category_id = $category->getId();
     }
 
     private $_forum;
@@ -106,6 +109,15 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
             'name' => Yii::t('podium.label', 'thread.name'),
             'slug' => Yii::t('podium.label', 'thread.slug'),
         ];
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
     }
 
     /**
@@ -182,6 +194,7 @@ class ThreadForm extends ThreadRepo implements CategorisedFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing thread', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

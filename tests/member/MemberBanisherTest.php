@@ -6,16 +6,16 @@ namespace bizley\podium\tests\member;
 
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\MemberBanner;
+use bizley\podium\api\models\member\MemberBanisher;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
 /**
- * Class MemberBanTest
+ * Class MemberBanisherTest
  * @package bizley\podium\tests\member
  */
-class MemberBanTest extends DbTestCase
+class MemberBanisherTest extends DbTestCase
 {
     /**
      * @var array
@@ -53,11 +53,11 @@ class MemberBanTest extends DbTestCase
      */
     public function testBan(): void
     {
-        Event::on(MemberBanner::class, MemberBanner::EVENT_BEFORE_BANNING, function () {
-            $this->eventsRaised[MemberBanner::EVENT_BEFORE_BANNING] = true;
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_BANNING, function () {
+            $this->eventsRaised[MemberBanisher::EVENT_BEFORE_BANNING] = true;
         });
-        Event::on(MemberBanner::class, MemberBanner::EVENT_AFTER_BANNING, function () {
-            $this->eventsRaised[MemberBanner::EVENT_AFTER_BANNING] = true;
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_AFTER_BANNING, function () {
+            $this->eventsRaised[MemberBanisher::EVENT_AFTER_BANNING] = true;
         });
 
         $this->assertTrue($this->podium()->member->ban(100)->result);
@@ -65,8 +65,8 @@ class MemberBanTest extends DbTestCase
         $banned = MemberRepo::findOne(100);
         $this->assertEquals(MemberStatus::BANNED, $banned->status_id);
 
-        $this->assertArrayHasKey(MemberBanner::EVENT_BEFORE_BANNING, $this->eventsRaised);
-        $this->assertArrayHasKey(MemberBanner::EVENT_AFTER_BANNING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBanisher::EVENT_BEFORE_BANNING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBanisher::EVENT_AFTER_BANNING, $this->eventsRaised);
     }
 
     /**
@@ -77,14 +77,14 @@ class MemberBanTest extends DbTestCase
         $handler = static function ($event) {
             $event->canBan = false;
         };
-        Event::on(MemberBanner::class, MemberBanner::EVENT_BEFORE_BANNING, $handler);
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_BANNING, $handler);
 
         $this->assertFalse($this->podium()->member->ban(100)->result);
 
         $notbanned = MemberRepo::findOne(100);
         $this->assertEquals(MemberStatus::ACTIVE, $notbanned->status_id);
 
-        Event::off(MemberBanner::class, MemberBanner::EVENT_BEFORE_BANNING, $handler);
+        Event::off(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_BANNING, $handler);
     }
 
     /**
@@ -97,7 +97,7 @@ class MemberBanTest extends DbTestCase
 
     public function testFailedBan(): void
     {
-        $mock = $this->getMockBuilder(MemberBanner::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MemberBanisher::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $mock->status_id = MemberStatus::ACTIVE;
@@ -110,11 +110,11 @@ class MemberBanTest extends DbTestCase
      */
     public function testUnban(): void
     {
-        Event::on(MemberBanner::class, MemberBanner::EVENT_BEFORE_UNBANNING, function () {
-            $this->eventsRaised[MemberBanner::EVENT_BEFORE_UNBANNING] = true;
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_UNBANNING, function () {
+            $this->eventsRaised[MemberBanisher::EVENT_BEFORE_UNBANNING] = true;
         });
-        Event::on(MemberBanner::class, MemberBanner::EVENT_AFTER_UNBANNING, function () {
-            $this->eventsRaised[MemberBanner::EVENT_AFTER_UNBANNING] = true;
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_AFTER_UNBANNING, function () {
+            $this->eventsRaised[MemberBanisher::EVENT_AFTER_UNBANNING] = true;
         });
 
         $this->assertTrue($this->podium()->member->unban(101)->result);
@@ -122,8 +122,8 @@ class MemberBanTest extends DbTestCase
         $unbanned = MemberRepo::findOne(101);
         $this->assertEquals(MemberStatus::ACTIVE, $unbanned->status_id);
 
-        $this->assertArrayHasKey(MemberBanner::EVENT_BEFORE_UNBANNING, $this->eventsRaised);
-        $this->assertArrayHasKey(MemberBanner::EVENT_AFTER_UNBANNING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBanisher::EVENT_BEFORE_UNBANNING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberBanisher::EVENT_AFTER_UNBANNING, $this->eventsRaised);
     }
 
     /**
@@ -134,14 +134,14 @@ class MemberBanTest extends DbTestCase
         $handler = static function ($event) {
             $event->canUnban = false;
         };
-        Event::on(MemberBanner::class, MemberBanner::EVENT_BEFORE_UNBANNING, $handler);
+        Event::on(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_UNBANNING, $handler);
 
         $this->assertFalse($this->podium()->member->unban(101)->result);
 
         $notunbanned = MemberRepo::findOne(101);
         $this->assertEquals(MemberStatus::BANNED, $notunbanned->status_id);
 
-        Event::off(MemberBanner::class, MemberBanner::EVENT_BEFORE_UNBANNING, $handler);
+        Event::off(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_UNBANNING, $handler);
     }
 
     /**
@@ -154,7 +154,7 @@ class MemberBanTest extends DbTestCase
 
     public function testFailedUnban(): void
     {
-        $mock = $this->getMockBuilder(MemberBanner::class)->setMethods(['save'])->getMock();
+        $mock = $this->getMockBuilder(MemberBanisher::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
         $mock->status_id = MemberStatus::BANNED;

@@ -7,26 +7,17 @@ namespace bizley\podium\api\models\thread;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\ThreadRepo;
+use Throwable;
 use Yii;
 
 /**
  * Class ThreadRemover
  * @package bizley\podium\api\models\thread
  */
-class ThreadRemover extends ThreadRepo implements RemoverInterface
+class ThreadRemover extends Thread implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.thread.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.thread.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -50,12 +41,14 @@ class ThreadRemover extends ThreadRepo implements RemoverInterface
 
         if (!$this->archived) {
             $this->addError('archived', Yii::t('podium.error', 'thread.must.be.archived'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting thread', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -63,7 +56,7 @@ class ThreadRemover extends ThreadRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }

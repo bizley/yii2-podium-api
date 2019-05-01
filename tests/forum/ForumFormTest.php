@@ -16,8 +16,8 @@ use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
-use function array_merge;
 use yii\helpers\ArrayHelper;
+use function array_merge;
 
 /**
  * Class ForumFormTest

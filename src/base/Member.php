@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use bizley\podium\api\interfaces\FriendshipInterface;
-use bizley\podium\api\interfaces\GroupingInterface;
-use bizley\podium\api\interfaces\IgnoringInterface;
-use bizley\podium\api\interfaces\BanInterface;
+use bizley\podium\api\interfaces\BefrienderInterface;
+use bizley\podium\api\interfaces\GrouperInterface;
+use bizley\podium\api\interfaces\IgnorerInterface;
+use bizley\podium\api\interfaces\BanisherInterface;
 use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RegistrationInterface;
+use bizley\podium\api\interfaces\RegistererInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -42,26 +42,26 @@ class Member extends Component implements MemberInterface
     public $formHandler = \bizley\podium\api\models\member\MemberForm::class;
 
     /**
-     * @var string|array|RegistrationInterface registration handler
-     * Component ID, class, configuration array, or instance of RegistrationInterface.
+     * @var string|array|RegistererInterface member registerer handler
+     * Component ID, class, configuration array, or instance of RegistererInterface.
      */
-    public $registrationHandler = \bizley\podium\api\models\member\Registration::class;
+    public $registererHandler = \bizley\podium\api\models\member\MemberRegisterer::class;
 
     /**
-     * @var string|array|FriendshipInterface friendship handler
-     * Component ID, class, configuration array, or instance of FriendshipInterface.
+     * @var string|array|BefrienderInterface member befriender handler
+     * Component ID, class, configuration array, or instance of BefrienderInterface.
      */
-    public $friendshipHandler = \bizley\podium\api\models\member\MemberFriendship::class;
+    public $befrienderHandler = \bizley\podium\api\models\member\MemberBefriender::class;
 
     /**
-     * @var string|array|IgnoringInterface ignoring handler
-     * Component ID, class, configuration array, or instance of IgnoringInterface.
+     * @var string|array|IgnorerInterface member ignorer handler
+     * Component ID, class, configuration array, or instance of IgnorerInterface.
      */
     public $ignorerHandler = \bizley\podium\api\models\member\MemberIgnorer::class;
 
     /**
-     * @var string|array|GroupingInterface grouping handler
-     * Component ID, class, configuration array, or instance of GroupingInterface.
+     * @var string|array|GrouperInterface member grouper handler
+     * Component ID, class, configuration array, or instance of GrouperInterface.
      */
     public $grouperHandler = \bizley\podium\api\models\member\MemberGrouper::class;
 
@@ -72,10 +72,10 @@ class Member extends Component implements MemberInterface
     public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
 
     /**
-     * @var string|array|BanInterface member banner handler
-     * Component ID, class, configuration array, or instance of BanInterface.
+     * @var string|array|BanisherInterface member banisher handler
+     * Component ID, class, configuration array, or instance of BanisherInterface.
      */
-    public $bannerHandler = \bizley\podium\api\models\member\MemberBanner::class;
+    public $banisherHandler = \bizley\podium\api\models\member\MemberBanisher::class;
 
     /**
      * @throws InvalidConfigException
@@ -86,20 +86,20 @@ class Member extends Component implements MemberInterface
 
         $this->modelHandler = Instance::ensure($this->modelHandler, MembershipInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
-        $this->registrationHandler = Instance::ensure($this->registrationHandler, RegistrationInterface::class);
-        $this->friendshipHandler = Instance::ensure($this->friendshipHandler, FriendshipInterface::class);
-        $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnoringInterface::class);
-        $this->grouperHandler = Instance::ensure($this->grouperHandler, GroupingInterface::class);
+        $this->registererHandler = Instance::ensure($this->registererHandler, RegistererInterface::class);
+        $this->befrienderHandler = Instance::ensure($this->befrienderHandler, BefrienderInterface::class);
+        $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnorerInterface::class);
+        $this->grouperHandler = Instance::ensure($this->grouperHandler, GrouperInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        $this->bannerHandler = Instance::ensure($this->bannerHandler, BanInterface::class);
+        $this->banisherHandler = Instance::ensure($this->banisherHandler, BanisherInterface::class);
     }
 
     /**
-     * @return RegistrationInterface
+     * @return RegistererInterface
      */
-    public function getRegistration(): RegistrationInterface
+    public function getRegisterer(): RegistererInterface
     {
-        return new $this->registrationHandler;
+        return new $this->registererHandler;
     }
 
     /**
@@ -109,7 +109,7 @@ class Member extends Component implements MemberInterface
      */
     public function register(array $data): PodiumResponse
     {
-        $registration = $this->getRegistration();
+        $registration = $this->getRegisterer();
 
         if (!$registration->loadData($data)) {
             return PodiumResponse::error();
@@ -197,11 +197,11 @@ class Member extends Component implements MemberInterface
     }
 
     /**
-     * @return FriendshipInterface
+     * @return BefrienderInterface
      */
-    public function getFriendship(): FriendshipInterface
+    public function getBefriender(): BefrienderInterface
     {
-        return new $this->friendshipHandler;
+        return new $this->befrienderHandler;
     }
 
     /**
@@ -212,7 +212,7 @@ class Member extends Component implements MemberInterface
      */
     public function befriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $friendship = $this->getFriendship();
+        $friendship = $this->getBefriender();
 
         $friendship->setMember($member);
         $friendship->setTarget($target);
@@ -228,7 +228,7 @@ class Member extends Component implements MemberInterface
      */
     public function unfriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
     {
-        $friendship = $this->getFriendship();
+        $friendship = $this->getBefriender();
 
         $friendship->setMember($member);
         $friendship->setTarget($target);
@@ -237,9 +237,9 @@ class Member extends Component implements MemberInterface
     }
 
     /**
-     * @return IgnoringInterface
+     * @return IgnorerInterface
      */
-    public function getIgnorer(): IgnoringInterface
+    public function getIgnorer(): IgnorerInterface
     {
         return new $this->ignorerHandler;
     }
@@ -278,11 +278,11 @@ class Member extends Component implements MemberInterface
 
     /**
      * @param int $id
-     * @return BanInterface|null
+     * @return BanisherInterface|null
      */
-    public function getBanner(int $id): ?BanInterface
+    public function getBanisher(int $id): ?BanisherInterface
     {
-        $handler = $this->bannerHandler;
+        $handler = $this->banisherHandler;
 
         return $handler::findById($id);
     }
@@ -295,7 +295,7 @@ class Member extends Component implements MemberInterface
      */
     public function ban(int $id): PodiumResponse
     {
-        $memberBanner = $this->getBanner($id);
+        $memberBanner = $this->getBanisher($id);
 
         if ($memberBanner === null) {
             throw new ModelNotFoundException('Member of given ID can not be found.');
@@ -312,7 +312,7 @@ class Member extends Component implements MemberInterface
      */
     public function unban(int $id): PodiumResponse
     {
-        $memberBanner = $this->getBanner($id);
+        $memberBanner = $this->getBanisher($id);
 
         if ($memberBanner === null) {
             throw new ModelNotFoundException('Member of given ID can not be found.');
@@ -322,9 +322,9 @@ class Member extends Component implements MemberInterface
     }
 
     /**
-     * @return GroupingInterface
+     * @return GrouperInterface
      */
-    public function getGrouper(): GroupingInterface
+    public function getGrouper(): GrouperInterface
     {
         return new $this->grouperHandler;
     }

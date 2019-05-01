@@ -7,8 +7,6 @@ namespace bizley\podium\api\models\group;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\GroupRepo;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -16,10 +14,8 @@ use yii\behaviors\TimestampBehavior;
  * Class GroupForm
  * @package bizley\podium\api\models\group
  */
-class GroupForm extends GroupRepo implements ModelFormInterface
+class GroupForm extends Group implements ModelFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.group.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.group.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.group.editing.before';
@@ -54,6 +50,15 @@ class GroupForm extends GroupRepo implements ModelFormInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -75,6 +80,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while creating group', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -110,6 +116,7 @@ class GroupForm extends GroupRepo implements ModelFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing group', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

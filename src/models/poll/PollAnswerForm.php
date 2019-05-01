@@ -6,8 +6,6 @@ namespace bizley\podium\api\models\poll;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\interfaces\AnswerFormInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\repos\PollAnswerRepo;
 use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
@@ -16,7 +14,7 @@ use yii\behaviors\TimestampBehavior;
  * Class PollAnswerForm
  * @package bizley\podium\api\models\poll
  */
-class PollAnswerForm extends PollAnswerRepo implements AnswerFormInterface
+class PollAnswerForm extends PollAnswer implements AnswerFormInterface
 {
     /**
      * @return array
@@ -58,16 +56,6 @@ class PollAnswerForm extends PollAnswerRepo implements AnswerFormInterface
      * @throws NotSupportedException
      */
     public function edit(): PodiumResponse
-    {
-        throw new NotSupportedException('Use PollForm to update poll.');
-    }
-
-    /**
-     * @param int $modelFormId
-     * @return ModelFormInterface|null
-     * @throws NotSupportedException
-     */
-    public static function findById(int $modelFormId): ?ModelFormInterface
     {
         throw new NotSupportedException('Use PollForm to update poll.');
     }

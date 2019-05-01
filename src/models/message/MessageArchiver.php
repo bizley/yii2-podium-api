@@ -6,31 +6,20 @@ namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;
-use bizley\podium\api\repos\MessageParticipantRepo;
 use Yii;
 
 /**
  * Class MessageParticipantArchiver
  * @package bizley\podium\api\models\message
  */
-class MessageArchiver extends MessageParticipantRepo implements MessageArchiverInterface
+class MessageArchiver extends MessageParticipant implements MessageArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.message.participant.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.message.participant.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.message.participant.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.message.participant.reviving.after';
-
-    /**
-     * @param int $modelId
-     * @return ArchiverInterface|null
-     */
-    public static function findById(int $modelId): ?ArchiverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @param int $messageId
@@ -65,8 +54,9 @@ class MessageArchiver extends MessageParticipantRepo implements MessageArchiverI
             return PodiumResponse::error();
         }
 
-        if ($this->archived) {
+        if ($this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'message.already.archived'));
+
             return PodiumResponse::error($this);
         }
 
@@ -74,11 +64,11 @@ class MessageArchiver extends MessageParticipantRepo implements MessageArchiverI
 
         if (!$this->save()) {
             Yii::error('Error while archiving message', 'podium');
+
             return PodiumResponse::error($this);
         }
 
         $this->afterArchive();
-
         return PodiumResponse::success();
     }
 
@@ -107,8 +97,9 @@ class MessageArchiver extends MessageParticipantRepo implements MessageArchiverI
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'message.not.archived'));
+
             return PodiumResponse::error($this);
         }
 
@@ -116,11 +107,11 @@ class MessageArchiver extends MessageParticipantRepo implements MessageArchiverI
 
         if (!$this->save()) {
             Yii::error('Error while reviving message', 'podium');
+
             return PodiumResponse::error($this);
         }
 
         $this->afterRevive();
-
         return PodiumResponse::success();
     }
 

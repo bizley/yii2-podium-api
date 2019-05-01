@@ -7,9 +7,10 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
-use bizley\podium\api\interfaces\FriendshipInterface;
+use bizley\podium\api\interfaces\BefrienderInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
+use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 
@@ -17,7 +18,7 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberFriendship
  * @package bizley\podium\api\models\member
  */
-class MemberFriendship extends AcquaintanceRepo implements FriendshipInterface
+class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
 {
     public const EVENT_BEFORE_BEFRIENDING = 'podium.acquaintance.befriending.before';
     public const EVENT_AFTER_BEFRIENDING = 'podium.acquaintance.befriending.after';
@@ -73,11 +74,14 @@ class MemberFriendship extends AcquaintanceRepo implements FriendshipInterface
             return PodiumResponse::error();
         }
 
-        if (static::find()->where([
+        if (
+            static::find()->where([
                 'member_id' => $this->member_id,
                 'target_id' => $this->target_id,
-            ])->exists()) {
+            ])->exists()
+        ) {
             $this->addError('target_id', Yii::t('podium.error', 'target.already.acquainted'));
+
             return PodiumResponse::error($this);
         }
 
@@ -85,6 +89,7 @@ class MemberFriendship extends AcquaintanceRepo implements FriendshipInterface
 
         if (!$this->save()) {
             Yii::error(['Error while befriending member', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -125,12 +130,14 @@ class MemberFriendship extends AcquaintanceRepo implements FriendshipInterface
         ])->one();
         if ($friendship === null) {
             $this->addError('target_id', Yii::t('podium.error', 'target.not.befriended'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($friendship->delete() === false) {
                 Yii::error('Error while unfriending member', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -138,8 +145,9 @@ class MemberFriendship extends AcquaintanceRepo implements FriendshipInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while unfriending member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

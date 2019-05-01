@@ -5,15 +5,15 @@ declare(strict_types=1);
 namespace bizley\podium\api\base;
 
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\BookmarkingInterface;
+use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
-use bizley\podium\api\interfaces\LockableInterface;
+use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
-use bizley\podium\api\interfaces\PinnableInterface;
+use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\interfaces\SubscribingInterface;
+use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -43,14 +43,14 @@ class Thread extends Component implements ThreadInterface
     public $formHandler = \bizley\podium\api\models\thread\ThreadForm::class;
 
     /**
-     * @var string|array|SubscribingInterface subscribing handler
-     * Component ID, class, configuration array, or instance of SubscribingInterface.
+     * @var string|array|SubscriberInterface thread subscriber handler
+     * Component ID, class, configuration array, or instance of SubscriberInterface.
      */
     public $subscriberHandler = \bizley\podium\api\models\thread\ThreadSubscriber::class;
 
     /**
-     * @var string|array|BookmarkingInterface bookmarking handler
-     * Component ID, class, configuration array, or instance of BookmarkingInterface.
+     * @var string|array|BookmarkerInterface thread bookmarker handler
+     * Component ID, class, configuration array, or instance of BookmarkerInterface.
      */
     public $bookmarkerHandler = \bizley\podium\api\models\thread\ThreadBookmarker::class;
 
@@ -73,14 +73,14 @@ class Thread extends Component implements ThreadInterface
     public $moverHandler = \bizley\podium\api\models\thread\ThreadMover::class;
 
     /**
-     * @var string|array|LockableInterface thread locker handler
-     * Component ID, class, configuration array, or instance of LockableInterface.
+     * @var string|array|LockerInterface thread locker handler
+     * Component ID, class, configuration array, or instance of LockerInterface.
      */
     public $lockerHandler = \bizley\podium\api\models\thread\ThreadLocker::class;
 
     /**
-     * @var string|array|PinnableInterface thread mover handler
-     * Component ID, class, configuration array, or instance of PinnableInterface.
+     * @var string|array|PinnerInterface thread pinner handler
+     * Component ID, class, configuration array, or instance of PinnerInterface.
      */
     public $pinnerHandler = \bizley\podium\api\models\thread\ThreadPinner::class;
 
@@ -93,13 +93,13 @@ class Thread extends Component implements ThreadInterface
 
         $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
         $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        $this->subscriberHandler = Instance::ensure($this->subscriberHandler, SubscribingInterface::class);
-        $this->bookmarkerHandler = Instance::ensure($this->bookmarkerHandler, BookmarkingInterface::class);
+        $this->subscriberHandler = Instance::ensure($this->subscriberHandler, SubscriberInterface::class);
+        $this->bookmarkerHandler = Instance::ensure($this->bookmarkerHandler, BookmarkerInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
         $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
-        $this->lockerHandler = Instance::ensure($this->lockerHandler, LockableInterface::class);
-        $this->pinnerHandler = Instance::ensure($this->pinnerHandler, PinnableInterface::class);
+        $this->lockerHandler = Instance::ensure($this->lockerHandler, LockerInterface::class);
+        $this->pinnerHandler = Instance::ensure($this->pinnerHandler, PinnerInterface::class);
     }
 
     /**
@@ -245,16 +245,16 @@ class Thread extends Component implements ThreadInterface
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
 
-        $threadMover->setForum($forum);
+        $threadMover->prepareForum($forum);
 
         return $threadMover->move();
     }
 
     /**
      * @param int $id
-     * @return PinnableInterface|null
+     * @return PinnerInterface|null
      */
-    public function getPinner(int $id): ?PinnableInterface
+    public function getPinner(int $id): ?PinnerInterface
     {
         $handler = $this->pinnerHandler;
 
@@ -297,9 +297,9 @@ class Thread extends Component implements ThreadInterface
 
     /**
      * @param int $id
-     * @return LockableInterface|null
+     * @return LockerInterface|null
      */
-    public function getLocker(int $id): ?LockableInterface
+    public function getLocker(int $id): ?LockerInterface
     {
         $handler = $this->lockerHandler;
 
@@ -386,9 +386,9 @@ class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @return SubscribingInterface
+     * @return SubscriberInterface
      */
-    public function getSubscriber(): SubscribingInterface
+    public function getSubscriber(): SubscriberInterface
     {
         return new $this->subscriberHandler;
     }
@@ -426,9 +426,9 @@ class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @return BookmarkingInterface
+     * @return BookmarkerInterface
      */
-    public function getBookmarker(): BookmarkingInterface
+    public function getBookmarker(): BookmarkerInterface
     {
         return new $this->bookmarkerHandler;
     }

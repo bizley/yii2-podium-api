@@ -5,19 +5,19 @@ declare(strict_types=1);
 namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\Registration;
+use bizley\podium\api\models\member\MemberRegisterer;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
+use yii\helpers\ArrayHelper;
 use function array_merge;
 use function time;
-use yii\helpers\ArrayHelper;
 
 /**
- * Class RegistrationTest
+ * Class MemberRegistererTest
  * @package bizley\podium\tests\member
  */
-class RegistrationTest extends DbTestCase
+class MemberRegistererTest extends DbTestCase
 {
     /**
      * @var array
@@ -33,11 +33,11 @@ class RegistrationTest extends DbTestCase
 
     public function testRegister(): void
     {
-        Event::on(Registration::class, Registration::EVENT_BEFORE_REGISTERING, function () {
-            $this->eventsRaised[Registration::EVENT_BEFORE_REGISTERING] = true;
+        Event::on(MemberRegisterer::class, MemberRegisterer::EVENT_BEFORE_REGISTERING, function () {
+            $this->eventsRaised[MemberRegisterer::EVENT_BEFORE_REGISTERING] = true;
         });
-        Event::on(Registration::class, Registration::EVENT_AFTER_REGISTERING, function () {
-            $this->eventsRaised[Registration::EVENT_AFTER_REGISTERING] = true;
+        Event::on(MemberRegisterer::class, MemberRegisterer::EVENT_AFTER_REGISTERING, function () {
+            $this->eventsRaised[MemberRegisterer::EVENT_AFTER_REGISTERING] = true;
         });
 
         $data = [
@@ -76,8 +76,8 @@ class RegistrationTest extends DbTestCase
             'slug' => $member->slug,
         ]);
 
-        $this->assertArrayHasKey(Registration::EVENT_BEFORE_REGISTERING, $this->eventsRaised);
-        $this->assertArrayHasKey(Registration::EVENT_AFTER_REGISTERING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberRegisterer::EVENT_BEFORE_REGISTERING, $this->eventsRaised);
+        $this->assertArrayHasKey(MemberRegisterer::EVENT_AFTER_REGISTERING, $this->eventsRaised);
     }
 
     public function testRegisterWithSlug(): void
@@ -102,7 +102,7 @@ class RegistrationTest extends DbTestCase
         $handler = static function ($event) {
             $event->canRegister = false;
         };
-        Event::on(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
+        Event::on(MemberRegisterer::class, MemberRegisterer::EVENT_BEFORE_REGISTERING, $handler);
 
         $data = [
             'user_id' => '101',
@@ -112,7 +112,7 @@ class RegistrationTest extends DbTestCase
 
         $this->assertEmpty(MemberRepo::findOne(['username' => 'notestname']));
 
-        Event::off(Registration::class, Registration::EVENT_BEFORE_REGISTERING, $handler);
+        Event::off(MemberRegisterer::class, MemberRegisterer::EVENT_BEFORE_REGISTERING, $handler);
     }
 
     public function testRegisterLoadFalse(): void
@@ -122,7 +122,7 @@ class RegistrationTest extends DbTestCase
 
     public function testFailedRegister(): void
     {
-        $this->assertFalse((new Registration())->register()->result);
+        $this->assertFalse((new MemberRegisterer())->register()->result);
     }
 
     /**
@@ -135,6 +135,6 @@ class RegistrationTest extends DbTestCase
             'user_id' => 'registration.user.id',
             'username' => 'registration.username',
             'slug' => 'registration.slug',
-        ], (new Registration())->attributeLabels());
+        ], (new MemberRegisterer())->attributeLabels());
     }
 }

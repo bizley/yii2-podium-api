@@ -14,8 +14,6 @@ use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\PollFormInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\PollRepo;
 use bizley\podium\api\repos\PollVoteRepo;
 use Throwable;
 use Yii;
@@ -32,10 +30,8 @@ use yii\di\Instance;
  *
  * @property PollAnswerForm[] $pollAnswers
  */
-class PollForm extends PollRepo implements PollFormInterface
+class PollForm extends Poll implements PollFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.poll.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.poll.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.poll.editing.before';
@@ -162,6 +158,15 @@ class PollForm extends PollRepo implements PollFormInterface
             'expires_at' => Yii::t('podium.label', 'poll.expires'),
             'answers' => Yii::t('podium.label', 'poll.answers'),
         ];
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
     }
 
     /**

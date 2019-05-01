@@ -7,31 +7,32 @@ namespace bizley\podium\api\interfaces;
 use bizley\podium\api\base\PodiumResponse;
 
 /**
- * Interface VoterInterface
+ * Interface GrouperInterface
  * @package bizley\podium\api\interfaces
  */
-interface VoterInterface
+interface GrouperInterface
 {
     /**
-     * Initiator of voting.
+     * Initiator of grouping.
      * @param MembershipInterface $member
      */
     public function setMember(MembershipInterface $member): void;
 
     /**
-     * Poll to vote in.
-     * @param PollModelInterface $poll
+     * Target group.
+     * @param ModelInterface $group
      */
-    public function setPoll(PollModelInterface $poll): void;
+    public function setGroup(ModelInterface $group): void;
 
     /**
-     * Answers to vote for.
-     * @param PollAnswerModelInterface[] $answers
-     */
-    public function setAnswers(array $answers): void;
-
-    /**
+     * Joins group.
      * @return PodiumResponse
      */
-    public function vote(): PodiumResponse;
+    public function join(): PodiumResponse;
+
+    /**
+     * Leaves group.
+     * @return PodiumResponse
+     */
+    public function leave(): PodiumResponse;
 }

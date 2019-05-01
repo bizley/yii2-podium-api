@@ -66,9 +66,9 @@ interface ForumInterface
     public function remove(int $id): PodiumResponse;
 
     /**
-     * @return SortableInterface
+     * @return SorterInterface
      */
-    public function getSorter(): SortableInterface;
+    public function getSorter(): SorterInterface;
 
     /**
      * Sorts forums.

@@ -9,7 +9,6 @@ use bizley\podium\api\events\MoveEvent;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\forum\Forum;
-use bizley\podium\api\repos\ThreadRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -20,30 +19,27 @@ use yii\db\Exception;
  * Class ThreadMover
  * @package bizley\podium\api\models\thread
  */
-class ThreadMover extends ThreadRepo implements MoverInterface
+class ThreadMover extends Thread implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.thread.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
     /**
-     * @param int $modelId
-     * @return MoverInterface|null
-     */
-    public static function findById(int $modelId): ?MoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
-
-    /**
      * @param ModelInterface $forum
+     * @throws Exception
      */
-    public function setForum(ModelInterface $forum): void
+    public function prepareForum(ModelInterface $forum): void
     {
         $this->fetchOldForumModel();
         $this->setNewForumModel($forum);
 
         $this->forum_id = $forum->getId();
-        $this->category_id = $forum->getParent()->getId();
+
+        $category = $forum->getParent();
+        if ($category === null) {
+            throw new Exception('Can not find parent category!');
+        }
+        $this->category_id = $category->getId();
     }
 
     private $_newForum;
@@ -153,7 +149,7 @@ class ThreadMover extends ThreadRepo implements MoverInterface
      * @param ModelInterface $category
      * @throws NotSupportedException
      */
-    public function setCategory(ModelInterface $category): void
+    public function prepareCategory(ModelInterface $category): void
     {
         throw new NotSupportedException('Thread target category can not be set directly.');
     }
@@ -162,7 +158,7 @@ class ThreadMover extends ThreadRepo implements MoverInterface
      * @param ModelInterface $thread
      * @throws NotSupportedException
      */
-    public function setThread(ModelInterface $thread): void
+    public function prepareThread(ModelInterface $thread): void
     {
         throw new NotSupportedException('Thread can not be moved to a Thread.');
     }

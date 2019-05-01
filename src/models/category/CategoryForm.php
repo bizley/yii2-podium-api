@@ -8,8 +8,6 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\CategoryRepo;
 use Yii;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
@@ -18,10 +16,8 @@ use yii\behaviors\TimestampBehavior;
  * Class CategoryForm
  * @package bizley\podium\api\models\category
  */
-class CategoryForm extends CategoryRepo implements AuthoredFormInterface
+class CategoryForm extends Category implements AuthoredFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.category.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.category.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.category.editing.before';
@@ -81,6 +77,15 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeCreate(): bool
@@ -102,6 +107,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while creating category', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -137,6 +143,7 @@ class CategoryForm extends CategoryRepo implements AuthoredFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing category', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

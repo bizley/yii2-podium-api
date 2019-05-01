@@ -210,7 +210,7 @@ class PostMoverTest extends DbTestCase
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new PostMover())->setCategory(Category::findOne(1));
+        (new PostMover())->prepareCategory(Category::findOne(1));
     }
 
     /**
@@ -219,6 +219,6 @@ class PostMoverTest extends DbTestCase
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new PostMover())->setForum(Forum::findOne(1));
+        (new PostMover())->prepareForum(Forum::findOne(1));
     }
 }

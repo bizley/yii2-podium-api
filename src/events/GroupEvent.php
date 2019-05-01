@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\GroupingInterface;
+use bizley\podium\api\interfaces\GrouperInterface;
 use yii\base\Event;
 
 /**
@@ -24,7 +24,7 @@ class GroupEvent extends Event
     public $canLeave = true;
 
     /**
-     * @var GroupingInterface
+     * @var GrouperInterface
      */
     public $model;
 }

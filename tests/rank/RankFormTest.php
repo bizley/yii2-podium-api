@@ -10,8 +10,8 @@ use bizley\podium\api\models\rank\RankForm;
 use bizley\podium\api\repos\RankRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
-use function time;
 use yii\helpers\ArrayHelper;
+use function time;
 
 /**
  * Class RankFormTest

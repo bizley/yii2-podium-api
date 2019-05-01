@@ -7,28 +7,18 @@ namespace bizley\podium\api\models\forum;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\repos\ForumRepo;
 use Yii;
 
 /**
  * Class ForumArchiver
  * @package bizley\podium\api\models\forum
  */
-class ForumArchiver extends ForumRepo implements ArchiverInterface
+class ForumArchiver extends Forum implements ArchiverInterface
 {
     public const EVENT_BEFORE_ARCHIVING = 'podium.forum.archiving.before';
     public const EVENT_AFTER_ARCHIVING = 'podium.forum.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.forum.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.forum.reviving.after';
-
-    /**
-     * @param int $modelId
-     * @return ArchiverInterface|null
-     */
-    public static function findById(int $modelId): ?ArchiverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -50,19 +40,21 @@ class ForumArchiver extends ForumRepo implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if ($this->archived) {
+        if ($this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'forum.already.archived'));
+
             return PodiumResponse::error($this);
         }
 
         $this->archived = true;
+
         if (!$this->save()) {
             Yii::error('Error while archiving forum', 'podium');
+
             return PodiumResponse::error($this);
         }
 
         $this->afterArchive();
-
         return PodiumResponse::success();
     }
 
@@ -91,19 +83,21 @@ class ForumArchiver extends ForumRepo implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'forum.not.archived'));
+
             return PodiumResponse::error($this);
         }
 
         $this->archived = false;
+
         if (!$this->save()) {
             Yii::error('Error while reviving forum', 'podium');
+
             return PodiumResponse::error($this);
         }
 
         $this->afterRevive();
-
         return PodiumResponse::success();
     }
 
