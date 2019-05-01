@@ -6,10 +6,8 @@ namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
-use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;
-use bizley\podium\api\repos\MessageParticipantRepo;
 use Yii;
 
 /**

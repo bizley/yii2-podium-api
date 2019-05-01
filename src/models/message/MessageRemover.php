@@ -9,8 +9,6 @@ use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageRemoverInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\MessageParticipantRepo;
 use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
@@ -20,7 +18,7 @@ use yii\db\Exception;
  * Class MessageParticipantRemover
  * @package bizley\podium\api\models\message
  */
-class MessageRemover extends MessageParticipantRepo implements MessageRemoverInterface
+class MessageRemover extends MessageParticipant implements MessageRemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.message.participant.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.message.participant.removing.after';
@@ -41,15 +39,6 @@ class MessageRemover extends MessageParticipantRepo implements MessageRemoverInt
     public function getMessageHandler(): ?ModelInterface
     {
         return $this->_messageHandler;
-    }
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
     }
 
     /**
@@ -85,7 +74,7 @@ class MessageRemover extends MessageParticipantRepo implements MessageRemoverInt
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'message.must.be.archived'));
 
             return PodiumResponse::error($this);
@@ -94,7 +83,6 @@ class MessageRemover extends MessageParticipantRepo implements MessageRemoverInt
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if ((int)static::find()->where(['message_id' => $this->message_id])->count() === 1) {
-
                 if ($this->delete() === false) {
                     Yii::error('Error while deleting message copy', 'podium');
 

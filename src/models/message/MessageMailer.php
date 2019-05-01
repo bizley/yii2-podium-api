@@ -11,8 +11,6 @@ use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\SendingInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\MessageRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -23,11 +21,8 @@ use yii\db\Exception;
  * Class MessageMailer
  * @package bizley\podium\api\models\message
  */
-class MessageMailer extends MessageRepo implements SendingInterface
+class MessageMailer extends Message implements SendingInterface
 {
-    // TODO check if findById should be not supported
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_SENDING = 'podium.message.sending.before';
     public const EVENT_AFTER_SENDING = 'podium.message.sending.after';
 
@@ -118,6 +113,15 @@ class MessageMailer extends MessageRepo implements SendingInterface
     }
 
     /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
+    }
+
+    /**
      * @return bool
      */
     public function beforeSend(): bool
@@ -137,8 +141,15 @@ class MessageMailer extends MessageRepo implements SendingInterface
             return PodiumResponse::error();
         }
 
-        if ($this->getReplyTo() && ($this->getReceiver() !== $this->getReplyTo()->getMemberId() || $this->getReplyTo()->getSideId() !== MessageSide::SENDER)) {
+        if (
+            $this->getReplyTo()
+            && (
+                $this->getReceiver() !== $this->getReplyTo()->getMemberId()
+                || $this->getReplyTo()->getSideId() !== MessageSide::SENDER
+            )
+        ) {
             $this->addError('reply_to_id', Yii::t('podium.error', 'message.wrong.reply'));
+
             return PodiumResponse::error($this);
         }
 
@@ -163,6 +174,7 @@ class MessageMailer extends MessageRepo implements SendingInterface
                 if ($repliedMessage === null) {
                     throw new Exception('Can not find message participant copy to change its status!');
                 }
+
                 if (!$repliedMessage->markReplied()->result) {
                     throw new Exception('Error while marking message participant copy as replied!');
                 }

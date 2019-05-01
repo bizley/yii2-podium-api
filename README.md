@@ -15,4 +15,4 @@
 - [x] Rank
 - [x] Group
 - [x] Poll
-- [ ] Message
+- [x] Message
