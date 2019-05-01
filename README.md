@@ -14,5 +14,5 @@
 - [x] Post
 - [x] Rank
 - [x] Group
-- [ ] Poll
+- [x] Poll
 - [ ] Message

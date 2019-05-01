@@ -7,7 +7,6 @@ namespace bizley\podium\api\models\poll;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\PollRepo;
 use Throwable;
 use Yii;
 
@@ -15,19 +14,10 @@ use Yii;
  * Class PostRemover
  * @package bizley\podium\api\models\poll
  */
-class PollRemover extends PollRepo implements RemoverInterface
+class PollRemover extends Poll implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.poll.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.poll.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -52,6 +42,7 @@ class PollRemover extends PollRepo implements RemoverInterface
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting poll', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -61,6 +52,7 @@ class PollRemover extends PollRepo implements RemoverInterface
 
         } catch (Throwable $exc) {
             Yii::error(['Exception while removing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

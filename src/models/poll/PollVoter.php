@@ -17,6 +17,7 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use yii\db\Exception;
+use function count;
 
 /**
  * Class PollVoter
@@ -92,16 +93,20 @@ class PollVoter extends Model implements VoterInterface
             return PodiumResponse::error();
         }
 
-        if (PollVoteRepo::find()->where([
+        if (
+            PollVoteRepo::find()->where([
                 'member_id' => $this->member_id,
                 'poll_id' => $this->poll_id,
-            ])->exists()) {
+            ])->exists()
+        ) {
             $this->addError('poll_id', Yii::t('podium.error', 'poll.already.voted'));
+
             return PodiumResponse::error($this);
         }
 
-        if ($this->choice_id === PollChoice::SINGLE && \count($this->answers) > 1) {
+        if ($this->choice_id === PollChoice::SINGLE && count($this->answers) > 1) {
             $this->addError('answers', Yii::t('podium.error', 'poll.one.vote.allowed'));
+
             return PodiumResponse::error($this);
         }
 
@@ -109,7 +114,6 @@ class PollVoter extends Model implements VoterInterface
         try {
             /* @var $pollAnswer PollAnswerModelInterface  */
             foreach ($this->answers as $pollAnswer) {
-
                 if (!$pollAnswer instanceof PollAnswerModelInterface) {
                     throw new InvalidArgumentException('Poll Answer must be an instance of PollAnswerModelInterface!');
                 }

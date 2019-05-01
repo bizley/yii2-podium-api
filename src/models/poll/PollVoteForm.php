@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\poll;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\repos\PollVoteRepo;
 use Yii;
 use yii\base\NotSupportedException;
@@ -67,10 +68,10 @@ class PollVoteForm extends PollVoteRepo implements ModelFormInterface
 
     /**
      * @param int $modelFormId
-     * @return ModelFormInterface|null
+     * @return ModelInterface|null
      * @throws NotSupportedException
      */
-    public static function findById(int $modelFormId): ?ModelFormInterface
+    public static function findById(int $modelFormId): ?ModelInterface
     {
         throw new NotSupportedException('Use PostPollForm to find poll.');
     }
