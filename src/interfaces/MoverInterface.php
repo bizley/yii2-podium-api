@@ -27,15 +27,15 @@ interface MoverInterface
     /**
      * @param ModelInterface $category
      */
-    public function setCategory(ModelInterface $category): void;
+    public function prepareCategory(ModelInterface $category): void;
 
     /**
      * @param ModelInterface $forum
      */
-    public function setForum(ModelInterface $forum): void;
+    public function prepareForum(ModelInterface $forum): void;
 
     /**
      * @param ModelInterface $thread
      */
-    public function setThread(ModelInterface $thread): void;
+    public function prepareThread(ModelInterface $thread): void;
 }

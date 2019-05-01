@@ -113,7 +113,7 @@ class ForumMoverTest extends DbTestCase
     public function testSetForum(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new ForumMover())->setForum(new Forum());
+        (new ForumMover())->prepareForum(new Forum());
     }
 
     /**
@@ -122,6 +122,6 @@ class ForumMoverTest extends DbTestCase
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new ForumMover())->setThread(new Thread());
+        (new ForumMover())->prepareThread(new Thread());
     }
 }

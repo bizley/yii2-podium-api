@@ -144,7 +144,7 @@ class ThreadMoverTest extends DbTestCase
     public function testSetCategory(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new ThreadMover())->setCategory(Category::findOne(1));
+        (new ThreadMover())->prepareCategory(Category::findOne(1));
     }
 
     /**
@@ -153,6 +153,6 @@ class ThreadMoverTest extends DbTestCase
     public function testSetThread(): void
     {
         $this->expectException(NotSupportedException::class);
-        (new ThreadMover())->setThread(Thread::findOne(1));
+        (new ThreadMover())->prepareThread(Thread::findOne(1));
     }
 }

@@ -121,8 +121,9 @@ class PostArchiver extends Post implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'post.not.archived'));
+
             return PodiumResponse::error($this);
         }
 

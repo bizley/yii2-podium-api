@@ -11,7 +11,7 @@
 - [x] Category
 - [x] Forum
 - [x] Thread
-- [ ] Post
+- [x] Post
 - [ ] Rank
 - [ ] Group
 - [ ] Poll

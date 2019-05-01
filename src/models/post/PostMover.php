@@ -11,7 +11,6 @@ use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\thread\Thread;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadRemover;
-use bizley\podium\api\repos\PostRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -22,32 +21,33 @@ use yii\db\Exception;
  * Class PostMover
  * @package bizley\podium\api\models\post
  */
-class PostMover extends PostRepo implements MoverInterface
+class PostMover extends Post implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.post.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.post.moving.after';
 
     /**
-     * @param int $modelId
-     * @return MoverInterface|null
-     */
-    public static function findById(int $modelId): ?MoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
-
-    /**
      * @param ModelInterface $thread
+     * @throws Exception
      */
-    public function setThread(ModelInterface $thread): void
+    public function prepareThread(ModelInterface $thread): void
     {
         $this->fetchOldThreadModel();
         $this->setNewThreadModel($thread);
 
         $this->thread_id = $thread->getId();
+
         $forum = $thread->getParent();
+        if ($forum === null) {
+            throw new Exception('Can not find parent forum!');
+        }
         $this->forum_id = $forum->getId();
-        $this->category_id = $forum->getParent()->getId();
+
+        $category = $forum->getParent();
+        if ($category === null) {
+            throw new Exception('Can not find parent category!');
+        }
+        $this->category_id = $category->getId();
     }
 
     private $_newThread;
@@ -124,14 +124,21 @@ class PostMover extends PostRepo implements MoverInterface
             if (!$this->getOldThreadModel()->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating old thread counters!');
             }
-            if (!$this->getOldThreadModel()->getParent()->updateCounters(['posts_count' => -1])) {
+
+            $oldForum = $this->getOldThreadModel()->getParent();
+            if ($oldForum === null) {
+                throw new Exception('Can not find old parent forum!');
+            }
+            if (!$oldForum->updateCounters(['posts_count' => -1])) {
                 throw new Exception('Error while updating old forum counters!');
             }
+
             if ($this->getOldThreadModel()->getPostsCount() === 0) {
                 $threadArchiver = $this->getOldThreadModel()->convert(ThreadArchiver::class);
                 if (!$threadArchiver->archive()) {
                     throw new Exception('Error while archiving old empty thread!');
                 }
+
                 $threadRemover = $this->getOldThreadModel()->convert(ThreadRemover::class);
                 $threadRemover->archived = true;
                 if (!$threadRemover->remove()->result) {
@@ -142,7 +149,12 @@ class PostMover extends PostRepo implements MoverInterface
             if (!$this->getNewThreadModel()->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating new thread counters!');
             }
-            if (!$this->getNewThreadModel()->getParent()->updateCounters(['posts_count' => 1])) {
+
+            $newForum = $this->getNewThreadModel()->getParent();
+            if ($newForum === null) {
+                throw new Exception('Can not find new parent forum!');
+            }
+            if (!$newForum->updateCounters(['posts_count' => 1])) {
                 throw new Exception('Error while updating new forum counters!');
             }
 
@@ -168,7 +180,7 @@ class PostMover extends PostRepo implements MoverInterface
      * @param ModelInterface $category
      * @throws NotSupportedException
      */
-    public function setCategory(ModelInterface $category): void
+    public function prepareCategory(ModelInterface $category): void
     {
         throw new NotSupportedException('Post target category can not be set directly.');
     }
@@ -177,7 +189,7 @@ class PostMover extends PostRepo implements MoverInterface
      * @param ModelInterface $forum
      * @throws NotSupportedException
      */
-    public function setForum(ModelInterface $forum): void
+    public function prepareForum(ModelInterface $forum): void
     {
         throw new NotSupportedException('Post target forum can not be set directly.');
     }

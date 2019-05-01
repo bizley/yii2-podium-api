@@ -28,7 +28,7 @@ class ThreadMover extends Thread implements MoverInterface
      * @param ModelInterface $forum
      * @throws Exception
      */
-    public function setForum(ModelInterface $forum): void
+    public function prepareForum(ModelInterface $forum): void
     {
         $this->fetchOldForumModel();
         $this->setNewForumModel($forum);
@@ -149,7 +149,7 @@ class ThreadMover extends Thread implements MoverInterface
      * @param ModelInterface $category
      * @throws NotSupportedException
      */
-    public function setCategory(ModelInterface $category): void
+    public function prepareCategory(ModelInterface $category): void
     {
         throw new NotSupportedException('Thread target category can not be set directly.');
     }
@@ -158,7 +158,7 @@ class ThreadMover extends Thread implements MoverInterface
      * @param ModelInterface $thread
      * @throws NotSupportedException
      */
-    public function setThread(ModelInterface $thread): void
+    public function prepareThread(ModelInterface $thread): void
     {
         throw new NotSupportedException('Thread can not be moved to a Thread.');
     }

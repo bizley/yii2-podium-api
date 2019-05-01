@@ -9,8 +9,6 @@ use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\models\ModelFormTrait;
-use bizley\podium\api\repos\PostRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
@@ -22,10 +20,8 @@ use function time;
  * Class PostForm
  * @package bizley\podium\api\models\post
  */
-class PostForm extends PostRepo implements CategorisedFormInterface
+class PostForm extends Post implements CategorisedFormInterface
 {
-    use ModelFormTrait;
-
     public const EVENT_BEFORE_CREATING = 'podium.post.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.post.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.post.editing.before';
@@ -41,15 +37,26 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
     /**
      * @param ModelInterface $thread
+     * @throws Exception
      */
     public function setThread(ModelInterface $thread): void
     {
         $this->setThreadModel($thread);
-        $this->setForumModel($thread->getParent());
+
+        $forum = $thread->getParent();
+        if ($forum === null) {
+            throw new Exception('Can not find parent forum!');
+        }
+        $this->setForumModel($forum);
 
         $this->thread_id = $thread->getId();
-        $this->forum_id = $this->getForumModel()->getId();
-        $this->category_id = $this->getForumModel()->getParent()->getId();
+        $this->forum_id = $forum->getId();
+
+        $category = $forum->getParent();
+        if ($category === null) {
+            throw new Exception('Can not find parent category!');
+        }
+        $this->category_id = $category->getId();
     }
 
     private $_thread;
@@ -113,6 +120,15 @@ class PostForm extends PostRepo implements CategorisedFormInterface
     public function attributeLabels(): array
     {
         return ['content' => Yii::t('podium.label', 'post.content')];
+    }
+
+    /**
+     * @param array $data
+     * @return bool
+     */
+    public function loadData(array $data = []): bool
+    {
+        return $this->load($data, '');
     }
 
     /**
@@ -195,6 +211,7 @@ class PostForm extends PostRepo implements CategorisedFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing post', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

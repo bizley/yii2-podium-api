@@ -245,7 +245,7 @@ class Thread extends Component implements ThreadInterface
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
 
-        $threadMover->setForum($forum);
+        $threadMover->prepareForum($forum);
 
         return $threadMover->move();
     }

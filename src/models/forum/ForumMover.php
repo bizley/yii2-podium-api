@@ -24,7 +24,7 @@ class ForumMover extends Forum implements MoverInterface
     /**
      * @param ModelInterface $category
      */
-    public function setCategory(ModelInterface $category): void
+    public function prepareCategory(ModelInterface $category): void
     {
         $this->category_id = $category->getId();
     }
@@ -77,7 +77,7 @@ class ForumMover extends Forum implements MoverInterface
      * @param ModelInterface $forum
      * @throws NotSupportedException
      */
-    public function setForum(ModelInterface $forum): void
+    public function prepareForum(ModelInterface $forum): void
     {
         throw new NotSupportedException('Forum can not be moved to a Forum.');
     }
@@ -86,7 +86,7 @@ class ForumMover extends Forum implements MoverInterface
      * @param ModelInterface $thread
      * @throws NotSupportedException
      */
-    public function setThread(ModelInterface $thread): void
+    public function prepareThread(ModelInterface $thread): void
     {
         throw new NotSupportedException('Forum can not be moved to a Thread.');
     }

@@ -248,7 +248,7 @@ class Forum extends Component implements ForumInterface
             throw new ModelNotFoundException('Forum of given ID can not be found.');
         }
 
-        $forumMover->setCategory($category);
+        $forumMover->prepareCategory($category);
 
         return $forumMover->move();
     }
