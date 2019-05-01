@@ -55,6 +55,7 @@ class CategoryArchiver extends Category implements ArchiverInterface
         }
 
         $this->afterArchive();
+
         return PodiumResponse::success();
     }
 
@@ -98,6 +99,7 @@ class CategoryArchiver extends Category implements ArchiverInterface
         }
 
         $this->afterRevive();
+
         return PodiumResponse::success();
     }
 

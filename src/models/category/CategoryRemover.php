@@ -7,26 +7,17 @@ namespace bizley\podium\api\models\category;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repos\CategoryRepo;
+use Throwable;
 use Yii;
 
 /**
  * Class ForumRemover
  * @package bizley\podium\api\models\category
  */
-class CategoryRemover extends CategoryRepo implements RemoverInterface
+class CategoryRemover extends Category implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.category.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.category.removing.after';
-
-    /**
-     * @param int $modelId
-     * @return RemoverInterface|null
-     */
-    public static function findById(int $modelId): ?RemoverInterface
-    {
-        return static::findOne(['id' => $modelId]);
-    }
 
     /**
      * @return bool
@@ -48,14 +39,16 @@ class CategoryRemover extends CategoryRepo implements RemoverInterface
             return PodiumResponse::error();
         }
 
-        if (!$this->archived) {
+        if (!$this->isArchived()) {
             $this->addError('archived', Yii::t('podium.error', 'category.must.be.archived'));
+
             return PodiumResponse::error($this);
         }
 
         try {
             if ($this->delete() === false) {
                 Yii::error('Error while deleting category', 'podium');
+
                 return PodiumResponse::error();
             }
 
@@ -63,8 +56,9 @@ class CategoryRemover extends CategoryRepo implements RemoverInterface
 
             return PodiumResponse::success();
 
-        } catch (\Throwable $exc) {
+        } catch (Throwable $exc) {
             Yii::error(['Exception while removing category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

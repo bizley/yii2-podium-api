@@ -79,6 +79,7 @@ class CategorySorter extends CategoryRepo implements SortableInterface
 
         if (!$this->validate()) {
             Yii::warning(['Categories sort validation failed', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -86,10 +87,12 @@ class CategorySorter extends CategoryRepo implements SortableInterface
         try {
             $nextOrder = 0;
             foreach ($this->sortOrder as $categoryId) {
-                if (static::updateAll([
+                if (
+                    static::updateAll([
                         'sort' => $nextOrder,
                         'updated_at' => time(),
-                    ], ['id' => $categoryId]) > 0) {
+                    ], ['id' => $categoryId]) > 0
+                ) {
                     $nextOrder++;
                 }
             }

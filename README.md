@@ -6,9 +6,9 @@
 
 ## COMPONENTS:
 
-- [ ] Account - other components need to be connected 
 - [x] Member
-- [ ] Category
+- [ ] Account - other components need to be connected 
+- [x] Category
 - [ ] Forum
 - [ ] Thread
 - [ ] Post
