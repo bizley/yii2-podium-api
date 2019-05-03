@@ -13,6 +13,7 @@ use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\di\Instance;
 
 /**
  * Class MessageParticipantRemover
@@ -23,22 +24,20 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
     public const EVENT_BEFORE_REMOVING = 'podium.message.participant.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.message.participant.removing.after';
 
-    private $_messageHandler;
+    /**
+     * @var string|array|ModelInterface message handler
+     * Component ID, class, configuration array, or instance of ModelInterface.
+     */
+    public $messageHandler = \bizley\podium\api\models\message\Message::class;
 
     /**
-     * @param ModelInterface $messageHandler
+     * @throws InvalidConfigException
      */
-    public function setMessageHandler(ModelInterface $messageHandler): void
+    public function init(): void
     {
-        $this->_messageHandler = $messageHandler;
-    }
+        parent::init();
 
-    /**
-     * @return ModelInterface|null
-     */
-    public function getMessageHandler(): ?ModelInterface
-    {
-        return $this->_messageHandler;
+        $this->messageHandler = Instance::ensure($this->messageHandler, ModelInterface::class);
     }
 
     /**
@@ -89,11 +88,7 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
                     throw new Exception('Error while deleting message copy!');
                 }
 
-                $messageClass = $this->getMessageHandler();
-
-                if ($messageClass === null) {
-                    throw new InvalidConfigException('MessageHandler must be set in order to remove message completely.');
-                }
+                $messageClass = $this->messageHandler;
 
                 $messageRepo = $messageClass::findById($this->message_id);
                 if ($messageRepo === null || $messageRepo->delete() === false) {

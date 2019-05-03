@@ -6,16 +6,15 @@ namespace bizley\podium\api\models\message;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MessageStatus;
-use bizley\podium\api\interfaces\ModelFormInterface;
+use bizley\podium\api\interfaces\MessageFormInterface;
 use Yii;
-use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 
 /**
  * Class PollAnswerForm
  * @package bizley\podium\api\models\message
  */
-class MessageForm extends MessageParticipant implements ModelFormInterface
+class MessageForm extends MessageParticipant implements MessageFormInterface
 {
     /**
      * @return array
@@ -26,17 +25,6 @@ class MessageForm extends MessageParticipant implements ModelFormInterface
     }
 
     /**
-     * Loads form data.
-     * @param array|null $data form data
-     * @return bool
-     * @throws NotSupportedException
-     */
-    public function loadData(?array $data = null): bool
-    {
-        throw new NotSupportedException('Use MessageSender to create message participant copy.');
-    }
-
-    /**
      * Creates new model.
      * @return PodiumResponse
      */
@@ -44,6 +32,7 @@ class MessageForm extends MessageParticipant implements ModelFormInterface
     {
         if (!$this->save(false)) {
             Yii::error('Error while creating message participant copy', 'podium');
+
             return PodiumResponse::error();
         }
 
@@ -59,6 +48,7 @@ class MessageForm extends MessageParticipant implements ModelFormInterface
 
         if (!$this->save(false)) {
             Yii::error('Error while marking message participant copy as read', 'podium');
+
             return PodiumResponse::error();
         }
 
@@ -74,6 +64,7 @@ class MessageForm extends MessageParticipant implements ModelFormInterface
 
         if (!$this->save(false)) {
             Yii::error(['Error while marking message participant copy as replied', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 
@@ -81,12 +72,47 @@ class MessageForm extends MessageParticipant implements ModelFormInterface
     }
 
     /**
-     * Updates model.
-     * @return PodiumResponse
-     * @throws NotSupportedException
+     * @param int $senderId
+     * @param int $replyId
+     * @return MessageFormInterface|null
      */
-    public function edit(): PodiumResponse
+    public function findMessageToReply(int $senderId, int $replyId): ?MessageFormInterface
     {
-        throw new NotSupportedException('Message participant copy can not be updated.');
+        return static::findOne([
+            'member_id' => $senderId,
+            'message_id' => $replyId,
+        ]);
+    }
+
+    /**
+     * @param int $senderId
+     */
+    public function setSenderId(int $senderId): void
+    {
+        $this->member_id = $senderId;
+    }
+
+    /**
+     * @param int $messageId
+     */
+    public function setMessageId(int $messageId): void
+    {
+        $this->message_id = $messageId;
+    }
+
+    /**
+     * @param string $statusId
+     */
+    public function setStatusId(string $statusId): void
+    {
+        $this->status_id = $statusId;
+    }
+
+    /**
+     * @param string $sideId
+     */
+    public function setSideId(string $sideId): void
+    {
+        $this->side_id = $sideId;
     }
 }

@@ -93,6 +93,7 @@ class MemberForm extends Member implements ModelFormInterface
 
         if (!$this->save()) {
             Yii::error(['Error while editing member', $this->errors], 'podium');
+
             return PodiumResponse::error($this);
         }
 

@@ -9,13 +9,16 @@ use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\events\MessageEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MessageFormInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\MessengerInterface;
 use Throwable;
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\di\Instance;
 
 /**
  * Class MessageMessenger
@@ -25,6 +28,30 @@ class MessageMessenger extends Message implements MessengerInterface
 {
     public const EVENT_BEFORE_SENDING = 'podium.message.sending.before';
     public const EVENT_AFTER_SENDING = 'podium.message.sending.after';
+
+    /**
+     * @var string|array|MessageFormInterface message form handler
+     * Component ID, class, configuration array, or instance of MessageFormInterface.
+     */
+    public $messageFormHandler = \bizley\podium\api\models\message\MessageForm::class;
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function init(): void
+    {
+        parent::init();
+
+        $this->messageFormHandler = Instance::ensure($this->messageFormHandler, MessageFormInterface::class);
+    }
+
+    /**
+     * @return MessageFormInterface
+     */
+    public function getForm(): MessageFormInterface
+    {
+        return new $this->messageFormHandler;
+    }
 
     private $_senderId;
 
@@ -166,36 +193,32 @@ class MessageMessenger extends Message implements MessengerInterface
             }
 
             if ($this->reply_to_id !== null) {
-                // TODO: make configurable
-                $repliedMessage = MessageForm::findOne([
-                    'member_id' => $this->getSender(),
-                    'message_id' => $this->reply_to_id,
-                ]);
-                if ($repliedMessage === null) {
+                $messageForm = $this->getForm();
+
+                $messageToReply = $messageForm->findMessageToReply($this->getSender(), $this->reply_to_id);
+                if ($messageToReply === null) {
                     throw new Exception('Can not find message participant copy to change its status!');
                 }
 
-                if (!$repliedMessage->markReplied()->result) {
+                if (!$messageToReply->markReplied()->result) {
                     throw new Exception('Error while marking message participant copy as replied!');
                 }
             }
 
-            $senderCopy = new MessageForm([
-                'member_id' => $this->getSender(),
-                'message_id' => $this->id,
-                'status_id' => MessageStatus::READ,
-                'side_id' => MessageSide::SENDER,
-            ]);
+            $senderCopy = $this->getForm();
+            $senderCopy->setSenderId($this->getSender());
+            $senderCopy->setMessageId($this->id);
+            $senderCopy->setStatusId(MessageStatus::READ);
+            $senderCopy->setSideId(MessageSide::SENDER);
             if (!$senderCopy->create()->result) {
                 throw new Exception('Error while creating sender message copy!');
             }
 
-            $receiverCopy = new MessageForm([
-                'member_id' => $this->getReceiver(),
-                'message_id' => $this->id,
-                'status_id' => MessageStatus::NEW,
-                'side_id' => MessageSide::RECEIVER,
-            ]);
+            $receiverCopy = $this->getForm();
+            $receiverCopy->setSenderId($this->getReceiver());
+            $receiverCopy->setMessageId($this->id);
+            $receiverCopy->setStatusId(MessageStatus::NEW);
+            $receiverCopy->setSideId(MessageSide::RECEIVER);
             if (!$receiverCopy->create()->result) {
                 throw new Exception('Error while creating receiver message copy!');
             }
@@ -235,6 +258,6 @@ class MessageMessenger extends Message implements MessengerInterface
      */
     public function create(): PodiumResponse
     {
-        throw new NotSupportedException('Use send to create message.');
+        throw new NotSupportedException('Use send() to create message.');
     }
 }

@@ -16,9 +16,4 @@ interface MessageRemoverInterface extends RemoverInterface
      * @return RemoverInterface|null
      */
     public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageRemoverInterface;
-
-    /**
-     * @param ModelInterface $messageHandler
-     */
-    public function setMessageHandler(ModelInterface $messageHandler): void;
 }

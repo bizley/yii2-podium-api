@@ -149,8 +149,6 @@ class Message extends Component implements MessageInterface
             throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
         }
 
-        $messageRemover->setMessageHandler($this->messageHandler);
-
         return $messageRemover->remove();
     }
 

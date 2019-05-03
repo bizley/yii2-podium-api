@@ -82,27 +82,6 @@ class MessageParticipantFormTest extends DbTestCase
         $this->assertEquals(MessageStatus::READ, $messageParticipantCreated->status_id);
     }
 
-    /**
-     * @throws NotSupportedException
-     */
-    public function testUpdate(): void
-    {
-        $this->expectException(NotSupportedException::class);
-        MessageForm::findOne([
-            'member_id' => 1,
-            'message_id' => 1,
-        ])->edit();
-    }
-
-    /**
-     * @throws NotSupportedException
-     */
-    public function testLoadData(): void
-    {
-        $this->expectException(NotSupportedException::class);
-        (new MessageForm())->loadData();
-    }
-
     public function testFailedCreate(): void
     {
         $mock = $this->getMockBuilder(MessageForm::class)->setMethods(['save'])->getMock();
