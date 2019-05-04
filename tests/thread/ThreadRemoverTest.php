@@ -165,4 +165,13 @@ class ThreadRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoThreadToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->remove(999);
+    }
 }

@@ -283,4 +283,28 @@ class Account extends Component implements AccountInterface
     {
         return $this->getPodium()->message->remove($id, $this->ensureMembership());
     }
+
+    /**
+     * Archives message copy.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws NoMembershipException
+     * @throws ModelNotFoundException
+     */
+    public function archiveMessage(int $id): PodiumResponse
+    {
+        return $this->getPodium()->message->archive($id, $this->ensureMembership());
+    }
+
+    /**
+     * Revives message copy.
+     * @param int $id
+     * @return PodiumResponse
+     * @throws NoMembershipException
+     * @throws ModelNotFoundException
+     */
+    public function reviveMessage(int $id): PodiumResponse
+    {
+        return $this->getPodium()->message->revive($id, $this->ensureMembership());
+    }
 }

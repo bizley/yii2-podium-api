@@ -107,6 +107,15 @@ class CategoryArchiverTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoCategoryToArchive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->category->archive(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -147,5 +156,14 @@ class CategoryArchiverTest extends DbTestCase
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->category->revive(1)->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoCategoryToRevive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->category->revive(999);
     }
 }

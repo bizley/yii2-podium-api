@@ -190,4 +190,13 @@ class MessageRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoMessageToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->message->remove(999, Member::findByUserId(1));
+    }
 }

@@ -124,4 +124,13 @@ class ForumMoverTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         (new ForumMover())->prepareThread(new Thread());
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoForumToMove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->forum->move(999, Category::findOne(2));
+    }
 }

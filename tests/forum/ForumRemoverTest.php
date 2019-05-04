@@ -11,6 +11,7 @@ use bizley\podium\api\repos\ForumRepo;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -159,9 +160,18 @@ class ForumRemoverTest extends DbTestCase
     public function testExceptionDelete(): void
     {
         $mock = $this->getMockBuilder(ForumRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
         $mock->archived = true;
 
         $this->assertFalse($mock->remove()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoForumToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->forum->remove(999);
     }
 }

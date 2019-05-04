@@ -130,6 +130,15 @@ class ThreadPinnerTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoThreadToPin(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->pin(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnpin(): void
     {
         Event::on(ThreadPinner::class, ThreadPinner::EVENT_BEFORE_UNPINNING, function () {
@@ -168,5 +177,14 @@ class ThreadPinnerTest extends DbTestCase
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->unpin()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoThreadToUnpin(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->unpin(999);
     }
 }

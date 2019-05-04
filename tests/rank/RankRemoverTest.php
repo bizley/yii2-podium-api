@@ -89,4 +89,13 @@ class RankRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoRankToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->rank->remove(999);
+    }
 }

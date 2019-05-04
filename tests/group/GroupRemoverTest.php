@@ -87,4 +87,13 @@ class GroupRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoGroupToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->group->remove(999);
+    }
 }

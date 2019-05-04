@@ -6,6 +6,7 @@ namespace bizley\podium\tests\post;
 
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\post\PostRemover;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
@@ -198,5 +199,14 @@ class PostRemoverTest extends DbTestCase
         $mock->archived = true;
 
         $this->assertFalse($mock->remove()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoPostToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->remove(999);
     }
 }

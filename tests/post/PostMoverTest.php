@@ -221,4 +221,13 @@ class PostMoverTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         (new PostMover())->prepareForum(Forum::findOne(1));
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoPostToMove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->move(999, Thread::findOne(1));
+    }
 }

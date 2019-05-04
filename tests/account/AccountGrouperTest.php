@@ -16,10 +16,10 @@ use yii\base\Event;
 use yii\db\Exception;
 
 /**
- * Class AccountGroupingTest
+ * Class AccountGrouperTest
  * @package bizley\podium\tests\account
  */
-class AccountGroupingTest extends AccountTestCase
+class AccountGrouperTest extends AccountTestCase
 {
     /**
      * @var array

@@ -8,8 +8,10 @@ use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Group;
+use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Message;
+use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
@@ -218,5 +220,15 @@ class PodiumTest extends DbTestCase
     public function testNoMembershipExcName(): void
     {
         $this->assertEquals('No Membership Exception', (new NoMembershipException())->getName());
+    }
+
+    public function testInsufficientDataExcName(): void
+    {
+        $this->assertEquals('Insufficient Data Exception', (new InsufficientDataException())->getName());
+    }
+
+    public function testModelNotFoundExcName(): void
+    {
+        $this->assertEquals('Model Not Found Exception', (new ModelNotFoundException())->getName());
     }
 }

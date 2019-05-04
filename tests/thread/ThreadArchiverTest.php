@@ -160,6 +160,15 @@ class ThreadArchiverTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoThreadToArchive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->archive(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(ThreadArchiver::class, ThreadArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -228,5 +237,14 @@ class ThreadArchiverTest extends DbTestCase
         $mock->archived = true;
 
         $this->assertFalse($mock->revive()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoThreadToRevive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->revive(999);
     }
 }

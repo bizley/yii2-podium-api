@@ -17,10 +17,10 @@ use yii\base\Event;
 use yii\db\Exception;
 
 /**
- * Class AccountLikingTest
+ * Class AccountLikerTest
  * @package bizley\podium\tests\account
  */
-class AccountLikingTest extends AccountTestCase
+class AccountLikerTest extends AccountTestCase
 {
     /**
      * @var array

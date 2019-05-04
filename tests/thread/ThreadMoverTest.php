@@ -155,4 +155,13 @@ class ThreadMoverTest extends DbTestCase
         $this->expectException(NotSupportedException::class);
         (new ThreadMover())->prepareThread(Thread::findOne(1));
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoThreadToMove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->move(999, Forum::findOne(2));
+    }
 }

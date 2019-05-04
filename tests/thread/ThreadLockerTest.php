@@ -130,6 +130,15 @@ class ThreadLockerTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoThreadToLock(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->lock(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnlock(): void
     {
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, function () {
@@ -168,5 +177,14 @@ class ThreadLockerTest extends DbTestCase
         $mock->method('save')->willReturn(false);
 
         $this->assertFalse($mock->unlock()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoThreadToUnlock(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->thread->unlock(999);
     }
 }

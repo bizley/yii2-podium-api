@@ -108,6 +108,15 @@ class MemberBanisherTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoMemberToBan(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->member->ban(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testUnban(): void
     {
         Event::on(MemberBanisher::class, MemberBanisher::EVENT_BEFORE_UNBANNING, function () {
@@ -160,5 +169,14 @@ class MemberBanisherTest extends DbTestCase
         $mock->status_id = MemberStatus::BANNED;
 
         $this->assertFalse($mock->unban()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoMemberToUnban(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->member->unban(999);
     }
 }

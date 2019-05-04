@@ -159,4 +159,13 @@ class PollRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoPollToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->poll->remove(999);
+    }
 }

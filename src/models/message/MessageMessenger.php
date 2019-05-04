@@ -180,7 +180,12 @@ class MessageMessenger extends Message implements MessengerInterface
             return PodiumResponse::error($this);
         }
 
-        $this->reply_to_id = $this->getReplyTo() ? $this->getReplyTo()->getParent()->getId() : null;
+        if ($this->getReplyTo()) {
+            $replyMessage = $this->getReplyTo()->getParent();
+            if ($replyMessage) {
+                $this->reply_to_id = $replyMessage->getId();
+            }
+        }
 
         if (!$this->validate()) {
             return PodiumResponse::error($this);

@@ -37,6 +37,12 @@ interface MemberInterface
     public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
+     * @param int $id
+     * @return ModelFormInterface|null
+     */
+    public function getForm(int $id): ?ModelFormInterface;
+
+    /**
      * Returns registration handler.
      * @return RegistererInterface
      */

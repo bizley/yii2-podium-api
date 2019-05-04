@@ -136,4 +136,18 @@ interface AccountInterface
      * @return PodiumResponse
      */
     public function removeMessage(int $id): PodiumResponse;
+
+    /**
+     * Archives message copy.
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function archiveMessage(int $id): PodiumResponse;
+
+    /**
+     * Revives message copy.
+     * @param int $id
+     * @return PodiumResponse
+     */
+    public function reviveMessage(int $id): PodiumResponse;
 }

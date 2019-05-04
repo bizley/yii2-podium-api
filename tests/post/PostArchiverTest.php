@@ -204,6 +204,15 @@ class PostArchiverTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoMessageToArchive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->archive(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(PostArchiver::class, PostArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -270,5 +279,14 @@ class PostArchiverTest extends DbTestCase
         $mock->archived = true;
 
         $this->assertFalse($mock->revive()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoMessageToRevive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->post->revive(999);
     }
 }

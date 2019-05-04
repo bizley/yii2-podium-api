@@ -139,6 +139,15 @@ class MessageArchiverTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoMessageToArchive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->message->archive(999, Member::findByUserId(1));
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(MessageArchiver::class, MessageArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -195,5 +204,14 @@ class MessageArchiverTest extends DbTestCase
         $mock->archived = true;
 
         $this->assertFalse($mock->revive()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoMessageToRevive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->message->revive(999, Member::findByUserId(1));
     }
 }

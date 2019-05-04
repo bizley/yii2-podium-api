@@ -167,4 +167,13 @@ class CategoryRemoverTest extends DbTestCase
 
         $this->assertFalse($mock->remove()->result);
     }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoCategoryToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->category->remove(999);
+    }
 }

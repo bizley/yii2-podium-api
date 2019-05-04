@@ -119,6 +119,15 @@ class ForumArchiverTest extends DbTestCase
     /**
      * @throws ModelNotFoundException
      */
+    public function testNoForumToArchive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->forum->archive(999);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
     public function testRevive(): void
     {
         Event::on(ForumArchiver::class, ForumArchiver::EVENT_BEFORE_REVIVING, function () {
@@ -159,5 +168,14 @@ class ForumArchiverTest extends DbTestCase
     public function testAlreadyRevived(): void
     {
         $this->assertFalse($this->podium()->forum->revive(1)->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoForumToRevive(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->forum->revive(999);
     }
 }

@@ -65,6 +65,16 @@ class PollTest extends DbTestCase
                 'created_at' => 1,
                 'updated_at' => 1,
             ],
+            [
+                'id' => 2,
+                'category_id' => 1,
+                'forum_id' => 1,
+                'author_id' => 1,
+                'name' => 'thread2',
+                'slug' => 'thread2',
+                'created_at' => 1,
+                'updated_at' => 1,
+            ],
         ],
         'podium_poll' => [
             [
@@ -77,7 +87,7 @@ class PollTest extends DbTestCase
             ],
             [
                 'id' => 2,
-                'thread_id' => 1,
+                'thread_id' => 2,
                 'author_id' => 1,
                 'question' => 'question2',
                 'created_at' => 1,
@@ -88,13 +98,19 @@ class PollTest extends DbTestCase
 
     public function testGetPollById(): void
     {
-        $poll = Poll::findById(1);
+        $poll = $this->podium()->poll->getById(1);
         $this->assertEquals(1, $poll->getId());
     }
 
     public function testNonExistingPoll(): void
     {
-        $this->assertEmpty(Poll::findById(999));
+        $this->assertEmpty($this->podium()->poll->getById(999));
+    }
+
+    public function testGetPollByThreadId(): void
+    {
+        $poll = $this->podium()->poll->getByThreadId(1);
+        $this->assertEquals(1, $poll->getId());
     }
 
     public function testGetPollsByFilterEmpty(): void

@@ -9,6 +9,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\MemberRemover;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
+use Exception;
 use yii\base\Event;
 
 /**
@@ -87,8 +88,17 @@ class MemberRemoverTest extends DbTestCase
     public function testExceptionRemove(): void
     {
         $mock = $this->getMockBuilder(MemberRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new \Exception()));
+        $mock->method('delete')->will($this->throwException(new Exception()));
 
         $this->assertFalse($mock->remove()->result);
+    }
+
+    /**
+     * @throws ModelNotFoundException
+     */
+    public function testNoMemberToRemove(): void
+    {
+        $this->expectException(ModelNotFoundException::class);
+        $this->podium()->member->remove(999);
     }
 }

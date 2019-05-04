@@ -154,16 +154,12 @@ class Member extends Component implements MemberInterface
     }
 
     /**
-     * @param int|null $id
+     * @param int $id
      * @return ModelFormInterface|null
      */
-    public function getForm(?int $id = null): ?ModelFormInterface
+    public function getForm(int $id): ?ModelFormInterface
     {
         $handler = $this->formHandler;
-
-        if ($id === null) {
-            return new $handler;
-        }
 
         return $handler::findById($id);
     }
