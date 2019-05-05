@@ -6,8 +6,11 @@ namespace bizley\podium\tests\post;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\post\Post;
+use bizley\podium\api\models\post\PostRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -94,6 +97,7 @@ class PostTest extends DbTestCase
     {
         $post = $this->podium()->post->getById(1);
         $this->assertEquals(1, $post->getId());
+        $this->assertEquals(1, $post->getCreatedAt());
     }
 
     public function testNonExistingPost(): void
@@ -123,6 +127,20 @@ class PostTest extends DbTestCase
         $this->assertEquals([2], $posts->getKeys());
     }
 
+    public function testGetPostsByFilterWithSorter(): void
+    {
+        $posts = $this->podium()->post->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $posts->getTotalCount());
+        $this->assertEquals([2, 1], $posts->getKeys());
+    }
+
+    public function testGetPostsByFilterWithPagination(): void
+    {
+        $posts = $this->podium()->post->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $posts->getTotalCount());
+        $this->assertEquals([1], $posts->getKeys());
+    }
+
     /**
      * @throws NotSupportedException
      */
@@ -130,5 +148,24 @@ class PostTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Post())->getPostsCount();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $post = Post::findById(1);
+        $this->assertInstanceOf(PostRemover::class, $post->convert(PostRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $post = Post::findById(1);
+        $post->convert('stdClass');
     }
 }

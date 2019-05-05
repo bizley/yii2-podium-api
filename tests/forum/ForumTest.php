@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\tests\forum;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\forum\Forum;
+use bizley\podium\api\models\forum\ForumRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -71,6 +75,7 @@ class ForumTest extends DbTestCase
     {
         $forum = $this->podium()->forum->getById(1);
         $this->assertEquals(1, $forum->getId());
+        $this->assertEquals(1, $forum->getCreatedAt());
     }
 
     public function testNonExistingForum(): void
@@ -100,6 +105,20 @@ class ForumTest extends DbTestCase
         $this->assertEquals([2], $forums->getKeys());
     }
 
+    public function testGetForumsByFilterWithSorter(): void
+    {
+        $forums = $this->podium()->forum->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $forums->getTotalCount());
+        $this->assertEquals([2, 1], $forums->getKeys());
+    }
+
+    public function testGetForumsByFilterWithPagination(): void
+    {
+        $forums = $this->podium()->forum->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $forums->getTotalCount());
+        $this->assertEquals([1], $forums->getKeys());
+    }
+
     public function testGetPostsCount(): void
     {
         $this->assertEquals(5, $this->podium()->forum->getById(1)->getPostsCount());
@@ -109,5 +128,24 @@ class ForumTest extends DbTestCase
     {
         $this->assertFalse($this->podium()->forum->getById(1)->isArchived());
         $this->assertTrue($this->podium()->forum->getById(2)->isArchived());
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $category = Forum::findById(1);
+        $this->assertInstanceOf(ForumRemover::class, $category->convert(ForumRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $category = Forum::findById(1);
+        $category->convert('stdClass');
     }
 }

@@ -6,8 +6,11 @@ namespace bizley\podium\tests\member;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
+use bizley\podium\api\models\member\MemberRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -115,6 +118,7 @@ class MemberTest extends DbTestCase
     {
         $member = $this->podium()->member->getById(2);
         $this->assertEquals(2, $member->getId());
+        $this->assertEquals(1, $member->getCreatedAt());
     }
 
     public function testGetMemberByUserId(): void
@@ -150,6 +154,20 @@ class MemberTest extends DbTestCase
         $this->assertEquals([3], $members->getKeys());
     }
 
+    public function testGetMembersByFilterWithSorter(): void
+    {
+        $members = $this->podium()->member->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $members->getTotalCount());
+        $this->assertEquals([3, 2], $members->getKeys());
+    }
+
+    public function testGetMembersByFilterWithPagination(): void
+    {
+        $members = $this->podium()->member->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $members->getTotalCount());
+        $this->assertEquals([2], $members->getKeys());
+    }
+
     public function testGetPostsCount(): void
     {
         $member = $this->podium()->member->getById(2);
@@ -178,5 +196,24 @@ class MemberTest extends DbTestCase
     {
         $member = $this->podium()->member->getById(3);
         $this->assertEquals('member3', $member->getUsername());
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $member = Member::findById(2);
+        $this->assertInstanceOf(MemberRemover::class, $member->convert(MemberRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $member = Member::findById(2);
+        $member->convert('stdClass');
     }
 }

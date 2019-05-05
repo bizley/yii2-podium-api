@@ -6,8 +6,11 @@ namespace bizley\podium\tests\poll;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\poll\Poll;
+use bizley\podium\api\models\poll\PollRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -100,6 +103,7 @@ class PollTest extends DbTestCase
     {
         $poll = $this->podium()->poll->getById(1);
         $this->assertEquals(1, $poll->getId());
+        $this->assertEquals(1, $poll->getCreatedAt());
     }
 
     public function testNonExistingPoll(): void
@@ -135,6 +139,20 @@ class PollTest extends DbTestCase
         $this->assertEquals([2], $polls->getKeys());
     }
 
+    public function testGetPollsByFilterWithSorter(): void
+    {
+        $polls = Poll::findByFilter(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $polls->getTotalCount());
+        $this->assertEquals([2, 1], $polls->getKeys());
+    }
+
+    public function testGetPollsByFilterWithPagination(): void
+    {
+        $polls = Poll::findByFilter(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $polls->getTotalCount());
+        $this->assertEquals([1], $polls->getKeys());
+    }
+
     /**
      * @throws NotSupportedException
      */
@@ -142,5 +160,24 @@ class PollTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Poll())->getPostsCount();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $poll = Poll::findById(1);
+        $this->assertInstanceOf(PollRemover::class, $poll->convert(PollRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $poll = Poll::findById(1);
+        $poll->convert('stdClass');
     }
 }

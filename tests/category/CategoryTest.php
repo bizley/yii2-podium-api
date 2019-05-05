@@ -6,8 +6,12 @@ namespace bizley\podium\tests\category;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\category\Category;
+use bizley\podium\api\models\category\CategoryRemover;
+use bizley\podium\api\models\forum\ForumMover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -58,6 +62,7 @@ class CategoryTest extends DbTestCase
     {
         $category = $this->podium()->category->getById(1);
         $this->assertEquals(1, $category->getId());
+        $this->assertEquals(1, $category->getCreatedAt());
     }
 
     public function testNonExistingCategory(): void
@@ -87,6 +92,20 @@ class CategoryTest extends DbTestCase
         $this->assertEquals([2], $categories->getKeys());
     }
 
+    public function testGetCategoriesByFilterWithSorter(): void
+    {
+        $categories = $this->podium()->category->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $categories->getTotalCount());
+        $this->assertEquals([2, 1], $categories->getKeys());
+    }
+
+    public function testGetCategoriesByFilterWithPagination(): void
+    {
+        $categories = $this->podium()->category->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $categories->getTotalCount());
+        $this->assertEquals([1], $categories->getKeys());
+    }
+
     /**
      * @throws NotSupportedException
      */
@@ -109,5 +128,24 @@ class CategoryTest extends DbTestCase
     {
         $this->assertTrue($this->podium()->category->getById(1)->isArchived());
         $this->assertFalse($this->podium()->category->getById(2)->isArchived());
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $category = Category::findById(1);
+        $this->assertInstanceOf(CategoryRemover::class, $category->convert(CategoryRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $category = Category::findById(1);
+        $category->convert('stdClass');
     }
 }

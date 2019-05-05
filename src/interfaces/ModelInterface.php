@@ -38,7 +38,7 @@ interface ModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return DataProviderInterface
      */
-    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * @return ModelInterface|null

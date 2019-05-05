@@ -17,6 +17,7 @@ use yii\data\Pagination;
 use yii\data\Sort;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+use function method_exists;
 
 /**
  * Class Member
@@ -142,7 +143,7 @@ class Member extends MemberRepo implements MembershipInterface
         /* @var $targetModel ActiveRecord */
         $targetModel = new $targetClass;
 
-        if (static::tableName() !== $targetModel::tableName()) {
+        if (!method_exists($targetModel, 'tableName') || static::tableName() !== $targetModel::tableName()) {
             throw new InvalidArgumentException('You can only convert object extending the same repository.');
         }
 

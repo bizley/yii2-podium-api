@@ -113,6 +113,14 @@ class CategoryArchiverTest extends DbTestCase
         $this->podium()->category->archive(999);
     }
 
+    public function testFailedArchive(): void
+    {
+        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->archive()->result);
+    }
+
     /**
      * @throws ModelNotFoundException
      */
@@ -165,5 +173,14 @@ class CategoryArchiverTest extends DbTestCase
     {
         $this->expectException(ModelNotFoundException::class);
         $this->podium()->category->revive(999);
+    }
+
+    public function testFailedRevive(): void
+    {
+        $mock = $this->getMockBuilder(CategoryArchiver::class)->setMethods(['save'])->getMock();
+        $mock->archived = true;
+        $mock->method('save')->willReturn(false);
+
+        $this->assertFalse($mock->revive()->result);
     }
 }

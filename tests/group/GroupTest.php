@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\tests\group;
 
 use bizley\podium\api\models\group\Group;
+use bizley\podium\api\models\group\GroupRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -40,6 +43,7 @@ class GroupTest extends DbTestCase
     {
         $group = $this->podium()->group->getById(1);
         $this->assertEquals(1, $group->getId());
+        $this->assertEquals(1, $group->getCreatedAt());
     }
 
     public function testNonExistingGroup(): void
@@ -69,6 +73,20 @@ class GroupTest extends DbTestCase
         $this->assertEquals([2], $groups->getKeys());
     }
 
+    public function testGetGroupsByFilterWithSorter(): void
+    {
+        $groups = $this->podium()->group->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $groups->getTotalCount());
+        $this->assertEquals([2, 1], $groups->getKeys());
+    }
+
+    public function testGetGroupsByFilterWithPagination(): void
+    {
+        $groups = $this->podium()->group->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $groups->getTotalCount());
+        $this->assertEquals([1], $groups->getKeys());
+    }
+
     /**
      * @throws NotSupportedException
      */
@@ -94,5 +112,24 @@ class GroupTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Group())->isArchived();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $group = Group::findById(1);
+        $this->assertInstanceOf(GroupRemover::class, $group->convert(GroupRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $group = Group::findById(1);
+        $group->convert('stdClass');
     }
 }

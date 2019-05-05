@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\tests\rank;
 
 use bizley\podium\api\models\rank\Rank;
+use bizley\podium\api\models\rank\RankRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -42,6 +45,7 @@ class RankTest extends DbTestCase
     {
         $rank = $this->podium()->rank->getById(1);
         $this->assertEquals(1, $rank->getId());
+        $this->assertEquals(1, $rank->getCreatedAt());
     }
 
     public function testNonExistingRank(): void
@@ -71,6 +75,20 @@ class RankTest extends DbTestCase
         $this->assertEquals([2], $ranks->getKeys());
     }
 
+    public function testGetRanksByFilterWithSorter(): void
+    {
+        $ranks = $this->podium()->rank->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $ranks->getTotalCount());
+        $this->assertEquals([2, 1], $ranks->getKeys());
+    }
+
+    public function testGetRanksByFilterWithPagination(): void
+    {
+        $ranks = $this->podium()->rank->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $ranks->getTotalCount());
+        $this->assertEquals([1], $ranks->getKeys());
+    }
+
     /**
      * @throws NotSupportedException
      */
@@ -96,5 +114,24 @@ class RankTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Rank())->getParent();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $rank = Rank::findById(1);
+        $this->assertInstanceOf(RankRemover::class, $rank->convert(RankRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $rank = Rank::findById(1);
+        $rank->convert('stdClass');
     }
 }

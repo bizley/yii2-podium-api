@@ -6,8 +6,11 @@ namespace bizley\podium\tests\message;
 
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\message\Message;
+use bizley\podium\api\models\message\MessageMessenger;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 
@@ -55,6 +58,7 @@ class MessageTest extends DbTestCase
     {
         $message = $this->podium()->message->getById(1);
         $this->assertEquals(1, $message->getId());
+        $this->assertEquals(1, $message->getCreatedAt());
     }
 
     public function testNonExistingMessage(): void
@@ -82,6 +86,20 @@ class MessageTest extends DbTestCase
 
         $this->assertEquals(1, $messages->getTotalCount());
         $this->assertEquals([2], $messages->getKeys());
+    }
+
+    public function testGetMessagesByFilterWithSorter(): void
+    {
+        $messages = $this->podium()->message->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $messages->getTotalCount());
+        $this->assertEquals([2, 1], $messages->getKeys());
+    }
+
+    public function testGetMessagesByFilterWithPagination(): void
+    {
+        $messages = $this->podium()->message->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $messages->getTotalCount());
+        $this->assertEquals([1], $messages->getKeys());
     }
 
     /**
@@ -114,5 +132,24 @@ class MessageTest extends DbTestCase
     {
         $this->expectException(NotSupportedException::class);
         (new Message())->isArchived();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $message = Message::findById(1);
+        $this->assertInstanceOf(MessageMessenger::class, $message->convert(MessageMessenger::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $message = Message::findById(1);
+        $message->convert('stdClass');
     }
 }

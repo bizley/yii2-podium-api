@@ -5,8 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\tests\DbTestCase;
 use yii\base\DynamicModel;
+use yii\base\InvalidArgumentException;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataFilter;
 
 /**
@@ -80,6 +84,7 @@ class ThreadTest extends DbTestCase
     {
         $thread = $this->podium()->thread->getById(1);
         $this->assertEquals(1, $thread->getId());
+        $this->assertEquals(1, $thread->getCreatedAt());
     }
 
     public function testNonExistingThread(): void
@@ -107,5 +112,38 @@ class ThreadTest extends DbTestCase
 
         $this->assertEquals(1, $threads->getTotalCount());
         $this->assertEquals([2], $threads->getKeys());
+    }
+
+    public function testGetThreadsByFilterWithSorter(): void
+    {
+        $threads = $this->podium()->thread->getAll(null, ['defaultOrder' => ['id' => SORT_DESC]]);
+        $this->assertEquals(2, $threads->getTotalCount());
+        $this->assertEquals([2, 1], $threads->getKeys());
+    }
+
+    public function testGetThreadsByFilterWithPagination(): void
+    {
+        $threads = $this->podium()->thread->getAll(null, null, ['defaultPageSize' => 1]);
+        $this->assertEquals(2, $threads->getTotalCount());
+        $this->assertEquals([1], $threads->getKeys());
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testConvert(): void
+    {
+        $thread = Thread::findById(1);
+        $this->assertInstanceOf(ThreadRemover::class, $thread->convert(ThreadRemover::class));
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function testWrongConvert(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $thread = Thread::findById(1);
+        $thread->convert('stdClass');
     }
 }

@@ -16,6 +16,7 @@ use bizley\podium\api\interfaces\PollFormInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PollVoteRepo;
 use Throwable;
+use function time;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
@@ -136,11 +137,11 @@ class PollForm extends Poll implements PollFormInterface
         return [
             [['revealed'], 'default', 'value' => true],
             [['choice_id'], 'default', 'value' => PollChoice::SINGLE],
-            [['question', 'revealed', 'choice_id', 'expires_at', 'answers', 'content'], 'required'],
-            [['question', 'content'], 'string', 'min' => 3],
+            [['question', 'revealed', 'choice_id', 'expires_at', 'answers'], 'required'],
+            [['question'], 'string', 'min' => 3],
             [['revealed'], 'boolean'],
             [['choice_id'], 'in', 'range' => PollChoice::keys()],
-            [['expires_at'], 'integer'],
+            [['expires_at'], 'integer', 'min' => time()],
             [['answers'], 'each', 'rule' => ['string', 'min' => 3]],
         ];
     }
@@ -151,7 +152,6 @@ class PollForm extends Poll implements PollFormInterface
     public function attributeLabels(): array
     {
         return [
-            'content' => Yii::t('podium.label', 'post.content'),
             'revealed' => Yii::t('podium.label', 'poll.revealed'),
             'choice_id' => Yii::t('podium.label', 'poll.choice.type'),
             'question' => Yii::t('podium.label', 'poll.question'),
@@ -261,7 +261,7 @@ class PollForm extends Poll implements PollFormInterface
             $this->afterCreate();
             $transaction->commit();
 
-            return PodiumResponse::success();
+            return PodiumResponse::success($this->getOldAttributes());
 
         } catch (Throwable $exc) {
             $transaction->rollBack();
@@ -329,7 +329,7 @@ class PollForm extends Poll implements PollFormInterface
             $this->afterEdit();
             $transaction->commit();
 
-            return PodiumResponse::success();
+            return PodiumResponse::success($this->getOldAttributes());
 
         } catch (Throwable $exc) {
             $transaction->rollBack();
