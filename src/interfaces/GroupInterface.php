@@ -28,14 +28,14 @@ interface GroupInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns group form handler instance.
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getForm(?int $id = null): ?ModelFormInterface;
+    public function getForm(int $id = null): ?ModelFormInterface;
 
     /**
      * Creates group.

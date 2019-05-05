@@ -119,7 +119,7 @@ class Thread extends Component implements ThreadInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $threadClass = $this->modelHandler;
 
@@ -130,7 +130,7 @@ class Thread extends Component implements ThreadInterface
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForm(?int $id = null): ?CategorisedFormInterface
+    public function getForm(int $id = null): ?CategorisedFormInterface
     {
         $handler = $this->formHandler;
 

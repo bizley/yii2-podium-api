@@ -95,7 +95,7 @@ class Post extends Component implements PostInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $postClass = $this->modelHandler;
 
@@ -106,7 +106,7 @@ class Post extends Component implements PostInterface
      * @param int|null $id
      * @return CategorisedFormInterface
      */
-    public function getForm(?int $id = null): ?CategorisedFormInterface
+    public function getForm(int $id = null): ?CategorisedFormInterface
     {
         $handler = $this->formHandler;
 

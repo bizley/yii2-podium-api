@@ -82,12 +82,12 @@ class Category extends Component implements CategoryInterface
     }
 
     /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
+     * @param DataFilter|null $filter
+     * @param bool|array|Sort|null $sort
+     * @param bool|array|Pagination|null $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $categoryClass = $this->modelHandler;
 
@@ -98,7 +98,7 @@ class Category extends Component implements CategoryInterface
      * @param int|null $id
      * @return AuthoredFormInterface|null
      */
-    public function getForm(?int $id = null): ?AuthoredFormInterface
+    public function getForm(int $id = null): ?AuthoredFormInterface
     {
         $handler = $this->formHandler;
 

@@ -69,7 +69,7 @@ class Podium extends ServiceLocator
      * Podium constructor.
      * @param array $config
      */
-    public function __construct($config = [])
+    public function __construct(array $config = [])
     {
         foreach ($this->coreComponents() as $id => $component) {
             if (!isset($config['components'][$id])) {

@@ -45,7 +45,10 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
      * @param MembershipInterface $participant
      * @return MessageRemoverInterface|null
      */
-    public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageRemoverInterface
+    public static function findByMessageIdAndParticipant(
+        int $messageId,
+        MembershipInterface $participant
+    ): ?MessageRemoverInterface
     {
         return static::findOne([
             'message_id' => $messageId,

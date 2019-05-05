@@ -26,7 +26,10 @@ class MessageArchiver extends MessageParticipant implements MessageArchiverInter
      * @param MembershipInterface $participant
      * @return MessageArchiverInterface|null
      */
-    public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageArchiverInterface
+    public static function findByMessageIdAndParticipant(
+        int $messageId,
+        MembershipInterface $participant
+    ): ?MessageArchiverInterface
     {
         return static::findOne([
             'message_id' => $messageId,

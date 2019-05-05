@@ -15,5 +15,8 @@ interface MessageArchiverInterface extends ArchiverInterface
      * @param MembershipInterface $participant
      * @return RemoverInterface|null
      */
-    public static function findByMessageIdAndParticipant(int $messageId, MembershipInterface $participant): ?MessageArchiverInterface;
+    public static function findByMessageIdAndParticipant(
+        int $messageId,
+        MembershipInterface $participant
+    ): ?MessageArchiverInterface;
 }

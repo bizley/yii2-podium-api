@@ -70,7 +70,7 @@ class Rank extends Component implements RankInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $rankClass = $this->modelHandler;
 
@@ -81,7 +81,7 @@ class Rank extends Component implements RankInterface
      * @param int|null $id
      * @return ModelFormInterface|null
      */
-    public function getForm(?int $id = null): ?ModelFormInterface
+    public function getForm(int $id = null): ?ModelFormInterface
     {
         $handler = $this->formHandler;
 

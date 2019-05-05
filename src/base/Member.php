@@ -146,7 +146,7 @@ class Member extends Component implements MemberInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $membership = $this->modelHandler;
 

@@ -28,14 +28,14 @@ interface CategoryInterface
      * @param bool|array|Pagination|null $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns category form handler instance.
      * @param int|null $id
      * @return AuthoredFormInterface|null
      */
-    public function getForm(?int $id = null): ?AuthoredFormInterface;
+    public function getForm(int $id = null): ?AuthoredFormInterface;
 
     /**
      * Creates category.

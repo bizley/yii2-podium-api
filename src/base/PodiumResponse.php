@@ -30,7 +30,7 @@ class PodiumResponse extends Component
 
     /**
      * Returns successful response.
-     * @param array|null $data
+     * @param array $data
      * @return PodiumResponse
      */
     public static function success(array $data = []): PodiumResponse
@@ -46,7 +46,7 @@ class PodiumResponse extends Component
      * @param Model|null $model
      * @return PodiumResponse
      */
-    public static function error(?Model $model = null): PodiumResponse
+    public static function error(Model $model = null): PodiumResponse
     {
         return new static([
             'result' => false,

@@ -20,7 +20,7 @@ interface ModelFormInterface
 
     /**
      * Loads form data.
-     * @param array|null $data form data
+     * @param array $data form data
      * @return bool
      */
     public function loadData(array $data = []): bool;

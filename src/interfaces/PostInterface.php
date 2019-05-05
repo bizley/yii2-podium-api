@@ -28,14 +28,14 @@ interface PostInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * Returns post form handler instance.
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForm(?int $id = null): ?CategorisedFormInterface;
+    public function getForm(int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates post.

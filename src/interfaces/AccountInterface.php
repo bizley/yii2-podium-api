@@ -121,13 +121,13 @@ interface AccountInterface
      * Sends message.
      * @param array $data
      * @param MembershipInterface $receiver
-     * @param MessageParticipantModelInterface $replyTo
+     * @param MessageParticipantModelInterface|null $replyTo
      * @return PodiumResponse
      */
     public function sendMessage(
         array $data,
         MembershipInterface $receiver,
-        ?MessageParticipantModelInterface $replyTo = null
+        MessageParticipantModelInterface $replyTo = null
     ): PodiumResponse;
 
     /**

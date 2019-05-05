@@ -79,7 +79,7 @@ class Message extends Component implements MessageInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         $messageClass = $this->messageHandler;
 
@@ -99,14 +99,14 @@ class Message extends Component implements MessageInterface
      * @param array $data
      * @param MembershipInterface $sender
      * @param MembershipInterface $receiver
-     * @param MessageParticipantModelInterface $replyTo
+     * @param MessageParticipantModelInterface|null $replyTo
      * @return PodiumResponse
      */
     public function send(
         array $data,
         MembershipInterface $sender,
         MembershipInterface $receiver,
-        ?MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
+        MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
     ): PodiumResponse
     {
         $sending = $this->getMessenger();

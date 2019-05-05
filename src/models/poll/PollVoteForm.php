@@ -33,11 +33,11 @@ class PollVoteForm extends PollVoteRepo implements ModelFormInterface
 
     /**
      * Loads form data.
-     * @param array|null $data form data
+     * @param array $data form data
      * @return bool
      * @throws NotSupportedException
      */
-    public function loadData(?array $data = null): bool
+    public function loadData(array $data = []): bool
     {
         throw new NotSupportedException('Use Voting to vote in poll.');
     }

@@ -17,7 +17,7 @@ interface RegistererInterface
      * @param array|null $data account data
      * @return bool
      */
-    public function loadData(?array $data = null): bool;
+    public function loadData(array $data = []): bool;
 
     /**
      * Registers new Podium account.

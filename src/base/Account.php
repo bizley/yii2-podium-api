@@ -259,14 +259,14 @@ class Account extends Component implements AccountInterface
      * Sends message.
      * @param array $data
      * @param MembershipInterface $receiver
-     * @param MessageParticipantModelInterface $replyTo
+     * @param MessageParticipantModelInterface|null $replyTo
      * @return PodiumResponse
      * @throws NoMembershipException
      */
     public function sendMessage(
         array $data,
         MembershipInterface $receiver,
-        ?MessageParticipantModelInterface $replyTo = null
+        MessageParticipantModelInterface $replyTo = null
     ): PodiumResponse
     {
         return $this->getPodium()->message->send($data, $this->ensureMembership(), $receiver, $replyTo);

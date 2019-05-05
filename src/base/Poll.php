@@ -86,7 +86,7 @@ class Poll extends Component implements PollInterface
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForm(?int $id = null): ?CategorisedFormInterface
+    public function getForm(int $id = null): ?CategorisedFormInterface
     {
         $handler = $this->formHandler;
 

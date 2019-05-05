@@ -110,7 +110,7 @@ class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findByFilter(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
+    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
         /* @var $query ActiveQuery */
         $query = static::find();

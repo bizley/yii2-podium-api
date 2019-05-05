@@ -29,7 +29,7 @@ interface PollInterface
      * @param int|null $id
      * @return CategorisedFormInterface|null
      */
-    public function getForm(?int $id = null): ?CategorisedFormInterface;
+    public function getForm(int $id = null): ?CategorisedFormInterface;
 
     /**
      * Creates poll post.

@@ -34,7 +34,7 @@ interface MemberInterface
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
      */
-    public function getAll(?DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
 
     /**
      * @param int $id

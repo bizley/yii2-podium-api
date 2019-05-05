@@ -65,10 +65,10 @@ class MemberRegisterer extends MemberRepo implements RegistererInterface
     }
 
     /**
-     * @param array|null $data
+     * @param array $data
      * @return bool
      */
-    public function loadData(?array $data = null): bool
+    public function loadData(array $data = []): bool
     {
         return $this->load($data, '');
     }
