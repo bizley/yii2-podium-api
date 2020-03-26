@@ -1,6 +1,4 @@
-dist: trusty
-sudo: false
-group: edge
+dist: xenial
 language: php
 env:
   global:
@@ -25,10 +23,11 @@ addons:
 matrix:
   fast_finish: true
   include:
+  - php: 7.4
+    env: TASK_TESTS_COVERAGE=1
   - php: 7.3
   - php: 7.2
   - php: 7.1
-    env: TASK_TESTS_COVERAGE=1
 
 install:
 - |
@@ -52,7 +51,7 @@ before_script:
   fi
 
 script:
-- vendor/bin/phpunit --verbose $PHPUNIT_FLAGS
+- vendor/bin/phpunit -v
 
 after_script:
 - |
