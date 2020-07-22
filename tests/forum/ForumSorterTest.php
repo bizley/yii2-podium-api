@@ -113,14 +113,14 @@ class ForumSorterTest extends DbTestCase
             $this->eventsRaised[ForumSorter::EVENT_AFTER_SORTING] = true;
         });
 
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
+        self::assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
 
-        $this->assertEquals(0, ForumRepo::findOne(3)->sort);
-        $this->assertEquals(1, ForumRepo::findOne(1)->sort);
-        $this->assertEquals(2, ForumRepo::findOne(2)->sort);
+        self::assertEquals(0, ForumRepo::findOne(3)->sort);
+        self::assertEquals(1, ForumRepo::findOne(1)->sort);
+        self::assertEquals(2, ForumRepo::findOne(2)->sort);
 
-        $this->assertArrayHasKey(ForumSorter::EVENT_BEFORE_SORTING, $this->eventsRaised);
-        $this->assertArrayHasKey(ForumSorter::EVENT_AFTER_SORTING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumSorter::EVENT_BEFORE_SORTING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumSorter::EVENT_AFTER_SORTING, $this->eventsRaised);
     }
 
     public function testSortEventPreventing(): void
@@ -130,46 +130,46 @@ class ForumSorterTest extends DbTestCase
         };
         Event::on(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, $handler);
 
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
+        self::assertFalse($this->podium()->forum->sort(Category::findOne(1), [3, 1, 2])->result);
 
-        $this->assertEquals(-9, ForumRepo::findOne(3)->sort);
-        $this->assertEquals(8, ForumRepo::findOne(1)->sort);
-        $this->assertEquals(4, ForumRepo::findOne(2)->sort);
+        self::assertEquals(-9, ForumRepo::findOne(3)->sort);
+        self::assertEquals(8, ForumRepo::findOne(1)->sort);
+        self::assertEquals(4, ForumRepo::findOne(2)->sort);
 
         Event::off(ForumSorter::class, ForumSorter::EVENT_BEFORE_SORTING, $handler);
     }
 
     public function testSortLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1))->result);
+        self::assertFalse($this->podium()->forum->sort(Category::findOne(1))->result);
     }
 
     public function testSortWrongDataType(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), ['aaa'])->result);
+        self::assertFalse($this->podium()->forum->sort(Category::findOne(1), ['aaa'])->result);
     }
 
     public function testSortWrongDataId(): void
     {
-        $this->assertFalse($this->podium()->forum->sort(Category::findOne(1), [99])->result);
+        self::assertFalse($this->podium()->forum->sort(Category::findOne(1), [99])->result);
     }
 
     public function testSortForumsInWrongCategory(): void
     {
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(2), [3, 1, 2])->result);
+        self::assertTrue($this->podium()->forum->sort(Category::findOne(2), [3, 1, 2])->result);
 
-        $this->assertEquals(-9, ForumRepo::findOne(3)->sort);
-        $this->assertEquals(8, ForumRepo::findOne(1)->sort);
-        $this->assertEquals(4, ForumRepo::findOne(2)->sort);
+        self::assertEquals(-9, ForumRepo::findOne(3)->sort);
+        self::assertEquals(8, ForumRepo::findOne(1)->sort);
+        self::assertEquals(4, ForumRepo::findOne(2)->sort);
     }
 
     public function testSortWithOutsideForum(): void
     {
-        $this->assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 4])->result);
+        self::assertTrue($this->podium()->forum->sort(Category::findOne(1), [3, 1, 4])->result);
 
-        $this->assertEquals(0, ForumRepo::findOne(3)->sort);
-        $this->assertEquals(1, ForumRepo::findOne(1)->sort);
-        $this->assertEquals(100, ForumRepo::findOne(4)->sort);
+        self::assertEquals(0, ForumRepo::findOne(3)->sort);
+        self::assertEquals(1, ForumRepo::findOne(1)->sort);
+        self::assertEquals(100, ForumRepo::findOne(4)->sort);
     }
 
     /**
@@ -193,9 +193,9 @@ class ForumSorterTest extends DbTestCase
     public function testExceptionSort(): void
     {
         $mock = $this->getMockBuilder(ForumSorter::class)->setMethods(['afterSort'])->getMock();
-        $mock->method('afterSort')->will($this->throwException(new \Exception()));
+        $mock->method('afterSort')->will(self::throwException(new \Exception()));
         $mock->sortOrder = [1];
 
-        $this->assertFalse($mock->sort()->result);
+        self::assertFalse($mock->sort()->result);
     }
 }

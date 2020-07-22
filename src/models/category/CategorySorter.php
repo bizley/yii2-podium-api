@@ -22,7 +22,7 @@ class CategorySorter extends CategoryRepo implements SorterInterface
     public const EVENT_BEFORE_SORTING = 'podium.category.sorting.before';
     public const EVENT_AFTER_SORTING = 'podium.category.sorting.after';
 
-    public $sortOrder;
+    public array $sortOrder = [];
 
     /**
      * @return array
@@ -32,7 +32,7 @@ class CategorySorter extends CategoryRepo implements SorterInterface
         return [
             [['sortOrder'], 'required'],
             [['sortOrder'], 'each', 'rule' => ['integer']],
-            [['sortOrder'], 'each', 'rule' => ['exist', 'targetAttribute' => 'id']],
+            [['sortOrder'], 'each', 'rule' => ['exist', 'targetClass' => static::class, 'targetAttribute' => 'id']],
         ];
     }
 

@@ -81,14 +81,14 @@ class CategorySorterTest extends DbTestCase
             $this->eventsRaised[CategorySorter::EVENT_AFTER_SORTING] = true;
         });
 
-        $this->assertTrue($this->podium()->category->sort([3, 1, 2])->result);
+        self::assertTrue($this->podium()->category->sort([3, 1, 2])->result);
 
-        $this->assertEquals(0, CategoryRepo::findOne(3)->sort);
-        $this->assertEquals(1, CategoryRepo::findOne(1)->sort);
-        $this->assertEquals(2, CategoryRepo::findOne(2)->sort);
+        self::assertEquals(0, CategoryRepo::findOne(3)->sort);
+        self::assertEquals(1, CategoryRepo::findOne(1)->sort);
+        self::assertEquals(2, CategoryRepo::findOne(2)->sort);
 
-        $this->assertArrayHasKey(CategorySorter::EVENT_BEFORE_SORTING, $this->eventsRaised);
-        $this->assertArrayHasKey(CategorySorter::EVENT_AFTER_SORTING, $this->eventsRaised);
+        self::assertArrayHasKey(CategorySorter::EVENT_BEFORE_SORTING, $this->eventsRaised);
+        self::assertArrayHasKey(CategorySorter::EVENT_AFTER_SORTING, $this->eventsRaised);
     }
 
     public function testSortEventPreventing(): void
@@ -98,37 +98,37 @@ class CategorySorterTest extends DbTestCase
         };
         Event::on(CategorySorter::class, CategorySorter::EVENT_BEFORE_SORTING, $handler);
 
-        $this->assertFalse($this->podium()->category->sort([3, 1, 2])->result);
+        self::assertFalse($this->podium()->category->sort([3, 1, 2])->result);
 
-        $this->assertEquals(-5, CategoryRepo::findOne(3)->sort);
-        $this->assertEquals(10, CategoryRepo::findOne(1)->sort);
-        $this->assertEquals(16, CategoryRepo::findOne(2)->sort);
+        self::assertEquals(-5, CategoryRepo::findOne(3)->sort);
+        self::assertEquals(10, CategoryRepo::findOne(1)->sort);
+        self::assertEquals(16, CategoryRepo::findOne(2)->sort);
 
         Event::off(CategorySorter::class, CategorySorter::EVENT_BEFORE_SORTING, $handler);
     }
 
     public function testSortLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->category->sort()->result);
+        self::assertFalse($this->podium()->category->sort()->result);
     }
 
     public function testSortWrongDataType(): void
     {
-        $this->assertFalse($this->podium()->category->sort(['aaa'])->result);
+        self::assertFalse($this->podium()->category->sort(['aaa'])->result);
     }
 
     public function testSortWrongDataId(): void
     {
-        $this->assertFalse($this->podium()->category->sort([99])->result);
+        self::assertFalse($this->podium()->category->sort([99])->result);
     }
 
     public function testExceptionSort(): void
     {
         $mock = $this->getMockBuilder(CategorySorter::class)->setMethods(['afterSort'])->getMock();
-        $mock->method('afterSort')->will($this->throwException(new Exception()));
+        $mock->method('afterSort')->will(self::throwException(new Exception()));
         $mock->sortOrder = [1];
 
-        $this->assertFalse($mock->sort()->result);
+        self::assertFalse($mock->sort()->result);
     }
 
     /**

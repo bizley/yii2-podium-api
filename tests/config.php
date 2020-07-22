@@ -5,7 +5,7 @@
  */
 $config = [
     'mysql' => [
-        'dsn' => 'mysql:host=localhost;dbname=podiumtest',
+        'dsn' => 'mysql:host=127.0.0.1;dbname=podium',
         'username' => 'podium',
         'password' => 'podium',
         'charset' => 'utf8mb4',

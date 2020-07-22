@@ -40,7 +40,7 @@ class ForumSorter extends ForumRepo implements SorterInterface
         return [
             [['sortOrder'], 'required'],
             [['sortOrder'], 'each', 'rule' => ['integer']],
-            [['sortOrder'], 'each', 'rule' => ['exist', 'targetAttribute' => 'id']],
+            [['sortOrder'], 'each', 'rule' => ['exist', 'targetClass' => static::class, 'targetAttribute' => 'id']],
         ];
     }
 
