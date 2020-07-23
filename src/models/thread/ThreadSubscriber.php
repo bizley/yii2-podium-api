@@ -26,7 +26,7 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
     public const EVENT_AFTER_UNSUBSCRIBING = 'podium.subscription.unsubscribing.after';
 
     /**
-     * {@inheritdoc}
+     * @return array<string|int, mixed>
      */
     public function behaviors(): array
     {
@@ -35,18 +35,28 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws MissingMemberIdException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new MissingMemberIdException('No member Id provided for thread subscriber');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param ModelInterface $thread
+     * @throws MissingThreadIdException
      */
     public function setThread(ModelInterface $thread): void
     {
-        $this->thread_id = $thread->getId();
+        $threadId = $thread->getId();
+        if ($threadId === null) {
+            throw new MissingThreadIdException('No thread Id provided for thread subscriber');
+        }
+        $this->thread_id = $threadId;
     }
 
     /**
@@ -116,6 +126,7 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
             return PodiumResponse::error();
         }
 
+        /** @var ThreadSubscriber|null $subscription */
         $subscription = static::find()->where([
             'member_id' => $this->member_id,
             'thread_id' => $this->thread_id,
@@ -138,7 +149,10 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
             return PodiumResponse::success();
 
         } catch (Throwable $exc) {
-            Yii::error(['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(
+                ['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()],
+                'podium'
+            );
 
             return PodiumResponse::error();
         }
