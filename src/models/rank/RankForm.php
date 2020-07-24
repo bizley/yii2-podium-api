@@ -22,7 +22,7 @@ class RankForm extends Rank implements ModelFormInterface
     public const EVENT_AFTER_EDITING = 'podium.rank.editing.after';
 
     /**
-     * @return array
+     * @return array<string|int, mixed>
      */
     public function behaviors(): array
     {
@@ -30,7 +30,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @return array
+     * @return array<string|int, mixed>
      */
     public function rules(): array
     {
@@ -43,7 +43,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     public function attributeLabels(): array
     {
@@ -54,7 +54,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @param array $data
+     * @param array<string, mixed> $data
      * @return bool
      */
     public function loadData(array $data = []): bool
@@ -63,6 +63,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
+     * Executes before create().
      * @return bool
      */
     public function beforeCreate(): bool
@@ -74,6 +75,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
+     * Creates new rank.
      * @return PodiumResponse
      */
     public function create(): PodiumResponse
@@ -93,12 +95,16 @@ class RankForm extends Rank implements ModelFormInterface
         return PodiumResponse::success($this->getOldAttributes());
     }
 
+    /**
+     * Executes after successful create().
+     */
     public function afterCreate(): void
     {
         $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
+     * Executes before edit().
      * @return bool
      */
     public function beforeEdit(): bool
@@ -110,6 +116,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
+     * Edits the rank.
      * @return PodiumResponse
      */
     public function edit(): PodiumResponse
@@ -129,6 +136,9 @@ class RankForm extends Rank implements ModelFormInterface
         return PodiumResponse::success($this->getOldAttributes());
     }
 
+    /**
+     * Executes after successful edit().
+     */
     public function afterEdit(): void
     {
         $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));

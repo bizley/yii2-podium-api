@@ -20,6 +20,7 @@ class RankRemover extends Rank implements RemoverInterface
     public const EVENT_AFTER_REMOVING = 'podium.rank.removing.after';
 
     /**
+     * Executes before remove().
      * @return bool
      */
     public function beforeRemove(): bool
@@ -31,6 +32,7 @@ class RankRemover extends Rank implements RemoverInterface
     }
 
     /**
+     * Removes the rank.
      * @return PodiumResponse
      */
     public function remove(): PodiumResponse
@@ -57,6 +59,9 @@ class RankRemover extends Rank implements RemoverInterface
         }
     }
 
+    /**
+     * Executes after successful remove().
+     */
     public function afterRemove(): void
     {
         $this->trigger(self::EVENT_AFTER_REMOVING);
