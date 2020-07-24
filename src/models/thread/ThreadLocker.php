@@ -23,7 +23,8 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
     public const EVENT_AFTER_UNLOCKING = 'podium.thread.unlocking.after';
 
     /**
-     * @return array
+     * Adds TimestampBehavior.
+     * @return array<int|string, mixed>
      */
     public function behaviors(): array
     {
@@ -40,6 +41,7 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
     }
 
     /**
+     * Executes before lock().
      * @return bool
      */
     public function beforeLock(): bool
@@ -51,6 +53,7 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
     }
 
     /**
+     * Locks the thread.
      * @return PodiumResponse
      */
     public function lock(): PodiumResponse
@@ -72,12 +75,16 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
         return PodiumResponse::success();
     }
 
+    /**
+     * Executes after successful lock().
+     */
     public function afterLock(): void
     {
         $this->trigger(self::EVENT_AFTER_LOCKING, new LockEvent(['model' => $this]));
     }
 
     /**
+     * Executes before unlock().
      * @return bool
      */
     public function beforeUnlock(): bool
@@ -89,6 +96,7 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
     }
 
     /**
+     * Unlocks the thread.
      * @return PodiumResponse
      */
     public function unlock(): PodiumResponse
@@ -110,6 +118,9 @@ class ThreadLocker extends ThreadRepo implements LockerInterface
         return PodiumResponse::success();
     }
 
+    /**
+     * Executes after successful unlock().
+     */
     public function afterUnlock(): void
     {
         $this->trigger(self::EVENT_AFTER_UNLOCKING, new LockEvent(['model' => $this]));

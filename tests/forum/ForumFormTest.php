@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\forum\ForumForm;
@@ -17,6 +17,7 @@ use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
+
 use function array_merge;
 
 /**
@@ -86,16 +87,16 @@ class ForumFormTest extends DbTestCase
         $response = $this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1));
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $createdAt = ArrayHelper::remove($responseData, 'created_at');
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $createdAt);
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $createdAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 2,
             'category_id' => 1,
             'name' => 'forum-new',
@@ -106,7 +107,7 @@ class ForumFormTest extends DbTestCase
         ], $responseData);
 
         $forum = ForumRepo::findOne(['name' => 'forum-new']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'forum-new',
             'author_id' => 1,
             'category_id' => 1,
@@ -123,8 +124,8 @@ class ForumFormTest extends DbTestCase
             'posts_count' => $forum->posts_count,
         ]);
 
-        $this->assertArrayHasKey(ForumForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
-        $this->assertArrayHasKey(ForumForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
 
     public function testCreateWithSlug(): void
@@ -135,10 +136,10 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
+        self::assertTrue($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
 
         $forum = ForumRepo::findOne(['name' => 'forum-new-with-slug']);
-        $this->assertEquals($data, [
+        self::assertEquals($data, [
             'name' => $forum->name,
             'slug' => $forum->slug,
             'visible' => $forum->visible,
@@ -158,21 +159,21 @@ class ForumFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertFalse($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
+        self::assertFalse($this->podium()->forum->create($data, Member::findOne(1), Category::findOne(1))->result);
 
-        $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-new']));
+        self::assertEmpty(ForumRepo::findOne(['name' => 'forum-new']));
 
         Event::off(ForumForm::class, ForumForm::EVENT_BEFORE_CREATING, $handler);
     }
 
     public function testCreateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->forum->create([], Member::findOne(1), Category::findOne(1))->result);
+        self::assertFalse($this->podium()->forum->create([], Member::findOne(1), Category::findOne(1))->result);
     }
 
     public function testFailedCreate(): void
     {
-        $this->assertFalse((new ForumForm())->create()->result);
+        self::assertFalse((new ForumForm())->create()->result);
     }
 
     /**
@@ -198,14 +199,14 @@ class ForumFormTest extends DbTestCase
         $response = $this->podium()->forum->edit($data);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'category_id' => 1,
             'name' => 'forum-updated',
@@ -221,7 +222,7 @@ class ForumFormTest extends DbTestCase
         ], $responseData);
 
         $forum = ForumRepo::findOne(['name' => 'forum-updated']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'forum1',
             'author_id' => 1,
             'category_id' => 1,
@@ -238,10 +239,10 @@ class ForumFormTest extends DbTestCase
             'threads_count' => $forum->threads_count,
             'posts_count' => $forum->posts_count,
         ]);
-        $this->assertEmpty(ForumRepo::findOne(['name' => 'forum1']));
+        self::assertEmpty(ForumRepo::findOne(['name' => 'forum1']));
 
-        $this->assertArrayHasKey(ForumForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
-        $this->assertArrayHasKey(ForumForm::EVENT_AFTER_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(ForumForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
     /**
@@ -261,10 +262,10 @@ class ForumFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->forum->edit($data)->result);
+        self::assertFalse($this->podium()->forum->edit($data)->result);
 
-        $this->assertNotEmpty(ForumRepo::findOne(['name' => 'forum1']));
-        $this->assertEmpty(ForumRepo::findOne(['name' => 'forum-updated']));
+        self::assertNotEmpty(ForumRepo::findOne(['name' => 'forum1']));
+        self::assertEmpty(ForumRepo::findOne(['name' => 'forum-updated']));
 
         Event::off(ForumForm::class, ForumForm::EVENT_BEFORE_EDITING, $handler);
     }
@@ -275,12 +276,12 @@ class ForumFormTest extends DbTestCase
      */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->forum->edit(['id' => 1])->result);
+        self::assertFalse($this->podium()->forum->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
     {
-        $this->assertFalse((new ForumForm())->edit()->result);
+        self::assertFalse((new ForumForm())->edit()->result);
     }
 
     /**
@@ -327,7 +328,7 @@ class ForumFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'forum.name',
             'visible' => 'forum.visible',
             'sort' => 'forum.sort',

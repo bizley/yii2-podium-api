@@ -8,7 +8,6 @@ use bizley\podium\api\base\Account;
 use bizley\podium\api\base\Category;
 use bizley\podium\api\base\Forum;
 use bizley\podium\api\base\Group;
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\Member;
 use bizley\podium\api\base\Message;
 use bizley\podium\api\base\ModelNotFoundException;
@@ -17,6 +16,7 @@ use bizley\podium\api\base\Poll;
 use bizley\podium\api\base\Post;
 use bizley\podium\api\base\Rank;
 use bizley\podium\api\base\Thread;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\Podium;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
@@ -80,7 +80,7 @@ class PodiumTest extends DbTestCase
     public function testVersion(): void
     {
         static::mockApplication();
-        $this->assertEquals('1.0.0', $this->podium()->getVersion());
+        self::assertEquals('1.0.0', $this->podium()->getVersion());
     }
 
     public function testAddDefaultClassToComponentConfig(): void
@@ -97,7 +97,7 @@ class PodiumTest extends DbTestCase
                 ],
             ],
         ]);
-        $this->assertEquals(Account::class, $this->podium()->getComponents()['account']['class']);
+        self::assertEquals(Account::class, $this->podium()->getComponents()['account']['class']);
     }
 
     public function testAddBridgeToComponentConfig(): void
@@ -115,7 +115,7 @@ class PodiumTest extends DbTestCase
                 ],
             ],
         ]);
-        $this->assertInstanceOf(Podium::class, $this->podium()->getComponents()['test']['podium']);
+        self::assertInstanceOf(Podium::class, $this->podium()->getComponents()['test']['podium']);
     }
 
     /**
@@ -133,7 +133,7 @@ class PodiumTest extends DbTestCase
                 ],
             ],
         ]);
-        $this->assertInstanceOf(Account::class, $this->podium()->getAccount());
+        self::assertInstanceOf(Account::class, $this->podium()->getAccount());
     }
 
     /**
@@ -142,7 +142,7 @@ class PodiumTest extends DbTestCase
     public function testGetCategory(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Category::class, $this->podium()->getCategory());
+        self::assertInstanceOf(Category::class, $this->podium()->getCategory());
     }
 
     /**
@@ -151,7 +151,7 @@ class PodiumTest extends DbTestCase
     public function testGetForum(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Forum::class, $this->podium()->getForum());
+        self::assertInstanceOf(Forum::class, $this->podium()->getForum());
     }
 
     /**
@@ -160,7 +160,7 @@ class PodiumTest extends DbTestCase
     public function testGetMember(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Member::class, $this->podium()->getMember());
+        self::assertInstanceOf(Member::class, $this->podium()->getMember());
     }
 
     /**
@@ -169,7 +169,7 @@ class PodiumTest extends DbTestCase
     public function testGetPost(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Post::class, $this->podium()->getPost());
+        self::assertInstanceOf(Post::class, $this->podium()->getPost());
     }
 
     /**
@@ -178,7 +178,7 @@ class PodiumTest extends DbTestCase
     public function testGetThread(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Thread::class, $this->podium()->getThread());
+        self::assertInstanceOf(Thread::class, $this->podium()->getThread());
     }
 
     /**
@@ -187,7 +187,7 @@ class PodiumTest extends DbTestCase
     public function testGetRank(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Rank::class, $this->podium()->getRank());
+        self::assertInstanceOf(Rank::class, $this->podium()->getRank());
     }
 
     /**
@@ -196,7 +196,7 @@ class PodiumTest extends DbTestCase
     public function testGetMessage(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Message::class, $this->podium()->getMessage());
+        self::assertInstanceOf(Message::class, $this->podium()->getMessage());
     }
 
     /**
@@ -205,7 +205,7 @@ class PodiumTest extends DbTestCase
     public function testGetGroup(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Group::class, $this->podium()->getGroup());
+        self::assertInstanceOf(Group::class, $this->podium()->getGroup());
     }
 
     /**
@@ -214,21 +214,21 @@ class PodiumTest extends DbTestCase
     public function testGetPoll(): void
     {
         static::mockApplication();
-        $this->assertInstanceOf(Poll::class, $this->podium()->getPoll());
+        self::assertInstanceOf(Poll::class, $this->podium()->getPoll());
     }
 
     public function testNoMembershipExcName(): void
     {
-        $this->assertEquals('No Membership Exception', (new NoMembershipException())->getName());
+        self::assertEquals('No Membership Exception', (new NoMembershipException())->getName());
     }
 
     public function testInsufficientDataExcName(): void
     {
-        $this->assertEquals('Insufficient Data Exception', (new InsufficientDataException())->getName());
+        self::assertEquals('Insufficient Data Exception', (new InsufficientDataException())->getName());
     }
 
     public function testModelNotFoundExcName(): void
     {
-        $this->assertEquals('Model Not Found Exception', (new ModelNotFoundException())->getName());
+        self::assertEquals('Model Not Found Exception', (new ModelNotFoundException())->getName());
     }
 }

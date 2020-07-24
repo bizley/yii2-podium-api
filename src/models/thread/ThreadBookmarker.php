@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\BookmarkEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -24,7 +25,8 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
     public const EVENT_AFTER_MARKING = 'podium.bookmark.marking.after';
 
     /**
-     * {@inheritdoc}
+     * Adds TimestampBehavior.
+     * @return array<string|int, mixed>
      */
     public function behaviors(): array
     {
@@ -38,15 +40,21 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for thread bookmarker');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param ModelInterface $post
      * @throws Exception
+     * @throws InsufficientDataException
      */
     public function setPost(ModelInterface $post): void
     {
@@ -57,28 +65,33 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
             throw new Exception('Can not find parent thread!');
         }
 
-        $this->thread_id = $thread->getId();
+        $threadId = $thread->getId();
+        if ($threadId === null) {
+            throw new InsufficientDataException('Missing post parent Id for thread bookmarker');
+        }
+        $this->thread_id = $threadId;
     }
 
-    private $_post;
+    private ?ModelInterface $post = null;
 
     /**
      * @param ModelInterface $post
      */
     public function setPostModel(ModelInterface $post): void
     {
-        $this->_post = $post;
+        $this->post = $post;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getPostModel(): ModelInterface
+    public function getPostModel(): ?ModelInterface
     {
-        return $this->_post;
+        return $this->post;
     }
 
     /**
+     * Executes before mark().
      * @return bool
      */
     public function beforeMark(): bool
@@ -94,15 +107,18 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
      */
     public function getBookmark(): ThreadBookmarker
     {
-        $bookmark = static::find()->where([
-            'member_id' => $this->member_id,
-            'thread_id' => $this->thread_id,
-        ])->one();
-
+        /** @var ThreadBookmarker|null $bookmark */
+        $bookmark = static::find()->where(
+            [
+                'member_id' => $this->member_id,
+                'thread_id' => $this->thread_id,
+            ]
+        )->one();
         return $bookmark ?? $this;
     }
 
     /**
+     * Bookmarks the thread.
      * @return PodiumResponse
      */
     public function mark(): PodiumResponse
@@ -112,12 +128,15 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
         }
 
         $bookmark = $this->getBookmark();
+        $post = $this->getPostModel();
 
-        if ($bookmark->last_seen !== null && $bookmark->last_seen >= $this->getPostModel()->getCreatedAt()) {
-            return PodiumResponse::success();
+        if ($post) {
+            if ($bookmark->last_seen !== null && $bookmark->last_seen >= $post->getCreatedAt()) {
+                return PodiumResponse::success();
+            }
+
+            $bookmark->last_seen = $post->getCreatedAt();
         }
-
-        $bookmark->last_seen = $this->getPostModel()->getCreatedAt();
 
         if (!$bookmark->save()) {
             Yii::error(['Error while bookmarking thread', $bookmark->errors], 'podium');

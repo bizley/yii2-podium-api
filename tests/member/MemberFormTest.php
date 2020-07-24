@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\member;
 
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\member\MemberForm;
 use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
+
 use function time;
 
 /**
@@ -62,14 +63,14 @@ class MemberFormTest extends DbTestCase
         ]);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'user_id' => '1',
             'username' => 'username-updated',
@@ -79,12 +80,12 @@ class MemberFormTest extends DbTestCase
         ], $responseData);
 
         $member = MemberRepo::findOne(['username' => 'username-updated']);
-        $this->assertNotEmpty($member);
-        $this->assertEquals('member', $member->slug);
-        $this->assertEmpty(MemberRepo::findOne(['username' => 'member']));
+        self::assertNotEmpty($member);
+        self::assertEquals('member', $member->slug);
+        self::assertEmpty(MemberRepo::findOne(['username' => 'member']));
 
-        $this->assertArrayHasKey(MemberForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
-        $this->assertArrayHasKey(MemberForm::EVENT_AFTER_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(MemberForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(MemberForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
     /**
@@ -98,13 +99,13 @@ class MemberFormTest extends DbTestCase
         };
         Event::on(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
 
-        $this->assertFalse($this->podium()->member->edit([
+        self::assertFalse($this->podium()->member->edit([
             'id' => 1,
             'username' => 'username-updated',
         ])->result);
 
-        $this->assertNotEmpty(MemberRepo::findOne(['username' => 'member']));
-        $this->assertEmpty(MemberRepo::findOne(['username' => 'username-updated']));
+        self::assertNotEmpty(MemberRepo::findOne(['username' => 'member']));
+        self::assertEmpty(MemberRepo::findOne(['username' => 'username-updated']));
 
         Event::off(MemberForm::class, MemberForm::EVENT_BEFORE_EDITING, $handler);
     }
@@ -115,7 +116,7 @@ class MemberFormTest extends DbTestCase
      */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->member->edit(['id' => 1])->result);
+        self::assertFalse($this->podium()->member->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -123,7 +124,7 @@ class MemberFormTest extends DbTestCase
         $mock = $this->getMockBuilder(MemberForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->edit()->result);
+        self::assertFalse($mock->edit()->result);
     }
 
     /**
@@ -161,7 +162,7 @@ class MemberFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals([
+        self::assertEquals([
             'username' => 'member.username',
             'slug' => 'member.slug',
         ], (new MemberForm())->attributeLabels());

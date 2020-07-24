@@ -10,6 +10,7 @@ use bizley\podium\api\interfaces\ArchiverInterface;
 use Throwable;
 use Yii;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class ThreadRemover
@@ -23,6 +24,7 @@ class ThreadArchiver extends Thread implements ArchiverInterface
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
 
     /**
+     * Executes before archive().
      * @return bool
      */
     public function beforeArchive(): bool
@@ -34,6 +36,7 @@ class ThreadArchiver extends Thread implements ArchiverInterface
     }
 
     /**
+     * Archives the thread.
      * @return PodiumResponse
      */
     public function archive(): PodiumResponse
@@ -54,6 +57,7 @@ class ThreadArchiver extends Thread implements ArchiverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $forum = $this->getParent();
@@ -61,10 +65,14 @@ class ThreadArchiver extends Thread implements ArchiverInterface
                 throw new Exception('Can not find parent forum!');
             }
 
-            if (!$forum->updateCounters([
-                'threads_count' => -1,
-                'posts_count' => -$this->posts_count,
-            ])) {
+            if (
+                !$forum->updateCounters(
+                    [
+                        'threads_count' => -1,
+                        'posts_count' => -$this->posts_count,
+                    ]
+                )
+            ) {
                 throw new Exception('Error while updating forum counters!');
             }
 
@@ -76,7 +84,6 @@ class ThreadArchiver extends Thread implements ArchiverInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while archiving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -85,12 +92,16 @@ class ThreadArchiver extends Thread implements ArchiverInterface
         }
     }
 
+    /**
+     * Executes after successful archive().
+     */
     public function afterArchive(): void
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
     /**
+     * Executes before revive().
      * @return bool
      */
     public function beforeRevive(): bool
@@ -102,6 +113,7 @@ class ThreadArchiver extends Thread implements ArchiverInterface
     }
 
     /**
+     * Revives the thread.
      * @return PodiumResponse
      */
     public function revive(): PodiumResponse
@@ -122,6 +134,7 @@ class ThreadArchiver extends Thread implements ArchiverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
@@ -133,10 +146,14 @@ class ThreadArchiver extends Thread implements ArchiverInterface
                 throw new Exception('Can not find parent forum!');
             }
 
-            if (!$forum->updateCounters([
-                'threads_count' => 1,
-                'posts_count' => $this->posts_count,
-            ])) {
+            if (
+                !$forum->updateCounters(
+                    [
+                        'threads_count' => 1,
+                        'posts_count' => $this->posts_count,
+                    ]
+                )
+            ) {
                 throw new Exception('Error while updating forum counters!');
             }
 
@@ -144,7 +161,6 @@ class ThreadArchiver extends Thread implements ArchiverInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while reviving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -153,6 +169,9 @@ class ThreadArchiver extends Thread implements ArchiverInterface
         }
     }
 
+    /**
+     * Executes after successful revive().
+     */
     public function afterRevive(): void
     {
         $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));

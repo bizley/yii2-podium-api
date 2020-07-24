@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\forum\Forum;
@@ -14,6 +15,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class ThreadMover
@@ -25,58 +27,69 @@ class ThreadMover extends Thread implements MoverInterface
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
     /**
+     * Prepares the target forum.
      * @param ModelInterface $forum
      * @throws Exception
+     * @throws InsufficientDataException
      */
     public function prepareForum(ModelInterface $forum): void
     {
         $this->fetchOldForumModel();
         $this->setNewForumModel($forum);
 
-        $this->forum_id = $forum->getId();
+        $forumId = $forum->getId();
+        if ($forumId === null) {
+            throw new InsufficientDataException('Missing forum Id for thread mover.');
+        }
+        $this->forum_id = $forumId;
 
         $category = $forum->getParent();
         if ($category === null) {
             throw new Exception('Can not find parent category!');
         }
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing forum parent Id for thread mover.');
+        }
+        $this->category_id = $categoryId;
     }
 
-    private $_newForum;
+    private ?ModelInterface $newForum = null;
 
     /**
      * @param ModelInterface $forum
      */
     public function setNewForumModel(ModelInterface $forum): void
     {
-        $this->_newForum = $forum;
+        $this->newForum = $forum;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getNewForumModel(): ModelInterface
+    public function getNewForumModel(): ?ModelInterface
     {
-        return $this->_newForum;
+        return $this->newForum;
     }
 
-    private $_oldForum;
+    private ?ModelInterface $oldForum = null;
 
     public function fetchOldForumModel(): void
     {
-        $this->_oldForum = Forum::findById($this->forum_id);
+        $this->oldForum = Forum::findById($this->forum_id);
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getOldForumModel(): ModelInterface
+    public function getOldForumModel(): ?ModelInterface
     {
-        return $this->_oldForum;
+        return $this->oldForum;
     }
 
     /**
-     * @return array
+     * Adds TimestampBehavior.
+     * @return array<string|int, mixed>
      */
     public function behaviors(): array
     {
@@ -84,6 +97,7 @@ class ThreadMover extends Thread implements MoverInterface
     }
 
     /**
+     * Executes before move().
      * @return bool
      */
     public function beforeMove(): bool
@@ -95,6 +109,7 @@ class ThreadMover extends Thread implements MoverInterface
     }
 
     /**
+     * Moves the thread to another forum.
      * @return PodiumResponse
      */
     public function move(): PodiumResponse
@@ -107,23 +122,34 @@ class ThreadMover extends Thread implements MoverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
                 throw new Exception('Error while moving thread!');
             }
 
-            if (!$this->getOldForumModel()->updateCounters([
-                'threads_count' => -1,
-                'posts_count' => -$this->posts_count,
-            ])) {
+            if (
+                ($oldForum = $this->getOldForumModel())
+                && !$oldForum->updateCounters(
+                    [
+                        'threads_count' => -1,
+                        'posts_count' => -$this->posts_count,
+                    ]
+                )
+            ) {
                 throw new Exception('Error while updating old forum counters!');
             }
 
-            if (!$this->getNewForumModel()->updateCounters([
-                'threads_count' => 1,
-                'posts_count' => $this->posts_count,
-            ])) {
+            if (
+                ($newForum = $this->getNewForumModel())
+                && !$newForum->updateCounters(
+                    [
+                        'threads_count' => 1,
+                        'posts_count' => $this->posts_count,
+                    ]
+                )
+            ) {
                 throw new Exception('Error while updating new forum counters!');
             }
 
@@ -131,7 +157,6 @@ class ThreadMover extends Thread implements MoverInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -140,6 +165,9 @@ class ThreadMover extends Thread implements MoverInterface
         }
     }
 
+    /**
+     * Executes after successful move().
+     */
     public function afterMove(): void
     {
         $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));

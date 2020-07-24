@@ -20,6 +20,7 @@ class ThreadRemover extends Thread implements RemoverInterface
     public const EVENT_AFTER_REMOVING = 'podium.thread.removing.after';
 
     /**
+     * Executes before remove().
      * @return bool
      */
     public function beforeRemove(): bool
@@ -31,6 +32,7 @@ class ThreadRemover extends Thread implements RemoverInterface
     }
 
     /**
+     * Removes the thread.
      * @return PodiumResponse
      */
     public function remove(): PodiumResponse
@@ -55,13 +57,15 @@ class ThreadRemover extends Thread implements RemoverInterface
             $this->afterRemove();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }
     }
 
+    /**
+     * Executes after successful remove().
+     */
     public function afterRemove(): void
     {
         $this->trigger(self::EVENT_AFTER_REMOVING);

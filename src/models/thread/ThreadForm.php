@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -15,6 +16,7 @@ use yii\base\NotSupportedException;
 use yii\behaviors\SluggableBehavior;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class ThreadForm
@@ -29,50 +31,65 @@ class ThreadForm extends Thread implements CategorisedFormInterface
 
     /**
      * @param MembershipInterface $author
+     * @throws InsufficientDataException
      */
     public function setAuthor(MembershipInterface $author): void
     {
-        $this->author_id = $author->getId();
+        $authorId = $author->getId();
+        if ($authorId === null) {
+            throw new InsufficientDataException('Missing author Id for thread form');
+        }
+        $this->author_id = $authorId;
     }
 
     /**
      * @param ModelInterface $forum
      * @throws Exception
+     * @throws InsufficientDataException
      */
     public function setForum(ModelInterface $forum): void
     {
         $this->setForumModel($forum);
 
-        $this->forum_id = $forum->getId();
+        $forumId = $forum->getId();
+        if ($forumId === null) {
+            throw new InsufficientDataException('Missing forum Id for thread form');
+        }
+        $this->forum_id = $forumId;
 
         $category = $forum->getParent();
         if ($category === null) {
             throw new Exception('Can not find parent category!');
         }
 
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing forum parent Id for thread form');
+        }
+        $this->category_id = $categoryId;
     }
 
-    private $_forum;
+    private ?ModelInterface $forum = null;
 
     /**
      * @param ModelInterface $forum
      */
     public function setForumModel(ModelInterface $forum): void
     {
-        $this->_forum = $forum;
+        $this->forum = $forum;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getForumModel(): ModelInterface
+    public function getForumModel(): ?ModelInterface
     {
-        return $this->_forum;
+        return $this->forum;
     }
 
     /**
-     * @return array
+     * Adds TimestampBehavior and SluggableBehavior.
+     * @return array<int|string, mixed>
      */
     public function behaviors(): array
     {
@@ -88,7 +105,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @return array
+     * @return array<int|string, mixed>
      */
     public function rules(): array
     {
@@ -101,7 +118,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @return array
+     * @return array<string, string>
      */
     public function attributeLabels(): array
     {
@@ -112,7 +129,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @param array $data
+     * @param array<string|int, mixed> $data
      * @return bool
      */
     public function loadData(array $data = []): bool
@@ -121,6 +138,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
+     * Executes before create().
      * @return bool
      */
     public function beforeCreate(): bool
@@ -132,6 +150,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
+     * Creates new thread.
      * @return PodiumResponse
      */
     public function create(): PodiumResponse
@@ -144,13 +163,17 @@ class ThreadForm extends Thread implements CategorisedFormInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
                 throw new Exception('Error while creating thread');
             }
 
-            if (!$this->getForumModel()->updateCounters(['threads_count' => 1])) {
+            if (
+                ($forum = $this->getForumModel())
+                && !$forum->updateCounters(['threads_count' => 1])
+            ) {
                 throw new Exception('Error while updating forum counters!');
             }
 
@@ -158,7 +181,6 @@ class ThreadForm extends Thread implements CategorisedFormInterface
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -167,12 +189,16 @@ class ThreadForm extends Thread implements CategorisedFormInterface
         }
     }
 
+    /**
+     * Executes after successful create().
+     */
     public function afterCreate(): void
     {
         $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
     }
 
     /**
+     * Executes before edit().
      * @return bool
      */
     public function beforeEdit(): bool
@@ -184,6 +210,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
+     * Edits the thread.
      * @return PodiumResponse
      */
     public function edit(): PodiumResponse
@@ -203,6 +230,9 @@ class ThreadForm extends Thread implements CategorisedFormInterface
         return PodiumResponse::success($this->getOldAttributes());
     }
 
+    /**
+     * Executes after successful edit().
+     */
     public function afterEdit(): void
     {
         $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));

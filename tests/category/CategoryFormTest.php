@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\category;
 
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\category\CategoryForm;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\repos\CategoryRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+
 use function array_merge;
 use function time;
 
@@ -73,16 +74,16 @@ class CategoryFormTest extends DbTestCase
         $response = $this->podium()->category->create($data, Member::findOne(1));
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $createdAt = ArrayHelper::remove($responseData, 'created_at');
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $createdAt);
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $createdAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 2,
             'name' => 'category-new',
             'slug' => 'category-new',
@@ -93,7 +94,7 @@ class CategoryFormTest extends DbTestCase
         ], $responseData);
 
         $category = CategoryRepo::findOne(['name' => 'category-new']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'category-new',
             'author_id' => 1,
         ]), [
@@ -105,8 +106,8 @@ class CategoryFormTest extends DbTestCase
             'author_id' => $category->author_id,
         ]);
 
-        $this->assertArrayHasKey(CategoryForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
-        $this->assertArrayHasKey(CategoryForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
 
     public function testCreateWithSlug(): void
@@ -117,10 +118,10 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertTrue($this->podium()->category->create($data, Member::findOne(1))->result);
+        self::assertTrue($this->podium()->category->create($data, Member::findOne(1))->result);
 
         $category = CategoryRepo::findOne(['name' => 'category-new-with-slug']);
-        $this->assertEquals($data, [
+        self::assertEquals($data, [
             'name' => $category->name,
             'visible' => $category->visible,
             'sort' => $category->sort,
@@ -140,21 +141,21 @@ class CategoryFormTest extends DbTestCase
             'visible' => 1,
             'sort' => 10,
         ];
-        $this->assertFalse($this->podium()->category->create($data, Member::findOne(1))->result);
+        self::assertFalse($this->podium()->category->create($data, Member::findOne(1))->result);
 
-        $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-new']));
+        self::assertEmpty(CategoryRepo::findOne(['name' => 'category-new']));
 
         Event::off(CategoryForm::class, CategoryForm::EVENT_BEFORE_CREATING, $handler);
     }
 
     public function testCreateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->category->create([], Member::findOne(1))->result);
+        self::assertFalse($this->podium()->category->create([], Member::findOne(1))->result);
     }
 
     public function testFailedCreate(): void
     {
-        $this->assertFalse((new CategoryForm())->create()->result);
+        self::assertFalse((new CategoryForm())->create()->result);
     }
 
     /**
@@ -180,14 +181,14 @@ class CategoryFormTest extends DbTestCase
         $response = $this->podium()->category->edit($data);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'name' => 'category-updated',
             'slug' => 'category1',
@@ -200,7 +201,7 @@ class CategoryFormTest extends DbTestCase
         ], $responseData);
 
         $category = CategoryRepo::findOne(['name' => 'category-updated']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'category1',
             'author_id' => 1,
         ]), [
@@ -211,10 +212,10 @@ class CategoryFormTest extends DbTestCase
             'slug' => $category->slug,
             'author_id' => $category->author_id,
         ]);
-        $this->assertEmpty(CategoryRepo::findOne(['name' => 'category1']));
+        self::assertEmpty(CategoryRepo::findOne(['name' => 'category1']));
 
-        $this->assertArrayHasKey(CategoryForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
-        $this->assertArrayHasKey(CategoryForm::EVENT_AFTER_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
     /**
@@ -234,10 +235,10 @@ class CategoryFormTest extends DbTestCase
             'visible' => 0,
             'sort' => 2,
         ];
-        $this->assertFalse($this->podium()->category->edit($data)->result);
+        self::assertFalse($this->podium()->category->edit($data)->result);
 
-        $this->assertNotEmpty(CategoryRepo::findOne(['name' => 'category1']));
-        $this->assertEmpty(CategoryRepo::findOne(['name' => 'category-updated']));
+        self::assertNotEmpty(CategoryRepo::findOne(['name' => 'category1']));
+        self::assertEmpty(CategoryRepo::findOne(['name' => 'category-updated']));
 
         Event::off(CategoryForm::class, CategoryForm::EVENT_BEFORE_EDITING, $handler);
     }
@@ -248,12 +249,12 @@ class CategoryFormTest extends DbTestCase
      */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->category->edit(['id' => 1])->result);
+        self::assertFalse($this->podium()->category->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
     {
-        $this->assertFalse((new CategoryForm())->edit()->result);
+        self::assertFalse((new CategoryForm())->edit()->result);
     }
 
     /**
@@ -282,7 +283,7 @@ class CategoryFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'category.name',
             'visible' => 'category.visible',
             'sort' => 'category.sort',

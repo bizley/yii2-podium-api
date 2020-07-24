@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
@@ -18,6 +18,7 @@ use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
+
 use function array_merge;
 use function time;
 
@@ -97,16 +98,16 @@ class ThreadFormTest extends DbTestCase
         $response = $this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1));
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $createdAt = ArrayHelper::remove($responseData, 'created_at');
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $createdAt);
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $createdAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 2,
             'category_id' => 1,
             'forum_id' => 1,
@@ -116,7 +117,7 @@ class ThreadFormTest extends DbTestCase
         ], $responseData);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-new']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'thread-new',
             'author_id' => 1,
             'category_id' => 1,
@@ -133,10 +134,10 @@ class ThreadFormTest extends DbTestCase
             'posts_count' => $thread->posts_count,
         ]);
 
-        $this->assertEquals(6, ForumRepo::findOne(1)->threads_count);
+        self::assertEquals(6, ForumRepo::findOne(1)->threads_count);
 
-        $this->assertArrayHasKey(ThreadForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
 
     public function testCreateWithSlug(): void
@@ -145,10 +146,10 @@ class ThreadFormTest extends DbTestCase
             'name' => 'thread-new-with-slug',
             'slug' => 'thr-slug',
         ];
-        $this->assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
+        self::assertTrue($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-new-with-slug']);
-        $this->assertEquals($data, [
+        self::assertEquals($data, [
             'name' => $thread->name,
             'slug' => $thread->slug,
         ]);
@@ -162,18 +163,18 @@ class ThreadFormTest extends DbTestCase
         Event::on(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
 
         $data = ['name' => 'thread-new'];
-        $this->assertFalse($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
+        self::assertFalse($this->podium()->thread->create($data, Member::findOne(1), Forum::findOne(1))->result);
 
-        $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-new']));
+        self::assertEmpty(ThreadRepo::findOne(['name' => 'thread-new']));
 
-        $this->assertEquals(5, ForumRepo::findOne(1)->threads_count);
+        self::assertEquals(5, ForumRepo::findOne(1)->threads_count);
 
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_CREATING, $handler);
     }
 
     public function testCreateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->thread->create([], Member::findOne(1), Forum::findOne(1))->result);
+        self::assertFalse($this->podium()->thread->create([], Member::findOne(1), Forum::findOne(1))->result);
     }
 
     public function testFailedCreateValidate(): void
@@ -181,7 +182,7 @@ class ThreadFormTest extends DbTestCase
         $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['validate'])->getMock();
         $mock->method('validate')->willReturn(false);
 
-        $this->assertFalse($mock->create()->result);
+        self::assertFalse($mock->create()->result);
     }
 
     public function testFailedCreate(): void
@@ -189,7 +190,7 @@ class ThreadFormTest extends DbTestCase
         $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->create()->result);
+        self::assertFalse($mock->create()->result);
     }
 
     /**
@@ -213,14 +214,14 @@ class ThreadFormTest extends DbTestCase
         $response = $this->podium()->thread->edit($data);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
         $updatedAt = ArrayHelper::remove($responseData, 'updated_at');
 
-        $this->assertLessThanOrEqual($time, $updatedAt);
+        self::assertLessThanOrEqual($time, $updatedAt);
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'category_id' => 1,
             'forum_id' => 1,
@@ -238,7 +239,7 @@ class ThreadFormTest extends DbTestCase
         ], $responseData);
 
         $thread = ThreadRepo::findOne(['name' => 'thread-updated']);
-        $this->assertEquals(array_merge($data, [
+        self::assertEquals(array_merge($data, [
             'slug' => 'thread1',
             'author_id' => 1,
             'category_id' => 1,
@@ -255,12 +256,12 @@ class ThreadFormTest extends DbTestCase
             'views_count' => $thread->views_count,
             'posts_count' => $thread->posts_count,
         ]);
-        $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread1']));
+        self::assertEmpty(ThreadRepo::findOne(['name' => 'thread1']));
 
-        $this->assertEquals(5, ForumRepo::findOne(1)->threads_count);
+        self::assertEquals(5, ForumRepo::findOne(1)->threads_count);
 
-        $this->assertArrayHasKey(ThreadForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadForm::EVENT_AFTER_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
     /**
@@ -278,10 +279,10 @@ class ThreadFormTest extends DbTestCase
             'id' => 1,
             'name' => 'thread-updated',
         ];
-        $this->assertFalse($this->podium()->thread->edit($data)->result);
+        self::assertFalse($this->podium()->thread->edit($data)->result);
 
-        $this->assertNotEmpty(ThreadRepo::findOne(['name' => 'thread1']));
-        $this->assertEmpty(ThreadRepo::findOne(['name' => 'thread-updated']));
+        self::assertNotEmpty(ThreadRepo::findOne(['name' => 'thread1']));
+        self::assertEmpty(ThreadRepo::findOne(['name' => 'thread-updated']));
 
         Event::off(ThreadForm::class, ThreadForm::EVENT_BEFORE_EDITING, $handler);
     }
@@ -292,7 +293,7 @@ class ThreadFormTest extends DbTestCase
      */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->thread->edit(['id' => 1])->result);
+        self::assertFalse($this->podium()->thread->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -300,7 +301,7 @@ class ThreadFormTest extends DbTestCase
         $mock = $this->getMockBuilder(ThreadForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->edit()->result);
+        self::assertFalse($mock->edit()->result);
     }
 
     /**
@@ -347,7 +348,7 @@ class ThreadFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'thread.name',
             'slug' => 'thread.slug',
         ], (new ThreadForm())->attributeLabels());

@@ -22,7 +22,8 @@ class ThreadPinner extends Thread implements PinnerInterface
     public const EVENT_AFTER_UNPINNING = 'podium.thread.unpinning.after';
 
     /**
-     * @return array
+     * Adds TimestampBehavior.
+     * @return array<string|int, mixed>
      */
     public function behaviors(): array
     {
@@ -30,6 +31,7 @@ class ThreadPinner extends Thread implements PinnerInterface
     }
 
     /**
+     * Executes before pin().
      * @return bool
      */
     public function beforePin(): bool
@@ -41,6 +43,7 @@ class ThreadPinner extends Thread implements PinnerInterface
     }
 
     /**
+     * Pins the thread.
      * @return PodiumResponse
      */
     public function pin(): PodiumResponse
@@ -62,12 +65,16 @@ class ThreadPinner extends Thread implements PinnerInterface
         return PodiumResponse::success();
     }
 
+    /**
+     * Executes after successful pin().
+     */
     public function afterPin(): void
     {
         $this->trigger(self::EVENT_AFTER_PINNING, new PinEvent(['model' => $this]));
     }
 
     /**
+     * Executes before unpin().
      * @return bool
      */
     public function beforeUnpin(): bool
@@ -79,6 +86,7 @@ class ThreadPinner extends Thread implements PinnerInterface
     }
 
     /**
+     * Unpins the thread.
      * @return PodiumResponse
      */
     public function unpin(): PodiumResponse
@@ -100,6 +108,9 @@ class ThreadPinner extends Thread implements PinnerInterface
         return PodiumResponse::success();
     }
 
+    /**
+     * Executes after successful unpin().
+     */
     public function afterUnpin(): void
     {
         $this->trigger(self::EVENT_AFTER_UNPINNING, new PinEvent(['model' => $this]));

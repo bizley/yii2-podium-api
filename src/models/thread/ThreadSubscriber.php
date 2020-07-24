@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SubscriptionEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
@@ -35,26 +36,26 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
 
     /**
      * @param MembershipInterface $member
-     * @throws MissingMemberIdException
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
         $memberId = $member->getId();
         if ($memberId === null) {
-            throw new MissingMemberIdException('No member Id provided for thread subscriber');
+            throw new InsufficientDataException('No member Id provided for thread subscriber');
         }
         $this->member_id = $memberId;
     }
 
     /**
      * @param ModelInterface $thread
-     * @throws MissingThreadIdException
+     * @throws InsufficientDataException
      */
     public function setThread(ModelInterface $thread): void
     {
         $threadId = $thread->getId();
         if ($threadId === null) {
-            throw new MissingThreadIdException('No thread Id provided for thread subscriber');
+            throw new InsufficientDataException('No thread Id provided for thread subscriber');
         }
         $this->thread_id = $threadId;
     }
@@ -126,7 +127,6 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
             return PodiumResponse::error();
         }
 
-        /** @var ThreadSubscriber|null $subscription */
         $subscription = static::find()->where([
             'member_id' => $this->member_id,
             'thread_id' => $this->thread_id,
@@ -138,6 +138,7 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
         }
 
         try {
+            /** @var ThreadSubscriber $subscription */
             if ($subscription->delete() === false) {
                 Yii::error('Error while unsubscribing thread', 'podium');
 
@@ -147,7 +148,6 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
             $this->afterUnsubscribe();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(
                 ['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()],

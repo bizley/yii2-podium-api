@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\models\thread;
 
 use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\ThreadModelInterface;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\repos\ThreadRepo;
 use yii\base\InvalidArgumentException;
@@ -16,6 +15,7 @@ use yii\data\Pagination;
 use yii\data\Sort;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+
 use function method_exists;
 
 /**
@@ -91,9 +91,11 @@ class Thread extends ThreadRepo implements ModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        /* @var $query ActiveQuery */
+    public static function findByFilter(
+        DataFilter $filter = null,
+        $sort = null,
+        $pagination = null
+    ): DataProviderInterface {
         $query = static::find();
 
         if ($filter !== null) {
@@ -122,8 +124,8 @@ class Thread extends ThreadRepo implements ModelInterface
      */
     public function convert(string $targetClass)
     {
-        /* @var $targetModel ActiveRecord */
-        $targetModel = new $targetClass;
+        /** @var ActiveRecord $targetModel */
+        $targetModel = new $targetClass();
 
         if (!method_exists($targetModel, 'tableName') || static::tableName() !== $targetModel::tableName()) {
             throw new InvalidArgumentException('You can only convert object extending the same repository.');

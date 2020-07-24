@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\post;
+namespace bizley\podium\tests\poll;
 
-use bizley\podium\api\base\InsufficientDataException;
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\PollChoice;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\category\Category;
 use bizley\podium\api\models\forum\Forum;
 use bizley\podium\api\models\member\Member;
@@ -19,6 +19,7 @@ use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
 use yii\helpers\ArrayHelper;
+
 use function time;
 
 /**
@@ -126,14 +127,14 @@ class PollFormTest extends DbTestCase
         $response = $this->podium()->poll->create($data, Member::findOne(1), Thread::findOne(1));
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
 
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'created_at'));
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'created_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 2,
             'thread_id' => 1,
             'author_id' => 1,
@@ -144,7 +145,7 @@ class PollFormTest extends DbTestCase
         ], $responseData);
 
         $poll = PollRepo::findOne(2);
-        $this->assertEquals([
+        self::assertEquals([
             'thread_id' => 1,
             'author_id' => 1,
             'question' => 'question2',
@@ -161,7 +162,7 @@ class PollFormTest extends DbTestCase
         ]);
 
         $pollAnswer1 = PollAnswerRepo::findOne(['answer' => 'answer21']);
-        $this->assertEquals([
+        self::assertEquals([
             'poll_id' => 2,
             'answer' => 'answer21',
         ], [
@@ -170,7 +171,7 @@ class PollFormTest extends DbTestCase
         ]);
 
         $pollAnswer2 = PollAnswerRepo::findOne(['answer' => 'answer22']);
-        $this->assertEquals([
+        self::assertEquals([
             'poll_id' => 2,
             'answer' => 'answer22',
         ], [
@@ -178,8 +179,8 @@ class PollFormTest extends DbTestCase
             'answer' => $pollAnswer2->answer,
         ]);
 
-        $this->assertArrayHasKey(PollForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
-        $this->assertArrayHasKey(PollForm::EVENT_AFTER_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(PollForm::EVENT_BEFORE_CREATING, $this->eventsRaised);
+        self::assertArrayHasKey(PollForm::EVENT_AFTER_CREATING, $this->eventsRaised);
     }
 
     public function testCreateEventPreventing(): void
@@ -197,18 +198,18 @@ class PollFormTest extends DbTestCase
                 'answer22',
             ],
         ];
-        $this->assertFalse($this->podium()->poll->create($data, Member::findOne(1), Thread::findOne(1))->result);
+        self::assertFalse($this->podium()->poll->create($data, Member::findOne(1), Thread::findOne(1))->result);
 
-        $this->assertEmpty(PollRepo::findOne(2));
-        $this->assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer21']));
-        $this->assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer22']));
+        self::assertEmpty(PollRepo::findOne(2));
+        self::assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer21']));
+        self::assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer22']));
 
         Event::off(PollForm::class, PollForm::EVENT_BEFORE_CREATING, $handler);
     }
 
     public function testCreateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
+        self::assertFalse($this->podium()->poll->create([], Member::findOne(1), Thread::findOne(1))->result);
     }
 
     public function testFailedCreateValidate(): void
@@ -216,7 +217,7 @@ class PollFormTest extends DbTestCase
         $mock = $this->getMockBuilder(PollForm::class)->setMethods(['validate'])->getMock();
         $mock->method('validate')->willReturn(false);
 
-        $this->assertFalse($mock->create()->result);
+        self::assertFalse($mock->create()->result);
     }
 
     public function testFailedCreate(): void
@@ -224,7 +225,7 @@ class PollFormTest extends DbTestCase
         $mock = $this->getMockBuilder(PollForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->create()->result);
+        self::assertFalse($mock->create()->result);
     }
 
     /**
@@ -254,14 +255,14 @@ class PollFormTest extends DbTestCase
         $response = $this->podium()->poll->edit($data);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
 
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'edited_at'));
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'edited_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'thread_id' => 1,
             'author_id' => 1,
@@ -273,7 +274,7 @@ class PollFormTest extends DbTestCase
         ], $responseData);
 
         $poll = PollRepo::findOne(1);
-        $this->assertEquals([
+        self::assertEquals([
             'thread_id' => 1,
             'author_id' => 1,
             'question' => 'updated-question',
@@ -288,10 +289,10 @@ class PollFormTest extends DbTestCase
             'choice_id' => $poll->choice_id,
             'expires_at' => $poll->expires_at,
         ]);
-        $this->assertEmpty(PollRepo::findOne(['question' => 'question1']));
+        self::assertEmpty(PollRepo::findOne(['question' => 'question1']));
 
         $pollAnswer1 = PollAnswerRepo::findOne(['answer' => 'answer1']);
-        $this->assertEquals([
+        self::assertEquals([
             'poll_id' => 1,
             'answer' => 'answer1',
         ], [
@@ -300,7 +301,7 @@ class PollFormTest extends DbTestCase
         ]);
 
         $pollAnswer2 = PollAnswerRepo::findOne(['answer' => 'answer12']);
-        $this->assertEquals([
+        self::assertEquals([
             'poll_id' => 1,
             'answer' => 'answer12',
         ], [
@@ -308,8 +309,8 @@ class PollFormTest extends DbTestCase
             'answer' => $pollAnswer2->answer,
         ]);
 
-        $this->assertArrayHasKey(PollForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
-        $this->assertArrayHasKey(PollForm::EVENT_AFTER_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(PollForm::EVENT_BEFORE_EDITING, $this->eventsRaised);
+        self::assertArrayHasKey(PollForm::EVENT_AFTER_EDITING, $this->eventsRaised);
     }
 
     /**
@@ -332,10 +333,10 @@ class PollFormTest extends DbTestCase
                 'answer12',
             ],
         ];
-        $this->assertFalse($this->podium()->poll->edit($data)->result);
+        self::assertFalse($this->podium()->poll->edit($data)->result);
 
-        $this->assertNotEmpty(PollRepo::findOne(['question' => 'question1']));
-        $this->assertEmpty(PollRepo::findOne(['question' => 'updated-question']));
+        self::assertNotEmpty(PollRepo::findOne(['question' => 'question1']));
+        self::assertEmpty(PollRepo::findOne(['question' => 'updated-question']));
 
         Event::off(PollForm::class, PollForm::EVENT_BEFORE_EDITING, $handler);
     }
@@ -361,14 +362,14 @@ class PollFormTest extends DbTestCase
         $response = $this->podium()->poll->edit($data);
         $time = time();
 
-        $this->assertTrue($response->result);
+        self::assertTrue($response->result);
 
         $responseData = $response->data;
 
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'edited_at'));
-        $this->assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'edited_at'));
+        self::assertLessThanOrEqual($time, ArrayHelper::remove($responseData, 'updated_at'));
 
-        $this->assertEquals([
+        self::assertEquals([
             'id' => 1,
             'thread_id' => 1,
             'author_id' => 1,
@@ -380,7 +381,7 @@ class PollFormTest extends DbTestCase
         ], $responseData);
 
         $poll = PollRepo::findOne(1);
-        $this->assertEquals([
+        self::assertEquals([
             'thread_id' => 1,
             'author_id' => 1,
             'question' => 'question1',
@@ -396,9 +397,9 @@ class PollFormTest extends DbTestCase
             'expires_at' => $poll->expires_at,
         ]);
 
-        $this->assertNotEmpty(PollAnswerRepo::findOne(['answer' => 'answer-new-1']));
-        $this->assertNotEmpty(PollAnswerRepo::findOne(['answer' => 'answer-new-2']));
-        $this->assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer1']));
+        self::assertNotEmpty(PollAnswerRepo::findOne(['answer' => 'answer-new-1']));
+        self::assertNotEmpty(PollAnswerRepo::findOne(['answer' => 'answer-new-2']));
+        self::assertEmpty(PollAnswerRepo::findOne(['answer' => 'answer1']));
     }
 
     /**
@@ -407,7 +408,7 @@ class PollFormTest extends DbTestCase
      */
     public function testUpdateLoadFalse(): void
     {
-        $this->assertFalse($this->podium()->poll->edit(['id' => 1])->result);
+        self::assertFalse($this->podium()->poll->edit(['id' => 1])->result);
     }
 
     public function testFailedEdit(): void
@@ -415,7 +416,7 @@ class PollFormTest extends DbTestCase
         $mock = $this->getMockBuilder(PollForm::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->edit()->result);
+        self::assertFalse($mock->edit()->result);
     }
 
     /**
@@ -462,7 +463,7 @@ class PollFormTest extends DbTestCase
      */
     public function testAttributeLabels(): void
     {
-        $this->assertEquals([
+        self::assertEquals([
             'revealed' => 'poll.revealed',
             'choice_id' => 'poll.choice.type',
             'question' => 'poll.question',
