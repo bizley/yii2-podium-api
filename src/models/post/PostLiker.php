@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ThumbEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\LikerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -14,6 +15,7 @@ use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class PostLiker
@@ -38,38 +40,48 @@ class PostLiker extends ThumbRepo implements LikerInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for post liker');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param ModelInterface $post
+     * @throws InsufficientDataException
      */
     public function setPost(ModelInterface $post): void
     {
         $this->setPostModel($post);
 
-        $this->post_id = $post->getId();
+        $postId = $post->getId();
+        if ($postId === null) {
+            throw new InsufficientDataException('Missing post Id for post liker');
+        }
+        $this->post_id = $postId;
     }
 
-    private $_post;
+    private ?ModelInterface $post = null;
 
     /**
      * @param ModelInterface $post
      */
     public function setPostModel(ModelInterface $post): void
     {
-        $this->_post = $post;
+        $this->post = $post;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getPostModel(): ModelInterface
+    public function getPostModel(): ?ModelInterface
     {
-        return $this->_post;
+        return $this->post;
     }
 
     /**
@@ -92,6 +104,7 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $rate */
         $rate = static::find()->where([
             'member_id' => $this->member_id,
             'post_id' => $this->post_id,
@@ -113,30 +126,35 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error($model);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$model->save(false)) {
                 throw new Exception('Error while giving thumb up!');
             }
 
-            if ($rate === null) {
-                if (!$this->getPostModel()->updateCounters(['likes' => 1])) {
+            $post = $this->getPostModel();
+            if ($post) {
+                if ($rate === null) {
+                    if (!$post->updateCounters(['likes' => 1])) {
+                        throw new Exception('Error while updating post likes!');
+                    }
+                } elseif (
+                    !$post->updateCounters(
+                        [
+                            'likes' => 1,
+                            'dislikes' => -1,
+                        ]
+                    )
+                ) {
                     throw new Exception('Error while updating post likes!');
                 }
-            } elseif (
-                !$this->getPostModel()->updateCounters([
-                    'likes' => 1,
-                    'dislikes' => -1,
-                ])
-            ) {
-                throw new Exception('Error while updating post likes!');
             }
 
             $this->afterThumbUp();
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while giving thumb up', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -170,6 +188,7 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $rate */
         $rate = static::find()->where([
             'member_id' => $this->member_id,
             'post_id' => $this->post_id,
@@ -191,31 +210,35 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error($model);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$model->save(false)) {
                 throw new Exception('Error while giving thumb down');
             }
 
-            if ($rate === null) {
-                if (!$this->getPostModel()->updateCounters(['dislikes' => 1])) {
+            $post = $this->getPostModel();
+            if ($post) {
+                if ($rate === null) {
+                    if (!$post->updateCounters(['dislikes' => 1])) {
+                        throw new Exception('Error while updating post likes!');
+                    }
+                } elseif (
+                    !$post->updateCounters(
+                        [
+                            'likes' => -1,
+                            'dislikes' => 1,
+                        ]
+                    )
+                ) {
                     throw new Exception('Error while updating post likes!');
                 }
-            } elseif (
-                !$this->getPostModel()->updateCounters([
-                    'likes' => -1,
-                    'dislikes' => 1,
-                ])
-            ) {
-                throw new Exception('Error while updating post likes!');
             }
 
             $this->afterThumbDown();
-
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while giving thumb down', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -249,6 +272,7 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $rate */
         $rate = static::find()->where([
             'member_id' => $this->member_id,
             'post_id' => $this->post_id,
@@ -260,14 +284,18 @@ class PostLiker extends ThumbRepo implements LikerInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if ($rate->thumb === 1) {
-                if (!$this->getPostModel()->updateCounters(['likes' => -1])) {
+            $post = $this->getPostModel();
+            if ($post) {
+                if ($rate->thumb === 1) {
+                    if (!$post->updateCounters(['likes' => -1])) {
+                        throw new Exception('Error while updating post likes!');
+                    }
+                } elseif (!$post->updateCounters(['dislikes' => -1])) {
                     throw new Exception('Error while updating post likes!');
                 }
-            } elseif (!$this->getPostModel()->updateCounters(['dislikes' => -1])) {
-                throw new Exception('Error while updating post likes!');
             }
 
             if ($rate->delete() === false) {
@@ -278,7 +306,6 @@ class PostLiker extends ThumbRepo implements LikerInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while resetting thumb', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

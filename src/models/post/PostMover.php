@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\models\thread\Thread;
@@ -16,6 +17,7 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class PostMover
@@ -29,58 +31,71 @@ class PostMover extends Post implements MoverInterface
     /**
      * @param ModelInterface $thread
      * @throws Exception
+     * @throws InsufficientDataException
      */
     public function prepareThread(ModelInterface $thread): void
     {
         $this->fetchOldThreadModel();
         $this->setNewThreadModel($thread);
 
-        $this->thread_id = $thread->getId();
+        $threadId = $thread->getId();
+        if ($threadId === null) {
+            throw new InsufficientDataException('Missing thread Id for post mover');
+        }
+        $this->thread_id = $threadId;
 
         $forum = $thread->getParent();
         if ($forum === null) {
             throw new Exception('Can not find parent forum!');
         }
-        $this->forum_id = $forum->getId();
+        $forumId = $forum->getId();
+        if ($forumId === null) {
+            throw new InsufficientDataException('Missing thread parent Id for post mover');
+        }
+        $this->forum_id = $forumId;
 
         $category = $forum->getParent();
         if ($category === null) {
             throw new Exception('Can not find parent category!');
         }
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing thread grandparent Id for post mover');
+        }
+        $this->category_id = $categoryId;
     }
 
-    private $_newThread;
+    private ?ModelInterface $newThread = null;
 
     /**
      * @param ModelInterface $thread
      */
     public function setNewThreadModel(ModelInterface $thread): void
     {
-        $this->_newThread = $thread;
+        $this->newThread = $thread;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getNewThreadModel(): ModelInterface
+    public function getNewThreadModel(): ?ModelInterface
     {
-        return $this->_newThread;
+        return $this->newThread;
     }
 
-    private $_oldThread;
+    private ?ModelInterface $oldThread = null;
 
     public function fetchOldThreadModel(): void
     {
-        $this->_oldThread = Thread::findById($this->thread_id);
+        $this->oldThread = Thread::findById($this->thread_id);
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getOldThreadModel(): ModelInterface
+    public function getOldThreadModel(): ?ModelInterface
     {
-        return $this->_oldThread;
+        return $this->oldThread;
     }
 
     /**
@@ -115,47 +130,53 @@ class PostMover extends Post implements MoverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
                 throw new Exception('Error while moving post!');
             }
 
-            if (!$this->getOldThreadModel()->updateCounters(['posts_count' => -1])) {
-                throw new Exception('Error while updating old thread counters!');
-            }
-
-            $oldForum = $this->getOldThreadModel()->getParent();
-            if ($oldForum === null) {
-                throw new Exception('Can not find old parent forum!');
-            }
-            if (!$oldForum->updateCounters(['posts_count' => -1])) {
-                throw new Exception('Error while updating old forum counters!');
-            }
-
-            if ($this->getOldThreadModel()->getPostsCount() === 0) {
-                $threadArchiver = $this->getOldThreadModel()->convert(ThreadArchiver::class);
-                if (!$threadArchiver->archive()) {
-                    throw new Exception('Error while archiving old empty thread!');
+            $oldThread = $this->getOldThreadModel();
+            if ($oldThread) {
+                if (!$oldThread->updateCounters(['posts_count' => -1])) {
+                    throw new Exception('Error while updating old thread counters!');
                 }
 
-                $threadRemover = $this->getOldThreadModel()->convert(ThreadRemover::class);
-                $threadRemover->archived = true;
-                if (!$threadRemover->remove()->result) {
-                    throw new Exception('Error while deleting old empty thread!');
+                $oldForum = $oldThread->getParent();
+                if ($oldForum === null) {
+                    throw new Exception('Can not find old parent forum!');
+                }
+                if (!$oldForum->updateCounters(['posts_count' => -1])) {
+                    throw new Exception('Error while updating old forum counters!');
+                }
+                if ($oldThread->getPostsCount() === 0) {
+                    $threadArchiver = $oldThread->convert(ThreadArchiver::class);
+                    if (!$threadArchiver->archive()) {
+                        throw new Exception('Error while archiving old empty thread!');
+                    }
+
+                    $threadRemover = $oldThread->convert(ThreadRemover::class);
+                    $threadRemover->archived = true;
+                    if (!$threadRemover->remove()->result) {
+                        throw new Exception('Error while deleting old empty thread!');
+                    }
                 }
             }
 
-            if (!$this->getNewThreadModel()->updateCounters(['posts_count' => 1])) {
-                throw new Exception('Error while updating new thread counters!');
-            }
+            $newThread = $this->getNewThreadModel();
+            if ($newThread) {
+                if (!$newThread->updateCounters(['posts_count' => 1])) {
+                    throw new Exception('Error while updating new thread counters!');
+                }
 
-            $newForum = $this->getNewThreadModel()->getParent();
-            if ($newForum === null) {
-                throw new Exception('Can not find new parent forum!');
-            }
-            if (!$newForum->updateCounters(['posts_count' => 1])) {
-                throw new Exception('Error while updating new forum counters!');
+                $newForum = $newThread->getParent();
+                if ($newForum === null) {
+                    throw new Exception('Can not find new parent forum!');
+                }
+                if (!$newForum->updateCounters(['posts_count' => 1])) {
+                    throw new Exception('Error while updating new forum counters!');
+                }
             }
 
             $this->afterMove();

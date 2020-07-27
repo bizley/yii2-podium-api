@@ -87,8 +87,8 @@ class Thread extends ThreadRepo implements ModelInterface
 
     /**
      * @param DataFilter|null $filter
-     * @param Sort|array|bool|null $sort
-     * @param Pagination|array|bool|null $pagination
+     * @param Sort|array<string, mixed>|bool|null $sort
+     * @param Pagination|array<string, mixed>|bool|null $pagination
      * @return ActiveDataProvider
      */
     public static function findByFilter(
