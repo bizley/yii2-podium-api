@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\post;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -14,6 +15,8 @@ use Yii;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
+
 use function time;
 
 /**
@@ -29,15 +32,21 @@ class PostForm extends Post implements CategorisedFormInterface
 
     /**
      * @param MembershipInterface $author
+     * @throws InsufficientDataException
      */
     public function setAuthor(MembershipInterface $author): void
     {
-        $this->author_id = $author->getId();
+        $authorId = $author->getId();
+        if ($authorId === null) {
+            throw new InsufficientDataException('Missing author Id for post form');
+        }
+        $this->author_id = $authorId;
     }
 
     /**
      * @param ModelInterface $thread
      * @throws Exception
+     * @throws InsufficientDataException
      */
     public function setThread(ModelInterface $thread): void
     {
@@ -49,50 +58,62 @@ class PostForm extends Post implements CategorisedFormInterface
         }
         $this->setForumModel($forum);
 
-        $this->thread_id = $thread->getId();
-        $this->forum_id = $forum->getId();
+        $threadId = $thread->getId();
+        if ($threadId === null) {
+            throw new InsufficientDataException('Missing thread Id for post form');
+        }
+        $this->thread_id = $threadId;
+        $forumId = $forum->getId();
+        if ($forumId === null) {
+            throw new InsufficientDataException('Missing parent thread Id for post form');
+        }
+        $this->forum_id = $forumId;
 
         $category = $forum->getParent();
         if ($category === null) {
             throw new Exception('Can not find parent category!');
         }
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing grandparent thread Id for post form');
+        }
+        $this->category_id = $categoryId;
     }
 
-    private $_thread;
+    private ?ModelInterface $thread = null;
 
     /**
      * @param ModelInterface $thread
      */
     public function setThreadModel(ModelInterface $thread): void
     {
-        $this->_thread = $thread;
+        $this->thread = $thread;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getThreadModel(): ModelInterface
+    public function getThreadModel(): ?ModelInterface
     {
-        return $this->_thread;
+        return $this->thread;
     }
 
-    private $_forum;
+    private ?ModelInterface $forum = null;
 
     /**
      * @param ModelInterface $forum
      */
     public function setForumModel(ModelInterface $forum): void
     {
-        $this->_forum = $forum;
+        $this->forum = $forum;
     }
 
     /**
-     * @return ModelInterface
+     * @return ModelInterface|null
      */
-    public function getForumModel(): ModelInterface
+    public function getForumModel(): ?ModelInterface
     {
-        return $this->_forum;
+        return $this->forum;
     }
 
     /**
@@ -155,16 +176,23 @@ class PostForm extends Post implements CategorisedFormInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
                 throw new Exception('Error while creating post!');
             }
 
-            if (!$this->getThreadModel()->updateCounters(['posts_count' => 1])) {
+            if (
+                ($thread = $this->getThreadModel())
+                && !$thread->updateCounters(['posts_count' => 1])
+            ) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if (!$this->getForumModel()->updateCounters(['posts_count' => 1])) {
+            if (
+                ($forum = $this->getForumModel())
+                && !$forum->updateCounters(['posts_count' => 1])
+            ) {
                 throw new Exception('Error while updating forum counters!');
             }
 
@@ -172,7 +200,6 @@ class PostForm extends Post implements CategorisedFormInterface
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

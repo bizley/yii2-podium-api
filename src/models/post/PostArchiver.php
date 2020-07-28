@@ -11,6 +11,7 @@ use bizley\podium\api\models\thread\ThreadArchiver;
 use Throwable;
 use Yii;
 use yii\db\Exception;
+use yii\db\Transaction;
 
 /**
  * Class PostArchiver
@@ -55,6 +56,7 @@ class PostArchiver extends Post implements ArchiverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
@@ -79,7 +81,11 @@ class PostArchiver extends Post implements ArchiverInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            if ($thread->getPostsCount() === 0 && !$thread->isArchived() && !$thread->convert(ThreadArchiver::class)->archive()) {
+            if (
+                $thread->getPostsCount() === 0
+                && !$thread->isArchived()
+                && !$thread->convert(ThreadArchiver::class)->archive()
+            ) {
                 throw new Exception('Error while archiving thread!');
             }
 
@@ -87,7 +93,6 @@ class PostArchiver extends Post implements ArchiverInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while archiving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -133,6 +138,7 @@ class PostArchiver extends Post implements ArchiverInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
@@ -161,7 +167,6 @@ class PostArchiver extends Post implements ArchiverInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while reviving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

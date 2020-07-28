@@ -26,7 +26,7 @@ class ThreadBookmarker extends BookmarkRepo implements BookmarkerInterface
 
     /**
      * Adds TimestampBehavior.
-     * @return array<string|int, mixed>
+     * @return array
      */
     public function behaviors(): array
     {

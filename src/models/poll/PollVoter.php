@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\poll;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\events\VoteEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
@@ -17,6 +18,8 @@ use Yii;
 use yii\base\InvalidArgumentException;
 use yii\base\Model;
 use yii\db\Exception;
+use yii\db\Transaction;
+
 use function count;
 
 /**
@@ -29,39 +32,49 @@ class PollVoter extends Model implements VoterInterface
     public const EVENT_AFTER_VOTING = 'podium.poll.voting.after';
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $member_id;
+    public ?int $member_id = null;
 
     /**
-     * @var int
+     * @var int|null
      */
-    public $poll_id;
+    public ?int $poll_id = null;
 
     /**
      * @var PollAnswerModelInterface[]
      */
-    public $answers;
+    public array $answers = [];
 
     /**
-     * @var string
+     * @var string|null
      */
-    public $choice_id;
+    public ?string $choice_id = null;
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for poll voter');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param PollModelInterface $poll
+     * @throws InsufficientDataException
      */
     public function setPoll(PollModelInterface $poll): void
     {
-        $this->poll_id = $poll->getId();
+        $pollId = $poll->getId();
+        if ($pollId === null) {
+            throw new InsufficientDataException('Missing poll Id for poll voter');
+        }
+        $this->poll_id = $pollId;
         $this->choice_id = $poll->getChoiceId();
     }
 
@@ -110,6 +123,7 @@ class PollVoter extends Model implements VoterInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             /* @var $pollAnswer PollAnswerModelInterface  */
@@ -136,7 +150,6 @@ class PollVoter extends Model implements VoterInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while voting', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

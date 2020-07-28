@@ -8,6 +8,7 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\events\MessageEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageFormInterface;
 use bizley\podium\api\interfaces\MessageParticipantModelInterface;
@@ -18,6 +19,7 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\Exception;
+use yii\db\Transaction;
 use yii\di\Instance;
 
 /**
@@ -30,7 +32,7 @@ class MessageMessenger extends Message implements MessengerInterface
     public const EVENT_AFTER_SENDING = 'podium.message.sending.after';
 
     /**
-     * @var string|array|MessageFormInterface message form handler
+     * @var string|array|object|MessageFormInterface message form handler
      * Component ID, class, configuration array, or instance of MessageFormInterface.
      */
     public $messageFormHandler = \bizley\podium\api\models\message\MessageForm::class;
@@ -50,46 +52,51 @@ class MessageMessenger extends Message implements MessengerInterface
      */
     public function getForm(): MessageFormInterface
     {
-        return new $this->messageFormHandler;
+        return new $this->messageFormHandler();
     }
 
-    private $_senderId;
+    private ?int $senderId = null;
 
     /**
      * @param MembershipInterface $sender
+     * @throws InsufficientDataException
      */
     public function setSender(MembershipInterface $sender): void
     {
-        $this->_senderId = $sender->getId();
+        $senderId = $sender->getId();
+        if ($senderId === null) {
+            throw new InsufficientDataException('Missing sender Id for message messenger');
+        }
+        $this->senderId = $senderId;
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getSender(): int
+    public function getSender(): ?int
     {
-        return $this->_senderId;
+        return $this->senderId;
     }
 
-    private $_receiverId;
+    private ?int $receiverId = null;
 
     /**
      * @param MembershipInterface $receiver
      */
     public function setReceiver(MembershipInterface $receiver): void
     {
-        $this->_receiverId = $receiver->getId();
+        $this->receiverId = $receiver->getId();
     }
 
     /**
-     * @return int
+     * @return int|null
      */
-    public function getReceiver(): int
+    public function getReceiver(): ?int
     {
-        return $this->_receiverId;
+        return $this->receiverId;
     }
 
-    private $_replyTo;
+    private ?MessageParticipantModelInterface $replyTo = null;
 
     /**
      * @param MessageParticipantModelInterface|null $replyTo
@@ -97,7 +104,7 @@ class MessageMessenger extends Message implements MessengerInterface
     public function setReplyTo(?MessageParticipantModelInterface $replyTo): void
     {
         if ($replyTo) {
-            $this->_replyTo = $replyTo;
+            $this->replyTo = $replyTo;
         }
     }
 
@@ -106,7 +113,7 @@ class MessageMessenger extends Message implements MessengerInterface
      */
     public function getReplyTo(): ?MessageParticipantModelInterface
     {
-        return $this->_replyTo;
+        return $this->replyTo;
     }
 
     /**
@@ -168,20 +175,15 @@ class MessageMessenger extends Message implements MessengerInterface
             return PodiumResponse::error();
         }
 
-        if (
-            $this->getReplyTo()
-            && (
-                $this->getReceiver() !== $this->getReplyTo()->getMemberId()
-                || $this->getReplyTo()->getSideId() !== MessageSide::SENDER
-            )
-        ) {
-            $this->addError('reply_to_id', Yii::t('podium.error', 'message.wrong.reply'));
+        $replyTo = $this->getReplyTo();
+        if ($replyTo) {
+            if ($replyTo->getSideId() !== MessageSide::SENDER || $this->getReceiver() !== $replyTo->getMemberId()) {
+                $this->addError('reply_to_id', Yii::t('podium.error', 'message.wrong.reply'));
 
-            return PodiumResponse::error($this);
-        }
+                return PodiumResponse::error($this);
+            }
 
-        if ($this->getReplyTo()) {
-            $replyMessage = $this->getReplyTo()->getParent();
+            $replyMessage = $replyTo->getParent();
             if ($replyMessage) {
                 $this->reply_to_id = $replyMessage->getId();
             }
@@ -191,16 +193,26 @@ class MessageMessenger extends Message implements MessengerInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
                 throw new Exception('Error while creating message!');
             }
 
+            $sender = $this->getSender();
+            if ($sender === null) {
+                throw new Exception('Can not find sender for message messenger!');
+            }
+            $receiver = $this->getReceiver();
+            if ($receiver === null) {
+                throw new Exception('Can not find receiver for message messenger!');
+            }
+
             if ($this->reply_to_id !== null) {
                 $messageForm = $this->getForm();
 
-                $messageToReply = $messageForm->findMessageToReply($this->getSender(), $this->reply_to_id);
+                $messageToReply = $messageForm->findMessageToReply($sender, $this->reply_to_id);
                 if ($messageToReply === null) {
                     throw new Exception('Can not find message participant copy to change its status!');
                 }
@@ -211,7 +223,7 @@ class MessageMessenger extends Message implements MessengerInterface
             }
 
             $senderCopy = $this->getForm();
-            $senderCopy->setSenderId($this->getSender());
+            $senderCopy->setSenderId($sender);
             $senderCopy->setMessageId($this->id);
             $senderCopy->setStatusId(MessageStatus::READ);
             $senderCopy->setSideId(MessageSide::SENDER);
@@ -220,7 +232,7 @@ class MessageMessenger extends Message implements MessengerInterface
             }
 
             $receiverCopy = $this->getForm();
-            $receiverCopy->setSenderId($this->getReceiver());
+            $receiverCopy->setSenderId($receiver);
             $receiverCopy->setMessageId($this->id);
             $receiverCopy->setStatusId(MessageStatus::NEW);
             $receiverCopy->setSideId(MessageSide::RECEIVER);
@@ -232,7 +244,6 @@ class MessageMessenger extends Message implements MessengerInterface
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while creating message', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

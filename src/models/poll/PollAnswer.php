@@ -24,7 +24,6 @@ use yii\db\ActiveRecord;
  *
  * @property ModelInterface $parent
  * @property Poll $poll
- * @property int $pollId
  */
 class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
 {
@@ -110,9 +109,11 @@ class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        /* @var $query ActiveQuery */
+    public static function findByFilter(
+        DataFilter $filter = null,
+        $sort = null,
+        $pagination = null
+    ): DataProviderInterface {
         $query = static::find();
 
         if ($filter !== null) {
@@ -141,8 +142,8 @@ class PollAnswer extends PollAnswerRepo implements PollAnswerModelInterface
      */
     public function convert(string $targetClass)
     {
-        /* @var $targetModel ActiveRecord */
-        $targetModel = new $targetClass;
+        /** @var ActiveRecord $targetModel  */
+        $targetModel = new $targetClass();
 
         if (static::tableName() !== $targetModel::tableName()) {
             throw new InvalidArgumentException('You can only convert object extending the same repository.');

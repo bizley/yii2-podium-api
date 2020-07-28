@@ -10,7 +10,7 @@ use yii\db\ActiveRecord;
  * Message Active Record.
  *
  * @property int $id
- * @property int $reply_to_id
+ * @property int|null $reply_to_id
  * @property string $subject
  * @property string $content
  * @property int $created_at

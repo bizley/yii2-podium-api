@@ -8,6 +8,7 @@ use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\AnswerFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
@@ -16,14 +17,16 @@ use bizley\podium\api\interfaces\PollFormInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PollVoteRepo;
 use Throwable;
-use function time;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\Exception;
+use yii\db\Transaction;
 use yii\di\Instance;
+
+use function time;
 
 /**
  * Class PostPollForm
@@ -39,13 +42,13 @@ class PollForm extends Poll implements PollFormInterface
     public const EVENT_AFTER_EDITING = 'podium.poll.editing.after';
 
     /**
-     * @var string|array|ModelFormInterface poll answer form handler
+     * @var string|array|object|ModelFormInterface poll answer form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
     public $answerFormHandler = \bizley\podium\api\models\poll\PollAnswerForm::class;
 
     /**
-     * @var string|array|RemoverInterface poll answer remover
+     * @var string|array|object|RemoverInterface poll answer remover
      * Component ID, class, configuration array, or instance of RemoverInterface.
      */
     public $answerRemoverHandler = \bizley\podium\api\models\poll\PollAnswerRemover::class;
@@ -53,7 +56,7 @@ class PollForm extends Poll implements PollFormInterface
     /**
      * @var array
      */
-    public $answers = [];
+    public array $answers = [];
 
     /**
      * @throws InvalidConfigException
@@ -74,14 +77,14 @@ class PollForm extends Poll implements PollFormInterface
         return $this->hasMany(PollAnswerForm::class, ['poll_id' => 'id']);
     }
 
-    private $_oldAnswers = [];
+    private array $oldAnswers = [];
 
     /**
      * @return array
      */
     public function getOldAnswers(): array
     {
-        return $this->_oldAnswers;
+        return $this->oldAnswers;
     }
 
     /**
@@ -90,7 +93,7 @@ class PollForm extends Poll implements PollFormInterface
      */
     public function addOldAnswer(int $id, string $oldAnswer): void
     {
-        $this->_oldAnswers[$id] = $oldAnswer;
+        $this->oldAnswers[$id] = $oldAnswer;
     }
 
     public function afterFind(): void
@@ -107,18 +110,28 @@ class PollForm extends Poll implements PollFormInterface
 
     /**
      * @param MembershipInterface $author
+     * @throws InsufficientDataException
      */
     public function setAuthor(MembershipInterface $author): void
     {
-        $this->author_id = $author->getId();
+        $authorId = $author->getId();
+        if ($authorId === null) {
+            throw new InsufficientDataException('Missing author Id for poll form');
+        }
+        $this->author_id = $authorId;
     }
 
     /**
      * @param ModelInterface $thread
+     * @throws InsufficientDataException
      */
     public function setThread(ModelInterface $thread): void
     {
-        $this->thread_id = $thread->getId();
+        $threadId = $thread->getId();
+        if ($threadId === null) {
+            throw new InsufficientDataException('Missing thread Id for poll form');
+        }
+        $this->thread_id = $threadId;
     }
 
     /**
@@ -174,7 +187,7 @@ class PollForm extends Poll implements PollFormInterface
      */
     public function getAnswerForm(): ModelFormInterface
     {
-        return new $this->answerFormHandler;
+        return new $this->answerFormHandler();
     }
 
     /**
@@ -185,7 +198,7 @@ class PollForm extends Poll implements PollFormInterface
      */
     public function createAnswer(int $pollId, string $answer): PodiumResponse
     {
-        /* @var $pollAnswerForm AnswerFormInterface */
+        /** @var AnswerFormInterface $pollAnswerForm */
         $pollAnswerForm = $this->getAnswerForm();
 
         $pollAnswerForm->setPollId($pollId);
@@ -200,9 +213,11 @@ class PollForm extends Poll implements PollFormInterface
      */
     public function getAnswerRemover(int $answerId): ?RemoverInterface
     {
+        /** @var PollAnswerRemover $handler */
         $handler = $this->answerRemoverHandler;
-
-        return $handler::findById($answerId);
+        /** @var RemoverInterface|null $answerRemover */
+        $answerRemover = $handler::findById($answerId);
+        return $answerRemover;
     }
 
     /**
@@ -246,6 +261,7 @@ class PollForm extends Poll implements PollFormInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
@@ -262,7 +278,6 @@ class PollForm extends Poll implements PollFormInterface
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while creating poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
@@ -306,6 +321,7 @@ class PollForm extends Poll implements PollFormInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->save(false)) {
@@ -330,7 +346,6 @@ class PollForm extends Poll implements PollFormInterface
             $transaction->commit();
 
             return PodiumResponse::success($this->getOldAttributes());
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while editing poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

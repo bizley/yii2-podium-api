@@ -23,8 +23,6 @@ use yii\db\ActiveRecord;
  *
  * @property ModelInterface $parent
  * @property Message $message
- * @property int $memberId
- * @property string $sideId
  */
 class MessageParticipant extends MessageParticipantRepo implements MessageParticipantModelInterface
 {
@@ -58,7 +56,7 @@ class MessageParticipant extends MessageParticipantRepo implements MessagePartic
      */
     public function isArchived(): bool
     {
-        return (bool) $this->archived;
+        return (bool)$this->archived;
     }
 
     /**
@@ -109,9 +107,11 @@ class MessageParticipant extends MessageParticipantRepo implements MessagePartic
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        /* @var $query ActiveQuery */
+    public static function findByFilter(
+        DataFilter $filter = null,
+        $sort = null,
+        $pagination = null
+    ): DataProviderInterface {
         $query = static::find();
 
         if ($filter !== null) {
@@ -140,8 +140,8 @@ class MessageParticipant extends MessageParticipantRepo implements MessagePartic
      */
     public function convert(string $targetClass)
     {
-        /* @var $targetModel ActiveRecord */
-        $targetModel = new $targetClass;
+        /** @var ActiveRecord $targetModel */
+        $targetModel = new $targetClass();
 
         if (static::tableName() !== $targetModel::tableName()) {
             throw new InvalidArgumentException('You can only convert object extending the same repository.');

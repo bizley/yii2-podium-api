@@ -13,6 +13,7 @@ use Throwable;
 use Yii;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use yii\db\Transaction;
 use yii\di\Instance;
 
 /**
@@ -25,7 +26,7 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
     public const EVENT_AFTER_REMOVING = 'podium.message.participant.removing.after';
 
     /**
-     * @var string|array|ModelInterface message handler
+     * @var string|array|object|ModelInterface message handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
     public $messageHandler = \bizley\podium\api\models\message\Message::class;
@@ -48,8 +49,7 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
     public static function findByMessageIdAndParticipant(
         int $messageId,
         MembershipInterface $participant
-    ): ?MessageRemoverInterface
-    {
+    ): ?MessageRemoverInterface {
         return static::findOne([
             'message_id' => $messageId,
             'member_id' => $participant->getId(),
@@ -82,6 +82,7 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if ((int)static::find()->where(['message_id' => $this->message_id])->count() === 1) {
@@ -91,6 +92,7 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
                     throw new Exception('Error while deleting message copy!');
                 }
 
+                /** @var ModelInterface $messageClass */
                 $messageClass = $this->messageHandler;
 
                 $messageRepo = $messageClass::findById($this->message_id);
@@ -116,7 +118,6 @@ class MessageRemover extends MessageParticipant implements MessageRemoverInterfa
             $transaction->commit();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while removing message', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

@@ -16,13 +16,13 @@ use yii\data\Pagination;
 use yii\data\Sort;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
+
 use function method_exists;
 
 /**
  * Class Post
  * @package bizley\podium\api\models\post
  *
- * @property ModelInterface $parent
  * @property Thread $thread
  */
 class Post extends PostRepo implements ModelInterface
@@ -91,9 +91,11 @@ class Post extends PostRepo implements ModelInterface
      * @param Pagination|array|bool|null $pagination
      * @return ActiveDataProvider
      */
-    public static function findByFilter(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        /* @var $query ActiveQuery */
+    public static function findByFilter(
+        DataFilter $filter = null,
+        $sort = null,
+        $pagination = null
+    ): DataProviderInterface {
         $query = static::find();
 
         if ($filter !== null) {
@@ -122,8 +124,8 @@ class Post extends PostRepo implements ModelInterface
      */
     public function convert(string $targetClass)
     {
-        /* @var $targetModel ActiveRecord */
-        $targetModel = new $targetClass;
+        /** @var ActiveRecord $targetModel */
+        $targetModel = new $targetClass();
 
         if (!method_exists($targetModel, 'tableName') || static::tableName() !== $targetModel::tableName()) {
             throw new InvalidArgumentException('You can only convert object extending the same repository.');

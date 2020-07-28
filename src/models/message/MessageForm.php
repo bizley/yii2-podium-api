@@ -11,7 +11,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * Class PollAnswerForm
+ * Class MessageForm
  * @package bizley\podium\api\models\message
  */
 class MessageForm extends MessageParticipant implements MessageFormInterface

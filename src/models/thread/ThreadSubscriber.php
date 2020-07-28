@@ -27,7 +27,7 @@ class ThreadSubscriber extends SubscriptionRepo implements SubscriberInterface
     public const EVENT_AFTER_UNSUBSCRIBING = 'podium.subscription.unsubscribing.after';
 
     /**
-     * @return array<string|int, mixed>
+     * @return array
      */
     public function behaviors(): array
     {

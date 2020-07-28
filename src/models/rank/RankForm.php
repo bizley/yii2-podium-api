@@ -22,7 +22,7 @@ class RankForm extends Rank implements ModelFormInterface
     public const EVENT_AFTER_EDITING = 'podium.rank.editing.after';
 
     /**
-     * @return array<string|int, mixed>
+     * @return array
      */
     public function behaviors(): array
     {
@@ -30,7 +30,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @return array<string|int, mixed>
+     * @return array
      */
     public function rules(): array
     {
@@ -43,7 +43,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @return array<string, string>
+     * @return array
      */
     public function attributeLabels(): array
     {
@@ -54,7 +54,7 @@ class RankForm extends Rank implements ModelFormInterface
     }
 
     /**
-     * @param array<string, mixed> $data
+     * @param array $data
      * @return bool
      */
     public function loadData(array $data = []): bool

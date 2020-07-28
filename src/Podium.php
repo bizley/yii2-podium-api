@@ -19,6 +19,7 @@ use yii\base\InvalidConfigException;
 use yii\di\ServiceLocator;
 use yii\helpers\ArrayHelper;
 use yii\i18n\PhpMessageSource;
+
 use function is_array;
 
 /**
@@ -50,19 +51,17 @@ use function is_array;
  * @property Post $post
  * @property Rank $rank
  * @property Thread $thread
- *
- * @property string $version
  */
 class Podium extends ServiceLocator
 {
-    private $_version = '1.0.0';
+    private string $version = '1.0.0';
 
     /**
      * @return string
      */
     public function getVersion(): string
     {
-        return $this->_version;
+        return $this->version;
     }
 
     /**
@@ -85,7 +84,7 @@ class Podium extends ServiceLocator
     /**
      * @throws InvalidConfigException
      */
-    public function init() // BC signature
+    public function init(): void
     {
         parent::init();
 

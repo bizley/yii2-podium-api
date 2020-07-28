@@ -89,7 +89,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
 
     /**
      * Adds TimestampBehavior and SluggableBehavior.
-     * @return array<int|string, mixed>
+     * @return array
      */
     public function behaviors(): array
     {
@@ -105,7 +105,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @return array<int|string, mixed>
+     * @return array
      */
     public function rules(): array
     {
@@ -118,7 +118,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @return array<string, string>
+     * @return array
      */
     public function attributeLabels(): array
     {
@@ -129,7 +129,7 @@ class ThreadForm extends Thread implements CategorisedFormInterface
     }
 
     /**
-     * @param array<string|int, mixed> $data
+     * @param array $data
      * @return bool
      */
     public function loadData(array $data = []): bool
