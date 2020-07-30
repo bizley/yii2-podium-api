@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\BefrienderInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
@@ -15,7 +16,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * Class MemberFriendship
+ * Class MemberBefriender
  * @package bizley\podium\api\models\member
  */
 class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
@@ -40,18 +41,28 @@ class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for member befriender');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param MembershipInterface $target
+     * @throws InsufficientDataException
      */
     public function setTarget(MembershipInterface $target): void
     {
-        $this->target_id = $target->getId();
+        $targetId = $target->getId();
+        if ($targetId === null) {
+            throw new InsufficientDataException('Missing target Id for member befriender');
+        }
+        $this->target_id = $targetId;
     }
 
     /**
@@ -123,6 +134,7 @@ class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $friendship */
         $friendship = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
@@ -137,14 +149,12 @@ class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
         try {
             if ($friendship->delete() === false) {
                 Yii::error('Error while unfriending member', 'podium');
-
                 return PodiumResponse::error();
             }
 
             $this->afterUnfriend();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while unfriending member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 

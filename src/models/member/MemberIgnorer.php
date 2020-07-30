@@ -7,6 +7,7 @@ namespace bizley\podium\api\models\member;
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\events\AcquaintanceEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\IgnorerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\repos\AcquaintanceRepo;
@@ -40,18 +41,28 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnorerInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for member ignorer');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param MembershipInterface $target
+     * @throws InsufficientDataException
      */
     public function setTarget(MembershipInterface $target): void
     {
-        $this->target_id = $target->getId();
+        $targetId = $target->getId();
+        if ($targetId === null) {
+            throw new InsufficientDataException('Missing target Id for member ignorer');
+        }
+        $this->target_id = $targetId;
     }
 
     /**
@@ -123,6 +134,7 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnorerInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $ignoring */
         $ignoring = static::find()->where([
             'member_id' => $this->member_id,
             'target_id' => $this->target_id,
@@ -144,7 +156,6 @@ class MemberIgnorer extends AcquaintanceRepo implements IgnorerInterface
             $this->afterUnignore();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while unignoring member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 

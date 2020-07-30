@@ -114,6 +114,8 @@ class MemberForm extends Member implements ModelFormInterface
      */
     public function create(): PodiumResponse
     {
-        throw new NotSupportedException('Member must not be created using this form. Use bizley\podium\api\models\member\MemberRegisterer.');
+        throw new NotSupportedException(
+            'Member must not be created using this form. Use bizley\podium\api\models\member\MemberRegisterer.'
+        );
     }
 }

@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\member;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\GroupEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\GrouperInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -40,18 +41,28 @@ class MemberGrouper extends GroupMemberRepo implements GrouperInterface
 
     /**
      * @param MembershipInterface $member
+     * @throws InsufficientDataException
      */
     public function setMember(MembershipInterface $member): void
     {
-        $this->member_id = $member->getId();
+        $memberId = $member->getId();
+        if ($memberId === null) {
+            throw new InsufficientDataException('Missing member Id for member grouper');
+        }
+        $this->member_id = $memberId;
     }
 
     /**
      * @param ModelInterface $group
+     * @throws InsufficientDataException
      */
     public function setGroup(ModelInterface $group): void
     {
-        $this->group_id = $group->getId();
+        $groupId = $group->getId();
+        if ($groupId === null) {
+            throw new InsufficientDataException('Missing group Id for member grouper');
+        }
+        $this->group_id = $groupId;
     }
 
     /**
@@ -121,6 +132,7 @@ class MemberGrouper extends GroupMemberRepo implements GrouperInterface
             return PodiumResponse::error();
         }
 
+        /** @var self|null $groupMember */
         $groupMember = static::find()->where([
             'member_id' => $this->member_id,
             'group_id' => $this->group_id,

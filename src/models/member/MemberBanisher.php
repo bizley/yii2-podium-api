@@ -12,7 +12,7 @@ use Yii;
 use yii\behaviors\TimestampBehavior;
 
 /**
- * Class MemberBanner
+ * Class MemberBanisher
  * @package bizley\podium\api\models\member
  */
 class MemberBanisher extends Member implements BanisherInterface
