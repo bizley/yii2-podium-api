@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use yii\db\Connection;
 use yii\db\Migration;
 
 class m180805_121100_create_table_podium_forum extends Migration
 {
-    public function up(): void
+    public function up(): bool
     {
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
+        /** @var Connection $db */
+        $db = $this->db;
+        if ($db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
@@ -33,18 +36,29 @@ class m180805_121100_create_table_podium_forum extends Migration
 
         $this->addForeignKey(
             'fk-podium_forum-author_id',
-            '{{%podium_forum}}', 'author_id',
-            '{{%podium_member}}', 'id',
-            'NO ACTION', 'CASCADE');
+            '{{%podium_forum}}',
+            'author_id',
+            '{{%podium_member}}',
+            'id',
+            'NO ACTION',
+            'CASCADE'
+        );
         $this->addForeignKey(
             'fk-podium_forum-category_id',
-            '{{%podium_forum}}', 'category_id',
-            '{{%podium_category}}', 'id',
-            'CASCADE', 'CASCADE');
+            '{{%podium_forum}}',
+            'category_id',
+            '{{%podium_category}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+
+        return true;
     }
 
-    public function down(): void
+    public function down(): bool
     {
         $this->dropTable('{{%podium_forum}}');
+        return true;
     }
 }

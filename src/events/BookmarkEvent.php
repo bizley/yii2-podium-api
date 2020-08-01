@@ -16,10 +16,10 @@ class BookmarkEvent extends Event
     /**
      * @var bool whether model can be marked
      */
-    public $canMark = true;
+    public bool $canMark = true;
 
     /**
-     * @var BookmarkerInterface
+     * @var BookmarkerInterface|null
      */
-    public $model;
+    public ?BookmarkerInterface $model = null;
 }

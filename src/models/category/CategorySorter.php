@@ -12,6 +12,7 @@ use bizley\podium\api\repos\CategoryRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
+use yii\db\Transaction;
 
 /**
  * Class CategorySorter
@@ -83,6 +84,7 @@ class CategorySorter extends CategoryRepo implements SorterInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $nextOrder = 0;
@@ -102,7 +104,6 @@ class CategorySorter extends CategoryRepo implements SorterInterface
             $this->afterSort();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while sorting categories', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

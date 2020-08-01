@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use yii\db\Connection;
 use yii\db\Migration;
 
 class m180106_052800_create_table_podium_acquaintance extends Migration
 {
-    public function up(): void
+    public function up(): bool
     {
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
+        /** @var Connection $db */
+        $db = $this->db;
+        if ($db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
             $typeId = 'ENUM("friend","ignore") NOT NULL';
         } else {
@@ -26,18 +29,31 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
         ], $tableOptions);
 
         $this->addPrimaryKey('pk-podium_acquaintance', '{{%podium_acquaintance}}', ['member_id', 'target_id']);
-        $this->addForeignKey('fk-podium_acquaintance-member_id',
-            '{{%podium_acquaintance}}', 'member_id',
-            '{{%podium_member}}', 'id',
-            'CASCADE', 'CASCADE');
-        $this->addForeignKey('fk-podium_acquaintance-target_id',
-            '{{%podium_acquaintance}}', 'target_id',
-            '{{%podium_member}}', 'id',
-            'CASCADE', 'CASCADE');
+        $this->addForeignKey(
+            'fk-podium_acquaintance-member_id',
+            '{{%podium_acquaintance}}',
+            'member_id',
+            '{{%podium_member}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-podium_acquaintance-target_id',
+            '{{%podium_acquaintance}}',
+            'target_id',
+            '{{%podium_member}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+
+        return true;
     }
 
-    public function down(): void
+    public function down(): bool
     {
         $this->dropTable('{{%podium_acquaintance}}');
+        return true;
     }
 }

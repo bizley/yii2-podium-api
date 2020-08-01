@@ -14,7 +14,7 @@ interface RegistererInterface
 {
     /**
      * Loads registration data.
-     * @param array|null $data account data
+     * @param array $data account data
      * @return bool
      */
     public function loadData(array $data = []): bool;

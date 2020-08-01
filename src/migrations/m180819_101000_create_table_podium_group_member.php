@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use yii\db\Connection;
 use yii\db\Migration;
 
 class m180819_101000_create_table_podium_group_member extends Migration
 {
-    public function up(): void
+    public function up(): bool
     {
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
+        /** @var Connection $db */
+        $db = $this->db;
+        if ($db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
@@ -24,18 +27,29 @@ class m180819_101000_create_table_podium_group_member extends Migration
         $this->addPrimaryKey('pk-podium_group_member', '{{%podium_group_member}}', ['member_id', 'group_id']);
         $this->addForeignKey(
             'fk-podium_group_member-member_id',
-            '{{%podium_group_member}}', 'member_id',
-            '{{%podium_member}}', 'id',
-            'CASCADE', 'CASCADE');
+            '{{%podium_group_member}}',
+            'member_id',
+            '{{%podium_member}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
         $this->addForeignKey(
             'fk-podium_group_member-group_id',
-            '{{%podium_group_member}}', 'group_id',
-            '{{%podium_group}}', 'id',
-            'CASCADE', 'CASCADE');
+            '{{%podium_group_member}}',
+            'group_id',
+            '{{%podium_group}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+
+        return true;
     }
 
-    public function down(): void
+    public function down(): bool
     {
         $this->dropTable('{{%podium_group_member}}');
+        return true;
     }
 }

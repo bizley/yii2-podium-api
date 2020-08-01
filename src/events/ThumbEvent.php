@@ -16,20 +16,20 @@ class ThumbEvent extends Event
     /**
      * @var bool whether member can give thumb up
      */
-    public $canThumbUp = true;
+    public bool $canThumbUp = true;
 
     /**
      * @var bool whether member can give thumb down
      */
-    public $canThumbDown = true;
+    public bool $canThumbDown = true;
 
     /**
      * @var bool whether member can reset thumb
      */
-    public $canThumbReset = true;
+    public bool $canThumbReset = true;
 
     /**
-     * @var LikerInterface
+     * @var LikerInterface|null
      */
-    public $model;
+    public ?LikerInterface $model = null;
 }

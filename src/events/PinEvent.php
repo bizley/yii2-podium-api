@@ -16,15 +16,15 @@ class PinEvent extends Event
     /**
      * @var bool whether models can be pinned
      */
-    public $canPin = true;
+    public bool $canPin = true;
 
     /**
      * @var bool whether models can be unpinned
      */
-    public $canUnpin = true;
+    public bool $canUnpin = true;
 
     /**
-     * @var PinnerInterface
+     * @var PinnerInterface|null
      */
-    public $model;
+    public ?PinnerInterface $model = null;
 }

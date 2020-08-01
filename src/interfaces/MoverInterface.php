@@ -14,7 +14,7 @@ interface MoverInterface
 {
     /**
      * @param int $modelId
-     * @return MoverInterface|null
+     * @return ModelInterface|null
      */
     public static function findById(int $modelId): ?ModelInterface;
 

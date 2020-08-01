@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\MoveEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use Yii;
@@ -23,10 +24,15 @@ class ForumMover extends Forum implements MoverInterface
 
     /**
      * @param ModelInterface $category
+     * @throws InsufficientDataException
      */
     public function prepareCategory(ModelInterface $category): void
     {
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing category Id for forum mover');
+        }
+        $this->category_id = $categoryId;
     }
 
     /**

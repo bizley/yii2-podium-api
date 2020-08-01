@@ -11,7 +11,7 @@ use Throwable;
 use Yii;
 
 /**
- * Class ForumRemover
+ * Class CategoryRemover
  * @package bizley\podium\api\models\category
  */
 class CategoryRemover extends Category implements RemoverInterface
@@ -55,7 +55,6 @@ class CategoryRemover extends Category implements RemoverInterface
             $this->afterRemove();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while removing category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 

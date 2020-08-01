@@ -6,12 +6,14 @@ namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SorterInterface;
 use bizley\podium\api\repos\ForumRepo;
 use Throwable;
 use Yii;
 use yii\base\NotSupportedException;
+use yii\db\Transaction;
 
 /**
  * Class ForumSorter
@@ -22,14 +24,19 @@ class ForumSorter extends ForumRepo implements SorterInterface
     public const EVENT_BEFORE_SORTING = 'podium.forum.sorting.before';
     public const EVENT_AFTER_SORTING = 'podium.forum.sorting.after';
 
-    public $sortOrder;
+    public array $sortOrder = [];
 
     /**
      * @param ModelInterface $category
+     * @throws InsufficientDataException
      */
     public function setCategory(ModelInterface $category): void
     {
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing category Id for forum sorter');
+        }
+        $this->category_id = $categoryId;
     }
 
     /**
@@ -91,6 +98,7 @@ class ForumSorter extends ForumRepo implements SorterInterface
             return PodiumResponse::error($this);
         }
 
+        /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $nextOrder = 0;
@@ -113,7 +121,6 @@ class ForumSorter extends ForumRepo implements SorterInterface
             $this->afterSort();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');

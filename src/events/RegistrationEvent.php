@@ -16,10 +16,10 @@ class RegistrationEvent extends Event
     /**
      * @var bool whether member can be registered
      */
-    public $canRegister = true;
+    public bool $canRegister = true;
 
     /**
-     * @var MemberRegisterer
+     * @var MemberRegisterer|null
      */
-    public $model;
+    public ?MemberRegisterer $model = null;
 }

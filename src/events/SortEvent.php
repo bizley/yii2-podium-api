@@ -15,5 +15,5 @@ class SortEvent extends Event
     /**
      * @var bool whether models can be sorted
      */
-    public $canSort = true;
+    public bool $canSort = true;
 }

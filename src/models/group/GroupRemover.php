@@ -49,7 +49,6 @@ class GroupRemover extends Group implements RemoverInterface
             $this->afterRemove();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while removing group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 

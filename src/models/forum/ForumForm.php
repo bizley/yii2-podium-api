@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\forum;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -27,18 +28,28 @@ class ForumForm extends Forum implements CategorisedFormInterface
 
     /**
      * @param MembershipInterface $author
+     * @throws InsufficientDataException
      */
     public function setAuthor(MembershipInterface $author): void
     {
-        $this->author_id = $author->getId();
+        $authorId = $author->getId();
+        if ($authorId === null) {
+            throw new InsufficientDataException('Missing author Id for forum form');
+        }
+        $this->author_id = $authorId;
     }
 
     /**
      * @param ModelInterface $category
+     * @throws InsufficientDataException
      */
     public function setCategory(ModelInterface $category): void
     {
-        $this->category_id = $category->getId();
+        $categoryId = $category->getId();
+        if ($categoryId === null) {
+            throw new InsufficientDataException('Missing category Id for forum form');
+        }
+        $this->category_id = $categoryId;
     }
 
     /**

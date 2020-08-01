@@ -17,25 +17,25 @@ class AcquaintanceEvent extends Event
     /**
      * @var bool whether member and target can be friends
      */
-    public $canBeFriends = true;
+    public bool $canBeFriends = true;
 
     /**
      * @var bool whether member can unfriend target
      */
-    public $canUnfriend = true;
+    public bool $canUnfriend = true;
 
     /**
      * @var bool whether member can ignore target
      */
-    public $canIgnore = true;
+    public bool $canIgnore = true;
 
     /**
      * @var bool whether member can unignore target
      */
-    public $canUnignore = true;
+    public bool $canUnignore = true;
 
     /**
-     * @var BefrienderInterface|IgnorerInterface
+     * @var BefrienderInterface|IgnorerInterface|null
      */
     public $model;
 }

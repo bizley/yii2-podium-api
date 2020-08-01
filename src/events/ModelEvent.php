@@ -16,15 +16,15 @@ class ModelEvent extends Event
     /**
      * @var bool whether model can be created
      */
-    public $canCreate = true;
+    public bool $canCreate = true;
 
     /**
      * @var bool whether model can be edited
      */
-    public $canEdit = true;
+    public bool $canEdit = true;
 
     /**
-     * @var ModelInterface
+     * @var ModelInterface|null
      */
-    public $model;
+    public ?ModelInterface $model = null;
 }

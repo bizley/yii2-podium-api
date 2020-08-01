@@ -14,7 +14,7 @@ interface ModelFormInterface
 {
     /**
      * @param int $modelFormId
-     * @return ModelFormInterface|null
+     * @return ModelInterface|null
      */
     public static function findById(int $modelFormId): ?ModelInterface;
 

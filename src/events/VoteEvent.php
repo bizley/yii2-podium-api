@@ -16,10 +16,10 @@ class VoteEvent extends Event
     /**
      * @var bool whether model can be voted for
      */
-    public $canVote = true;
+    public bool $canVote = true;
 
     /**
-     * @var VoterInterface
+     * @var VoterInterface|null
      */
-    public $model;
+    public ?VoterInterface $model = null;
 }

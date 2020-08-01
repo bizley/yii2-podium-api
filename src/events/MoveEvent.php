@@ -16,10 +16,10 @@ class MoveEvent extends Event
     /**
      * @var bool whether model can be moved
      */
-    public $canMove = true;
+    public bool $canMove = true;
 
     /**
-     * @var MoverInterface
+     * @var MoverInterface|null
      */
-    public $model;
+    public ?MoverInterface $model = null;
 }

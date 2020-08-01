@@ -16,15 +16,15 @@ class BanEvent extends Event
     /**
      * @var bool whether member can be banned
      */
-    public $canBan = true;
+    public bool $canBan = true;
 
     /**
      * @var bool whether member can be unbanned
      */
-    public $canUnban = true;
+    public bool $canUnban = true;
 
     /**
-     * @var BanisherInterface
+     * @var BanisherInterface|null
      */
-    public $model;
+    public ?BanisherInterface $model = null;
 }

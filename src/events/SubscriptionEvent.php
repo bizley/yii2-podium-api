@@ -16,15 +16,15 @@ class SubscriptionEvent extends Event
     /**
      * @var bool whether model can be subscribed
      */
-    public $canSubscribe = true;
+    public bool $canSubscribe = true;
 
     /**
      * @var bool whether model can be unsubscribed
      */
-    public $canUnsubscribe = true;
+    public bool $canUnsubscribe = true;
 
     /**
-     * @var SubscriberInterface
+     * @var SubscriberInterface|null
      */
-    public $model;
+    public ?SubscriberInterface $model = null;
 }

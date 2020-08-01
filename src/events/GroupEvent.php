@@ -16,15 +16,15 @@ class GroupEvent extends Event
     /**
      * @var bool whether model can be joined
      */
-    public $canJoin = true;
+    public bool $canJoin = true;
 
     /**
      * @var bool whether model can be left
      */
-    public $canLeave = true;
+    public bool $canLeave = true;
 
     /**
-     * @var GrouperInterface
+     * @var GrouperInterface|null
      */
-    public $model;
+    public ?GrouperInterface $model = null;
 }

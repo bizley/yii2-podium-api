@@ -15,5 +15,5 @@ class RemoveEvent extends Event
     /**
      * @var bool whether model can be removed
      */
-    public $canRemove = true;
+    public bool $canRemove = true;
 }

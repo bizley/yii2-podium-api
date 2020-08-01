@@ -16,15 +16,15 @@ class ArchiveEvent extends Event
     /**
      * @var bool whether model can be archived
      */
-    public $canArchive = true;
+    public bool $canArchive = true;
 
     /**
      * @var bool whether model can be revived
      */
-    public $canRevive = true;
+    public bool $canRevive = true;
 
     /**
-     * @var ArchiverInterface
+     * @var ArchiverInterface|null
      */
-    public $model;
+    public ?ArchiverInterface $model = null;
 }

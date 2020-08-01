@@ -6,6 +6,7 @@ namespace bizley\podium\api\models\category;
 
 use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\AuthoredFormInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use Yii;
@@ -25,10 +26,15 @@ class CategoryForm extends Category implements AuthoredFormInterface
 
     /**
      * @param MembershipInterface $author
+     * @throws InsufficientDataException
      */
     public function setAuthor(MembershipInterface $author): void
     {
-        $this->author_id = $author->getId();
+        $authorId = $author->getId();
+        if ($authorId === null) {
+            throw new InsufficientDataException('Missing author Id for category form');
+        }
+        $this->author_id = $authorId;
     }
 
     /**

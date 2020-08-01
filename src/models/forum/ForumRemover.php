@@ -55,7 +55,6 @@ class ForumRemover extends Forum implements RemoverInterface
             $this->afterRemove();
 
             return PodiumResponse::success();
-
         } catch (Throwable $exc) {
             Yii::error(['Exception while removing forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 

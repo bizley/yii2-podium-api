@@ -13,7 +13,7 @@ interface MessageArchiverInterface extends ArchiverInterface
     /**
      * @param int $messageId
      * @param MembershipInterface $participant
-     * @return RemoverInterface|null
+     * @return MessageArchiverInterface|null
      */
     public static function findByMessageIdAndParticipant(
         int $messageId,

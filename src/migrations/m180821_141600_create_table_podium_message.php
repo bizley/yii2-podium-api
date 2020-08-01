@@ -4,14 +4,17 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\migrations;
 
+use yii\db\Connection;
 use yii\db\Migration;
 
 class m180821_141600_create_table_podium_message extends Migration
 {
-    public function up(): void
+    public function up(): bool
     {
         $tableOptions = null;
-        if ($this->db->driverName === 'mysql') {
+        /** @var Connection $db */
+        $db = $this->db;
+        if ($db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
         }
 
@@ -26,13 +29,20 @@ class m180821_141600_create_table_podium_message extends Migration
 
         $this->addForeignKey(
             'fk-podium_message-reply_to_id',
-            '{{%podium_message}}', 'reply_to_id',
-            '{{%podium_message}}', 'id',
-            'NO ACTION', 'CASCADE');
+            '{{%podium_message}}',
+            'reply_to_id',
+            '{{%podium_message}}',
+            'id',
+            'NO ACTION',
+            'CASCADE'
+        );
+
+        return true;
     }
 
-    public function down(): void
+    public function down(): bool
     {
         $this->dropTable('{{%podium_message}}');
+        return true;
     }
 }

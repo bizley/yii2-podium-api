@@ -16,15 +16,15 @@ class LockEvent extends Event
     /**
      * @var bool whether models can be locked
      */
-    public $canLock = true;
+    public bool $canLock = true;
 
     /**
      * @var bool whether models can be unlocked
      */
-    public $canUnlock = true;
+    public bool $canUnlock = true;
 
     /**
-     * @var PinnerInterface
+     * @var PinnerInterface|null
      */
-    public $model;
+    public ?PinnerInterface $model = null;
 }

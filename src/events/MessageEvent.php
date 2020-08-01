@@ -16,10 +16,10 @@ class MessageEvent extends Event
     /**
      * @var bool whether model can be created
      */
-    public $canSend = true;
+    public bool $canSend = true;
 
     /**
-     * @var MessengerInterface
+     * @var MessengerInterface|null
      */
-    public $model;
+    public ?MessengerInterface $model = null;
 }
