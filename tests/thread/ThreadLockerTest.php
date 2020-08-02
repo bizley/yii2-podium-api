@@ -96,11 +96,11 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_LOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->lock(1)->result);
-        $this->assertEquals(1, ThreadRepo::findOne(1)->locked);
+        self::assertTrue($this->podium()->thread->lock(1)->result);
+        self::assertEquals(1, ThreadRepo::findOne(1)->locked);
 
-        $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_LOCKING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadLocker::EVENT_AFTER_LOCKING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadLocker::EVENT_BEFORE_LOCKING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadLocker::EVENT_AFTER_LOCKING, $this->eventsRaised);
     }
 
     /**
@@ -113,8 +113,8 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->lock(1)->result);
-        $this->assertEquals(0, ThreadRepo::findOne(1)->locked);
+        self::assertFalse($this->podium()->thread->lock(1)->result);
+        self::assertEquals(0, ThreadRepo::findOne(1)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_LOCKING, $handler);
     }
@@ -124,7 +124,7 @@ class ThreadLockerTest extends DbTestCase
         $mock = $this->getMockBuilder(ThreadLocker::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->lock()->result);
+        self::assertFalse($mock->lock()->result);
     }
 
     /**
@@ -148,11 +148,11 @@ class ThreadLockerTest extends DbTestCase
             $this->eventsRaised[ThreadLocker::EVENT_AFTER_UNLOCKING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->unlock(2)->result);
-        $this->assertEquals(0, ThreadRepo::findOne(2)->locked);
+        self::assertTrue($this->podium()->thread->unlock(2)->result);
+        self::assertEquals(0, ThreadRepo::findOne(2)->locked);
 
-        $this->assertArrayHasKey(ThreadLocker::EVENT_BEFORE_UNLOCKING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadLocker::EVENT_AFTER_UNLOCKING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadLocker::EVENT_BEFORE_UNLOCKING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadLocker::EVENT_AFTER_UNLOCKING, $this->eventsRaised);
     }
 
     /**
@@ -165,8 +165,8 @@ class ThreadLockerTest extends DbTestCase
         };
         Event::on(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);
 
-        $this->assertFalse($this->podium()->thread->unlock(2)->result);
-        $this->assertEquals(1, ThreadRepo::findOne(2)->locked);
+        self::assertFalse($this->podium()->thread->unlock(2)->result);
+        self::assertEquals(1, ThreadRepo::findOne(2)->locked);
 
         Event::off(ThreadLocker::class, ThreadLocker::EVENT_BEFORE_UNLOCKING, $handler);
     }
@@ -176,7 +176,7 @@ class ThreadLockerTest extends DbTestCase
         $mock = $this->getMockBuilder(ThreadLocker::class)->setMethods(['save'])->getMock();
         $mock->method('save')->willReturn(false);
 
-        $this->assertFalse($mock->unlock()->result);
+        self::assertFalse($mock->unlock()->result);
     }
 
     /**

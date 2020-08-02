@@ -16,8 +16,15 @@ use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
+use bizley\podium\api\models\thread\ThreadArchiver;
+use bizley\podium\api\models\thread\ThreadBookmarker;
+use bizley\podium\api\models\thread\ThreadForm;
+use bizley\podium\api\models\thread\ThreadLocker;
+use bizley\podium\api\models\thread\ThreadMover;
+use bizley\podium\api\models\thread\ThreadPinner;
+use bizley\podium\api\models\thread\ThreadRemover;
+use bizley\podium\api\models\thread\ThreadSubscriber;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -29,79 +36,61 @@ use yii\helpers\ArrayHelper;
  * Class Thread
  * @package bizley\podium\api\base
  */
-class Thread extends Component implements ThreadInterface
+final class Thread extends Component implements ThreadInterface
 {
     /**
      * @var string|array|ModelInterface thread handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $modelHandler = \bizley\podium\api\models\thread\Thread::class;
+    public $modelConfig = \bizley\podium\api\models\thread\Thread::class;
 
     /**
      * @var string|array|CategorisedFormInterface thread form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
-    public $formHandler = \bizley\podium\api\models\thread\ThreadForm::class;
+    public $formConfig = ThreadForm::class;
 
     /**
      * @var string|array|SubscriberInterface thread subscriber handler
      * Component ID, class, configuration array, or instance of SubscriberInterface.
      */
-    public $subscriberHandler = \bizley\podium\api\models\thread\ThreadSubscriber::class;
+    public $subscriberConfig = ThreadSubscriber::class;
 
     /**
      * @var string|array|BookmarkerInterface thread bookmarker handler
      * Component ID, class, configuration array, or instance of BookmarkerInterface.
      */
-    public $bookmarkerHandler = \bizley\podium\api\models\thread\ThreadBookmarker::class;
+    public $bookmarkerConfig = ThreadBookmarker::class;
 
     /**
      * @var string|array|RemoverInterface thread remover handler
      * Component ID, class, configuration array, or instance of RemoverInterface.
      */
-    public $removerHandler = \bizley\podium\api\models\thread\ThreadRemover::class;
+    public $removerConfig = ThreadRemover::class;
 
     /**
      * @var string|array|ArchiverInterface thread archiver handler
      * Component ID, class, configuration array, or instance of ArchivableInterface.
      */
-    public $archiverHandler = \bizley\podium\api\models\thread\ThreadArchiver::class;
+    public $archiverConfig = ThreadArchiver::class;
 
     /**
      * @var string|array|MoverInterface thread mover handler
      * Component ID, class, configuration array, or instance of MovableInterface.
      */
-    public $moverHandler = \bizley\podium\api\models\thread\ThreadMover::class;
+    public $moverConfig = ThreadMover::class;
 
     /**
      * @var string|array|LockerInterface thread locker handler
      * Component ID, class, configuration array, or instance of LockerInterface.
      */
-    public $lockerHandler = \bizley\podium\api\models\thread\ThreadLocker::class;
+    public $lockerConfig = ThreadLocker::class;
 
     /**
      * @var string|array|PinnerInterface thread pinner handler
      * Component ID, class, configuration array, or instance of PinnerInterface.
      */
-    public $pinnerHandler = \bizley\podium\api\models\thread\ThreadPinner::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    public function init(): void
-    {
-        parent::init();
-
-        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        $this->subscriberHandler = Instance::ensure($this->subscriberHandler, SubscriberInterface::class);
-        $this->bookmarkerHandler = Instance::ensure($this->bookmarkerHandler, BookmarkerInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
-        $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
-        $this->lockerHandler = Instance::ensure($this->lockerHandler, LockerInterface::class);
-        $this->pinnerHandler = Instance::ensure($this->pinnerHandler, PinnerInterface::class);
-    }
+    public $pinnerConfig = ThreadPinner::class;
 
     /**
      * @param int $id
@@ -109,8 +98,8 @@ class Thread extends Component implements ThreadInterface
      */
     public function getById(int $id): ?ModelInterface
     {
-        $threadClass = $this->modelHandler;
-
+        /** @var ModelInterface $threadClass */
+        $threadClass = Instance::ensure($this->modelConfig, ModelInterface::class);
         return $threadClass::findById($id);
     }
 
@@ -122,8 +111,8 @@ class Thread extends Component implements ThreadInterface
      */
     public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $threadClass = $this->modelHandler;
-
+        /** @var ModelInterface $threadClass */
+        $threadClass = Instance::ensure($this->modelConfig, ModelInterface::class);
         return $threadClass::findByFilter($filter, $sort, $pagination);
     }
 
@@ -133,13 +122,14 @@ class Thread extends Component implements ThreadInterface
      */
     public function getForm(int $id = null): ?CategorisedFormInterface
     {
-        $handler = $this->formHandler;
-
+        /** @var CategorisedFormInterface $handler */
+        $handler = Instance::ensure($this->formConfig, CategorisedFormInterface::class);
         if ($id === null) {
-            return new $handler;
+            return $handler;
         }
-
-        return $handler::findById($id);
+        /** @var CategorisedFormInterface|null $findModel */
+        $findModel = $handler::findById($id);
+        return $findModel;
     }
 
     /**
@@ -151,7 +141,7 @@ class Thread extends Component implements ThreadInterface
      */
     public function create(array $data, MembershipInterface $author, ModelInterface $forum): PodiumResponse
     {
-        /* @var $threadForm CategorisedFormInterface */
+        /** @var CategorisedFormInterface $threadForm */
         $threadForm = $this->getForm();
 
         $threadForm->setAuthor($author);
@@ -174,21 +164,17 @@ class Thread extends Component implements ThreadInterface
     public function edit(array $data): PodiumResponse
     {
         $id = ArrayHelper::remove($data, 'id');
-
         if ($id === null) {
             throw new InsufficientDataException('ID key is missing.');
         }
 
         $threadForm = $this->getForm((int)$id);
-
         if ($threadForm === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         if (!$threadForm->loadData($data)) {
             return PodiumResponse::error();
         }
-
         return $threadForm->edit();
     }
 
@@ -198,9 +184,11 @@ class Thread extends Component implements ThreadInterface
      */
     public function getRemover(int $id): ?RemoverInterface
     {
-        $handler = $this->removerHandler;
-
-        return $handler::findById($id);
+        /** @var RemoverInterface $handler */
+        $handler = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        /** @var RemoverInterface|null $remover */
+        $remover = $handler::findById($id);
+        return $remover;
     }
 
     /**
@@ -212,11 +200,9 @@ class Thread extends Component implements ThreadInterface
     public function remove(int $id): PodiumResponse
     {
         $threadRemover = $this->getRemover($id);
-
         if ($threadRemover === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadRemover->remove();
     }
 
@@ -226,9 +212,11 @@ class Thread extends Component implements ThreadInterface
      */
     public function getMover(int $id): ?MoverInterface
     {
-        $handler = $this->moverHandler;
-
-        return $handler::findById($id);
+        /** @var MoverInterface $handler */
+        $handler = Instance::ensure($this->moverConfig, MoverInterface::class);
+        /** @var MoverInterface|null $mover */
+        $mover = $handler::findById($id);
+        return $mover;
     }
 
     /**
@@ -241,13 +229,10 @@ class Thread extends Component implements ThreadInterface
     public function move(int $id, ModelInterface $forum): PodiumResponse
     {
         $threadMover = $this->getMover($id);
-
         if ($threadMover === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         $threadMover->prepareForum($forum);
-
         return $threadMover->move();
     }
 
@@ -257,9 +242,11 @@ class Thread extends Component implements ThreadInterface
      */
     public function getPinner(int $id): ?PinnerInterface
     {
-        $handler = $this->pinnerHandler;
-
-        return $handler::findById($id);
+        /** @var PinnerInterface $handler */
+        $handler = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
+        /** @var PinnerInterface|null $pinner */
+        $pinner = $handler::findById($id);
+        return $pinner;
     }
 
     /**
@@ -271,11 +258,9 @@ class Thread extends Component implements ThreadInterface
     public function pin(int $id): PodiumResponse
     {
         $threadPinner = $this->getPinner($id);
-
         if ($threadPinner === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadPinner->pin();
     }
 
@@ -288,11 +273,9 @@ class Thread extends Component implements ThreadInterface
     public function unpin(int $id): PodiumResponse
     {
         $threadPinner = $this->getPinner($id);
-
         if ($threadPinner === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadPinner->unpin();
     }
 
@@ -302,9 +285,11 @@ class Thread extends Component implements ThreadInterface
      */
     public function getLocker(int $id): ?LockerInterface
     {
-        $handler = $this->lockerHandler;
-
-        return $handler::findById($id);
+        /** @var LockerInterface $handler */
+        $handler = Instance::ensure($this->lockerConfig, LockerInterface::class);
+        /** @var LockerInterface|null $locker */
+        $locker = $handler::findById($id);
+        return $locker;
     }
 
     /**
@@ -316,11 +301,9 @@ class Thread extends Component implements ThreadInterface
     public function lock(int $id): PodiumResponse
     {
         $threadLocker = $this->getLocker($id);
-
         if ($threadLocker === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadLocker->lock();
     }
 
@@ -333,11 +316,9 @@ class Thread extends Component implements ThreadInterface
     public function unlock(int $id): PodiumResponse
     {
         $threadLocker = $this->getLocker($id);
-
         if ($threadLocker === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadLocker->unlock();
     }
 
@@ -347,9 +328,11 @@ class Thread extends Component implements ThreadInterface
      */
     public function getArchiver(int $id): ?ArchiverInterface
     {
-        $handler = $this->archiverHandler;
-
-        return $handler::findById($id);
+        /** @var ArchiverInterface $handler */
+        $handler = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        /** @var ArchiverInterface|null $archiver */
+        $archiver = $handler::findById($id);
+        return $archiver;
     }
 
     /**
@@ -361,11 +344,9 @@ class Thread extends Component implements ThreadInterface
     public function archive(int $id): PodiumResponse
     {
         $threadArchiver = $this->getArchiver($id);
-
         if ($threadArchiver === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadArchiver->archive();
     }
 
@@ -378,11 +359,9 @@ class Thread extends Component implements ThreadInterface
     public function revive(int $id): PodiumResponse
     {
         $threadArchiver = $this->getArchiver($id);
-
         if ($threadArchiver === null) {
             throw new ModelNotFoundException('Thread of given ID can not be found.');
         }
-
         return $threadArchiver->revive();
     }
 
@@ -391,7 +370,9 @@ class Thread extends Component implements ThreadInterface
      */
     public function getSubscriber(): SubscriberInterface
     {
-        return new $this->subscriberHandler;
+        /** @var SubscriberInterface $subscriber */
+        $subscriber = Instance::ensure($this->subscriberConfig, SubscriberInterface::class);
+        return $subscriber;
     }
 
     /**
@@ -431,7 +412,9 @@ class Thread extends Component implements ThreadInterface
      */
     public function getBookmarker(): BookmarkerInterface
     {
-        return new $this->bookmarkerHandler;
+        /** @var BookmarkerInterface $bookmarker */
+        $bookmarker = Instance::ensure($this->bookmarkerConfig, BookmarkerInterface::class);
+        return $bookmarker;
     }
 
     /**
