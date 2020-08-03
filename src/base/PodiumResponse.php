@@ -4,29 +4,22 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\base;
 
-use yii\base\Component;
-use yii\base\Model;
-
 /**
  * Class PodiumResponse
  * @package bizley\podium\api\base
  */
-class PodiumResponse extends Component
+final class PodiumResponse
 {
-    /**
-     * @var bool
-     */
-    public $result;
+    private bool $result;
+    private array $errors;
+    private array $data;
 
-    /**
-     * @var array
-     */
-    public $errors = [];
-
-    /**
-     * @var array
-     */
-    public $data = [];
+    private function __construct(bool $result, array $errors = [], array $data = [])
+    {
+        $this->result = $result;
+        $this->errors = $errors;
+        $this->data = $data;
+    }
 
     /**
      * Returns successful response.
@@ -35,22 +28,31 @@ class PodiumResponse extends Component
      */
     public static function success(array $data = []): PodiumResponse
     {
-        return new static([
-            'result' => true,
-            'data' => $data,
-        ]);
+        return new self(true, [], $data);
     }
 
     /**
      * Returns erroneous response.
-     * @param Model|null $model
+     * @param array $errors
      * @return PodiumResponse
      */
-    public static function error(Model $model = null): PodiumResponse
+    public static function error(array $errors = []): PodiumResponse
     {
-        return new static([
-            'result' => false,
-            'errors' => $model ? $model->errors : [],
-        ]);
+        return new self(false, $errors);
+    }
+
+    public function getResult(): bool
+    {
+        return $this->result;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    public function getData(): array
+    {
+        return $this->data;
     }
 }

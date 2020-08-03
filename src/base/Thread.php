@@ -23,7 +23,7 @@ use bizley\podium\api\models\thread\ThreadLocker;
 use bizley\podium\api\models\thread\ThreadMover;
 use bizley\podium\api\models\thread\ThreadPinner;
 use bizley\podium\api\models\thread\ThreadRemover;
-use bizley\podium\api\models\thread\ThreadSubscriber;
+use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;

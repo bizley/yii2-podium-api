@@ -9,10 +9,13 @@ use bizley\podium\tests\props\EchoMigrateController;
 use Yii;
 use yii\base\InvalidRouteException;
 use yii\console\Application;
+use yii\console\Exception as ConsoleException;
 use yii\console\ExitCode;
 use yii\db\Connection;
+use yii\db\Exception as DbException;
 use yii\helpers\ArrayHelper;
 use yii\i18n\PhpMessageSource;
+
 use function fwrite;
 use function ob_end_clean;
 use function ob_end_flush;
@@ -27,31 +30,16 @@ abstract class DbTestCase extends TestCase
     /**
      * @var array [table => [row1 columns => values], [row2 columns => values], ...]
      */
-    public $fixtures = [];
+    public array $fixtures = [];
 
-    /**
-     * @var string
-     */
-    protected static $driverName = 'mysql';
+    protected static string $driverName = 'mysql';
+    protected static array $database = [];
+    protected static Connection $db;
+    public static array $params = [];
 
-    /**
-     * @var array
-     */
-    protected static $database = [];
-
-    /**
-     * @var Connection
-     */
-    protected static $db;
-
-    /**
-     * @var array
-     */
-    public static $params;
-
-    public static function getParam($name, $default = null)
+    public static function getParam(string $name, array $default = []): array
     {
-        if (static::$params === null) {
+        if (static::$params === []) {
             static::$params = require __DIR__ . '/config.php';
         }
 
@@ -60,8 +48,8 @@ abstract class DbTestCase extends TestCase
 
     /**
      * @throws InvalidRouteException
-     * @throws \yii\console\Exception
-     * @throws \yii\db\Exception
+     * @throws ConsoleException
+     * @throws DbException
      */
     public static function setUpBeforeClass(): void
     {
@@ -72,7 +60,7 @@ abstract class DbTestCase extends TestCase
     /**
      * @param array $config
      * @param string $appClass
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     protected static function mockApplication(array $config = [], string $appClass = Application::class): void
     {
@@ -112,7 +100,7 @@ abstract class DbTestCase extends TestCase
      * @param string $route
      * @param array $params
      * @throws InvalidRouteException
-     * @throws \yii\console\Exception
+     * @throws ConsoleException
      */
     protected static function runSilentMigration(string $route, array $params = []): void
     {
@@ -128,7 +116,7 @@ abstract class DbTestCase extends TestCase
 
     /**
      * @throws InvalidRouteException
-     * @throws \yii\console\Exception
+     * @throws ConsoleException
      */
     public static function tearDownAfterClass(): void
     {
@@ -143,7 +131,7 @@ abstract class DbTestCase extends TestCase
 
     /**
      * @return Connection
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     public static function getConnection(): Connection
     {
@@ -174,16 +162,13 @@ abstract class DbTestCase extends TestCase
         return static::$db;
     }
 
-    /**
-     * @return Podium
-     */
     protected function podium(): Podium
     {
         return Yii::$app->podium;
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     public function fixturesUp(): void
     {
@@ -194,7 +179,7 @@ abstract class DbTestCase extends TestCase
         }
     }
     /**
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     public function fixturesDown(): void
     {
@@ -208,7 +193,7 @@ abstract class DbTestCase extends TestCase
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     protected function setUp(): void
     {
@@ -216,7 +201,7 @@ abstract class DbTestCase extends TestCase
     }
 
     /**
-     * @throws \yii\db\Exception
+     * @throws DbException
      */
     protected function tearDown(): void
     {

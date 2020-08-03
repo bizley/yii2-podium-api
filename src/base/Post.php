@@ -13,6 +13,11 @@ use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\models\post\PostArchiver;
+use bizley\podium\api\models\post\PostForm;
+use bizley\podium\api\models\post\PostLiker;
+use bizley\podium\api\models\post\PostMover;
+use bizley\podium\api\models\post\PostRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
@@ -26,7 +31,7 @@ use yii\helpers\ArrayHelper;
  * Class Post
  * @package bizley\podium\api\base
  */
-class Post extends Component implements PostInterface
+final class Post extends Component implements PostInterface
 {
     /**
      * @var string|array|ModelInterface post handler
@@ -38,31 +43,31 @@ class Post extends Component implements PostInterface
      * @var string|array|CategorisedFormInterface post form handler
      * Component ID, class, configuration array, or instance of CategorisedFormInterface.
      */
-    public $formHandler = \bizley\podium\api\models\post\PostForm::class;
+    public $formHandler = PostForm::class;
 
     /**
      * @var string|array|LikerInterface liking handler
      * Component ID, class, configuration array, or instance of LikerInterface.
      */
-    public $likerHandler = \bizley\podium\api\models\post\PostLiker::class;
+    public $likerHandler = PostLiker::class;
 
     /**
      * @var string|array|RemoverInterface post remover handler
      * Component ID, class, configuration array, or instance of RemoverInterface.
      */
-    public $removerHandler = \bizley\podium\api\models\post\PostRemover::class;
+    public $removerHandler = PostRemover::class;
 
     /**
      * @var string|array|ArchiverInterface post archiver handler
      * Component ID, class, configuration array, or instance of ArchiverInterface.
      */
-    public $archiverHandler = \bizley\podium\api\models\post\PostArchiver::class;
+    public $archiverHandler = PostArchiver::class;
 
     /**
      * @var string|array|MoverInterface post mover handler
      * Component ID, class, configuration array, or instance of MoverInterface.
      */
-    public $moverHandler = \bizley\podium\api\models\post\PostMover::class;
+    public $moverHandler = PostMover::class;
 
     /**
      * @throws InvalidConfigException
@@ -71,9 +76,6 @@ class Post extends Component implements PostInterface
     {
         parent::init();
 
-        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        $this->likerHandler = Instance::ensure($this->likerHandler, LikerInterface::class);
         $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
         $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
         $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
@@ -85,8 +87,8 @@ class Post extends Component implements PostInterface
      */
     public function getById(int $id): ?ModelInterface
     {
-        $postClass = $this->modelHandler;
-
+        /** @var ModelInterface $postClass */
+        $postClass = Instance::ensure($this->modelHandler, ModelInterface::class);
         return $postClass::findById($id);
     }
 
@@ -98,24 +100,25 @@ class Post extends Component implements PostInterface
      */
     public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $postClass = $this->modelHandler;
-
+        /** @var ModelInterface $postClass */
+        $postClass = Instance::ensure($this->modelHandler, ModelInterface::class);
         return $postClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
      * @param int|null $id
-     * @return CategorisedFormInterface
+     * @return CategorisedFormInterface|null
      */
     public function getForm(int $id = null): ?CategorisedFormInterface
     {
-        $handler = $this->formHandler;
-
+        /** @var CategorisedFormInterface $handler */
+        $handler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
         if ($id === null) {
-            return new $handler;
+            return $handler;
         }
-
-        return $handler::findById($id);
+        /** @var CategorisedFormInterface|null $form */
+        $form = $handler::findById($id);
+        return $form;
     }
 
     /**
@@ -127,7 +130,7 @@ class Post extends Component implements PostInterface
      */
     public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
     {
-        /* @var $postForm CategorisedFormInterface */
+        /** @var CategorisedFormInterface $postForm */
         $postForm = $this->getForm();
 
         $postForm->setAuthor($author);
@@ -150,21 +153,17 @@ class Post extends Component implements PostInterface
     public function edit(array $data): PodiumResponse
     {
         $id = ArrayHelper::remove($data, 'id');
-
         if ($id === null) {
             throw new InsufficientDataException('ID key is missing.');
         }
 
         $postForm = $this->getForm((int)$id);
-
         if ($postForm === null) {
             throw new ModelNotFoundException('Post of given ID can not be found.');
         }
-
         if (!$postForm->loadData($data)) {
             return PodiumResponse::error();
         }
-
         return $postForm->edit();
     }
 
@@ -174,9 +173,11 @@ class Post extends Component implements PostInterface
      */
     public function getRemover(int $id): ?RemoverInterface
     {
-        $handler = $this->removerHandler;
-
-        return $handler::findById($id);
+        /** @var RemoverInterface $handler */
+        $handler = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        /** @var RemoverInterface|null $remover */
+        $remover = $handler::findById($id);
+        return $remover;
     }
 
     /**
@@ -277,7 +278,9 @@ class Post extends Component implements PostInterface
      */
     public function getLiker(): LikerInterface
     {
-        return new $this->likerHandler;
+        /** @var LikerInterface $liker */
+        $liker = Instance::ensure($this->likerHandler, LikerInterface::class);
+        return $liker;
     }
 
     /**
