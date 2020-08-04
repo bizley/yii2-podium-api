@@ -54,10 +54,9 @@ interface ThreadInterface
     public function edit(array $data): PodiumResponse;
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @return RemoverInterface
      */
-    public function getRemover(int $id): ?RemoverInterface;
+    public function getRemover(): RemoverInterface;
 
     /**
      * @param int $id

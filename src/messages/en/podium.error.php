@@ -31,5 +31,6 @@ return [
     'thread.already.subscribed' => 'Thread is already subscribed.',
     'thread.must.be.archived' => 'Thread must be archived first.',
     'thread.not.archived' => 'Thread is not archived.',
+    'thread.not.exists' => 'Thread does not exist.',
     'thread.not.subscribed' => 'Thread is not subscribed.',
 ];

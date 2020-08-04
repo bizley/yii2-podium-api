@@ -13,14 +13,9 @@ use bizley\podium\api\base\PodiumResponse;
 interface RemoverInterface
 {
     /**
-     * @param int $modelId
-     * @return ModelInterface|null
-     */
-    public static function findById(int $modelId): ?ModelInterface;
-
-    /**
      * Removes model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function remove(): PodiumResponse;
+    public function remove(int $id): PodiumResponse;
 }

@@ -6,6 +6,9 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\SubscriptionActiveRecord;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
+use LogicException;
+use Throwable;
+use yii\db\StaleObjectException;
 
 use function is_int;
 
@@ -66,10 +69,15 @@ class SubscriptionRepository implements SubscriptionRepositoryInterface
         return $this->errors;
     }
 
+    /**
+     * @return bool
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function delete(): bool
     {
         if ($this->model === null) {
-            return false;
+            throw new LogicException('You need to call find() first!');
         }
         return is_int($this->model->delete());
     }

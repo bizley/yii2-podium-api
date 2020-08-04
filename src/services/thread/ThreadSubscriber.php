@@ -26,8 +26,6 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
     public const EVENT_AFTER_UNSUBSCRIBING = 'podium.subscription.unsubscribing.after';
 
     private ?SubscriptionRepositoryInterface $subscription = null;
-    private ?int $memberId = null;
-    private ?int $threadId = null;
 
     /**
      * @var string|array|SubscriptionRepositoryInterface
@@ -48,26 +46,6 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $this->subscription;
     }
 
-    public function setMember(MembershipInterface $member): void
-    {
-        $this->memberId = $member->getId();
-    }
-
-    public function getMemberId(): ?int
-    {
-        return $this->memberId;
-    }
-
-    public function setThread(ModelInterface $thread): void
-    {
-        $this->threadId = $thread->getId();
-    }
-
-    public function getThreadId(): ?int
-    {
-        return $this->threadId;
-    }
-
     public function beforeSubscribe(): bool
     {
         $event = new SubscriptionEvent();
@@ -77,21 +55,23 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
     }
 
     /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
      * @return PodiumResponse
      * @throws InsufficientDataException
      * @throws InvalidConfigException
      */
-    public function subscribe(): PodiumResponse
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
             return PodiumResponse::error();
         }
 
-        $memberId = $this->getMemberId();
+        $memberId = $member->getId();
         if ($memberId === null) {
             throw new InsufficientDataException('Missing member ID for Thread Subscriber!');
         }
-        $threadId = $this->getThreadId();
+        $threadId = $thread->getId();
         if ($threadId === null) {
             throw new InsufficientDataException('Missing thread ID for Thread Subscriber!');
         }
@@ -125,21 +105,23 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
     }
 
     /**
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
      * @return PodiumResponse
      * @throws InsufficientDataException
      * @throws InvalidConfigException
      */
-    public function unsubscribe(): PodiumResponse
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
             return PodiumResponse::error();
         }
 
-        $memberId = $this->getMemberId();
+        $memberId = $member->getId();
         if ($memberId === null) {
             throw new InsufficientDataException('Missing member ID for Thread Subscriber!');
         }
-        $threadId = $this->getThreadId();
+        $threadId = $thread->getId();
         if ($threadId === null) {
             throw new InsufficientDataException('Missing thread ID for Thread Subscriber!');
         }

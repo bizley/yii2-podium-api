@@ -25,6 +25,7 @@ use bizley\podium\api\models\thread\ThreadPinner;
 use bizley\podium\api\models\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
+use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -179,31 +180,25 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @return RemoverInterface
+     * @throws InvalidConfigException
      */
-    public function getRemover(int $id): ?RemoverInterface
+    public function getRemover(): RemoverInterface
     {
         /** @var RemoverInterface $handler */
         $handler = Instance::ensure($this->removerConfig, RemoverInterface::class);
-        /** @var RemoverInterface|null $remover */
-        $remover = $handler::findById($id);
-        return $remover;
+        return $handler;
     }
 
     /**
      * Deletes thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function remove(int $id): PodiumResponse
     {
-        $threadRemover = $this->getRemover($id);
-        if ($threadRemover === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadRemover->remove();
+        return $this->getRemover()->remove($id);
     }
 
     /**
@@ -383,12 +378,7 @@ final class Thread extends Component implements ThreadInterface
      */
     public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
-        $subscribing = $this->getSubscriber();
-
-        $subscribing->setMember($member);
-        $subscribing->setThread($thread);
-
-        return $subscribing->subscribe();
+        return $this->getSubscriber()->subscribe($member, $thread);
     }
 
     /**
@@ -399,12 +389,7 @@ final class Thread extends Component implements ThreadInterface
      */
     public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
     {
-        $subscribing = $this->getSubscriber();
-
-        $subscribing->setMember($member);
-        $subscribing->setThread($thread);
-
-        return $subscribing->unsubscribe();
+        return $this->getSubscriber()->unsubscribe($member, $thread);
     }
 
     /**

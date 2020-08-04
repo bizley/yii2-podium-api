@@ -13,26 +13,18 @@ use bizley\podium\api\base\PodiumResponse;
 interface SubscriberInterface
 {
     /**
-     * Initiator of subscribing.
+     * Subscribes the member to the thread.
      * @param MembershipInterface $member
-     */
-    public function setMember(MembershipInterface $member): void;
-
-    /**
-     * Target of subscribing.
      * @param ModelInterface $thread
-     */
-    public function setThread(ModelInterface $thread): void;
-
-    /**
-     * Subscribes.
      * @return PodiumResponse
      */
-    public function subscribe(): PodiumResponse;
+    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 
     /**
-     * Unsubscribes.
+     * Unsubscribes the member from the thread.
+     * @param MembershipInterface $member
+     * @param ModelInterface $thread
      * @return PodiumResponse
      */
-    public function unsubscribe(): PodiumResponse;
+    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
 }
