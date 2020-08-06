@@ -21,8 +21,8 @@ use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\models\thread\ThreadLocker;
 use bizley\podium\api\models\thread\ThreadMover;
-use bizley\podium\api\models\thread\ThreadPinner;
-use bizley\podium\api\models\thread\ThreadRemover;
+use bizley\podium\api\services\thread\ThreadPinner;
+use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -96,6 +96,7 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @param int $id
      * @return ModelInterface|null
+     * @throws InvalidConfigException
      */
     public function getById(int $id): ?ModelInterface
     {
@@ -109,6 +110,7 @@ final class Thread extends Component implements ThreadInterface
      * @param null|bool|array|Sort $sort
      * @param null|bool|array|Pagination $pagination
      * @return DataProviderInterface
+     * @throws InvalidConfigException
      */
     public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
@@ -120,6 +122,7 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @param int|null $id
      * @return CategorisedFormInterface|null
+     * @throws InvalidConfigException
      */
     public function getForm(int $id = null): ?CategorisedFormInterface
     {
@@ -232,46 +235,36 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @param int $id
-     * @return PinnerInterface|null
+     * @return PinnerInterface
+     * @throws InvalidConfigException
      */
-    public function getPinner(int $id): ?PinnerInterface
+    public function getPinner(): PinnerInterface
     {
         /** @var PinnerInterface $handler */
         $handler = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
-        /** @var PinnerInterface|null $pinner */
-        $pinner = $handler::findById($id);
-        return $pinner;
+        return $handler;
     }
 
     /**
-     * Pins thread
+     * Pins thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function pin(int $id): PodiumResponse
     {
-        $threadPinner = $this->getPinner($id);
-        if ($threadPinner === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadPinner->pin();
+        return $this->getPinner()->pin($id);
     }
 
     /**
      * Unpins thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function unpin(int $id): PodiumResponse
     {
-        $threadPinner = $this->getPinner($id);
-        if ($threadPinner === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadPinner->unpin();
+        return $this->getPinner()->unpin($id);
     }
 
     /**

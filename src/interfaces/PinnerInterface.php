@@ -13,20 +13,16 @@ use bizley\podium\api\base\PodiumResponse;
 interface PinnerInterface
 {
     /**
-     * @param int $modelId
-     * @return ModelInterface|null
-     */
-    public static function findById(int $modelId): ?ModelInterface;
-
-    /**
      * Pins model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function pin(): PodiumResponse;
+    public function pin(int $id): PodiumResponse;
 
     /**
      * Unpins model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function unpin(): PodiumResponse;
+    public function unpin(int $id): PodiumResponse;
 }

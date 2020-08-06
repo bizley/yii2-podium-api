@@ -16,6 +16,7 @@ class ThreadRepository implements ThreadRepositoryInterface
 {
     public string $threadActiveRecord = ThreadActiveRecord::class;
 
+    private array $errors = [];
     private ?ThreadActiveRecord $model = null;
 
     public function find(int $id): bool
@@ -47,5 +48,40 @@ class ThreadRepository implements ThreadRepositoryInterface
             throw new LogicException('You need to call find() first!');
         }
         return is_int($this->model->delete());
+    }
+
+    public function pin(): bool
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+
+        $this->model->pinned = true;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
+    }
+
+    public function unpin(): bool
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+
+        $this->model->pinned = false;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
     }
 }

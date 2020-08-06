@@ -31,7 +31,7 @@ final class ThreadRemover extends Component implements RemoverInterface
      * @return ThreadRepositoryInterface
      * @throws InvalidConfigException
      */
-    public function getThread(): ThreadRepositoryInterface
+    private function getThread(): ThreadRepositoryInterface
     {
         if ($this->thread === null) {
             /** @var ThreadRepositoryInterface $thread */

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveRecord;
 
 /**
@@ -27,11 +28,13 @@ use yii\db\ActiveRecord;
  */
 class ThreadActiveRecord extends ActiveRecord
 {
-    /**
-     * @return string
-     */
     public static function tableName(): string
     {
         return '{{%podium_thread}}';
+    }
+
+    public function behaviors(): array
+    {
+        return ['timestamp' => TimestampBehavior::class];
     }
 }

@@ -79,10 +79,9 @@ interface ThreadInterface
     public function move(int $id, ModelInterface $forum): PodiumResponse;
 
     /**
-     * @param int $id
-     * @return PinnerInterface|null
+     * @return PinnerInterface
      */
-    public function getPinner(int $id): ?PinnerInterface;
+    public function getPinner(): PinnerInterface;
 
     /**
      * @param int $id

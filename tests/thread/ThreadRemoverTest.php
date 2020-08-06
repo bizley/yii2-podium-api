@@ -6,23 +6,17 @@ namespace bizley\podium\tests\thread;
 
 use bizley\podium\api\base\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\thread\ThreadRemover;
+use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
+use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\tests\DbTestCase;
 use Exception;
 use yii\base\Event;
 
-/**
- * Class ThreadRemoverTest
- * @package bizley\podium\tests\thread
- */
 class ThreadRemoverTest extends DbTestCase
 {
-    /**
-     * @var array
-     */
-    public $fixtures = [
+    public array $fixtures = [
         'podium_member' => [
             [
                 'id' => 1,
@@ -93,14 +87,8 @@ class ThreadRemoverTest extends DbTestCase
         ],
     ];
 
-    /**
-     * @var array
-     */
-    protected $eventsRaised = [];
+    private array $eventsRaised = [];
 
-    /**
-     * @throws ModelNotFoundException
-     */
     public function testRemove(): void
     {
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, function () {
@@ -110,18 +98,15 @@ class ThreadRemoverTest extends DbTestCase
             $this->eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
         });
 
-        $this->assertTrue($this->podium()->thread->remove(1)->result);
+        self::assertTrue($this->podium()->thread->remove(1)->getResult());
 
-        $this->assertEmpty(ThreadRepo::findOne(1));
-        $this->assertEmpty(PostRepo::findOne(1));
+        self::assertEmpty(ThreadRepo::findOne(1));
+        self::assertEmpty(PostRepo::findOne(1));
 
-        $this->assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
-        $this->assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        self::assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
-    /**
-     * @throws ModelNotFoundException
-     */
     public function testRemoveEventPreventing(): void
     {
         $handler = static function ($event) {
@@ -129,46 +114,38 @@ class ThreadRemoverTest extends DbTestCase
         };
         Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
 
-        $this->assertFalse($this->podium()->thread->remove(1)->result);
+        self::assertFalse($this->podium()->thread->remove(1)->getResult());
 
-        $this->assertNotEmpty(ThreadRepo::findOne(1));
-        $this->assertNotEmpty(PostRepo::findOne(1));
+        self::assertNotEmpty(ThreadRepo::findOne(1));
+        self::assertNotEmpty(PostRepo::findOne(1));
 
         Event::off(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
-    /**
-     * @throws ModelNotFoundException
-     */
     public function testNonArchived(): void
     {
-        $this->assertFalse($this->podium()->thread->remove(2)->result);
-        $this->assertNotEmpty(ThreadRepo::findOne(2));
+        self::assertFalse($this->podium()->thread->remove(2)->getResult());
+        self::assertNotEmpty(ThreadRepo::findOne(2));
     }
 
     public function testFailedRemove(): void
     {
-        $mock = $this->getMockBuilder(ThreadRemover::class)->setMethods(['delete'])->getMock();
+        $mock = $this->createMock(RemoverInterface::class);
         $mock->method('delete')->willReturn(false);
+        $mock->method('isArchived')->willReturn(true);
 
-        $mock->archived = true;
-
-        $this->assertFalse($mock->remove()->result);
+        self::assertFalse($mock->remove(1)->getResult());
     }
 
     public function testExceptionRemove(): void
     {
-        $mock = $this->getMockBuilder(ThreadRemover::class)->setMethods(['delete'])->getMock();
-        $mock->method('delete')->will($this->throwException(new Exception()));
+        $mock = $this->createMock(RemoverInterface::class);
+        $mock->method('delete')->willThrowException(new Exception());
+        $mock->method('isArchived')->willReturn(true);
 
-        $mock->archived = true;
-
-        $this->assertFalse($mock->remove()->result);
+        self::assertFalse($mock->remove(1)->getResult());
     }
 
-    /**
-     * @throws ModelNotFoundException
-     */
     public function testNoThreadToRemove(): void
     {
         $this->expectException(ModelNotFoundException::class);
