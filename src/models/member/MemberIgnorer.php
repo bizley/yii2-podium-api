@@ -10,7 +10,7 @@ use bizley\podium\api\events\AcquaintanceEvent;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\IgnorerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\repos\AcquaintanceRepo;
+use bizley\podium\api\repos\AcquaintanceActiveRecord;
 use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -19,7 +19,7 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberIgnorer
  * @package bizley\podium\api\models\member
  */
-class MemberIgnorer extends AcquaintanceRepo implements IgnorerInterface
+class MemberIgnorer extends AcquaintanceActiveRecord implements IgnorerInterface
 {
     public const EVENT_BEFORE_IGNORING = 'podium.acquaintance.ignoring.before';
     public const EVENT_AFTER_IGNORING = 'podium.acquaintance.ignoring.after';

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\repos;
+namespace bizley\podium\api\ars;
 
 use yii\db\ActiveRecord;
 
@@ -17,11 +17,8 @@ use yii\db\ActiveRecord;
  * @property int $created_at
  * @property int $updated_at
  */
-class MemberRepo extends ActiveRecord
+class MemberActiveRecord extends ActiveRecord
 {
-    /**
-     * @return string
-     */
     public static function tableName(): string
     {
         return '{{%podium_member}}';

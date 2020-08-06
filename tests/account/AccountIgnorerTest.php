@@ -7,9 +7,9 @@ namespace bizley\podium\tests\account;
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\MemberIgnorer;
 use bizley\podium\api\models\member\Member;
-use bizley\podium\api\repos\AcquaintanceRepo;
+use bizley\podium\api\models\member\MemberIgnorer;
+use bizley\podium\api\repos\AcquaintanceActiveRecord;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
@@ -102,7 +102,7 @@ class AccountIgnorerTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->ignoreMember(Member::findOne(11))->result);
 
-        $acq = AcquaintanceRepo::findOne([
+        $acq = AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::IGNORE,
@@ -125,7 +125,7 @@ class AccountIgnorerTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->ignoreMember(Member::findOne(11))->result);
 
-        $acq = AcquaintanceRepo::findOne([
+        $acq = AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::IGNORE,
@@ -157,7 +157,7 @@ class AccountIgnorerTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->unignoreMember(Member::findOne(12))->result);
 
-        $acq = AcquaintanceRepo::findOne([
+        $acq = AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::IGNORE,
@@ -180,7 +180,7 @@ class AccountIgnorerTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->unignoreMember(Member::findOne(12))->result);
 
-        $acq = AcquaintanceRepo::findOne([
+        $acq = AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::IGNORE,

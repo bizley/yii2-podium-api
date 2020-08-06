@@ -10,7 +10,7 @@ use bizley\podium\api\events\AcquaintanceEvent;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\BefrienderInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\repos\AcquaintanceRepo;
+use bizley\podium\api\repos\AcquaintanceActiveRecord;
 use Throwable;
 use Yii;
 use yii\behaviors\TimestampBehavior;
@@ -19,7 +19,7 @@ use yii\behaviors\TimestampBehavior;
  * Class MemberBefriender
  * @package bizley\podium\api\models\member
  */
-class MemberBefriender extends AcquaintanceRepo implements BefrienderInterface
+class MemberBefriender extends AcquaintanceActiveRecord implements BefrienderInterface
 {
     public const EVENT_BEFORE_BEFRIENDING = 'podium.acquaintance.befriending.before';
     public const EVENT_AFTER_BEFRIENDING = 'podium.acquaintance.befriending.after';

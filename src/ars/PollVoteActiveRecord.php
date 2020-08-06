@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\repos;
+namespace bizley\podium\api\ars;
 
 use yii\db\ActiveRecord;
 
@@ -14,11 +14,8 @@ use yii\db\ActiveRecord;
  * @property int $member_id
  * @property int $created_at
  */
-class PollVoteRepo extends ActiveRecord
+class PollVoteActiveRecord extends ActiveRecord
 {
-    /**
-     * @return string
-     */
     public static function tableName(): string
     {
         return '{{%podium_poll_vote}}';

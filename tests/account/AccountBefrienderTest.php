@@ -7,9 +7,9 @@ namespace bizley\podium\tests\account;
 use bizley\podium\api\base\NoMembershipException;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\member\MemberBefriender;
 use bizley\podium\api\models\member\Member;
-use bizley\podium\api\repos\AcquaintanceRepo;
+use bizley\podium\api\models\member\MemberBefriender;
+use bizley\podium\api\repos\AcquaintanceActiveRecord;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;
 use Yii;
@@ -102,7 +102,7 @@ class AccountBefrienderTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->befriendMember(Member::findOne(11))->result);
 
-        $this->assertNotEmpty(AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::FRIEND,
@@ -124,7 +124,7 @@ class AccountBefrienderTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->befriendMember(Member::findOne(11))->result);
 
-        $this->assertEmpty(AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 11,
             'type_id' => AcquaintanceType::FRIEND,
@@ -155,7 +155,7 @@ class AccountBefrienderTest extends AccountTestCase
 
         $this->assertTrue($this->podium()->account->unfriendMember(Member::findOne(12))->result);
 
-        $this->assertEmpty(AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::FRIEND,
@@ -177,7 +177,7 @@ class AccountBefrienderTest extends AccountTestCase
 
         $this->assertFalse($this->podium()->account->unfriendMember(Member::findOne(12))->result);
 
-        $this->assertNotEmpty(AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 10,
             'target_id' => 12,
             'type_id' => AcquaintanceType::FRIEND,

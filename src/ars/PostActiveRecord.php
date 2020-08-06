@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\repos;
+namespace bizley\podium\api\ars;
 
 use yii\db\ActiveRecord;
 
@@ -23,11 +23,8 @@ use yii\db\ActiveRecord;
  * @property int $edited_at
  * @property bool $archived
  */
-class PostRepo extends ActiveRecord
+class PostActiveRecord extends ActiveRecord
 {
-    /**
-     * @return string
-     */
     public static function tableName(): string
     {
         return '{{%podium_post}}';

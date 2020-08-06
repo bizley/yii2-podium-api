@@ -8,7 +8,7 @@ use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\member\MemberIgnorer;
-use bizley\podium\api\repos\AcquaintanceRepo;
+use bizley\podium\api\repos\AcquaintanceActiveRecord;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 
@@ -77,7 +77,7 @@ class MemberIgnorerTest extends DbTestCase
 
         $this->assertTrue($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101))->result);
 
-        $this->assertNotEmpty(AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 100,
             'target_id' => 101,
             'type_id' => AcquaintanceType::IGNORE,
@@ -96,7 +96,7 @@ class MemberIgnorerTest extends DbTestCase
 
         $this->assertFalse($this->podium()->member->ignore(Member::findOne(100), Member::findOne(101))->result);
 
-        $this->assertEmpty(AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 100,
             'target_id' => 101,
             'type_id' => AcquaintanceType::IGNORE,
@@ -129,7 +129,7 @@ class MemberIgnorerTest extends DbTestCase
 
         $this->assertTrue($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102))->result);
 
-        $this->assertEmpty(AcquaintanceRepo::findOne([
+        $this->assertEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 101,
             'target_id' => 102,
             'type_id' => AcquaintanceType::IGNORE,
@@ -148,7 +148,7 @@ class MemberIgnorerTest extends DbTestCase
 
         $this->assertFalse($this->podium()->member->unignore(Member::findOne(101), Member::findOne(102))->result);
 
-        $this->assertNotEmpty(AcquaintanceRepo::findOne([
+        $this->assertNotEmpty(AcquaintanceActiveRecord::findOne([
             'member_id' => 101,
             'target_id' => 102,
             'type_id' => AcquaintanceType::IGNORE,
