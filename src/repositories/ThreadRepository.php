@@ -34,6 +34,29 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $model === null;
     }
 
+    public function getId(): int
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+        return $this->model->id;
+    }
+
+    public function getParent(): RepositoryInterface
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+        $parent = new ForumRepository();
+        $parent->setModel($this->model->forum);
+        return $parent;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
     public function isArchived(): bool
     {
         if ($this->model === null) {
@@ -85,11 +108,6 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $this->model->save(false);
     }
 
-    public function getErrors(): array
-    {
-        return $this->errors;
-    }
-
     public function move(ForumRepositoryInterface $newForum): bool
     {
         if ($this->model === null) {
@@ -124,21 +142,33 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return false;
     }
 
-    public function getId(): int
+    public function lock(): bool
     {
         if ($this->model === null) {
             throw new LogicException('You need to call find() first!');
         }
-        return $this->model->id;
+
+        $this->model->locked = true;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
     }
 
-    public function getParent(): RepositoryInterface
+    public function unlock(): bool
     {
         if ($this->model === null) {
             throw new LogicException('You need to call find() first!');
         }
-        $parent = new ForumRepository();
-        $parent->setModel($this->model->forum);
-        return $parent;
+
+        $this->model->locked = false;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
     }
 }

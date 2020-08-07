@@ -95,10 +95,9 @@ interface ThreadInterface
     public function unpin(int $id): PodiumResponse;
 
     /**
-     * @param int $id
-     * @return LockerInterface|null
+     * @return LockerInterface
      */
-    public function getLocker(int $id): ?LockerInterface;
+    public function getLocker(): LockerInterface;
 
     /**
      * @param int $id

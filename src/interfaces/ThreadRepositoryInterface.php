@@ -10,4 +10,6 @@ interface ThreadRepositoryInterface extends RepositoryInterface
     public function pin(): bool;
     public function unpin(): bool;
     public function move(ForumRepositoryInterface $newForum): bool;
+    public function lock(): bool;
+    public function unlock(): bool;
 }

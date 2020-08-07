@@ -13,20 +13,16 @@ use bizley\podium\api\base\PodiumResponse;
 interface LockerInterface
 {
     /**
-     * @param int $modelId
-     * @return LockerInterface|null
-     */
-    public static function findById(int $modelId): ?LockerInterface;
-
-    /**
      * Locks model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function lock(): PodiumResponse;
+    public function lock(int $id): PodiumResponse;
 
     /**
      * Unlock model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function unlock(): PodiumResponse;
+    public function unlock(int $id): PodiumResponse;
 }

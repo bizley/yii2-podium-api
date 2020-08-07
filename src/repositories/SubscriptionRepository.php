@@ -12,7 +12,7 @@ use yii\db\StaleObjectException;
 
 use function is_int;
 
-class SubscriptionRepository implements SubscriptionRepositoryInterface
+final class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
     public string $subscriptionActiveRecord = SubscriptionActiveRecord::class;
 

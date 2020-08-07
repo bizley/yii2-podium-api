@@ -20,7 +20,7 @@ use bizley\podium\api\interfaces\ThreadInterface;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\models\thread\ThreadForm;
-use bizley\podium\api\models\thread\ThreadLocker;
+use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
 use bizley\podium\api\services\thread\ThreadRemover;
@@ -262,46 +262,36 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @param int $id
-     * @return LockerInterface|null
+     * @return LockerInterface
+     * @throws InvalidConfigException
      */
-    public function getLocker(int $id): ?LockerInterface
+    public function getLocker(): LockerInterface
     {
         /** @var LockerInterface $handler */
         $handler = Instance::ensure($this->lockerConfig, LockerInterface::class);
-        /** @var LockerInterface|null $locker */
-        $locker = $handler::findById($id);
-        return $locker;
+        return $handler;
     }
 
     /**
      * Locks thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function lock(int $id): PodiumResponse
     {
-        $threadLocker = $this->getLocker($id);
-        if ($threadLocker === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadLocker->lock();
+        return $this->getLocker()->lock($id);
     }
 
     /**
      * Unlocks thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function unlock(int $id): PodiumResponse
     {
-        $threadLocker = $this->getLocker($id);
-        if ($threadLocker === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadLocker->unlock();
+        return $this->getLocker()->unlock($id);
     }
 
     /**
