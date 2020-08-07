@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\ars;
 
 use yii\behaviors\TimestampBehavior;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
@@ -15,6 +16,9 @@ use yii\db\ActiveRecord;
  * @property bool $seen
  * @property int $created_at
  * @property int $updated_at
+ *
+ * @property ThreadActiveRecord $thread
+ * @property MemberActiveRecord $member
  */
 class SubscriptionActiveRecord extends ActiveRecord
 {
@@ -26,5 +30,15 @@ class SubscriptionActiveRecord extends ActiveRecord
     public function behaviors(): array
     {
         return ['timestamp' => TimestampBehavior::class];
+    }
+
+    public function getThread(): ActiveQuery
+    {
+        return $this->hasOne(ThreadActiveRecord::class, ['id' => 'thread_id']);
+    }
+
+    public function getMember(): ActiveQuery
+    {
+        return $this->hasOne(MemberActiveRecord::class, ['id' => 'member_id']);
     }
 }
