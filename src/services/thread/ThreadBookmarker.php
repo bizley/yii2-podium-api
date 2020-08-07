@@ -60,7 +60,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
      * @throws InsufficientDataException
      * @throws InvalidConfigException
      */
-    public function mark(PostRepositoryInterface $post, MembershipInterface $member): PodiumResponse
+    public function mark(MembershipInterface $member, PostRepositoryInterface $post): PodiumResponse
     {
         if (!$this->beforeMark()) {
             return PodiumResponse::error();

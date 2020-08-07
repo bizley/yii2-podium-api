@@ -14,9 +14,9 @@ interface BookmarkerInterface
 {
     /**
      * Marks thread.
-     * @param PostRepositoryInterface $post
      * @param MembershipInterface $member
+     * @param PostRepositoryInterface $post
      * @return PodiumResponse
      */
-    public function mark(PostRepositoryInterface $post, MembershipInterface $member): PodiumResponse;
+    public function mark(MembershipInterface $member, PostRepositoryInterface $post): PodiumResponse;
 }
