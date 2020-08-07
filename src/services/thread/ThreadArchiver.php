@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\thread;
 
 use bizley\podium\api\base\PodiumResponse;
-use bizley\podium\api\events\LockEvent;
-use bizley\podium\api\interfaces\LockerInterface;
+use bizley\podium\api\events\ArchiveEvent;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
 use Throwable;
@@ -15,12 +15,12 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
-final class ThreadLocker extends Component implements LockerInterface
+final class ThreadArchiver extends Component implements ArchiverInterface
 {
-    public const EVENT_BEFORE_LOCKING = 'podium.thread.locking.before';
-    public const EVENT_AFTER_LOCKING = 'podium.thread.locking.after';
-    public const EVENT_BEFORE_UNLOCKING = 'podium.thread.unlocking.before';
-    public const EVENT_AFTER_UNLOCKING = 'podium.thread.unlocking.after';
+    public const EVENT_BEFORE_ARCHIVING = 'podium.thread.archiving.before';
+    public const EVENT_AFTER_ARCHIVING = 'podium.thread.archiving.after';
+    public const EVENT_BEFORE_REVIVING = 'podium.thread.reviving.before';
+    public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
 
     private ?ThreadRepositoryInterface $thread = null;
 
@@ -43,23 +43,23 @@ final class ThreadLocker extends Component implements LockerInterface
         return $this->thread;
     }
 
-    public function beforeLock(): bool
+    public function beforeArchive(): bool
     {
-        $event = new LockEvent();
-        $this->trigger(self::EVENT_BEFORE_LOCKING, $event);
+        $event = new ArchiveEvent();
+        $this->trigger(self::EVENT_BEFORE_ARCHIVING, $event);
 
-        return $event->canLock;
+        return $event->canArchive;
     }
 
     /**
-     * Locks the thread.
+     * Archives the thread.
      * @param int $id
      * @return PodiumResponse
      * @throws InvalidConfigException
      */
-    public function lock(int $id): PodiumResponse
+    public function archive(int $id): PodiumResponse
     {
-        if (!$this->beforeLock()) {
+        if (!$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
@@ -69,41 +69,41 @@ final class ThreadLocker extends Component implements LockerInterface
         }
 
         try {
-            if (!$thread->lock()) {
+            if (!$thread->archive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterLock();
+            $this->afterArchive();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while locking thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while archiving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }
     }
 
-    public function afterLock(): void
+    public function afterArchive(): void
     {
-        $this->trigger(self::EVENT_AFTER_LOCKING, new LockEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
     }
 
-    public function beforeUnlock(): bool
+    public function beforeRevive(): bool
     {
-        $event = new LockEvent();
-        $this->trigger(self::EVENT_BEFORE_UNLOCKING, $event);
+        $event = new ArchiveEvent();
+        $this->trigger(self::EVENT_BEFORE_REVIVING, $event);
 
-        return $event->canUnlock;
+        return $event->canRevive;
     }
 
     /**
-     * Unlocks the thread.
+     * Revives the thread.
      * @param int $id
      * @return PodiumResponse
      * @throws InvalidConfigException
      */
-    public function unlock(int $id): PodiumResponse
+    public function revive(int $id): PodiumResponse
     {
-        if (!$this->beforeUnlock()) {
+        if (!$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
@@ -113,21 +113,21 @@ final class ThreadLocker extends Component implements LockerInterface
         }
 
         try {
-            if (!$thread->unlock()) {
+            if (!$thread->revive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterUnlock();
+            $this->afterRevive();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while unlocking thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while reviving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
             return PodiumResponse::error();
         }
     }
 
-    public function afterUnlock(): void
+    public function afterRevive(): void
     {
-        $this->trigger(self::EVENT_AFTER_UNLOCKING, new LockEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
     }
 }

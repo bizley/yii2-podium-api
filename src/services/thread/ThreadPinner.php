@@ -9,6 +9,7 @@ use bizley\podium\api\events\PinEvent;
 use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
+use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -66,14 +67,18 @@ final class ThreadPinner extends Component implements PinnerInterface
             return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
         }
 
-        if (!$thread->pin()) {
-            Yii::error(['Error while pinning thread', $thread->getErrors()], 'podium');
-            return PodiumResponse::error($thread->getErrors());
+        try {
+            if (!$thread->pin()) {
+                return PodiumResponse::error($thread->getErrors());
+            }
+
+            $this->afterPin();
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            Yii::error(['Exception while pinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-
-        $this->afterPin();
-
-        return PodiumResponse::success();
     }
 
     public function afterPin(): void
@@ -105,15 +110,18 @@ final class ThreadPinner extends Component implements PinnerInterface
             return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
         }
 
-        if (!$thread->unpin()) {
-            Yii::error(['Error while unpinning thread', $thread->getErrors()], 'podium');
+        try {
+            if (!$thread->unpin()) {
+                return PodiumResponse::error($thread->getErrors());
+            }
 
-            return PodiumResponse::error($thread->getErrors());
+            $this->afterUnpin();
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            Yii::error(['Exception while unpinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-
-        $this->afterUnpin();
-
-        return PodiumResponse::success();
     }
 
     public function afterUnpin(): void

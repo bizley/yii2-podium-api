@@ -112,6 +112,11 @@ interface ThreadInterface
     public function unlock(int $id): PodiumResponse;
 
     /**
+     * @return ArchiverInterface
+     */
+    public function getArchiver(): ArchiverInterface;
+
+    /**
      * @param int $id
      * @return PodiumResponse
      */

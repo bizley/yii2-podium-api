@@ -80,15 +80,19 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         if ($subscription->isMemberSubscribed($memberId, $threadId)) {
             return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.already.subscribed')]);
         }
-        if (!$subscription->subscribe($memberId, $threadId)) {
-            $errors = $subscription->getErrors();
-            Yii::error(['Error while subscribing to the thread', $errors], 'podium');
-            return PodiumResponse::error($errors);
+
+        try {
+            if (!$subscription->subscribe($memberId, $threadId)) {
+                return PodiumResponse::error($subscription->getErrors());
+            }
+
+            $this->afterSubscribe();
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            Yii::error(['Exception while subscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
         }
-
-        $this->afterSubscribe();
-
-        return PodiumResponse::success();
     }
 
     public function afterSubscribe(): void
@@ -131,8 +135,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         }
         try {
             if (!$subscription->delete()) {
-                Yii::error('Error while unsubscribing thread', 'podium');
-                return PodiumResponse::error();
+                return PodiumResponse::error($subscription->getErrors());
             }
 
             $this->afterUnsubscribe();

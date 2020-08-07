@@ -71,7 +71,6 @@ final class ThreadRemover extends Component implements RemoverInterface
 
         try {
             if (!$thread->delete()) {
-                Yii::error('Error while deleting thread', 'podium');
                 return PodiumResponse::error();
             }
 

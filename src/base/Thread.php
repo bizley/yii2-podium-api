@@ -17,9 +17,9 @@ use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
-use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\models\thread\ThreadForm;
+use bizley\podium\api\services\thread\ThreadArchiver;
 use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
@@ -295,46 +295,36 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @param int $id
-     * @return ArchiverInterface|null
+     * @return ArchiverInterface
+     * @throws InvalidConfigException
      */
-    public function getArchiver(int $id): ?ArchiverInterface
+    public function getArchiver(): ArchiverInterface
     {
         /** @var ArchiverInterface $handler */
         $handler = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
-        /** @var ArchiverInterface|null $archiver */
-        $archiver = $handler::findById($id);
-        return $archiver;
+        return $handler;
     }
 
     /**
      * Archives thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function archive(int $id): PodiumResponse
     {
-        $threadArchiver = $this->getArchiver($id);
-        if ($threadArchiver === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadArchiver->archive();
+        return $this->getArchiver()->archive($id);
     }
 
     /**
      * Revives thread.
      * @param int $id
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
     public function revive(int $id): PodiumResponse
     {
-        $threadArchiver = $this->getArchiver($id);
-        if ($threadArchiver === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        return $threadArchiver->revive();
+        return $this->getArchiver()->revive($id);
     }
 
     /**

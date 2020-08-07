@@ -11,6 +11,7 @@ use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
+use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -72,13 +73,18 @@ final class ThreadMover extends Component implements MoverInterface
             return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
         }
 
-        if (!$thread->move($forum)) {
-            Yii::error(['Error while moving thread', $thread->getErrors()], 'podium');
-            return PodiumResponse::error($thread->getErrors());
-        }
+        try {
+            if (!$thread->move($forum)) {
+                return PodiumResponse::error($thread->getErrors());
+            }
 
-        $this->afterMove();
-        return PodiumResponse::success();
+            $this->afterMove();
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            return PodiumResponse::error();
+        }
     }
 
     /**

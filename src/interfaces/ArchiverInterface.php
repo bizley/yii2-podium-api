@@ -13,20 +13,16 @@ use bizley\podium\api\base\PodiumResponse;
 interface ArchiverInterface
 {
     /**
-     * @param int $modelId
-     * @return ModelInterface|null
-     */
-    public static function findById(int $modelId): ?ModelInterface;
-
-    /**
      * Archives model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function archive(): PodiumResponse;
+    public function archive(int $id): PodiumResponse;
 
     /**
      * Revives model.
+     * @param int $id
      * @return PodiumResponse
      */
-    public function revive(): PodiumResponse;
+    public function revive(int $id): PodiumResponse;
 }

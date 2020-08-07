@@ -12,10 +12,7 @@ use LogicException;
 use Throwable;
 use Yii;
 use yii\db\Exception;
-use yii\db\StaleObjectException;
 use yii\db\Transaction;
-
-use function is_int;
 
 final class ThreadRepository implements ThreadRepositoryInterface
 {
@@ -65,17 +62,29 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $this->model->archived;
     }
 
-    /**
-     * @return bool
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
     public function delete(): bool
     {
         if ($this->model === null) {
             throw new LogicException('You need to call find() first!');
         }
-        return is_int($this->model->delete());
+
+        /** @var Transaction $transaction */
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            if (!$this->getParent()->updateCounters(-1, -$this->model->posts_count)) {
+                throw new Exception('Error while updating forum counters!');
+            }
+            if ($this->model->delete() === false) {
+                throw new Exception('Error while deleting thread!');
+            }
+            $transaction->commit();
+            return true;
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
+            Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+        }
+
+        return false;
     }
 
     public function pin(): bool
@@ -164,6 +173,36 @@ final class ThreadRepository implements ThreadRepositoryInterface
         }
 
         $this->model->locked = false;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
+    }
+
+    public function archive(): bool
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+
+        $this->model->archived = true;
+
+        if (!$this->model->validate()) {
+            $this->errors = $this->model->errors;
+        }
+
+        return $this->model->save(false);
+    }
+
+    public function revive(): bool
+    {
+        if ($this->model === null) {
+            throw new LogicException('You need to call find() first!');
+        }
+
+        $this->model->archived = false;
 
         if (!$this->model->validate()) {
             $this->errors = $this->model->errors;

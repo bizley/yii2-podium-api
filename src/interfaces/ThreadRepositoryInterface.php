@@ -12,4 +12,6 @@ interface ThreadRepositoryInterface extends RepositoryInterface
     public function move(ForumRepositoryInterface $newForum): bool;
     public function lock(): bool;
     public function unlock(): bool;
+    public function archive(): bool;
+    public function revive(): bool;
 }
