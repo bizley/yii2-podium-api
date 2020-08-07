@@ -18,6 +18,7 @@ use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\services\thread\ThreadArchiver;
 use bizley\podium\api\services\thread\ThreadBookmarker;
@@ -342,10 +343,10 @@ final class Thread extends Component implements ThreadInterface
     /**
      * Subscribes to a thread.
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      */
-    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
+    public function subscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         return $this->getSubscriber()->subscribe($member, $thread);
     }
@@ -353,10 +354,10 @@ final class Thread extends Component implements ThreadInterface
     /**
      * Unsubscribes from a thread.
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      */
-    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
+    public function unsubscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         return $this->getSubscriber()->unsubscribe($member, $thread);
     }

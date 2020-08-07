@@ -8,9 +8,9 @@ use bizley\podium\api\base\PodiumResponse;
 use bizley\podium\api\events\SubscriptionEvent;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\SubscriptionRepository;
 use Throwable;
 use Yii;
@@ -56,12 +56,12 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
 
     /**
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      * @throws InsufficientDataException
      * @throws InvalidConfigException
      */
-    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
+    public function subscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
             return PodiumResponse::error();
@@ -110,12 +110,12 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
 
     /**
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      * @throws InsufficientDataException
      * @throws InvalidConfigException
      */
-    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse
+    public function unsubscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
             return PodiumResponse::error();

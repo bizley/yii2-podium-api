@@ -135,17 +135,17 @@ interface ThreadInterface
 
     /**
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      */
-    public function subscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
+    public function subscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
 
     /**
      * @param MembershipInterface $member
-     * @param ModelInterface $thread
+     * @param ThreadRepositoryInterface $thread
      * @return PodiumResponse
      */
-    public function unsubscribe(MembershipInterface $member, ModelInterface $thread): PodiumResponse;
+    public function unsubscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
 
     /**
      * @return BookmarkerInterface
