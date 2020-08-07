@@ -14,12 +14,13 @@ use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PinnerInterface;
+use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
-use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\services\thread\ThreadArchiver;
+use bizley\podium\api\services\thread\ThreadBookmarker;
 use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
@@ -329,6 +330,7 @@ final class Thread extends Component implements ThreadInterface
 
     /**
      * @return SubscriberInterface
+     * @throws InvalidConfigException
      */
     public function getSubscriber(): SubscriberInterface
     {
@@ -361,6 +363,7 @@ final class Thread extends Component implements ThreadInterface
 
     /**
      * @return BookmarkerInterface
+     * @throws InvalidConfigException
      */
     public function getBookmarker(): BookmarkerInterface
     {
@@ -371,17 +374,13 @@ final class Thread extends Component implements ThreadInterface
 
     /**
      * Marks last seen post in a thread.
+     * @param PostRepositoryInterface $post
      * @param MembershipInterface $member
-     * @param ModelInterface $post
      * @return PodiumResponse
+     * @throws InvalidConfigException
      */
-    public function mark(MembershipInterface $member, ModelInterface $post): PodiumResponse
+    public function mark(PostRepositoryInterface $post, MembershipInterface $member): PodiumResponse
     {
-        $bookmarking = $this->getBookmarker();
-
-        $bookmarking->setMember($member);
-        $bookmarking->setPost($post);
-
-        return $bookmarking->mark();
+        return $this->getBookmarker()->mark($post, $member);
     }
 }

@@ -13,20 +13,10 @@ use bizley\podium\api\base\PodiumResponse;
 interface BookmarkerInterface
 {
     /**
-     * Initiator of bookmarking.
-     * @param MembershipInterface $member
-     */
-    public function setMember(MembershipInterface $member): void;
-
-    /**
-     * Post marker.
-     * @param ModelInterface $post
-     */
-    public function setPost(ModelInterface $post): void;
-
-    /**
      * Marks thread.
+     * @param PostRepositoryInterface $post
+     * @param MembershipInterface $member
      * @return PodiumResponse
      */
-    public function mark(): PodiumResponse;
+    public function mark(PostRepositoryInterface $post, MembershipInterface $member): PodiumResponse;
 }

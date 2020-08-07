@@ -157,5 +157,5 @@ interface ThreadInterface
      * @param ModelInterface $post
      * @return PodiumResponse
      */
-    public function mark(MembershipInterface $member, ModelInterface $post): PodiumResponse;
+    public function mark(PostRepositoryInterface $post, MembershipInterface $member): PodiumResponse;
 }

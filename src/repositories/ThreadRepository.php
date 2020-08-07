@@ -31,6 +31,11 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $model === null;
     }
 
+    public function setModel(ThreadActiveRecord $model): void
+    {
+        $this->model = $model;
+    }
+
     public function getId(): int
     {
         if ($this->model === null) {

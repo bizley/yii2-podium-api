@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -23,6 +24,16 @@ class BookmarkActiveRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%podium_bookmark}}';
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'createdAtAttribute' => false,
+            ],
+        ];
     }
 
     public function getMember(): ActiveQuery
