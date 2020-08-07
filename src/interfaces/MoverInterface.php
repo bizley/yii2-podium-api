@@ -13,29 +13,10 @@ use bizley\podium\api\base\PodiumResponse;
 interface MoverInterface
 {
     /**
-     * @param int $modelId
-     * @return ModelInterface|null
-     */
-    public static function findById(int $modelId): ?ModelInterface;
-
-    /**
      * Moves model.
+     * @param int $id
+     * @param RepositoryInterface $repository
      * @return PodiumResponse
      */
-    public function move(): PodiumResponse;
-
-    /**
-     * @param ModelInterface $category
-     */
-    public function prepareCategory(ModelInterface $category): void;
-
-    /**
-     * @param ModelInterface $forum
-     */
-    public function prepareForum(ModelInterface $forum): void;
-
-    /**
-     * @param ModelInterface $thread
-     */
-    public function prepareThread(ModelInterface $thread): void;
+    public function move(int $id, RepositoryInterface $repository): PodiumResponse;
 }

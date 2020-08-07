@@ -8,6 +8,7 @@ use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
+use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\ModelInterface;
@@ -20,7 +21,7 @@ use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\models\thread\ThreadBookmarker;
 use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\models\thread\ThreadLocker;
-use bizley\podium\api\models\thread\ThreadMover;
+use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
 use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
@@ -205,33 +206,26 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
-     * @param int $id
-     * @return MoverInterface|null
+     * @return MoverInterface
+     * @throws InvalidConfigException
      */
-    public function getMover(int $id): ?MoverInterface
+    public function getMover(): MoverInterface
     {
         /** @var MoverInterface $handler */
         $handler = Instance::ensure($this->moverConfig, MoverInterface::class);
-        /** @var MoverInterface|null $mover */
-        $mover = $handler::findById($id);
-        return $mover;
+        return $handler;
     }
 
     /**
      * Moves thread.
      * @param int $id
-     * @param ModelInterface $forum
+     * @param ForumRepositoryInterface $forum
      * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function move(int $id, ModelInterface $forum): PodiumResponse
+    public function move(int $id, ForumRepositoryInterface $forum): PodiumResponse
     {
-        $threadMover = $this->getMover($id);
-        if ($threadMover === null) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        $threadMover->prepareForum($forum);
-        return $threadMover->move();
+        return $this->getMover()->move($id, $forum);
     }
 
     /**

@@ -65,18 +65,17 @@ interface ThreadInterface
     public function remove(int $id): PodiumResponse;
 
     /**
-     * @param int $id
      * @return MoverInterface|null
      */
-    public function getMover(int $id): ?MoverInterface;
+    public function getMover(): ?MoverInterface;
 
     /**
      * Moves thread to different forum.
      * @param int $id
-     * @param ModelInterface $forum
+     * @param ForumRepositoryInterface $forum
      * @return PodiumResponse
      */
-    public function move(int $id, ModelInterface $forum): PodiumResponse;
+    public function move(int $id, ForumRepositoryInterface $forum): PodiumResponse;
 
     /**
      * @return PinnerInterface
