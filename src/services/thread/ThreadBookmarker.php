@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\services\thread;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\BookmarkEvent;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\BookmarkerInterface;
@@ -72,7 +72,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
             throw new InsufficientDataException('Missing member ID for Thread Bookmarker!');
         }
         $threadId = $post->getParent()->getId();
-        if (!$bookmark->find($memberId, $threadId)) {
+        if (!$bookmark->fetchOne($memberId, $threadId)) {
             $bookmark->create($memberId, $threadId);
         }
 

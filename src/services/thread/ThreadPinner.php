@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\services\thread;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\PinEvent;
 use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
