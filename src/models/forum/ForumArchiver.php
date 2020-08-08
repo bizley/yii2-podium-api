@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\forum;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use Yii;

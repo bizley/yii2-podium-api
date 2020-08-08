@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\post;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ThumbEvent;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\LikerInterface;

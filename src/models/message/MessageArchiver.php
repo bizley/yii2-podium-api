@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\message;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;

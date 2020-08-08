@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\member;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use Yii;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\models\poll;
 
-use bizley\podium\api\base\ModelNotFoundException;
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\ModelNotFoundException;
+use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\InsufficientDataException;
