@@ -2,15 +2,16 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\base;
+namespace bizley\podium\api\components;
 
 use bizley\podium\api\InsufficientDataException;
-use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\ModelFormInterface;
 use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\RankInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\models\rank\RankForm;
+use bizley\podium\api\models\rank\RankRemover;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;
@@ -19,40 +20,28 @@ use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
 /**
- * Class Group
+ * Class Rank
  * @package bizley\podium\api\base
  */
-class Group extends Component implements GroupInterface
+final class Rank extends Component implements RankInterface
 {
     /**
-     * @var string|array|ModelInterface group handler
+     * @var string|array|ModelInterface rank handler
      * Component ID, class, configuration array, or instance of ModelInterface.
      */
-    public $modelHandler = \bizley\podium\api\models\group\Group::class;
+    public $modelHandler = \bizley\podium\api\models\rank\Rank::class;
 
     /**
-     * @var string|array|ModelFormInterface group form handler
+     * @var string|array|ModelFormInterface rank form handler
      * Component ID, class, configuration array, or instance of ModelFormInterface.
      */
-    public $formHandler = \bizley\podium\api\models\group\GroupForm::class;
+    public $formHandler = RankForm::class;
 
     /**
-     * @var string|array|RemoverInterface group remover handler
+     * @var string|array|RemoverInterface rank remover handler
      * Component ID, class, configuration array, or instance of RemoverInterface.
      */
-    public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    public function init(): void
-    {
-        parent::init();
-
-        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-    }
+    public $removerHandler = RankRemover::class;
 
     /**
      * @param int $id
@@ -60,9 +49,9 @@ class Group extends Component implements GroupInterface
      */
     public function getById(int $id): ?ModelInterface
     {
-        $groupClass = $this->modelHandler;
-
-        return $groupClass::findById($id);
+        /** @var ModelInterface $rankClass */
+        $rankClass = Instance::ensure($this->modelHandler, ModelInterface::class);
+        return $rankClass::findById($id);
     }
 
     /**
@@ -73,9 +62,9 @@ class Group extends Component implements GroupInterface
      */
     public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
     {
-        $groupClass = $this->modelHandler;
-
-        return $groupClass::findByFilter($filter, $sort, $pagination);
+        /** @var ModelInterface $rankClass */
+        $rankClass = Instance::ensure($this->modelHandler, ModelInterface::class);
+        return $rankClass::findByFilter($filter, $sort, $pagination);
     }
 
     /**
@@ -84,34 +73,33 @@ class Group extends Component implements GroupInterface
      */
     public function getForm(int $id = null): ?ModelFormInterface
     {
-        $handler = $this->formHandler;
-
+        /** @var ModelFormInterface $handler */
+        $handler = Instance::ensure($this->formHandler, ModelFormInterface::class);
         if ($id === null) {
-            return new $handler;
+            return $handler;
         }
-
-        return $handler::findById($id);
+        /** @var ModelFormInterface|null $form */
+        $form = $handler::findById($id);
+        return $form;
     }
 
     /**
-     * Creates group.
+     * Creates rank.
      * @param array $data
      * @return PodiumResponse
      */
     public function create(array $data): PodiumResponse
     {
-        /* @var $groupForm ModelFormInterface */
-        $groupForm = $this->getForm();
-
-        if (!$groupForm->loadData($data)) {
+        /** @var ModelFormInterface $rankForm */
+        $rankForm = $this->getForm();
+        if (!$rankForm->loadData($data)) {
             return PodiumResponse::error();
         }
-
-        return $groupForm->create();
+        return $rankForm->create();
     }
 
     /**
-     * Updates group.
+     * Updates rank.
      * @param array $data
      * @return PodiumResponse
      * @throws InsufficientDataException
@@ -120,22 +108,18 @@ class Group extends Component implements GroupInterface
     public function edit(array $data): PodiumResponse
     {
         $id = ArrayHelper::remove($data, 'id');
-
         if ($id === null) {
             throw new InsufficientDataException('ID key is missing.');
         }
 
-        $groupForm = $this->getForm((int)$id);
-
-        if ($groupForm === null) {
-            throw new ModelNotFoundException('Group of given ID can not be found.');
+        $rankForm = $this->getForm((int)$id);
+        if ($rankForm === null) {
+            throw new ModelNotFoundException('Rank of given ID can not be found.');
         }
-
-        if (!$groupForm->loadData($data)) {
+        if (!$rankForm->loadData($data)) {
             return PodiumResponse::error();
         }
-
-        return $groupForm->edit();
+        return $rankForm->edit();
     }
 
     /**
@@ -144,25 +128,25 @@ class Group extends Component implements GroupInterface
      */
     public function getRemover(int $id): ?RemoverInterface
     {
-        $handler = $this->removerHandler;
-
-        return $handler::findById($id);
+        /** @var RemoverInterface $handler */
+        $handler = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        /** @var RemoverInterface|null $remover */
+        $remover = $handler::findById($id);
+        return $remover;
     }
 
     /**
-     * Deletes group.
+     * Deletes rank.
      * @param int $id
      * @return PodiumResponse
      * @throws ModelNotFoundException
      */
     public function remove(int $id): PodiumResponse
     {
-        $groupRemover = $this->getRemover($id);
-
-        if ($groupRemover === null) {
-            throw new ModelNotFoundException('Group of given ID can not be found.');
+        $rankRemover = $this->getRemover($id);
+        if ($rankRemover === null) {
+            throw new ModelNotFoundException('Rank of given ID can not be found.');
         }
-
-        return $groupRemover->remove();
+        return $rankRemover->remove();
     }
 }

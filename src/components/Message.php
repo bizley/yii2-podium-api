@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\base;
+namespace bizley\podium\api\components;
 
 use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;

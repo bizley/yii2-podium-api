@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\base;
+namespace bizley\podium\api\components;
 
 /**
  * Class PodiumResponse

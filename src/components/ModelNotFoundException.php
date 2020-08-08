@@ -2,21 +2,21 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\base;
+namespace bizley\podium\api\components;
 
 use yii\base\Exception;
 
 /**
- * Class NoMembershipException
+ * Class ModelNotFoundException
  * @package bizley\podium\api\base
  */
-class NoMembershipException extends Exception
+class ModelNotFoundException extends Exception
 {
     /**
      * @return string the user-friendly name of this exception
      */
     public function getName(): string
     {
-        return 'No Membership Exception';
+        return 'Model Not Found Exception';
     }
 }
