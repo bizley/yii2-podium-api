@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
-use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
 use Throwable;
 use Yii;
 use yii\db\Exception;
 use yii\db\Transaction;
 
-final class ThreadRepository implements ThreadRepositoryInterface
+final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 

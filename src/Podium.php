@@ -24,10 +24,12 @@ use function is_array;
 
 /**
  * Podium API
- * Yii 2 Forum Engine
+ * Yii 2 Forum Engine.
  *
  * @author Paweł Bizley Brzozowski <pawel@positive.codes>
+ *
  * @version 1.0.0
+ *
  * @license Apache License 2.0
  *
  * https://github.com/bizley/yii2-podium-api
@@ -41,33 +43,26 @@ use function is_array;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
- * @property Account $account
+ * @property Account  $account
  * @property Category $category
- * @property Forum $forum
- * @property Group $group
- * @property Member $member
- * @property Message $message
- * @property Poll $poll
- * @property Post $post
- * @property Rank $rank
- * @property Thread $thread
+ * @property Forum    $forum
+ * @property Group    $group
+ * @property Member   $member
+ * @property Message  $message
+ * @property Poll     $poll
+ * @property Post     $post
+ * @property Rank     $rank
+ * @property Thread   $thread
  */
 class Podium extends ServiceLocator
 {
     private string $version = '1.0.0';
 
-    /**
-     * @return string
-     */
     public function getVersion(): string
     {
         return $this->version;
     }
 
-    /**
-     * Podium constructor.
-     * @param array $config
-     */
     public function __construct(array $config = [])
     {
         foreach ($this->coreComponents() as $id => $component) {
@@ -116,7 +111,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns account component.
-     * @return Account|null|object
+     *
+     * @return Account|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getAccount()
@@ -126,7 +123,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns category component.
-     * @return Category|null|object
+     *
+     * @return Category|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getCategory()
@@ -136,7 +135,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns forum component.
-     * @return Forum|null|object
+     *
+     * @return Forum|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getForum()
@@ -146,7 +147,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns group component.
-     * @return Group|null|object
+     *
+     * @return Group|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getGroup()
@@ -156,7 +159,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns member component.
-     * @return Member|null|object
+     *
+     * @return Member|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getMember()
@@ -166,7 +171,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns message component.
-     * @return Message|null|object
+     *
+     * @return Message|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getMessage()
@@ -176,7 +183,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns poll component.
-     * @return Poll|null|object
+     *
+     * @return Poll|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getPoll()
@@ -186,7 +195,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns post component.
-     * @return Post|null|object
+     *
+     * @return Post|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getPost()
@@ -196,7 +207,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns rank component.
-     * @return Rank|null|object
+     *
+     * @return Rank|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getRank()
@@ -206,7 +219,9 @@ class Podium extends ServiceLocator
 
     /**
      * Returns thread component.
-     * @return Thread|null|object
+     *
+     * @return Thread|object|null
+     *
      * @throws InvalidConfigException
      */
     public function getThread()
@@ -220,13 +235,14 @@ class Podium extends ServiceLocator
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
-            'basePath' => __DIR__ . '/messages',
+            'basePath' => __DIR__.'/messages',
         ];
     }
 
     /**
      * Sets Podium reference for custom components.
      * Custom component should be child of PodiumComponent class.
+     *
      * @throws InvalidConfigException
      */
     public function completeComponents(): void
