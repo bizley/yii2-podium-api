@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
-use bizley\podium\api\base\NoMembershipException;
+use bizley\podium\api\components\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\post\PostLiker;
 use bizley\podium\api\models\post\Post;
+use bizley\podium\api\models\post\PostLiker;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThumbRepo;
 use bizley\podium\tests\AccountTestCase;

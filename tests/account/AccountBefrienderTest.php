@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
-use bizley\podium\api\base\NoMembershipException;
+use bizley\podium\api\components\NoMembershipException;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\Member;

@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
-use bizley\podium\api\base\NoMembershipException;
+use bizley\podium\api\components\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
-use bizley\podium\api\models\thread\ThreadSubscriber;
 use bizley\podium\api\models\thread\Thread;
+use bizley\podium\api\models\thread\ThreadSubscriber;
 use bizley\podium\api\repos\SubscriptionRepo;
 use bizley\podium\tests\AccountTestCase;
 use bizley\podium\tests\props\UserIdentity;

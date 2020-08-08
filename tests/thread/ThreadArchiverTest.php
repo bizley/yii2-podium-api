@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\thread;
 
-use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\components\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\thread\ThreadArchiver;
 use bizley\podium\api\repos\ForumRepo;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\rank;
 
-use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\components\ModelNotFoundException;
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\models\rank\RankForm;
 use bizley\podium\api\repos\RankRepo;

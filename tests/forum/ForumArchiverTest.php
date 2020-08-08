@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\forum;
 
-use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\components\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\forum\ForumArchiver;
 use bizley\podium\api\repos\ForumRepo;

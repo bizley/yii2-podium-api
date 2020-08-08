@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\account;
 
-use bizley\podium\api\base\ModelNotFoundException;
-use bizley\podium\api\base\NoMembershipException;
+use bizley\podium\api\components\ModelNotFoundException;
+use bizley\podium\api\components\NoMembershipException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\models\member\Member;
 use bizley\podium\api\models\message\MessageArchiver;
-use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\api\models\message\MessageMessenger;
+use bizley\podium\api\models\message\MessageParticipant;
 use bizley\podium\api\models\message\MessageRemover;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\api\repos\MessageRepo;

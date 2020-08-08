@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\member;
 
-use bizley\podium\api\base\ModelNotFoundException;
+use bizley\podium\api\components\ModelNotFoundException;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\models\member\MemberRemover;
 use bizley\podium\api\repos\MemberRepo;
