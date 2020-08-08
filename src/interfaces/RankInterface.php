@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use yii\data\DataFilter;
 use yii\data\DataProviderInterface;
 use yii\data\Pagination;

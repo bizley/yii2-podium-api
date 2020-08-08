@@ -8,7 +8,8 @@ interface RepositoryInterface
 {
     public function getId(): int;
     public function getParent(): RepositoryInterface;
-    public function find(int $id): bool;
+    public function fetchOne(int $id): bool;
+    public function fetchAll($filter = null, $sort = null, $pagination = null): void;
     public function getErrors(): array;
     public function delete(): bool;
 }

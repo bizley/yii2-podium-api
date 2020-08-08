@@ -8,7 +8,7 @@ interface SubscriptionRepositoryInterface
 {
     public function isMemberSubscribed(int $memberId, int $threadId): bool;
     public function subscribe(int $memberId, int $threadId): bool;
-    public function find(int $memberId, int $threadId): bool;
+    public function fetchOne(int $memberId, int $threadId): bool;
     public function getErrors(): array;
     public function delete(): bool;
 }

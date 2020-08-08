@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-use bizley\podium\api\base\PodiumResponse;
+use bizley\podium\api\components\PodiumResponse;
 use yii\data\DataFilter;
-use yii\data\DataProviderInterface;
 use yii\data\Pagination;
 use yii\data\Sort;
 
@@ -18,17 +17,17 @@ interface ThreadInterface
 {
     /**
      * @param int $id
-     * @return ModelInterface|null
+     * @return ThreadRepositoryInterface
      */
-    public function getById(int $id): ?ModelInterface;
+    public function getById(int $id): ThreadRepositoryInterface;
 
     /**
      * @param null|DataFilter $filter
      * @param null|bool|array|Sort $sort
      * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
+     * @return ThreadRepositoryInterface
      */
-    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
+    public function getAll($filter = null, $sort = null, $pagination = null): ThreadRepositoryInterface;
 
     /**
      * Returns thread form handler instance.
