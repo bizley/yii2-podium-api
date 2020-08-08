@@ -8,78 +8,51 @@ use bizley\podium\api\ars\ForumActiveRecord;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
-use Throwable;
-use yii\db\StaleObjectException;
-
-use function is_int;
 
 final class ForumRepository implements ForumRepositoryInterface
 {
-    public string $forumActiveRecord = ForumActiveRecord::class;
+    use ActiveRecordRepositoryTrait;
 
-    private array $errors = [];
+    public string $activeRecordClass = ForumActiveRecord::class;
+
     private ?ForumActiveRecord $model = null;
 
-    public function find(int $id): bool
+    public function getActiveRecordClass(): string
     {
-        /** @var ForumActiveRecord $modelClass */
-        $modelClass = $this->forumActiveRecord;
-        /** @var ForumActiveRecord|null $model */
-        $model = $modelClass::findOne($id);
-        if ($model === null) {
-            return false;
+        return $this->activeRecordClass;
+    }
+
+    public function getModel(): ForumActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
         }
-        $this->model = $model;
-        return true;
+
+        return $this->model;
     }
 
-    public function setModel(ForumActiveRecord $model): void
+    public function setModel(?ForumActiveRecord $activeRecord): void
     {
-        $this->model = $model;
-    }
-
-    public function getErrors(): array
-    {
-        return $this->errors;
+        $this->model = $activeRecord;
     }
 
     public function getId(): int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->id;
+        return $this->getModel()->id;
     }
 
     public function getParent(): RepositoryInterface
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
+        $category = $this->getModel()->category;
         $parent = new CategoryRepository();
-        $parent->setModel($this->model->category);
-        return $parent;
-    }
+        $parent->setModel($category);
 
-    /**
-     * @return bool
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function delete(): bool
-    {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return is_int($this->model->delete());
+        return $parent;
     }
 
     public function updateCounters(int $threads, int $posts): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->updateCounters(
+        return $this->getModel()->updateCounters(
             [
                 'threads_count' => $threads,
                 'posts_count' => $posts,

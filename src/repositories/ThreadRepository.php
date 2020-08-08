@@ -16,73 +16,63 @@ use yii\db\Transaction;
 
 final class ThreadRepository implements ThreadRepositoryInterface
 {
-    public string $threadActiveRecord = ThreadActiveRecord::class;
+    use ActiveRecordRepositoryTrait;
 
-    private array $errors = [];
+    public string $activeRecordClass = ThreadActiveRecord::class;
+
     private ?ThreadActiveRecord $model = null;
 
-    public function find(int $id): bool
+    public function getActiveRecordClass(): string
     {
-        /** @var ThreadActiveRecord $modelClass */
-        $modelClass = $this->threadActiveRecord;
-        /** @var ThreadActiveRecord|null $model */
-        $model = $modelClass::findOne($id);
-        $this->model = $model;
-        return $model === null;
+        return $this->activeRecordClass;
     }
 
-    public function setModel(ThreadActiveRecord $model): void
+    public function getModel(): ThreadActiveRecord
     {
-        $this->model = $model;
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
+        }
+        return $this->model;
+    }
+
+    public function setModel(?ThreadActiveRecord $activeRecord): void
+    {
+        $this->model = $activeRecord;
     }
 
     public function getId(): int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->id;
+        return $this->getModel()->id;
     }
 
     public function getParent(): RepositoryInterface
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
+        $forumRepository = $this->getModel()->forum;
         $parent = new ForumRepository();
-        $parent->setModel($this->model->forum);
-        return $parent;
-    }
+        $parent->setModel($forumRepository);
 
-    public function getErrors(): array
-    {
-        return $this->errors;
+        return $parent;
     }
 
     public function isArchived(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->archived;
+        return $this->getModel()->archived;
     }
 
     public function delete(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-
+        $thread = $this->getModel();
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->getParent()->updateCounters(-1, -$this->model->posts_count)) {
+            if (!$this->getParent()->updateCounters(-1, -$thread->posts_count)) {
                 throw new Exception('Error while updating forum counters!');
             }
-            if ($this->model->delete() === false) {
+            if (false === $thread->delete()) {
                 throw new Exception('Error while deleting thread!');
             }
             $transaction->commit();
+
             return true;
         } catch (Throwable $exc) {
             $transaction->rollBack();
@@ -94,59 +84,48 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
     public function pin(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->pinned = true;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->pinned = true;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 
     public function unpin(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->pinned = false;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->pinned = false;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 
     public function move(ForumRepositoryInterface $newForum): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-
+        $thread = $this->getModel();
         $oldForum = $this->getParent();
-
-        $this->model->forum_id = $newForum->getId();
-        $this->model->category_id = $newForum->getParent()->getId();
-
+        $thread->forum_id = $newForum->getId();
+        $thread->category_id = $newForum->getParent()->getId();
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$this->model->save()) {
-                $this->errors = $this->model->errors;
+            if (!$thread->save()) {
+                $this->errors = $thread->errors;
+
                 return false;
             }
-            if (!$oldForum->updateCounters(-1, -$this->model->posts_count)) {
+            if (!$oldForum->updateCounters(-1, -$thread->posts_count)) {
                 throw new Exception('Error while updating old forum counters!');
             }
-            if (!$newForum->updateCounters(1, $this->model->posts_count)) {
+            if (!$newForum->updateCounters(1, $thread->posts_count)) {
                 throw new Exception('Error while updating new forum counters!');
             }
             $transaction->commit();
+
             return true;
         } catch (Throwable $exc) {
             $transaction->rollBack();
@@ -158,61 +137,45 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
     public function lock(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->locked = true;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->locked = true;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 
     public function unlock(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->locked = false;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->locked = false;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 
     public function archive(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->archived = true;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->archived = true;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 
     public function revive(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $thread = $this->getModel();
+        $thread->archived = false;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        $this->model->archived = false;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $thread->save(false);
     }
 }

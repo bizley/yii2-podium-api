@@ -8,22 +8,35 @@ use bizley\podium\api\ars\SubscriptionActiveRecord;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
 use LogicException;
 use Throwable;
-use yii\db\StaleObjectException;
-
-use function is_int;
+use Yii;
+use yii\db\Exception;
 
 final class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
-    public string $subscriptionActiveRecord = SubscriptionActiveRecord::class;
+    public string $activeRecordClass = SubscriptionActiveRecord::class;
 
-    private array $errors = [];
     private ?SubscriptionActiveRecord $model = null;
+    private array $errors = [];
+
+    public function getModel(): SubscriptionActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
+        }
+
+        return $this->model;
+    }
+
+    public function setModel(?SubscriptionActiveRecord $activeRecord): void
+    {
+        $this->model = $activeRecord;
+    }
 
     public function isMemberSubscribed(int $memberId, int $threadId): bool
     {
-        /** @var SubscriptionActiveRecord $model */
-        $model = $this->subscriptionActiveRecord;
-        return $model::find()
+        $modelClass = $this->activeRecordClass;
+        /* @var SubscriptionActiveRecord $modelClass */
+        return $modelClass::find()
             ->where(
                 [
                     'member_id' => $memberId,
@@ -36,7 +49,7 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
     public function subscribe(int $memberId, int $threadId): bool
     {
         /** @var SubscriptionActiveRecord $model */
-        $model = new $this->subscriptionActiveRecord();
+        $model = new $this->activeRecordClass();
         $model->member_id = $memberId;
         $model->thread_id = $threadId;
 
@@ -47,10 +60,10 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         return $model->save(false);
     }
 
-    public function find(int $memberId, int $threadId): bool
+    public function fetchOne(int $memberId, int $threadId): bool
     {
         /** @var SubscriptionActiveRecord $modelClass */
-        $modelClass = $this->subscriptionActiveRecord;
+        $modelClass = $this->activeRecordClass;
         /** @var SubscriptionActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
@@ -60,8 +73,12 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
                 ]
             )
             ->one();
+        if (null === $model) {
+            return false;
+        }
         $this->model = $model;
-        return $model === null;
+
+        return true;
     }
 
     public function getErrors(): array
@@ -69,16 +86,21 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         return $this->errors;
     }
 
-    /**
-     * @return bool
-     * @throws Throwable
-     * @throws StaleObjectException
-     */
     public function delete(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        try {
+            if (false === $this->getModel()->delete()) {
+                throw new Exception('Error while deleting model!');
+            }
+
+            return true;
+        } catch (Throwable $exc) {
+            Yii::error(
+                ['Exception while deleting subscription', $exc->getMessage(), $exc->getTraceAsString()],
+                'podium'
+            );
         }
-        return is_int($this->model->delete());
+
+        return false;
     }
 }

@@ -15,60 +15,59 @@ use yii\db\Transaction;
 
 final class PostRepository implements PostRepositoryInterface
 {
-    public string $postActiveRecord = PostActiveRecord::class;
+    use ActiveRecordRepositoryTrait;
 
-    private array $errors = [];
+    public string $activeRecordClass = PostActiveRecord::class;
+
     private ?PostActiveRecord $model = null;
 
-    public function find(int $id): bool
+    public function getActiveRecordClass(): string
     {
-        /** @var PostActiveRecord $modelClass */
-        $modelClass = $this->postActiveRecord;
-        /** @var PostActiveRecord|null $model */
-        $model = $modelClass::findOne($id);
-        $this->model = $model;
-        return $model === null;
+        return $this->activeRecordClass;
+    }
+
+    public function getModel(): PostActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
+        }
+
+        return $this->model;
+    }
+
+    public function setModel(?PostActiveRecord $activeRecord): void
+    {
+        $this->model = $activeRecord;
     }
 
     public function getId(): int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->id;
+        return $this->getModel()->id;
     }
 
     public function getParent(): RepositoryInterface
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
+        $threadRepository = $this->getModel()->thread;
         $parent = new ThreadRepository();
-        $parent->setModel($this->model->thread);
-        return $parent;
-    }
+        $parent->setModel($threadRepository);
 
-    public function getErrors(): array
-    {
-        return $this->errors;
+        return $parent;
     }
 
     public function delete(): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-
+        $post = $this->getModel();
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
             if (!$this->getParent()->updateCounters(0, -1)) {
                 throw new Exception('Error while updating thread counters!');
             }
-            if ($this->model->delete() === false) {
+            if (false === $post->delete()) {
                 throw new Exception('Error while deleting post!');
             }
             $transaction->commit();
+
             return true;
         } catch (Throwable $exc) {
             $transaction->rollBack();
@@ -80,9 +79,6 @@ final class PostRepository implements PostRepositoryInterface
 
     public function getCreatedAt(): int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->created_at;
+        return $this->getModel()->created_at;
     }
 }

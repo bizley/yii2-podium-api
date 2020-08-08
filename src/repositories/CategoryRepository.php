@@ -8,69 +8,45 @@ use bizley\podium\api\ars\CategoryActiveRecord;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
-use Throwable;
 use yii\base\NotSupportedException;
-use yii\db\StaleObjectException;
-
-use function is_int;
 
 final class CategoryRepository implements CategoryRepositoryInterface
 {
-    public string $categoryActiveRecord = CategoryActiveRecord::class;
+    use ActiveRecordRepositoryTrait;
 
-    private array $errors = [];
+    public string $activeRecordClass = CategoryActiveRecord::class;
+
     private ?CategoryActiveRecord $model = null;
 
-    public function find(int $id): bool
+    public function getActiveRecordClass(): string
     {
-        /** @var CategoryActiveRecord $modelClass */
-        $modelClass = $this->categoryActiveRecord;
-        /** @var CategoryActiveRecord|null $model */
-        $model = $modelClass::findOne($id);
-        if ($model === null) {
-            return false;
+        return $this->activeRecordClass;
+    }
+
+    public function getModel(): CategoryActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
         }
-        $this->model = $model;
-        return true;
+
+        return $this->model;
     }
 
-    public function setModel(CategoryActiveRecord $model): void
+    public function setModel(?CategoryActiveRecord $activeRecord): void
     {
-        $this->model = $model;
-    }
-
-    public function getErrors(): array
-    {
-        return $this->errors;
+        $this->model = $activeRecord;
     }
 
     public function getId(): int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->id;
+        return $this->getModel()->id;
     }
 
     /**
-     * @return RepositoryInterface
      * @throws NotSupportedException
      */
     public function getParent(): RepositoryInterface
     {
         throw new NotSupportedException('Category has no parent!');
-    }
-
-    /**
-     * @return bool
-     * @throws StaleObjectException
-     * @throws Throwable
-     */
-    public function delete(): bool
-    {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return is_int($this->model->delete());
     }
 }

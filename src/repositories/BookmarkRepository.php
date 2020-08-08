@@ -10,15 +10,29 @@ use LogicException;
 
 final class BookmarkRepository implements BookmarkRepositoryInterface
 {
-    public string $bookmarkActiveRecord = BookmarkActiveRecord::class;
+    public string $activeRecordClass = BookmarkActiveRecord::class;
 
     private array $errors = [];
     private ?BookmarkActiveRecord $model = null;
 
-    public function find(int $memberId, int $threadId): bool
+    public function getModel(): BookmarkActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
+        }
+
+        return $this->model;
+    }
+
+    public function setModel(?BookmarkActiveRecord $activeRecord): void
+    {
+        $this->model = $activeRecord;
+    }
+
+    public function fetchOne(int $memberId, int $threadId): bool
     {
         /** @var BookmarkActiveRecord $modelClass */
-        $modelClass = $this->bookmarkActiveRecord;
+        $modelClass = $this->activeRecordClass;
         /** @var BookmarkActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
@@ -28,10 +42,11 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
                 ]
             )
             ->one();
-        if ($model === null) {
+        if (null === $model) {
             return false;
         }
         $this->model = $model;
+
         return true;
     }
 
@@ -43,7 +58,7 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
     public function create(int $memberId, int $threadId): void
     {
         /** @var BookmarkActiveRecord $model */
-        $model = new $this->bookmarkActiveRecord();
+        $model = new $this->activeRecordClass();
         $model->member_id = $memberId;
         $model->thread_id = $threadId;
         $this->model = $model;
@@ -51,24 +66,18 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
 
     public function getLastSeen(): ?int
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
-        }
-        return $this->model->last_seen;
+        return $this->getModel()->last_seen;
     }
 
     public function mark(int $timeMark): bool
     {
-        if ($this->model === null) {
-            throw new LogicException('You need to call find() first!');
+        $bookmark = $this->getModel();
+        $bookmark->last_seen = $timeMark;
+
+        if (!$bookmark->validate()) {
+            $this->errors = $bookmark->errors;
         }
 
-        $this->model->last_seen = $timeMark;
-
-        if (!$this->model->validate()) {
-            $this->errors = $this->model->errors;
-        }
-
-        return $this->model->save(false);
+        return $bookmark->save(false);
     }
 }
