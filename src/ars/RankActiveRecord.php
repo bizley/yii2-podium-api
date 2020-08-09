@@ -9,11 +9,11 @@ use yii\db\ActiveRecord;
 /**
  * Rank Active Record.
  *
- * @property int $id
+ * @property int    $id
  * @property string $name
- * @property int $min_posts
- * @property int $created_at
- * @property int $updated_at
+ * @property int    $min_posts
+ * @property int    $created_at
+ * @property int    $updated_at
  */
 class RankActiveRecord extends ActiveRecord
 {

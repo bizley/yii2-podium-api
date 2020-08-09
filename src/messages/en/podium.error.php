@@ -24,6 +24,7 @@ return [
     'post.must.be.archived' => 'Post must be archived first.',
     'post.not.archived' => 'Post is not archived.',
     'post.not.rated' => 'Post is not rated.',
+    'rank.not.exists' => 'Rank does not exist.',
     'target.already.acquainted' => 'Target is already acquainted.',
     'target.not.befriended' => 'Target is not befriended.',
     'target.not.ignored' => 'Target is not ignored.',
