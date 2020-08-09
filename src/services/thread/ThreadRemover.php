@@ -13,6 +13,8 @@ use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\db\Exception;
+use yii\db\Transaction;
 use yii\di\Instance;
 
 final class ThreadRemover extends Component implements RemoverInterface
@@ -28,16 +30,16 @@ final class ThreadRemover extends Component implements RemoverInterface
     public $repositoryConfig = ThreadRepository::class;
 
     /**
-     * @return ThreadRepositoryInterface
      * @throws InvalidConfigException
      */
     private function getThread(): ThreadRepositoryInterface
     {
-        if ($this->thread === null) {
+        if (null === $this->thread) {
             /** @var ThreadRepositoryInterface $thread */
             $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
             $this->thread = $thread;
         }
+
         return $this->thread;
     }
 
@@ -51,9 +53,6 @@ final class ThreadRemover extends Component implements RemoverInterface
 
     /**
      * Removes the thread.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
      */
     public function remove(int $id): PodiumResponse
     {
@@ -61,24 +60,33 @@ final class ThreadRemover extends Component implements RemoverInterface
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-        if (!$thread->isArchived()) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.must.be.archived')]);
-        }
-
+        /** @var Transaction $transaction */
+        $transaction = Yii::$app->db->beginTransaction();
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+            if (!$thread->isArchived()) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.must.be.archived')]);
+            }
+
             if (!$thread->delete()) {
                 return PodiumResponse::error();
             }
 
+            if (!$thread->getParent()->updateCounters(-1, -$thread->getPostsCount())) {
+                throw new Exception('Error while updating forum counters!');
+            }
+
+            $transaction->commit();
             $this->afterRemove();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
+            $transaction->rollBack();
             Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

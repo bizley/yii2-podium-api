@@ -16,7 +16,7 @@ interface ThreadInterface
     /**
      * Updates thread.
      */
-    public function edit(array $data): PodiumResponse;
+    public function edit(int $id, array $data): PodiumResponse;
 
     public function remove(int $id): PodiumResponse;
 

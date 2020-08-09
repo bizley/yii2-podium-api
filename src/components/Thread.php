@@ -5,15 +5,13 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
-use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
-use bizley\podium\api\interfaces\CategorisedFormInterface;
+use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
@@ -21,10 +19,10 @@ use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
-use bizley\podium\api\models\thread\ThreadForm;
 use bizley\podium\api\repositories\ThreadRepository;
 use bizley\podium\api\services\thread\ThreadArchiver;
 use bizley\podium\api\services\thread\ThreadBookmarker;
+use bizley\podium\api\services\thread\ThreadBuilder;
 use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
@@ -34,19 +32,13 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
 final class Thread extends Component implements ThreadInterface
 {
     /**
-     * @var string|array|ModelInterface
+     * @var string|array|BuilderInterface
      */
-    public $modelConfig = \bizley\podium\api\models\thread\Thread::class;
-
-    /**
-     * @var string|array|CategorisedFormInterface
-     */
-    public $formConfig = ThreadForm::class;
+    public $builderConfig = ThreadBuilder::class;
 
     /**
      * @var string|array|SubscriberInterface
@@ -84,7 +76,7 @@ final class Thread extends Component implements ThreadInterface
     public $pinnerConfig = ThreadPinner::class;
 
     /**
-     * @var string|array|ThreadRepositoryInterface
+     * @var string|array|ActiveRecordThreadRepositoryInterface
      */
     public $repositoryConfig = ThreadRepository::class;
 
@@ -117,59 +109,32 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getForm(int $id = null): ?CategorisedFormInterface
+    public function getBuilder(): BuilderInterface
     {
-        /** @var CategorisedFormInterface $handler */
-        $handler = Instance::ensure($this->formConfig, CategorisedFormInterface::class);
-        if (null === $id) {
-            return $handler;
-        }
-        /** @var CategorisedFormInterface|null $findModel */
-        $findModel = $handler::findById($id);
+        /** @var BuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
 
-        return $findModel;
+        return $builder;
     }
 
     /**
      * Creates thread.
+     *
+     * @throws InvalidConfigException
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $forum): PodiumResponse
+    public function create(array $data, MembershipInterface $author, ForumRepositoryInterface $forum): PodiumResponse
     {
-        /** @var CategorisedFormInterface $threadForm */
-        $threadForm = $this->getForm();
-
-        $threadForm->setAuthor($author);
-        $threadForm->setForum($forum);
-
-        if (!$threadForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $threadForm->create();
+        return $this->getBuilder()->create($data, $author, $forum);
     }
 
     /**
      * Updates thread.
      *
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit(int $id, array $data): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-        if (null === $id) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $threadForm = $this->getForm((int) $id);
-        if (null === $threadForm) {
-            throw new ModelNotFoundException('Thread of given ID can not be found.');
-        }
-        if (!$threadForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $threadForm->edit();
+        return $this->getBuilder()->edit($id, $data);
     }
 
     /**

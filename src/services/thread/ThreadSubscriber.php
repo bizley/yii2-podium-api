@@ -6,8 +6,7 @@ namespace bizley\podium\api\services\thread;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\SubscriptionEvent;
-use bizley\podium\api\InsufficientDataException;
-use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
@@ -33,16 +32,16 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
     public $repositoryConfig = SubscriptionRepository::class;
 
     /**
-     * @return SubscriptionRepositoryInterface
      * @throws InvalidConfigException
      */
     public function getSubscription(): SubscriptionRepositoryInterface
     {
-        if ($this->subscription === null) {
+        if (null === $this->subscription) {
             /** @var SubscriptionRepositoryInterface $subscription */
             $subscription = Instance::ensure($this->repositoryConfig, SubscriptionRepositoryInterface::class);
             $this->subscription = $subscription;
         }
+
         return $this->subscription;
     }
 
@@ -54,34 +53,21 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canSubscribe;
     }
 
-    /**
-     * @param MembershipInterface $member
-     * @param ThreadRepositoryInterface $thread
-     * @return PodiumResponse
-     * @throws InsufficientDataException
-     * @throws InvalidConfigException
-     */
-    public function subscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
             return PodiumResponse::error();
         }
 
-        $memberId = $member->getId();
-        if ($memberId === null) {
-            throw new InsufficientDataException('Missing member ID for Thread Subscriber!');
-        }
-        $threadId = $thread->getId();
-        if ($threadId === null) {
-            throw new InsufficientDataException('Missing thread ID for Thread Subscriber!');
-        }
-
-        $subscription = $this->getSubscription();
-        if ($subscription->isMemberSubscribed($memberId, $threadId)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.already.subscribed')]);
-        }
-
         try {
+            $memberId = $member->getId();
+            $threadId = $thread->getId();
+
+            $subscription = $this->getSubscription();
+            if ($subscription->isMemberSubscribed($memberId, $threadId)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.already.subscribed')]);
+            }
+
             if (!$subscription->subscribe($memberId, $threadId)) {
                 return PodiumResponse::error($subscription->getErrors());
             }
@@ -91,6 +77,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while subscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
@@ -108,32 +95,20 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canUnsubscribe;
     }
 
-    /**
-     * @param MembershipInterface $member
-     * @param ThreadRepositoryInterface $thread
-     * @return PodiumResponse
-     * @throws InsufficientDataException
-     * @throws InvalidConfigException
-     */
-    public function unsubscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function unsubscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
             return PodiumResponse::error();
         }
 
-        $memberId = $member->getId();
-        if ($memberId === null) {
-            throw new InsufficientDataException('Missing member ID for Thread Subscriber!');
-        }
-        $threadId = $thread->getId();
-        if ($threadId === null) {
-            throw new InsufficientDataException('Missing thread ID for Thread Subscriber!');
-        }
-        $subscription = $this->getSubscription();
-        if (!$subscription->find($memberId, $threadId)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.subscribed')]);
-        }
         try {
+            $memberId = $member->getId();
+            $threadId = $thread->getId();
+            $subscription = $this->getSubscription();
+            if (!$subscription->fetchOne($memberId, $threadId)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.subscribed')]);
+            }
+
             if (!$subscription->delete()) {
                 return PodiumResponse::error($subscription->getErrors());
             }

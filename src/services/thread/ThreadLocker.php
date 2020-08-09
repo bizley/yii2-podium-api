@@ -30,16 +30,16 @@ final class ThreadLocker extends Component implements LockerInterface
     public $repositoryConfig = ThreadRepository::class;
 
     /**
-     * @return ThreadRepositoryInterface
      * @throws InvalidConfigException
      */
     private function getThread(): ThreadRepositoryInterface
     {
-        if ($this->thread === null) {
+        if (null === $this->thread) {
             /** @var ThreadRepositoryInterface $thread */
             $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
             $this->thread = $thread;
         }
+
         return $this->thread;
     }
 
@@ -53,9 +53,6 @@ final class ThreadLocker extends Component implements LockerInterface
 
     /**
      * Locks the thread.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
      */
     public function lock(int $id): PodiumResponse
     {
@@ -63,12 +60,12 @@ final class ThreadLocker extends Component implements LockerInterface
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->lock()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -78,6 +75,7 @@ final class ThreadLocker extends Component implements LockerInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while locking thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
@@ -97,9 +95,6 @@ final class ThreadLocker extends Component implements LockerInterface
 
     /**
      * Unlocks the thread.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
      */
     public function unlock(int $id): PodiumResponse
     {
@@ -107,12 +102,12 @@ final class ThreadLocker extends Component implements LockerInterface
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->unlock()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -122,6 +117,7 @@ final class ThreadLocker extends Component implements LockerInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while unlocking thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

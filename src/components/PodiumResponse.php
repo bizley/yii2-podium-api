@@ -4,10 +4,6 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-/**
- * Class PodiumResponse
- * @package bizley\podium\api\base
- */
 final class PodiumResponse
 {
     private bool $result;
@@ -23,8 +19,6 @@ final class PodiumResponse
 
     /**
      * Returns successful response.
-     * @param array $data
-     * @return PodiumResponse
      */
     public static function success(array $data = []): PodiumResponse
     {
@@ -33,8 +27,6 @@ final class PodiumResponse
 
     /**
      * Returns erroneous response.
-     * @param array $errors
-     * @return PodiumResponse
      */
     public static function error(array $errors = []): PodiumResponse
     {

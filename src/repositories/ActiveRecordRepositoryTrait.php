@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use Throwable;
-use Yii;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
 use yii\db\ActiveRecord;
-use yii\db\Exception;
+use yii\db\StaleObjectException;
+
+use function is_int;
 
 trait ActiveRecordRepositoryTrait
 {
@@ -82,18 +83,26 @@ trait ActiveRecordRepositoryTrait
         $this->setCollection($dataProvider);
     }
 
+    /**
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function delete(): bool
     {
-        try {
-            if (false === $this->getModel()->delete()) {
-                throw new Exception('Error while deleting model!');
-            }
+        return is_int($this->getModel()->delete());
+    }
 
-            return true;
-        } catch (Throwable $exc) {
-            Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+    public function edit(array $data): bool
+    {
+        $model = $this->getModel();
+        if (!$model->load($data, '')) {
+            return false;
         }
 
-        return false;
+        if (!$model->validate()) {
+            $this->errors = $model->errors;
+        }
+
+        return $model->save(false);
     }
 }

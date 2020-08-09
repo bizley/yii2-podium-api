@@ -30,16 +30,16 @@ final class ThreadArchiver extends Component implements ArchiverInterface
     public $repositoryConfig = ThreadRepository::class;
 
     /**
-     * @return ThreadRepositoryInterface
      * @throws InvalidConfigException
      */
     private function getThread(): ThreadRepositoryInterface
     {
-        if ($this->thread === null) {
+        if (null === $this->thread) {
             /** @var ThreadRepositoryInterface $thread */
             $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
             $this->thread = $thread;
         }
+
         return $this->thread;
     }
 
@@ -53,9 +53,6 @@ final class ThreadArchiver extends Component implements ArchiverInterface
 
     /**
      * Archives the thread.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
      */
     public function archive(int $id): PodiumResponse
     {
@@ -63,12 +60,12 @@ final class ThreadArchiver extends Component implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->archive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -78,6 +75,7 @@ final class ThreadArchiver extends Component implements ArchiverInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while archiving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
@@ -97,9 +95,6 @@ final class ThreadArchiver extends Component implements ArchiverInterface
 
     /**
      * Revives the thread.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
      */
     public function revive(int $id): PodiumResponse
     {
@@ -107,12 +102,12 @@ final class ThreadArchiver extends Component implements ArchiverInterface
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->revive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -122,6 +117,7 @@ final class ThreadArchiver extends Component implements ArchiverInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while reviving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }

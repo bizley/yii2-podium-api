@@ -43,16 +43,16 @@ use function is_array;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
- * @property Account  $account
+ * @property Account $account
  * @property Category $category
- * @property Forum    $forum
- * @property Group    $group
- * @property Member   $member
- * @property Message  $message
- * @property Poll     $poll
- * @property Post     $post
- * @property Rank     $rank
- * @property Thread   $thread
+ * @property Forum $forum
+ * @property Group $group
+ * @property Member $member
+ * @property Message $message
+ * @property Poll $poll
+ * @property Post $post
+ * @property Rank $rank
+ * @property Thread $thread
  */
 class Podium extends ServiceLocator
 {
@@ -235,13 +235,12 @@ class Podium extends ServiceLocator
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
-            'basePath' => __DIR__.'/messages',
+            'basePath' => __DIR__ . '/messages',
         ];
     }
 
     /**
      * Sets Podium reference for custom components.
-     * Custom component should be child of PodiumComponent class.
      *
      * @throws InvalidConfigException
      */

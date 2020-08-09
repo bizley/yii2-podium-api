@@ -6,13 +6,8 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
 use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
-use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
-use Throwable;
-use Yii;
-use yii\db\Exception;
-use yii\db\Transaction;
 
 final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
 {
@@ -32,6 +27,7 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
         if (null === $this->model) {
             throw new LogicException('You need to call fetchOne() or setModel() first!');
         }
+
         return $this->model;
     }
 
@@ -59,27 +55,28 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function delete(): bool
+    public function getPostsCount(): int
     {
-        $thread = $this->getModel();
-        /** @var Transaction $transaction */
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            if (!$this->getParent()->updateCounters(-1, -$thread->posts_count)) {
-                throw new Exception('Error while updating forum counters!');
-            }
-            if (false === $thread->delete()) {
-                throw new Exception('Error while deleting thread!');
-            }
-            $transaction->commit();
+        return $this->getModel()->posts_count;
+    }
 
-            return true;
-        } catch (Throwable $exc) {
-            $transaction->rollBack();
-            Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+    public function create(array $data, int $authorId, int $forumId, int $categoryId): bool
+    {
+        /** @var ThreadActiveRecord $thread */
+        $thread = new $this->activeRecordClass();
+        if (!$thread->load($data, '')) {
+            return false;
         }
 
-        return false;
+        $thread->author_id = $authorId;
+        $thread->forum_id = $forumId;
+        $thread->category_id = $categoryId;
+
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
+        }
+
+        return $thread->save(false);
     }
 
     public function pin(): bool
@@ -104,35 +101,16 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
         return $thread->save(false);
     }
 
-    public function move(ForumRepositoryInterface $newForum): bool
+    public function move(int $forumId, int $categoryId): bool
     {
         $thread = $this->getModel();
-        $oldForum = $this->getParent();
-        $thread->forum_id = $newForum->getId();
-        $thread->category_id = $newForum->getParent()->getId();
-        /** @var Transaction $transaction */
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            if (!$thread->save()) {
-                $this->errors = $thread->errors;
-
-                return false;
-            }
-            if (!$oldForum->updateCounters(-1, -$thread->posts_count)) {
-                throw new Exception('Error while updating old forum counters!');
-            }
-            if (!$newForum->updateCounters(1, $thread->posts_count)) {
-                throw new Exception('Error while updating new forum counters!');
-            }
-            $transaction->commit();
-
-            return true;
-        } catch (Throwable $exc) {
-            $transaction->rollBack();
-            Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+        $thread->forum_id = $forumId;
+        $thread->category_id = $categoryId;
+        if (!$thread->validate()) {
+            $this->errors = $thread->errors;
         }
 
-        return false;
+        return $thread->save(false);
     }
 
     public function lock(): bool

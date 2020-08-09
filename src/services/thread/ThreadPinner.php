@@ -30,16 +30,16 @@ final class ThreadPinner extends Component implements PinnerInterface
     public $repositoryConfig = ThreadRepository::class;
 
     /**
-     * @return ThreadRepositoryInterface
      * @throws InvalidConfigException
      */
     private function getThread(): ThreadRepositoryInterface
     {
-        if ($this->thread === null) {
+        if (null === $this->thread) {
             /** @var ThreadRepositoryInterface $thread */
             $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
             $this->thread = $thread;
         }
+
         return $this->thread;
     }
 
@@ -51,23 +51,18 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canPin;
     }
 
-    /**
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
-     */
     public function pin(int $id): PodiumResponse
     {
         if (!$this->beforePin()) {
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->pin()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -77,6 +72,7 @@ final class ThreadPinner extends Component implements PinnerInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while pinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
@@ -94,23 +90,18 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canUnpin;
     }
 
-    /**
-     * @param int $id
-     * @return PodiumResponse
-     * @throws InvalidConfigException
-     */
     public function unpin(int $id): PodiumResponse
     {
         if (!$this->beforeUnpin()) {
             return PodiumResponse::error();
         }
 
-        $thread = $this->getThread();
-        if (!$thread->find($id)) {
-            return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-        }
-
         try {
+            $thread = $this->getThread();
+            if (!$thread->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
+            }
+
             if (!$thread->unpin()) {
                 return PodiumResponse::error($thread->getErrors());
             }
@@ -120,6 +111,7 @@ final class ThreadPinner extends Component implements PinnerInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             Yii::error(['Exception while unpinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
             return PodiumResponse::error();
         }
     }
