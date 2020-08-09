@@ -1,18 +1,40 @@
-[![Build Status](https://img.shields.io/travis/bizley/yii2-podium-api.svg)](https://travis-ci.org/bizley/yii2-podium-api)
-[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/bizley/yii2-podium-api/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/bizley/yii2-podium-api/?branch=master)
-[![Code Coverage](https://scrutinizer-ci.com/g/bizley/yii2-podium-api/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/bizley/yii2-podium-api/?branch=master)
+# Yii 2 Podium API
 
-# Yii 2 Podium API _[Work In Progress]_
+**[Work In Progress]**
 
-## COMPONENTS:
+Sorry for neglecting this project for so long.
 
-- [x] Member
-- [ ] Account - other components need to be connected 
-- [x] Category
-- [x] Forum
+I'm rewriting it again because now I know more than 2 years ago. When I'll finish I'll know more than now but maybe another 
+rewriting will not be necessary. We'll see.
+
+The goal right now is simple - to make Podium easily extendable and for its components to be easy to implement.
+
+I've decided that this package by default will use Active Records as its base since this is the default of Yii 2, but 
+will be open to other implementations. As much as I love this framework I really need to fight with its solutions 
+sometimes (but hey, Yii 3 is coming, right?). Anyway - if you find something terrible from the architectural point of 
+view please let me know.
+
+Podium is divided into the components (not to be mistaken by Yii's components although these are implemented as them) 
+that take care of main aspects of forum structure. Each component is responsible for the actions (again, not Yii's 
+actions) concerning its aspect, and these actions are implemented as services that operate on repositories. As for the 
+repositories - these are objects that know about the storage of data they can handle and how to work with them. By 
+default the storage here is a database mapped by the Active Records (as I said earlier), but it should be easy enough 
+to implement custom storage (at least I'm trying to make it easy).
+
+There are some rules:
+ - only repositories know about the storage,
+ - each repository knows how to handle one single storage unit and not more.
+
+So far the components ready are:
 - [x] Thread
-- [x] Post
-- [x] Rank
-- [x] Group
-- [x] Poll
-- [x] Message
+- [ ] Rank
+- [ ] Post
+- [ ] Poll
+- [ ] Message
+- [ ] Member
+- [ ] Group
+- [ ] Forum
+- [ ] Category
+- [ ] Account
+
+When API is ready, I'll start preparing the client.
