@@ -8,7 +8,6 @@ use bizley\podium\api\ars\ThreadActiveRecord;
 use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
-use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\interfaces\MembershipInterface;
@@ -17,6 +16,7 @@ use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SubscriberInterface;
+use bizley\podium\api\interfaces\ThreadBuilderInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
@@ -36,7 +36,7 @@ use yii\di\Instance;
 final class Thread extends Component implements ThreadInterface
 {
     /**
-     * @var string|array|BuilderInterface
+     * @var string|array|ThreadBuilderInterface
      */
     public $builderConfig = ThreadBuilder::class;
 
@@ -109,10 +109,10 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getBuilder(): BuilderInterface
+    public function getBuilder(): ThreadBuilderInterface
     {
-        /** @var BuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+        /** @var ThreadBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, ThreadBuilderInterface::class);
 
         return $builder;
     }

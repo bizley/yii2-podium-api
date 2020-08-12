@@ -8,6 +8,7 @@ use bizley\podium\api\ars\RankActiveRecord;
 use bizley\podium\api\interfaces\ActiveRecordRankRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
+use yii\base\NotSupportedException;
 
 final class RankRepository implements ActiveRecordRankRepositoryInterface
 {
@@ -41,12 +42,26 @@ final class RankRepository implements ActiveRecordRankRepositoryInterface
         return $this->getModel()->id;
     }
 
+    /**
+     * @throws NotSupportedException
+     */
     public function getParent(): RepositoryInterface
     {
-        $forumRepository = $this->getModel()->forum;
-        $parent = new ForumRepository();
-        $parent->setModel($forumRepository);
+        throw new NotSupportedException('Rank does not have parent!');
+    }
 
-        return $parent;
+    public function create(array $data): bool
+    {
+        /** @var RankActiveRecord $rank */
+        $rank = new $this->activeRecordClass();
+        if (!$rank->load($data, '')) {
+            return false;
+        }
+
+        if (!$rank->validate()) {
+            $this->errors = $rank->errors;
+        }
+
+        return $rank->save(false);
     }
 }

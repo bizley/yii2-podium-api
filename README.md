@@ -27,7 +27,7 @@ There are some rules:
 
 So far the components ready are:
 - [x] Thread
-- [ ] Rank
+- [x] Rank
 - [ ] Post
 - [ ] Poll
 - [ ] Message

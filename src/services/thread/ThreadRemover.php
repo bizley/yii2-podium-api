@@ -6,6 +6,7 @@ namespace bizley\podium\api\services\thread;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
+use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
@@ -75,7 +76,9 @@ final class ThreadRemover extends Component implements RemoverInterface
                 return PodiumResponse::error();
             }
 
-            if (!$thread->getParent()->updateCounters(-1, -$thread->getPostsCount())) {
+            /** @var ForumRepositoryInterface $forum */
+            $forum = $thread->getParent();
+            if (!$forum->updateCounters(-1, -$thread->getPostsCount())) {
                 throw new Exception('Error while updating forum counters!');
             }
 

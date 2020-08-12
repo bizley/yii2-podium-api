@@ -59,9 +59,16 @@ final class ThreadBuilder extends Component implements BuilderInterface
     /**
      * Creates new thread.
      */
-    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $forum): PodiumResponse
-    {
-        if (!$forum instanceof ForumRepositoryInterface || !$this->beforeCreate()) {
+    public function create(
+        array $data,
+        MemberRepositoryInterface $author = null,
+        RepositoryInterface $forum = null
+    ): PodiumResponse {
+        if (
+            !$forum instanceof ForumRepositoryInterface
+            || !$author instanceof MemberRepositoryInterface
+            || !$this->beforeCreate()
+        ) {
             return PodiumResponse::error();
         }
 

@@ -41,9 +41,6 @@ final class RankRemover extends Component implements RemoverInterface
         return $this->rank;
     }
 
-    /**
-     * Executes before remove().
-     */
     public function beforeRemove(): bool
     {
         $event = new RemoveEvent();
