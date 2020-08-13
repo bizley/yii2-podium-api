@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\SubscriptionActiveRecord;
-use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
+use bizley\podium\api\interfaces\ActiveRecordSubscriptionRepositoryInterface;
 use LogicException;
 use Throwable;
-use Yii;
-use yii\db\Exception;
+use yii\db\StaleObjectException;
 
-final class SubscriptionRepository implements SubscriptionRepositoryInterface
+final class SubscriptionRepository implements ActiveRecordSubscriptionRepositoryInterface
 {
     public string $activeRecordClass = SubscriptionActiveRecord::class;
 
@@ -86,21 +85,12 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         return $this->errors;
     }
 
+    /**
+     * @throws Throwable
+     * @throws StaleObjectException
+     */
     public function delete(): bool
     {
-        try {
-            if (false === $this->getModel()->delete()) {
-                throw new Exception('Error while deleting model!');
-            }
-
-            return true;
-        } catch (Throwable $exc) {
-            Yii::error(
-                ['Exception while deleting subscription', $exc->getMessage(), $exc->getTraceAsString()],
-                'podium'
-            );
-        }
-
-        return false;
+        return is_int($this->getModel()->delete());
     }
 }

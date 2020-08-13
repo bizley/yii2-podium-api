@@ -6,7 +6,7 @@ namespace bizley\podium\api\services\thread;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
-use bizley\podium\api\interfaces\BuilderInterface;
+use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
@@ -20,7 +20,7 @@ use yii\db\Exception;
 use yii\db\Transaction;
 use yii\di\Instance;
 
-final class ThreadBuilder extends Component implements BuilderInterface
+final class ThreadBuilder extends Component implements CategoryBuilderInterface
 {
     public const EVENT_BEFORE_CREATING = 'podium.thread.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.thread.creating.after';
@@ -59,16 +59,9 @@ final class ThreadBuilder extends Component implements BuilderInterface
     /**
      * Creates new thread.
      */
-    public function create(
-        array $data,
-        MemberRepositoryInterface $author = null,
-        RepositoryInterface $forum = null
-    ): PodiumResponse {
-        if (
-            !$forum instanceof ForumRepositoryInterface
-            || !$author instanceof MemberRepositoryInterface
-            || !$this->beforeCreate()
-        ) {
+    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $forum): PodiumResponse
+    {
+        if (!$forum instanceof ForumRepositoryInterface || !$this->beforeCreate()) {
             return PodiumResponse::error();
         }
 

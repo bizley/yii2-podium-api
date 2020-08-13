@@ -6,39 +6,20 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-/**
- * Interface LikerInterface
- * @package bizley\podium\api\interfaces
- */
 interface LikerInterface
 {
     /**
-     * Initiator of liking.
-     * @param MembershipInterface $member
-     */
-    public function setMember(MembershipInterface $member): void;
-
-    /**
-     * Target of liking.
-     * @param ModelInterface $post
-     */
-    public function setPost(ModelInterface $post): void;
-
-    /**
      * Gives thumb up.
-     * @return PodiumResponse
      */
-    public function thumbUp(): PodiumResponse;
+    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
 
     /**
      * Gives thumb down.
-     * @return PodiumResponse
      */
-    public function thumbDown(): PodiumResponse;
+    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
 
     /**
      * Resets thumb.
-     * @return PodiumResponse
      */
-    public function thumbReset(): PodiumResponse;
+    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
 }

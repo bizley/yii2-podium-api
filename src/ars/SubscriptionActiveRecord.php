@@ -11,12 +11,11 @@ use yii\db\ActiveRecord;
 /**
  * Subscription Active Record.
  *
- * @property int $member_id
- * @property int $thread_id
- * @property bool $seen
- * @property int $created_at
- * @property int $updated_at
- *
+ * @property int                $member_id
+ * @property int                $thread_id
+ * @property bool               $seen
+ * @property int                $created_at
+ * @property int                $updated_at
  * @property ThreadActiveRecord $thread
  * @property MemberActiveRecord $member
  */

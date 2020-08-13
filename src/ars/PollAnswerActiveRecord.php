@@ -10,12 +10,11 @@ use yii\db\ActiveRecord;
 /**
  * Poll Answer Active Record.
  *
- * @property int $id
- * @property int $poll_id
- * @property string $answer
- * @property int $created_at
- * @property int $updated_at
- *
+ * @property int              $id
+ * @property int              $poll_id
+ * @property string           $answer
+ * @property int              $created_at
+ * @property int              $updated_at
  * @property PollActiveRecord $poll
  */
 class PollAnswerActiveRecord extends ActiveRecord

@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PostActiveRecord;
-use bizley\podium\api\interfaces\PostRepositoryInterface;
+use bizley\podium\api\interfaces\ActiveRecordPostRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
-use Throwable;
-use Yii;
-use yii\db\Exception;
-use yii\db\Transaction;
 
-final class PostRepository implements PostRepositoryInterface
+final class PostRepository implements ActiveRecordPostRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -54,31 +50,78 @@ final class PostRepository implements PostRepositoryInterface
         return $parent;
     }
 
-    public function delete(): bool
+    public function isArchived(): bool
     {
-        $post = $this->getModel();
-        /** @var Transaction $transaction */
-        $transaction = Yii::$app->db->beginTransaction();
-        try {
-            if (!$this->getParent()->updateCounters(0, -1)) {
-                throw new Exception('Error while updating thread counters!');
-            }
-            if (false === $post->delete()) {
-                throw new Exception('Error while deleting post!');
-            }
-            $transaction->commit();
-
-            return true;
-        } catch (Throwable $exc) {
-            $transaction->rollBack();
-            Yii::error(['Exception while deleting post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
-        }
-
-        return false;
+        return $this->getModel()->archived;
     }
 
     public function getCreatedAt(): int
     {
         return $this->getModel()->created_at;
+    }
+
+    public function create(array $data, int $authorId, int $threadId, int $forumId, int $categoryId): bool
+    {
+        /** @var PostActiveRecord $post */
+        $post = new $this->activeRecordClass();
+        if (!$post->load($data, '')) {
+            return false;
+        }
+
+        $post->author_id = $authorId;
+        $post->thread_id = $threadId;
+        $post->forum_id = $forumId;
+        $post->category_id = $categoryId;
+
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+        }
+
+        return $post->save(false);
+    }
+
+    public function move(int $threadId, int $forumId, int $categoryId): bool
+    {
+        $post = $this->getModel();
+        $post->thread_id = $threadId;
+        $post->forum_id = $forumId;
+        $post->category_id = $categoryId;
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+        }
+
+        return $post->save(false);
+    }
+
+    public function archive(): bool
+    {
+        $post = $this->getModel();
+        $post->archived = true;
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+        }
+
+        return $post->save(false);
+    }
+
+    public function revive(): bool
+    {
+        $post = $this->getModel();
+        $post->archived = false;
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+        }
+
+        return $post->save(false);
+    }
+
+    public function updateCounters(int $likes, int $dislikes): bool
+    {
+        return $this->getModel()->updateCounters(
+            [
+                'likes' => $likes,
+                'dislikes' => $dislikes,
+            ]
+        );
     }
 }

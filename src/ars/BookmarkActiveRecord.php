@@ -11,11 +11,10 @@ use yii\db\ActiveRecord;
 /**
  * Bookmark Active Record.
  *
- * @property int $member_id
- * @property int $thread_id
- * @property int $last_seen
- * @property int $updated_at
- *
+ * @property int                $member_id
+ * @property int                $thread_id
+ * @property int                $last_seen
+ * @property int                $updated_at
  * @property MemberActiveRecord $member
  * @property ThreadActiveRecord $thread
  */

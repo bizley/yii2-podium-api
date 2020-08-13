@@ -10,16 +10,15 @@ use yii\db\ActiveRecord;
 /**
  * Poll Active Record.
  *
- * @property int $id
- * @property int $thread_id
- * @property int $author_id
- * @property string $question
- * @property bool $revealed
- * @property string $choice_id
- * @property int $created_at
- * @property int $updated_at
- * @property int $expires_at
- *
+ * @property int                $id
+ * @property int                $thread_id
+ * @property int                $author_id
+ * @property string             $question
+ * @property bool               $revealed
+ * @property string             $choice_id
+ * @property int                $created_at
+ * @property int                $updated_at
+ * @property int                $expires_at
  * @property ThreadActiveRecord $thread
  * @property MemberActiveRecord $author
  */

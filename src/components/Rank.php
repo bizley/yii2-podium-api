@@ -91,6 +91,9 @@ final class Rank extends Component implements RankInterface
         return $this->getBuilder()->edit($id, $data);
     }
 
+    /**
+     * @throws InvalidConfigException
+     */
     public function getRemover(): RemoverInterface
     {
         /** @var RemoverInterface $remover */
@@ -101,6 +104,8 @@ final class Rank extends Component implements RankInterface
 
     /**
      * Deletes rank.
+     *
+     * @throws InvalidConfigException
      */
     public function remove(int $id): PodiumResponse
     {

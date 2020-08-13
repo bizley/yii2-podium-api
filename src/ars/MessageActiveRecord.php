@@ -10,13 +10,12 @@ use yii\db\ActiveRecord;
 /**
  * Message Active Record.
  *
- * @property int $id
- * @property int|null $reply_to_id
- * @property string $subject
- * @property string $content
- * @property int $created_at
- * @property int $updated_at
- *
+ * @property int                      $id
+ * @property int|null                 $reply_to_id
+ * @property string                   $subject
+ * @property string                   $content
+ * @property int                      $created_at
+ * @property int                      $updated_at
  * @property MessageActiveRecord|null $replyTo
  */
 class MessageActiveRecord extends ActiveRecord

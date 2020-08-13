@@ -23,6 +23,7 @@ class m180810_192900_create_table_podium_post extends Migration
             'category_id' => $this->integer()->notNull(),
             'forum_id' => $this->integer()->notNull(),
             'thread_id' => $this->integer()->notNull(),
+            'old_thread_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
             'content' => $this->text()->notNull(),
             'edited' => $this->boolean()->notNull()->defaultValue(false),
@@ -65,6 +66,15 @@ class m180810_192900_create_table_podium_post extends Migration
             'fk-podium_post-thread_id',
             '{{%podium_post}}',
             'thread_id',
+            '{{%podium_thread}}',
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk-podium_post-old_thread_id',
+            '{{%podium_post}}',
+            'old_thread_id',
             '{{%podium_thread}}',
             'id',
             'CASCADE',

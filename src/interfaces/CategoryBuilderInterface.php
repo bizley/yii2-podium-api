@@ -6,9 +6,9 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-interface ThreadBuilderInterface
+interface CategoryBuilderInterface
 {
-    public function create(array $data, MembershipInterface $author, ForumRepositoryInterface $forum): PodiumResponse;
+    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $parent): PodiumResponse;
 
     public function edit(int $id, array $data): PodiumResponse;
 }

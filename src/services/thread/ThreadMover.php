@@ -76,9 +76,9 @@ final class ThreadMover extends Component implements MoverInterface
 
             $postsCount = $thread->getPostsCount();
 
-            /** @var ForumRepositoryInterface $forum */
-            $forum = $thread->getParent();
-            if (!$forum->updateCounters(-1, -$postsCount)) {
+            /** @var ForumRepositoryInterface $threadParent */
+            $threadParent = $thread->getParent();
+            if (!$threadParent->updateCounters(-1, -$postsCount)) {
                 throw new Exception('Error while updating old forum counters!');
             }
             if (!$forum->updateCounters(1, $postsCount)) {

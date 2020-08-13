@@ -10,24 +10,24 @@ use yii\db\ActiveRecord;
 /**
  * Post Active Record.
  *
- * @property int $id
- * @property int $author_id
- * @property int $category_id
- * @property int $forum_id
- * @property int $thread_id
- * @property string $content
- * @property bool $edited
- * @property int $likes
- * @property int $dislikes
- * @property int $created_at
- * @property int $updated_at
- * @property int $edited_at
- * @property bool $archived
- *
+ * @property int                  $id
+ * @property int                  $author_id
+ * @property int                  $category_id
+ * @property int                  $forum_id
+ * @property int                  $thread_id
+ * @property int|null             $old_thread_id
+ * @property string               $content
+ * @property bool                 $edited
+ * @property int                  $likes
+ * @property int                  $dislikes
+ * @property int                  $created_at
+ * @property int                  $updated_at
+ * @property int                  $edited_at
+ * @property bool                 $archived
  * @property CategoryActiveRecord $category
- * @property ForumActiveRecord $forum
- * @property ThreadActiveRecord $thread
- * @property MemberActiveRecord $author
+ * @property ForumActiveRecord    $forum
+ * @property ThreadActiveRecord   $thread
+ * @property MemberActiveRecord   $author
  */
 class PostActiveRecord extends ActiveRecord
 {
@@ -54,5 +54,10 @@ class PostActiveRecord extends ActiveRecord
     public function getAuthor(): ActiveQuery
     {
         return $this->hasOne(MemberActiveRecord::class, ['id' => 'author_id']);
+    }
+
+    public function getOldThread(): ActiveQuery
+    {
+        return $this->hasOne(ThreadActiveRecord::class, ['id' => 'old_thread_id']);
     }
 }

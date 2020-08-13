@@ -156,4 +156,9 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
 
         return $thread->save(false);
     }
+
+    public function updateCounters(int $posts): bool
+    {
+        return $this->getModel()->updateCounters(['posts_count' => $posts]);
+    }
 }

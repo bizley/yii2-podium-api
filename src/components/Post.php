@@ -4,330 +4,231 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\InsufficientDataException;
+use bizley\podium\api\ars\PostActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordPostRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\CategorisedFormInterface;
+use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\LikerInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostInterface;
+use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\models\post\PostArchiver;
-use bizley\podium\api\models\post\PostForm;
-use bizley\podium\api\models\post\PostLiker;
-use bizley\podium\api\models\post\PostMover;
-use bizley\podium\api\models\post\PostRemover;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use bizley\podium\api\repositories\PostRepository;
+use bizley\podium\api\services\post\PostArchiver;
+use bizley\podium\api\services\post\PostBuilder;
+use bizley\podium\api\services\post\PostLiker;
+use bizley\podium\api\services\post\PostMover;
+use bizley\podium\api\services\post\PostRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\data\DataFilter;
-use yii\data\DataProviderInterface;
-use yii\data\Pagination;
-use yii\data\Sort;
+use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
-/**
- * Class Post
- * @package bizley\podium\api\base
- */
 final class Post extends Component implements PostInterface
 {
     /**
-     * @var string|array|ModelInterface post handler
-     * Component ID, class, configuration array, or instance of ModelInterface.
+     * @var string|array|CategoryBuilderInterface
      */
-    public $modelHandler = \bizley\podium\api\models\post\Post::class;
+    public $builderConfig = PostBuilder::class;
 
     /**
-     * @var string|array|CategorisedFormInterface post form handler
-     * Component ID, class, configuration array, or instance of CategorisedFormInterface.
-     */
-    public $formHandler = PostForm::class;
-
-    /**
-     * @var string|array|LikerInterface liking handler
-     * Component ID, class, configuration array, or instance of LikerInterface.
+     * @var string|array|LikerInterface
      */
     public $likerHandler = PostLiker::class;
 
     /**
-     * @var string|array|RemoverInterface post remover handler
-     * Component ID, class, configuration array, or instance of RemoverInterface.
+     * @var string|array|RemoverInterface
      */
     public $removerHandler = PostRemover::class;
 
     /**
-     * @var string|array|ArchiverInterface post archiver handler
-     * Component ID, class, configuration array, or instance of ArchiverInterface.
+     * @var string|array|ArchiverInterface
      */
     public $archiverHandler = PostArchiver::class;
 
     /**
-     * @var string|array|MoverInterface post mover handler
-     * Component ID, class, configuration array, or instance of MoverInterface.
+     * @var string|array|MoverInterface
      */
     public $moverHandler = PostMover::class;
 
     /**
+     * @var string|array|ActiveRecordPostRepositoryInterface
+     */
+    public $repositoryConfig = PostRepository::class;
+
+    /**
      * @throws InvalidConfigException
      */
-    public function init(): void
+    public function getById(int $id): ?PostActiveRecord
     {
-        parent::init();
-
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        $this->archiverHandler = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
-        $this->moverHandler = Instance::ensure($this->moverHandler, MoverInterface::class);
-    }
-
-    /**
-     * @param int $id
-     * @return ModelInterface|null
-     */
-    public function getById(int $id): ?ModelInterface
-    {
-        /** @var ModelInterface $postClass */
-        $postClass = Instance::ensure($this->modelHandler, ModelInterface::class);
-        return $postClass::findById($id);
-    }
-
-    /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
-     */
-    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        /** @var ModelInterface $postClass */
-        $postClass = Instance::ensure($this->modelHandler, ModelInterface::class);
-        return $postClass::findByFilter($filter, $sort, $pagination);
-    }
-
-    /**
-     * @param int|null $id
-     * @return CategorisedFormInterface|null
-     */
-    public function getForm(int $id = null): ?CategorisedFormInterface
-    {
-        /** @var CategorisedFormInterface $handler */
-        $handler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        if ($id === null) {
-            return $handler;
+        /** @var ActiveRecordPostRepositoryInterface $post */
+        $post = Instance::ensure($this->repositoryConfig, ActiveRecordPostRepositoryInterface::class);
+        if (!$post->fetchOne($id)) {
+            return null;
         }
-        /** @var CategorisedFormInterface|null $form */
-        $form = $handler::findById($id);
-        return $form;
+
+        return $post->getModel();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getAll($filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    {
+        /** @var ActiveRecordPostRepositoryInterface $rank */
+        $rank = Instance::ensure($this->repositoryConfig, ActiveRecordPostRepositoryInterface::class);
+        $rank->fetchAll($filter, $sort, $pagination);
+
+        return $rank->getCollection();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getBuilder(): CategoryBuilderInterface
+    {
+        /** @var CategoryBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+
+        return $builder;
     }
 
     /**
      * Creates post.
-     * @param array $data
-     * @param MembershipInterface $author
-     * @param ModelInterface $thread
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
-    {
-        /** @var CategorisedFormInterface $postForm */
-        $postForm = $this->getForm();
-
-        $postForm->setAuthor($author);
-        $postForm->setThread($thread);
-
-        if (!$postForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $postForm->create();
+    public function create(
+        array $data,
+        MemberRepositoryInterface $author,
+        ThreadRepositoryInterface $thread
+    ): PodiumResponse {
+        return $this->getBuilder()->create($data, $author, $thread);
     }
 
     /**
      * Updates post.
-     * @param array $data
-     * @return PodiumResponse
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit(int $id, array $data): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-        if ($id === null) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $postForm = $this->getForm((int)$id);
-        if ($postForm === null) {
-            throw new ModelNotFoundException('Post of given ID can not be found.');
-        }
-        if (!$postForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-        return $postForm->edit();
+        return $this->getBuilder()->edit($id, $data);
     }
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getRemover(int $id): ?RemoverInterface
+    public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $handler */
-        $handler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        /** @var RemoverInterface|null $remover */
-        $remover = $handler::findById($id);
+        /** @var RemoverInterface $remover */
+        $remover = Instance::ensure($this->removerHandler, RemoverInterface::class);
+
         return $remover;
     }
 
     /**
      * Deletes post.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
     public function remove(int $id): PodiumResponse
     {
-        $postRemover = $this->getRemover($id);
-
-        if ($postRemover === null) {
-            throw new ModelNotFoundException('Post of given ID can not be found.');
-        }
-
-        return $postRemover->remove();
+        return $this->getRemover()->remove($id);
     }
 
     /**
-     * @param int $id
-     * @return MoverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getMover(int $id): ?MoverInterface
+    public function getMover(): MoverInterface
     {
-        $handler = $this->moverHandler;
+        /** @var MoverInterface $mover */
+        $mover = Instance::ensure($this->moverHandler, MoverInterface::class);
 
-        return $handler::findById($id);
+        return $mover;
     }
 
     /**
      * Moves post.
-     * @param int $id
-     * @param ModelInterface $thread
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function move(int $id, ModelInterface $thread): PodiumResponse
+    public function move(int $id, ThreadRepositoryInterface $thread): PodiumResponse
     {
-        $postMover = $this->getMover($id);
-
-        if ($postMover === null) {
-            throw new ModelNotFoundException('Post of given ID can not be found.');
-        }
-
-        $postMover->prepareThread($thread);
-
-        return $postMover->move();
+        return $this->getMover()->move($id, $thread);
     }
 
     /**
-     * @param int $id
-     * @return ArchiverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getArchiver(int $id): ?ArchiverInterface
+    public function getArchiver(): ArchiverInterface
     {
-        $handler = $this->archiverHandler;
+        /** @var ArchiverInterface $archiver */
+        $archiver = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
 
-        return $handler::findById($id);
+        return $archiver;
     }
 
     /**
      * Archives post.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
     public function archive(int $id): PodiumResponse
     {
-        $postArchiver = $this->getArchiver($id);
-
-        if ($postArchiver === null) {
-            throw new ModelNotFoundException('Post of given ID can not be found.');
-        }
-
-        return $postArchiver->archive();
+        return $this->getArchiver()->archive($id);
     }
 
     /**
      * Revives post.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
     public function revive(int $id): PodiumResponse
     {
-        $postArchiver = $this->getArchiver($id);
-
-        if ($postArchiver === null) {
-            throw new ModelNotFoundException('Post of given ID can not be found.');
-        }
-
-        return $postArchiver->revive();
+        return $this->getArchiver()->revive($id);
     }
 
     /**
-     * @return LikerInterface
+     * @throws InvalidConfigException
      */
     public function getLiker(): LikerInterface
     {
         /** @var LikerInterface $liker */
         $liker = Instance::ensure($this->likerHandler, LikerInterface::class);
+
         return $liker;
     }
 
     /**
      * Gives post a thumb up.
-     * @param MembershipInterface $member
-     * @param ModelInterface $post
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function thumbUp(MembershipInterface $member, ModelInterface $post): PodiumResponse
+    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
     {
-        $liking = $this->getLiker();
-
-        $liking->setMember($member);
-        $liking->setPost($post);
-
-        return $liking->thumbUp();
+        return $this->getLiker()->thumbUp($member, $post);
     }
 
     /**
      * Gives post a thumb down.
-     * @param MembershipInterface $member
-     * @param ModelInterface $post
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function thumbDown(MembershipInterface $member, ModelInterface $post): PodiumResponse
+    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
     {
-        $liking = $this->getLiker();
-
-        $liking->setMember($member);
-        $liking->setPost($post);
-
-        return $liking->thumbDown();
+        return $this->getLiker()->thumbDown($member, $post);
     }
 
     /**
      * Resets post given thumb.
-     * @param MembershipInterface $member
-     * @param ModelInterface $post
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function thumbReset(MembershipInterface $member, ModelInterface $post): PodiumResponse
+    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
     {
-        $liking = $this->getLiker();
-
-        $liking->setMember($member);
-        $liking->setPost($post);
-
-        return $liking->thumbReset();
+        return $this->getLiker()->thumbReset($member, $post);
     }
 }
