@@ -5,13 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\LockerInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
@@ -30,6 +29,8 @@ use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\di\Instance;
 
@@ -76,7 +77,7 @@ final class Thread extends Component implements ThreadInterface
     public $pinnerConfig = ThreadPinner::class;
 
     /**
-     * @var string|array|ActiveRecordThreadRepositoryInterface
+     * @var string|array|ThreadRepositoryInterface
      */
     public $repositoryConfig = ThreadRepository::class;
 
@@ -85,8 +86,8 @@ final class Thread extends Component implements ThreadInterface
      */
     public function getById(int $id): ?ThreadActiveRecord
     {
-        /** @var ActiveRecordThreadRepositoryInterface $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordThreadRepositoryInterface::class);
+        /** @var ThreadRepository $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
         if (!$thread->fetchOne($id)) {
             return null;
         }
@@ -96,11 +97,12 @@ final class Thread extends Component implements ThreadInterface
 
     /**
      * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function getAll($filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ActiveRecordThreadRepositoryInterface $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordThreadRepositoryInterface::class);
+        /** @var ThreadRepository $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
         $thread->fetchAll($filter, $sort, $pagination);
 
         return $thread->getCollection();
@@ -122,8 +124,11 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function create(array $data, MembershipInterface $author, ForumRepositoryInterface $forum): PodiumResponse
-    {
+    public function create(
+        array $data,
+        MemberRepositoryInterface $author,
+        ForumRepositoryInterface $forum
+    ): PodiumResponse {
         return $this->getBuilder()->create($data, $author, $forum);
     }
 
@@ -132,7 +137,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit(int $id, array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
         return $this->getBuilder()->edit($id, $data);
     }
@@ -153,7 +158,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
         return $this->getRemover()->remove($id);
     }
@@ -174,7 +179,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function move(int $id, ForumRepositoryInterface $forum): PodiumResponse
+    public function move($id, ForumRepositoryInterface $forum): PodiumResponse
     {
         return $this->getMover()->move($id, $forum);
     }
@@ -195,7 +200,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function pin(int $id): PodiumResponse
+    public function pin($id): PodiumResponse
     {
         return $this->getPinner()->pin($id);
     }
@@ -205,7 +210,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function unpin(int $id): PodiumResponse
+    public function unpin($id): PodiumResponse
     {
         return $this->getPinner()->unpin($id);
     }
@@ -226,7 +231,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function lock(int $id): PodiumResponse
+    public function lock($id): PodiumResponse
     {
         return $this->getLocker()->lock($id);
     }
@@ -236,7 +241,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function unlock(int $id): PodiumResponse
+    public function unlock($id): PodiumResponse
     {
         return $this->getLocker()->unlock($id);
     }
@@ -257,7 +262,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive(int $id): PodiumResponse
+    public function archive($id): PodiumResponse
     {
         return $this->getArchiver()->archive($id);
     }
@@ -267,7 +272,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive(int $id): PodiumResponse
+    public function revive($id): PodiumResponse
     {
         return $this->getArchiver()->revive($id);
     }
@@ -288,7 +293,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function subscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         return $this->getSubscriber()->subscribe($member, $thread);
     }
@@ -298,7 +303,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function unsubscribe(MembershipInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function unsubscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
     {
         return $this->getSubscriber()->unsubscribe($member, $thread);
     }
@@ -319,7 +324,7 @@ final class Thread extends Component implements ThreadInterface
      *
      * @throws InvalidConfigException
      */
-    public function mark(MembershipInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function mark(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
     {
         return $this->getBookmarker()->mark($member, $post);
     }

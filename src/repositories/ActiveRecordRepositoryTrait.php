@@ -39,7 +39,7 @@ trait ActiveRecordRepositoryTrait
         return $this->errors;
     }
 
-    public function fetchOne(int $id): bool
+    public function fetchOne($id): bool
     {
         $modelClass = $this->getActiveRecordClass();
         /** @var ActiveRecord $modelClass */

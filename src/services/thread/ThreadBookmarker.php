@@ -65,7 +65,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
             $memberId = $member->getId();
             $threadId = $post->getParent()->getId();
             if (!$bookmark->fetchOne($memberId, $threadId)) {
-                $bookmark->create($memberId, $threadId);
+                $bookmark->prepare($memberId, $threadId);
             }
 
             $postCreatedTime = $post->getCreatedAt();

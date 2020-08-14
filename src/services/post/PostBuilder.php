@@ -120,7 +120,7 @@ final class PostBuilder extends Component implements CategoryBuilderInterface
     /**
      * Edits the thread.
      */
-    public function edit(int $id, array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
         if (!$this->beforeEdit()) {
             return PodiumResponse::error();

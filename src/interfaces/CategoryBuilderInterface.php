@@ -10,5 +10,5 @@ interface CategoryBuilderInterface
 {
     public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $parent): PodiumResponse;
 
-    public function edit(int $id, array $data): PodiumResponse;
+    public function edit($id, array $data): PodiumResponse;
 }

@@ -56,7 +56,7 @@ final class ThreadMover extends Component implements MoverInterface
     /**
      * Moves the thread to another forum.
      */
-    public function move(int $id, RepositoryInterface $forum): PodiumResponse
+    public function move($id, RepositoryInterface $forum): PodiumResponse
     {
         if (!$forum instanceof ForumRepositoryInterface || !$this->beforeMove()) {
             return PodiumResponse::error();

@@ -54,7 +54,7 @@ final class ThreadLocker extends Component implements LockerInterface
     /**
      * Locks the thread.
      */
-    public function lock(int $id): PodiumResponse
+    public function lock($id): PodiumResponse
     {
         if (!$this->beforeLock()) {
             return PodiumResponse::error();
@@ -96,7 +96,7 @@ final class ThreadLocker extends Component implements LockerInterface
     /**
      * Unlocks the thread.
      */
-    public function unlock(int $id): PodiumResponse
+    public function unlock($id): PodiumResponse
     {
         if (!$this->beforeUnlock()) {
             return PodiumResponse::error();

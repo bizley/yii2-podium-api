@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\PostActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordPostRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\LikerInterface;
@@ -23,6 +22,8 @@ use bizley\podium\api\services\post\PostMover;
 use bizley\podium\api\services\post\PostRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\di\Instance;
 
@@ -36,25 +37,25 @@ final class Post extends Component implements PostInterface
     /**
      * @var string|array|LikerInterface
      */
-    public $likerHandler = PostLiker::class;
+    public $likerConfig = PostLiker::class;
 
     /**
      * @var string|array|RemoverInterface
      */
-    public $removerHandler = PostRemover::class;
+    public $removerConfig = PostRemover::class;
 
     /**
      * @var string|array|ArchiverInterface
      */
-    public $archiverHandler = PostArchiver::class;
+    public $archiverConfig = PostArchiver::class;
 
     /**
      * @var string|array|MoverInterface
      */
-    public $moverHandler = PostMover::class;
+    public $moverConfig = PostMover::class;
 
     /**
-     * @var string|array|ActiveRecordPostRepositoryInterface
+     * @var string|array|PostRepositoryInterface
      */
     public $repositoryConfig = PostRepository::class;
 
@@ -63,8 +64,8 @@ final class Post extends Component implements PostInterface
      */
     public function getById(int $id): ?PostActiveRecord
     {
-        /** @var ActiveRecordPostRepositoryInterface $post */
-        $post = Instance::ensure($this->repositoryConfig, ActiveRecordPostRepositoryInterface::class);
+        /** @var PostRepository $post */
+        $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
         if (!$post->fetchOne($id)) {
             return null;
         }
@@ -74,11 +75,12 @@ final class Post extends Component implements PostInterface
 
     /**
      * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function getAll($filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ActiveRecordPostRepositoryInterface $rank */
-        $rank = Instance::ensure($this->repositoryConfig, ActiveRecordPostRepositoryInterface::class);
+        /** @var PostRepository $rank */
+        $rank = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
         $rank->fetchAll($filter, $sort, $pagination);
 
         return $rank->getCollection();
@@ -113,7 +115,7 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit(int $id, array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
         return $this->getBuilder()->edit($id, $data);
     }
@@ -124,7 +126,7 @@ final class Post extends Component implements PostInterface
     public function getRemover(): RemoverInterface
     {
         /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
 
         return $remover;
     }
@@ -134,7 +136,7 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
         return $this->getRemover()->remove($id);
     }
@@ -145,7 +147,7 @@ final class Post extends Component implements PostInterface
     public function getMover(): MoverInterface
     {
         /** @var MoverInterface $mover */
-        $mover = Instance::ensure($this->moverHandler, MoverInterface::class);
+        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
 
         return $mover;
     }
@@ -155,7 +157,7 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function move(int $id, ThreadRepositoryInterface $thread): PodiumResponse
+    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse
     {
         return $this->getMover()->move($id, $thread);
     }
@@ -166,7 +168,7 @@ final class Post extends Component implements PostInterface
     public function getArchiver(): ArchiverInterface
     {
         /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverHandler, ArchiverInterface::class);
+        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
 
         return $archiver;
     }
@@ -176,7 +178,7 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive(int $id): PodiumResponse
+    public function archive($id): PodiumResponse
     {
         return $this->getArchiver()->archive($id);
     }
@@ -186,7 +188,7 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive(int $id): PodiumResponse
+    public function revive($id): PodiumResponse
     {
         return $this->getArchiver()->revive($id);
     }
@@ -197,7 +199,7 @@ final class Post extends Component implements PostInterface
     public function getLiker(): LikerInterface
     {
         /** @var LikerInterface $liker */
-        $liker = Instance::ensure($this->likerHandler, LikerInterface::class);
+        $liker = Instance::ensure($this->likerConfig, LikerInterface::class);
 
         return $liker;
     }

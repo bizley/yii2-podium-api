@@ -19,6 +19,7 @@ use yii\db\ActiveRecord;
  * @property int                $created_at
  * @property int                $updated_at
  * @property int                $expires_at
+ * @property bool               $archived
  * @property ThreadActiveRecord $thread
  * @property MemberActiveRecord $author
  */

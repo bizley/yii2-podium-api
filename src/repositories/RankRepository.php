@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\RankActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordRankRepositoryInterface;
+use bizley\podium\api\interfaces\RankRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 use yii\base\NotSupportedException;
 
-final class RankRepository implements ActiveRecordRankRepositoryInterface
+final class RankRepository implements RankRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 

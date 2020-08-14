@@ -5,11 +5,11 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordThreadRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
 
-final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
+final class ThreadRepository implements ThreadRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -60,7 +60,7 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
         return $this->getModel()->posts_count;
     }
 
-    public function create(array $data, int $authorId, int $forumId, int $categoryId): bool
+    public function create(array $data, $authorId, $forumId, $categoryId): bool
     {
         /** @var ThreadActiveRecord $thread */
         $thread = new $this->activeRecordClass();
@@ -101,7 +101,7 @@ final class ThreadRepository implements ActiveRecordThreadRepositoryInterface
         return $thread->save(false);
     }
 
-    public function move(int $forumId, int $categoryId): bool
+    public function move($forumId, $categoryId): bool
     {
         $thread = $this->getModel();
         $thread->forum_id = $forumId;

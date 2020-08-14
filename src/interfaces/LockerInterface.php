@@ -6,23 +6,15 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-/**
- * Interface LockerInterface
- * @package bizley\podium\api\interfaces
- */
 interface LockerInterface
 {
     /**
      * Locks model.
-     * @param int $id
-     * @return PodiumResponse
      */
-    public function lock(int $id): PodiumResponse;
+    public function lock($id): PodiumResponse;
 
     /**
      * Unlock model.
-     * @param int $id
-     * @return PodiumResponse
      */
-    public function unlock(int $id): PodiumResponse;
+    public function unlock($id): PodiumResponse;
 }

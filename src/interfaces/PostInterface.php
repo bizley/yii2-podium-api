@@ -23,18 +23,18 @@ interface PostInterface
     /**
      * Updates post.
      */
-    public function edit(int $id, array $data): PodiumResponse;
+    public function edit($id, array $data): PodiumResponse;
 
-    public function remove(int $id): PodiumResponse;
+    public function remove($id): PodiumResponse;
 
     /**
      * Moves post to different thread.
      */
-    public function move(int $id, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function archive(int $id): PodiumResponse;
+    public function archive($id): PodiumResponse;
 
-    public function revive(int $id): PodiumResponse;
+    public function revive($id): PodiumResponse;
 
     public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
 

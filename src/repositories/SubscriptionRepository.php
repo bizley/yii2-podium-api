@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\SubscriptionActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordSubscriptionRepositoryInterface;
+use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
 
-final class SubscriptionRepository implements ActiveRecordSubscriptionRepositoryInterface
+final class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
     public string $activeRecordClass = SubscriptionActiveRecord::class;
 
@@ -31,7 +31,7 @@ final class SubscriptionRepository implements ActiveRecordSubscriptionRepository
         $this->model = $activeRecord;
     }
 
-    public function isMemberSubscribed(int $memberId, int $threadId): bool
+    public function isMemberSubscribed($memberId, $threadId): bool
     {
         $modelClass = $this->activeRecordClass;
         /* @var SubscriptionActiveRecord $modelClass */
@@ -45,7 +45,7 @@ final class SubscriptionRepository implements ActiveRecordSubscriptionRepository
             ->exists();
     }
 
-    public function subscribe(int $memberId, int $threadId): bool
+    public function subscribe($memberId, $threadId): bool
     {
         /** @var SubscriptionActiveRecord $model */
         $model = new $this->activeRecordClass();
@@ -59,7 +59,7 @@ final class SubscriptionRepository implements ActiveRecordSubscriptionRepository
         return $model->save(false);
     }
 
-    public function fetchOne(int $memberId, int $threadId): bool
+    public function fetchOne($memberId, $threadId): bool
     {
         /** @var SubscriptionActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;

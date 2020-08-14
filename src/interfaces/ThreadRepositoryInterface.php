@@ -6,11 +6,11 @@ namespace bizley\podium\api\interfaces;
 
 interface ThreadRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data, int $authorId, int $forumId, int $categoryId): bool;
+    public function create(array $data, $authorId, $forumId, $categoryId): bool;
     public function isArchived(): bool;
     public function pin(): bool;
     public function unpin(): bool;
-    public function move(int $forumId, int $categoryId): bool;
+    public function move($forumId, $categoryId): bool;
     public function lock(): bool;
     public function unlock(): bool;
     public function archive(): bool;

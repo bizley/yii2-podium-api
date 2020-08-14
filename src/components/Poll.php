@@ -6,65 +6,45 @@ namespace bizley\podium\api\components;
 
 use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
+use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\interfaces\VoterInterface;
+use bizley\podium\api\models\poll\PollVoter;
+use bizley\podium\api\repositories\PollRepository;
+use bizley\podium\api\services\poll\PollRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\helpers\ArrayHelper;
 
-/**
- * Class Poll
- * @package bizley\podium\api\base
- */
-class Poll extends Component implements PollInterface
+final class Poll extends Component implements PollInterface
 {
     /**
-     * @var string|array|PollModelInterface poll handler
-     * Component ID, class, configuration array, or instance of PollModelInterface.
+     * @var string|array|CategoryBuilderInterface
      */
-    public $modelHandler = \bizley\podium\api\models\poll\Poll::class;
+    public $builderConfig = PollBuilder::class;
 
     /**
-     * @var string|array|CategorisedFormInterface poll form handler
-     * Component ID, class, configuration array, or instance of CategorisedFormInterface.
+     * @var string|array|VoterInterface
      */
-    public $formHandler = \bizley\podium\api\models\poll\PollForm::class;
+    public $voterConfig = PollVoter::class;
 
     /**
-     * @var string|array|VoterInterface voter handler
-     * Component ID, class, configuration array, or instance of VoterInterface.
+     * @var string|array|RemoverInterface
      */
-    public $voterHandler = \bizley\podium\api\models\poll\PollVoter::class;
+    public $removerConfig = PollRemover::class;
 
     /**
-     * @var string|array|RemoverInterface poll remover handler
-     * Component ID, class, configuration array, or instance of RemoverInterface.
+     * @var string|array|PollRepositoryInterface
      */
-    public $removerHandler = \bizley\podium\api\models\poll\PollRemover::class;
+    public $repositoryConfig = PollRepository::class;
 
-    /**
-     * @throws InvalidConfigException
-     */
-    public function init(): void
-    {
-        parent::init();
-
-        $this->modelHandler = Instance::ensure($this->modelHandler, PollModelInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, CategorisedFormInterface::class);
-        $this->voterHandler = Instance::ensure($this->voterHandler, VoterInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-    }
-
-    /**
-     * @param int $id
-     * @return PollModelInterface|null
-     */
     public function getById(int $id): ?PollModelInterface
     {
         $postClass = $this->modelHandler;
@@ -72,10 +52,6 @@ class Poll extends Component implements PollInterface
         return $postClass::findById($id);
     }
 
-    /**
-     * @param int $threadId
-     * @return PollModelInterface|null
-     */
     public function getByThreadId(int $threadId): ?PollModelInterface
     {
         $pollClass = $this->modelHandler;
@@ -83,16 +59,12 @@ class Poll extends Component implements PollInterface
         return $pollClass::getByThreadId($threadId);
     }
 
-    /**
-     * @param int|null $id
-     * @return CategorisedFormInterface|null
-     */
     public function getForm(int $id = null): ?CategorisedFormInterface
     {
         $handler = $this->formHandler;
 
-        if ($id === null) {
-            return new $handler;
+        if (null === $id) {
+            return new $handler();
         }
 
         return $handler::findById($id);
@@ -100,13 +72,12 @@ class Poll extends Component implements PollInterface
 
     /**
      * Creates poll post.
-     * @param array $data
-     * @param MembershipInterface $author
-     * @param ModelInterface $thread
-     * @return PodiumResponse
      */
-    public function create(array $data, MembershipInterface $author, ModelInterface $thread): PodiumResponse
-    {
+    public function create(
+        array $data,
+        MemberRepositoryInterface $author,
+        ThreadRepositoryInterface $thread
+    ): PodiumResponse {
         /* @var $pollForm CategorisedFormInterface */
         $pollForm = $this->getForm();
 
@@ -122,8 +93,7 @@ class Poll extends Component implements PollInterface
 
     /**
      * Updates poll post.
-     * @param array $data
-     * @return PodiumResponse
+     *
      * @throws InsufficientDataException
      * @throws ModelNotFoundException
      */
@@ -131,13 +101,13 @@ class Poll extends Component implements PollInterface
     {
         $id = ArrayHelper::remove($data, 'id');
 
-        if ($id === null) {
+        if (null === $id) {
             throw new InsufficientDataException('ID key is missing.');
         }
 
-        $postPollForm = $this->getForm((int)$id);
+        $postPollForm = $this->getForm((int) $id);
 
-        if ($postPollForm === null) {
+        if (null === $postPollForm) {
             throw new ModelNotFoundException('Poll of given ID can not be found.');
         }
 
@@ -149,56 +119,49 @@ class Poll extends Component implements PollInterface
     }
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getRemover(int $id): ?RemoverInterface
+    public function getRemover(): RemoverInterface
     {
-        $handler = $this->removerHandler;
+        /** @var RemoverInterface $remover */
+        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
 
-        return $handler::findById($id);
+        return $remover;
     }
 
     /**
      * Deletes poll.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
-        $pollRemover = $this->getRemover($id);
-
-        if ($pollRemover === null) {
-            throw new ModelNotFoundException('Poll of given ID can not be found.');
-        }
-
-        return $pollRemover->remove();
+        return $this->getRemover()->remove($id);
     }
 
     /**
-     * @return VoterInterface
+     * @throws InvalidConfigException
      */
     public function getVoter(): VoterInterface
     {
-        return new $this->voterHandler;
+        /** @var VoterInterface $voter */
+        $voter = Instance::ensure($this->voterConfig, VoterInterface::class);
+
+        return $voter;
     }
 
     /**
      * Votes in poll.
-     * @param MembershipInterface $member
-     * @param PollModelInterface $poll
+     *
      * @param PollAnswerModelInterface[] $answers
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function vote(MembershipInterface $member, PollModelInterface $poll, array $answers): PodiumResponse
-    {
-        $voter = $this->getVoter();
-
-        $voter->setMember($member);
-        $voter->setPoll($poll);
-        $voter->setAnswers($answers);
-
-        return $voter->vote();
+    public function vote(
+        MemberRepositoryInterface $member,
+        PollRepositoryInterface $poll,
+        array $answers
+    ): PodiumResponse {
+        return $this->getVoter()->vote($member, $poll, $answers);
     }
 }

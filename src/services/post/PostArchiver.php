@@ -54,7 +54,7 @@ final class PostArchiver extends Component implements ArchiverInterface
     /**
      * Archives the thread.
      */
-    public function archive(int $id): PodiumResponse
+    public function archive($id): PodiumResponse
     {
         if (!$this->beforeArchive()) {
             return PodiumResponse::error();
@@ -96,7 +96,7 @@ final class PostArchiver extends Component implements ArchiverInterface
     /**
      * Revives the thread.
      */
-    public function revive(int $id): PodiumResponse
+    public function revive($id): PodiumResponse
     {
         if (!$this->beforeRevive()) {
             return PodiumResponse::error();

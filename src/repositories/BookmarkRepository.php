@@ -29,7 +29,7 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function fetchOne(int $memberId, int $threadId): bool
+    public function fetchOne($memberId, $threadId): bool
     {
         /** @var BookmarkActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
@@ -55,12 +55,14 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         return $this->errors;
     }
 
-    public function create(int $memberId, int $threadId): void
+    public function prepare($memberId, $threadId): void
     {
         /** @var BookmarkActiveRecord $model */
         $model = new $this->activeRecordClass();
+
         $model->member_id = $memberId;
         $model->thread_id = $threadId;
+
         $this->model = $model;
     }
 

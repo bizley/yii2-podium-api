@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThumbActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordThumbRepositoryInterface;
+use bizley\podium\api\interfaces\ThumbRepositoryInterface;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
 
-final class ThumbRepository implements ActiveRecordThumbRepositoryInterface
+final class ThumbRepository implements ThumbRepositoryInterface
 {
     public string $activeRecordClass = ThumbActiveRecord::class;
 
@@ -31,7 +31,7 @@ final class ThumbRepository implements ActiveRecordThumbRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function prepare(int $memberId, int $postId): void
+    public function prepare($memberId, $postId): void
     {
         /** @var ThumbActiveRecord $thumb */
         $thumb = new $this->activeRecordClass();
@@ -43,7 +43,7 @@ final class ThumbRepository implements ActiveRecordThumbRepositoryInterface
         $this->model = $thumb;
     }
 
-    public function fetchOne(int $memberId, int $postId): bool
+    public function fetchOne($memberId, $postId): bool
     {
         /** @var ThumbActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;

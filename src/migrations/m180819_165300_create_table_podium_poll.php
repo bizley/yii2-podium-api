@@ -32,6 +32,7 @@ class m180819_165300_create_table_podium_poll extends Migration
             'created_at' => $this->integer()->notNull(),
             'updated_at' => $this->integer()->notNull(),
             'expires_at' => $this->integer(),
+            'archived' => $this->boolean()->notNull()->defaultValue(false),
         ], $tableOptions);
 
         $this->addForeignKey(

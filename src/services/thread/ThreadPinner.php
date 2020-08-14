@@ -51,7 +51,7 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canPin;
     }
 
-    public function pin(int $id): PodiumResponse
+    public function pin($id): PodiumResponse
     {
         if (!$this->beforePin()) {
             return PodiumResponse::error();
@@ -90,7 +90,7 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canUnpin;
     }
 
-    public function unpin(int $id): PodiumResponse
+    public function unpin($id): PodiumResponse
     {
         if (!$this->beforeUnpin()) {
             return PodiumResponse::error();

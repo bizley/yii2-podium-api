@@ -5,15 +5,17 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\RankActiveRecord;
-use bizley\podium\api\interfaces\ActiveRecordRankRepositoryInterface;
 use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\RankInterface;
+use bizley\podium\api\interfaces\RankRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repositories\RankRepository;
 use bizley\podium\api\services\rank\RankBuilder;
 use bizley\podium\api\services\rank\RankRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\di\Instance;
 
@@ -27,10 +29,10 @@ final class Rank extends Component implements RankInterface
     /**
      * @var string|array|RemoverInterface
      */
-    public $removerHandler = RankRemover::class;
+    public $removerConfig = RankRemover::class;
 
     /**
-     * @var string|array|ActiveRecordRankRepositoryInterface
+     * @var string|array|RankRepositoryInterface
      */
     public $repositoryConfig = RankRepository::class;
 
@@ -39,22 +41,23 @@ final class Rank extends Component implements RankInterface
      */
     public function getById(int $id): ?RankActiveRecord
     {
-        /** @var ActiveRecordRankRepositoryInterface $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordRankRepositoryInterface::class);
-        if (!$thread->fetchOne($id)) {
+        /** @var RankRepository $rank */
+        $rank = Instance::ensure($this->repositoryConfig, RankRepositoryInterface::class);
+        if (!$rank->fetchOne($id)) {
             return null;
         }
 
-        return $thread->getModel();
+        return $rank->getModel();
     }
 
     /**
      * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function getAll($filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ActiveRecordRankRepositoryInterface $rank */
-        $rank = Instance::ensure($this->repositoryConfig, ActiveRecordRankRepositoryInterface::class);
+        /** @var RankRepository $rank */
+        $rank = Instance::ensure($this->repositoryConfig, RankRepositoryInterface::class);
         $rank->fetchAll($filter, $sort, $pagination);
 
         return $rank->getCollection();
@@ -86,7 +89,7 @@ final class Rank extends Component implements RankInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit(int $id, array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
         return $this->getBuilder()->edit($id, $data);
     }
@@ -97,7 +100,7 @@ final class Rank extends Component implements RankInterface
     public function getRemover(): RemoverInterface
     {
         /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerHandler, RemoverInterface::class);
+        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
 
         return $remover;
     }
@@ -107,7 +110,7 @@ final class Rank extends Component implements RankInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
         return $this->getRemover()->remove($id);
     }

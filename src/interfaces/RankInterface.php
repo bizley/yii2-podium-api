@@ -16,7 +16,7 @@ interface RankInterface
     /**
      * Updates rank.
      */
-    public function edit(int $id, array $data): PodiumResponse;
+    public function edit($id, array $data): PodiumResponse;
 
-    public function remove(int $id): PodiumResponse;
+    public function remove($id): PodiumResponse;
 }

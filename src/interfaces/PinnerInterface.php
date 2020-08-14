@@ -6,23 +6,15 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-/**
- * Interface PinnerInterface
- * @package bizley\podium\api\interfaces
- */
 interface PinnerInterface
 {
     /**
      * Pins model.
-     * @param int $id
-     * @return PodiumResponse
      */
-    public function pin(int $id): PodiumResponse;
+    public function pin($id): PodiumResponse;
 
     /**
      * Unpins model.
-     * @param int $id
-     * @return PodiumResponse
      */
-    public function unpin(int $id): PodiumResponse;
+    public function unpin($id): PodiumResponse;
 }

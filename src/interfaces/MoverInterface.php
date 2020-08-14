@@ -11,5 +11,5 @@ interface MoverInterface
     /**
      * Moves model.
      */
-    public function move(int $id, RepositoryInterface $repository): PodiumResponse;
+    public function move($id, RepositoryInterface $repository): PodiumResponse;
 }

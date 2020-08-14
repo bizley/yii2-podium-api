@@ -52,7 +52,7 @@ final class RankRemover extends Component implements RemoverInterface
     /**
      * Removes the rank.
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
         if (!$this->beforeRemove()) {
             return PodiumResponse::error();

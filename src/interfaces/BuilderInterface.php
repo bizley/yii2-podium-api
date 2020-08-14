@@ -10,5 +10,5 @@ interface BuilderInterface
 {
     public function create(array $data): PodiumResponse;
 
-    public function edit(int $id, array $data): PodiumResponse;
+    public function edit($id, array $data): PodiumResponse;
 }

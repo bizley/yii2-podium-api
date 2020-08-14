@@ -16,6 +16,7 @@ return [
     'message.not.archived' => 'Message is not archived.',
     'message.wrong.reply' => 'Replying to wrong message.',
     'poll.already.voted' => 'Poll vote is already done.',
+    'poll.not.exists' => 'Poll does not exist.',
     'poll.one.vote.allowed' => 'Poll allows only one vote.',
     'poll.wrong.answer' => 'Selected answer comes from different poll.',
     'post.already.archived' => 'Post is already archived.',

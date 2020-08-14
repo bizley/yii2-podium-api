@@ -55,7 +55,7 @@ final class ThreadRemover extends Component implements RemoverInterface
     /**
      * Removes the thread.
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
         if (!$this->beforeRemove()) {
             return PodiumResponse::error();
