@@ -14,6 +14,7 @@ use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\db\Transaction;
 use yii\di\Instance;
 
 use function count;
@@ -65,6 +66,8 @@ final class PollVoter extends Component implements VoterInterface
             return PodiumResponse::error();
         }
 
+        /** @var Transaction $transaction */
+        $transaction = Yii::$app->db->beginTransaction();
         try {
             $poll = $this->getPoll();
             if (!$poll->fetchOne($poll->getId())) {
@@ -82,10 +85,12 @@ final class PollVoter extends Component implements VoterInterface
             }
 
             $this->afterVote();
+            $transaction->commit();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while deleting poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            $transaction->rollBack();
+            Yii::error(['Exception while voting in poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }

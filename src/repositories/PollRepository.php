@@ -58,7 +58,7 @@ final class PollRepository implements PollRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function create(array $data, $authorId, $threadId): bool
+    public function create(array $data, array $answers, $authorId, $threadId): bool
     {
         /** @var PollActiveRecord $poll */
         $poll = new $this->activeRecordClass();
@@ -69,12 +69,21 @@ final class PollRepository implements PollRepositoryInterface
         $poll->author_id = $authorId;
         $poll->thread_id = $threadId;
 
-        if (!$poll->validate()) {
+        if (!$poll->save()) {
             $this->errors = $poll->errors;
             return false;
         }
 
-        return $poll->save(false);
+        $this->model = $poll;
+
+        $answerRepository = $this->getAnswerRepository();
+        foreach ($answers as $answer) {
+            if (!$answerRepository->create($answer)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     public function move($threadId): bool

@@ -79,11 +79,11 @@ final class Post extends Component implements PostInterface
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var PostRepository $rank */
-        $rank = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
-        $rank->fetchAll($filter, $sort, $pagination);
+        /** @var PostRepository $poll */
+        $poll = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
+        $poll->fetchAll($filter, $sort, $pagination);
 
-        return $rank->getCollection();
+        return $poll->getCollection();
     }
 
     /**

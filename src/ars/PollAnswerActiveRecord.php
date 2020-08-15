@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -22,6 +23,19 @@ class PollAnswerActiveRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%podium_poll_answer}}';
+    }
+
+    public function behaviors(): array
+    {
+        return ['timestamp' => TimestampBehavior::class];
+    }
+
+    public function rules(): array
+    {
+        return [
+            [['answer'], 'required'],
+            [['answer'], 'string', 'max' => 255],
+        ];
     }
 
     public function getPoll(): ActiveQuery

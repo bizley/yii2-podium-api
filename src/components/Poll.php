@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\InsufficientDataException;
-use bizley\podium\api\interfaces\CategorisedFormInterface;
-use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\ars\PollActiveRecord;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\PollBuilderInterface;
 use bizley\podium\api\interfaces\PollInterface;
-use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\interfaces\VoterInterface;
 use bizley\podium\api\repositories\PollRepository;
+use bizley\podium\api\services\poll\PollBuilder;
 use bizley\podium\api\services\poll\PollRemover;
 use bizley\podium\api\services\poll\PollVoter;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
+use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
 final class Poll extends Component implements PollInterface
 {
     /**
-     * @var string|array|CategoryBuilderInterface
+     * @var string|array|PollBuilderInterface
      */
     public $builderConfig = PollBuilder::class;
 
@@ -44,68 +45,66 @@ final class Poll extends Component implements PollInterface
      */
     public $repositoryConfig = PollRepository::class;
 
-    public function getById(int $id): ?PollModelInterface
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getById(int $id): ?PollActiveRecord
     {
-        $postClass = $this->modelHandler;
+        /** @var PollRepository $poll */
+        $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
+        if (!$poll->fetchOne($id)) {
+            return null;
+        }
 
-        return $postClass::findById($id);
+        return $poll->getModel();
     }
-
-    public function getByThreadId(int $threadId): ?PollModelInterface
-    {
-        $pollClass = $this->modelHandler;
-
-        return $pollClass::getByThreadId($threadId);
-    }
-
-
 
     /**
-     * Creates poll post.
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    {
+        /** @var PollRepository $poll */
+        $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
+        $poll->fetchAll($filter, $sort, $pagination);
+
+        return $poll->getCollection();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getBuilder(): PollBuilderInterface
+    {
+        /** @var PollBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, PollBuilderInterface::class);
+
+        return $builder;
+    }
+
+    /**
+     * Creates poll.
+     *
+     * @throws InvalidConfigException
      */
     public function create(
         array $data,
+        array $answers,
         MemberRepositoryInterface $author,
         ThreadRepositoryInterface $thread
     ): PodiumResponse {
-        /* @var $pollForm CategorisedFormInterface */
-        $pollForm = $this->getForm();
-
-        $pollForm->setAuthor($author);
-        $pollForm->setThread($thread);
-
-        if (!$pollForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $pollForm->create();
+        return $this->getBuilder()->create($data, $answers, $author, $thread);
     }
 
     /**
-     * Updates poll post.
+     * Updates poll.
      *
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit($id, array $data, array $answers): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-
-        if (null === $id) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $postPollForm = $this->getForm((int) $id);
-
-        if (null === $postPollForm) {
-            throw new ModelNotFoundException('Poll of given ID can not be found.');
-        }
-
-        if (!$postPollForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $postPollForm->edit();
+        return $this->getBuilder()->edit($id, $data, $answers);
     }
 
     /**

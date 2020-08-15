@@ -11,13 +11,12 @@ use bizley\podium\api\components\PodiumResponse;
  */
 interface PollInterface
 {
-    public function fetchByThread(ThreadRepositoryInterface $thread): bool;
-
     /**
      * Creates poll post.
      */
     public function create(
         array $data,
+        array $answers,
         MemberRepositoryInterface $author,
         ThreadRepositoryInterface $thread
     ): PodiumResponse;
@@ -25,9 +24,9 @@ interface PollInterface
     /**
      * Updates poll post.
      */
-    public function edit(array $data): PodiumResponse;
+    public function edit($id, array $data, array $answers): PodiumResponse;
 
-    public function remove(int $id): PodiumResponse;
+    public function remove($id): PodiumResponse;
 
     /**
      * Votes in poll.

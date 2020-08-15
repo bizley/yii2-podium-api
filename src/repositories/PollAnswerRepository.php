@@ -14,6 +14,7 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
 
     private ?PollAnswerActiveRecord $model = null;
     private $pollId;
+    private array $errors = [];
 
     public function __construct($pollId)
     {
@@ -34,10 +35,15 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         $this->model = $activeRecord;
     }
 
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
     public function isAnswer($id): bool
     {
         $modelClass = $this->activeRecordClass;
-        /** @var PollAnswerActiveRecord $modelClass */
+        /* @var PollAnswerActiveRecord $modelClass */
         return $modelClass::find()
             ->where(
                 [
@@ -46,5 +52,22 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
                 ]
             )
             ->exists();
+    }
+
+    public function create(string $answer): bool
+    {
+        /** @var PollAnswerActiveRecord $model */
+        $model = new $this->activeRecordClass();
+
+        $model->poll_id = $this->pollId;
+        $model->answer = $answer;
+
+        if (!$model->validate()) {
+            $this->errors = $model->errors;
+
+            return false;
+        }
+
+        return $model->save(false);
     }
 }
