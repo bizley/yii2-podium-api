@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollActiveRecord;
+use bizley\podium\api\enums\PollAnswerAction;
 use bizley\podium\api\enums\PollChoice;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\PollVoteRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use Exception;
 use LogicException;
+use yii\helpers\ArrayHelper;
+
+use function is_string;
 
 final class PollRepository implements PollRepositoryInterface
 {
@@ -71,6 +76,7 @@ final class PollRepository implements PollRepositoryInterface
 
         if (!$poll->save()) {
             $this->errors = $poll->errors;
+
             return false;
         }
 
@@ -86,12 +92,63 @@ final class PollRepository implements PollRepositoryInterface
         return true;
     }
 
+    /**
+     * @throws Exception
+     */
+    public function edit(array $data, array $answers = []): bool
+    {
+        $model = $this->getModel();
+        if (!$model->load($data, '')) {
+            return false;
+        }
+
+        if (!$model->save()) {
+            $this->errors = $model->errors;
+
+            return false;
+        }
+
+        $answerRepository = $this->getAnswerRepository();
+        foreach ($answers as $answer) {
+            $id = null;
+            if (is_string($answer)) {
+                $text = $answer;
+                $action = PollAnswerAction::ADD;
+            } else {
+                $text = ArrayHelper::getValue($answer, 0);
+                $action = ArrayHelper::getValue($answer, 'action', PollAnswerAction::ADD);
+                $id = ArrayHelper::getValue($answer, 'id');
+            }
+
+            switch ($action) {
+                case PollAnswerAction::EDIT:
+                    $actionResult = $answerRepository->edit($id, $text);
+                    break;
+
+                case PollAnswerAction::REMOVE:
+                    $actionResult = $answerRepository->remove($id);
+                    break;
+
+                case PollAnswerAction::ADD:
+                default:
+                    $actionResult = $answerRepository->create($text);
+                    break;
+            }
+            if (!$actionResult) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function move($threadId): bool
     {
         $poll = $this->getModel();
         $poll->thread_id = $threadId;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+
             return false;
         }
 
@@ -104,6 +161,7 @@ final class PollRepository implements PollRepositoryInterface
         $poll->archived = true;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+
             return false;
         }
 
@@ -116,6 +174,7 @@ final class PollRepository implements PollRepositoryInterface
         $poll->archived = false;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+
             return false;
         }
 
@@ -164,6 +223,7 @@ final class PollRepository implements PollRepositoryInterface
             $pollVoteRepository = $this->getVoteRepository();
             if (!$pollVoteRepository->register($memberId, $answerId)) {
                 $this->errors = $pollVoteRepository->getErrors();
+
                 return false;
             }
         }

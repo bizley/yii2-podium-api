@@ -11,6 +11,9 @@ return [
     'message.status.new' => 'New',
     'message.status.read' => 'Read',
     'message.status.replied' => 'Replied',
+    'poll.answer.action.add' => 'Add',
+    'poll.answer.action.edit' => 'Edit',
+    'poll.answer.action.remove' => 'Remove',
     'poll.choice.multiple' => 'Multiple',
     'poll.choice.single' => 'Single',
 ];

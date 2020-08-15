@@ -6,38 +6,16 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollAnswerActiveRecord;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
-use LogicException;
 
 final class PollAnswerRepository implements PollAnswerRepositoryInterface
 {
     public string $activeRecordClass = PollAnswerActiveRecord::class;
 
-    private ?PollAnswerActiveRecord $model = null;
     private $pollId;
-    private array $errors = [];
 
     public function __construct($pollId)
     {
         $this->pollId = $pollId;
-    }
-
-    public function getModel(): PollAnswerActiveRecord
-    {
-        if (null === $this->model) {
-            throw new LogicException('You need to call fetchOne() or setModel() first!');
-        }
-
-        return $this->model;
-    }
-
-    public function setModel(?PollAnswerActiveRecord $activeRecord): void
-    {
-        $this->model = $activeRecord;
-    }
-
-    public function getErrors(): array
-    {
-        return $this->errors;
     }
 
     public function isAnswer($id): bool
@@ -62,12 +40,39 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         $model->poll_id = $this->pollId;
         $model->answer = $answer;
 
-        if (!$model->validate()) {
-            $this->errors = $model->errors;
+        return $model->save();
+    }
 
+    public function remove($id): bool
+    {
+        /** @var PollAnswerActiveRecord $model */
+        $model = $this->activeRecordClass;
+        $model::deleteAll(
+            [
+                'poll_id' => $this->pollId,
+                'id' => $id,
+            ]
+        );
+
+        return true;
+    }
+
+    public function edit($id, string $answer): bool
+    {
+        /** @var PollAnswerActiveRecord $modelClass */
+        $modelClass = $this->activeRecordClass;
+        $model = $modelClass::find()
+            ->where(
+                [
+                    'poll_id' => $this->pollId,
+                    'id' => $id,
+                ]
+            )
+            ->one();
+        if ($model === null) {
             return false;
         }
 
-        return $model->save(false);
+        return $model->save();
     }
 }

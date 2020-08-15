@@ -8,7 +8,9 @@ interface PollAnswerRepositoryInterface
 {
     public function isAnswer($id): bool;
 
-    public function getErrors(): array;
-
     public function create(string $answer): bool;
+
+    public function remove($id): bool;
+
+    public function edit($id, string $answer): bool;
 }

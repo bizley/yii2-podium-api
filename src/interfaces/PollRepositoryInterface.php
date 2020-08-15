@@ -7,7 +7,7 @@ namespace bizley\podium\api\interfaces;
 interface PollRepositoryInterface
 {
     public function create(array $data, array $answers, $authorId, $threadId): bool;
-    public function edit(array $data, array $answers): bool;
+    public function edit(array $data, array $answers = []): bool;
     public function isArchived(): bool;
     public function move($threadId): bool;
     public function archive(): bool;
