@@ -101,6 +101,7 @@ trait ActiveRecordRepositoryTrait
 
         if (!$model->validate()) {
             $this->errors = $model->errors;
+            return false;
         }
 
         return $model->save(false);

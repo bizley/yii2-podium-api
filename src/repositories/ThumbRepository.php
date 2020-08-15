@@ -94,6 +94,7 @@ final class ThumbRepository implements ThumbRepositoryInterface
         $thumb->thumb = 1;
         if (!$thumb->validate()) {
             $this->errors = $thumb->errors;
+            return false;
         }
 
         return $thumb->save(false);

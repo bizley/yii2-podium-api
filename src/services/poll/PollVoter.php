@@ -16,6 +16,8 @@ use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
+use function count;
+
 final class PollVoter extends Component implements VoterInterface
 {
     public const EVENT_BEFORE_VOTING = 'podium.poll.voting.before';
@@ -58,12 +60,26 @@ final class PollVoter extends Component implements VoterInterface
         PollRepositoryInterface $poll,
         array $answers
     ): PodiumResponse {
-        if (!$this->beforeVote()) {
+        $answersCount = count($answers);
+        if (0 === $answersCount || !$this->beforeVote()) {
             return PodiumResponse::error();
         }
 
         try {
-            // TODO
+            $poll = $this->getPoll();
+            if (!$poll->fetchOne($poll->getId())) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
+            }
+            $memberId = $member->getId();
+            if ($poll->hasMemberVoted($memberId)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.already.voted')]);
+            }
+            if ($answersCount > 1 && $poll->isSingleChoice()) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.one.vote.allowed')]);
+            }
+            if (!$poll->vote($memberId, $answers)) {
+                return PodiumResponse::error($poll->getErrors());
+            }
 
             $this->afterVote();
 

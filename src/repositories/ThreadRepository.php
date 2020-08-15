@@ -74,6 +74,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -85,6 +86,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->pinned = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -96,6 +98,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->pinned = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -108,6 +111,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->category_id = $categoryId;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -119,6 +123,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->locked = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -130,6 +135,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->locked = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -141,6 +147,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->archived = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);
@@ -152,6 +159,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->archived = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+            return false;
         }
 
         return $thread->save(false);

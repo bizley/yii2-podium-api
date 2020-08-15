@@ -54,6 +54,7 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
 
         if (!$model->validate()) {
             $this->errors = $model->errors;
+            return false;
         }
 
         return $model->save(false);

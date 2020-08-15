@@ -75,6 +75,7 @@ final class PostRepository implements PostRepositoryInterface
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
+            return false;
         }
 
         return $post->save(false);
@@ -83,11 +84,14 @@ final class PostRepository implements PostRepositoryInterface
     public function move($threadId, $forumId, $categoryId): bool
     {
         $post = $this->getModel();
+
         $post->thread_id = $threadId;
         $post->forum_id = $forumId;
         $post->category_id = $categoryId;
+
         if (!$post->validate()) {
             $this->errors = $post->errors;
+            return false;
         }
 
         return $post->save(false);
@@ -99,6 +103,7 @@ final class PostRepository implements PostRepositoryInterface
         $post->archived = true;
         if (!$post->validate()) {
             $this->errors = $post->errors;
+            return false;
         }
 
         return $post->save(false);
@@ -110,6 +115,7 @@ final class PostRepository implements PostRepositoryInterface
         $post->archived = false;
         if (!$post->validate()) {
             $this->errors = $post->errors;
+            return false;
         }
 
         return $post->save(false);

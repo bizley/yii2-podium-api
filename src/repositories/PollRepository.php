@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollActiveRecord;
+use bizley\podium\api\enums\PollChoice;
+use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
+use bizley\podium\api\interfaces\PollVoteRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 
@@ -68,6 +71,7 @@ final class PollRepository implements PollRepositoryInterface
 
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+            return false;
         }
 
         return $poll->save(false);
@@ -79,6 +83,7 @@ final class PollRepository implements PollRepositoryInterface
         $poll->thread_id = $threadId;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+            return false;
         }
 
         return $poll->save(false);
@@ -90,6 +95,7 @@ final class PollRepository implements PollRepositoryInterface
         $poll->archived = true;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+            return false;
         }
 
         return $poll->save(false);
@@ -101,8 +107,58 @@ final class PollRepository implements PollRepositoryInterface
         $poll->archived = false;
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
+            return false;
         }
 
         return $poll->save(false);
+    }
+
+    private ?PollAnswerRepositoryInterface $pollAnswerRepository = null;
+
+    public function getAnswerRepository(): PollAnswerRepositoryInterface
+    {
+        if (null === $this->pollAnswerRepository) {
+            $this->pollAnswerRepository = new PollAnswerRepository($this->getId());
+        }
+
+        return $this->pollAnswerRepository;
+    }
+
+    private ?PollVoteRepositoryInterface $pollVoteRepository = null;
+
+    public function getVoteRepository(): PollVoteRepositoryInterface
+    {
+        if (null === $this->pollVoteRepository) {
+            $this->pollVoteRepository = new PollVoteRepository($this->getId());
+        }
+
+        return $this->pollVoteRepository;
+    }
+
+    public function hasMemberVoted($memberId): bool
+    {
+        return $this->getVoteRepository()->hasMemberVoted($memberId);
+    }
+
+    public function isSingleChoice(): bool
+    {
+        return PollChoice::SINGLE === $this->getModel()->choice_id;
+    }
+
+    public function vote($memberId, array $answers): bool
+    {
+        foreach ($answers as $answerId) {
+            if (!$this->getAnswerRepository()->isAnswer($answerId)) {
+                throw new LogicException('Provided Poll Answer does not belong to the voted Poll!');
+            }
+
+            $pollVoteRepository = $this->getVoteRepository();
+            if (!$pollVoteRepository->register($memberId, $answerId)) {
+                $this->errors = $pollVoteRepository->getErrors();
+                return false;
+            }
+        }
+
+        return true;
     }
 }

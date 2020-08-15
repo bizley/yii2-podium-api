@@ -60,6 +60,7 @@ final class RankRepository implements RankRepositoryInterface
 
         if (!$rank->validate()) {
             $this->errors = $rank->errors;
+            return false;
         }
 
         return $rank->save(false);

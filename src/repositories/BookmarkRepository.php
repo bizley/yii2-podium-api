@@ -78,6 +78,7 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
 
         if (!$bookmark->validate()) {
             $this->errors = $bookmark->errors;
+            return false;
         }
 
         return $bookmark->save(false);

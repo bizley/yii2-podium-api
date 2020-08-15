@@ -31,8 +31,6 @@ interface PollInterface
 
     /**
      * Votes in poll.
-     *
-     * @param PollAnswerModelInterface[] $answers
      */
     public function vote(
         MemberRepositoryInterface $member,

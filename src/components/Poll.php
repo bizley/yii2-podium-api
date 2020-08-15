@@ -8,16 +8,15 @@ use bizley\podium\api\InsufficientDataException;
 use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
-use bizley\podium\api\interfaces\PollAnswerModelInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollModelInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\interfaces\VoterInterface;
-use bizley\podium\api\models\poll\PollVoter;
 use bizley\podium\api\repositories\PollRepository;
 use bizley\podium\api\services\poll\PollRemover;
+use bizley\podium\api\services\poll\PollVoter;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
@@ -59,16 +58,7 @@ final class Poll extends Component implements PollInterface
         return $pollClass::getByThreadId($threadId);
     }
 
-    public function getForm(int $id = null): ?CategorisedFormInterface
-    {
-        $handler = $this->formHandler;
 
-        if (null === $id) {
-            return new $handler();
-        }
-
-        return $handler::findById($id);
-    }
 
     /**
      * Creates poll post.
@@ -152,8 +142,6 @@ final class Poll extends Component implements PollInterface
 
     /**
      * Votes in poll.
-     *
-     * @param PollAnswerModelInterface[] $answers
      *
      * @throws InvalidConfigException
      */
