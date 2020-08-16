@@ -2,45 +2,45 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\services\rank;
+namespace bizley\podium\api\services\group;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
 use bizley\podium\api\interfaces\BuilderInterface;
-use bizley\podium\api\interfaces\RankRepositoryInterface;
-use bizley\podium\api\repositories\RankRepository;
+use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\repositories\GroupRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
-final class RankBuilder extends Component implements BuilderInterface
+final class GroupBuilder extends Component implements BuilderInterface
 {
-    public const EVENT_BEFORE_CREATING = 'podium.rank.creating.before';
-    public const EVENT_AFTER_CREATING = 'podium.rank.creating.after';
-    public const EVENT_BEFORE_EDITING = 'podium.rank.editing.before';
-    public const EVENT_AFTER_EDITING = 'podium.rank.editing.after';
+    public const EVENT_BEFORE_CREATING = 'podium.group.creating.before';
+    public const EVENT_AFTER_CREATING = 'podium.group.creating.after';
+    public const EVENT_BEFORE_EDITING = 'podium.group.editing.before';
+    public const EVENT_AFTER_EDITING = 'podium.group.editing.after';
 
-    private ?RankRepositoryInterface $rank = null;
+    private ?GroupRepositoryInterface $group = null;
 
     /**
-     * @var string|array|RankRepositoryInterface
+     * @var string|array|GroupRepositoryInterface
      */
-    public $repositoryConfig = RankRepository::class;
+    public $repositoryConfig = GroupRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    private function getRank(): RankRepositoryInterface
+    private function getGroup(): GroupRepositoryInterface
     {
-        if (null === $this->rank) {
-            /** @var RankRepositoryInterface $rank */
-            $rank = Instance::ensure($this->repositoryConfig, RankRepositoryInterface::class);
-            $this->rank = $rank;
+        if (null === $this->group) {
+            /** @var GroupRepositoryInterface $group */
+            $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
+            $this->group = $group;
         }
 
-        return $this->rank;
+        return $this->group;
     }
 
     public function beforeCreate(): bool
@@ -52,7 +52,7 @@ final class RankBuilder extends Component implements BuilderInterface
     }
 
     /**
-     * Creates new rank.
+     * Creates new group.
      */
     public function create(array $data): PodiumResponse
     {
@@ -61,17 +61,17 @@ final class RankBuilder extends Component implements BuilderInterface
         }
 
         try {
-            $rank = $this->getRank();
+            $group = $this->getGroup();
 
-            if (!$rank->create($data)) {
-                return PodiumResponse::error($rank->getErrors());
+            if (!$group->create($data)) {
+                return PodiumResponse::error($group->getErrors());
             }
 
             $this->afterCreate();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while creating rank', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while creating group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }
@@ -91,7 +91,7 @@ final class RankBuilder extends Component implements BuilderInterface
     }
 
     /**
-     * Edits the rank.
+     * Edits the group.
      */
     public function edit($id, array $data): PodiumResponse
     {
@@ -100,20 +100,20 @@ final class RankBuilder extends Component implements BuilderInterface
         }
 
         try {
-            $rank = $this->getRank();
-            if (!$rank->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'rank.not.exists')]);
+            $group = $this->getGroup();
+            if (!$group->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.exists')]);
             }
 
-            if (!$rank->edit($data)) {
-                return PodiumResponse::error($rank->getErrors());
+            if (!$group->edit($data)) {
+                return PodiumResponse::error($group->getErrors());
             }
 
             $this->afterEdit();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while editing rank', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while editing group', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }

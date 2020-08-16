@@ -4,165 +4,114 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\InsufficientDataException;
+use bizley\podium\api\ars\GroupActiveRecord;
+use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\GroupInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\GroupRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\repositories\GroupRepository;
+use bizley\podium\api\services\group\GroupBuilder;
+use bizley\podium\api\services\group\GroupRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\data\DataFilter;
-use yii\data\DataProviderInterface;
-use yii\data\Pagination;
-use yii\data\Sort;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
+use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
-/**
- * Class Group
- * @package bizley\podium\api\base
- */
-class Group extends Component implements GroupInterface
+final class Group extends Component implements GroupInterface
 {
     /**
-     * @var string|array|ModelInterface group handler
-     * Component ID, class, configuration array, or instance of ModelInterface.
+     * @var string|array|BuilderInterface
      */
-    public $modelHandler = \bizley\podium\api\models\group\Group::class;
+    public $builderConfig = GroupBuilder::class;
 
     /**
-     * @var string|array|ModelFormInterface group form handler
-     * Component ID, class, configuration array, or instance of ModelFormInterface.
+     * @var string|array|RemoverInterface
      */
-    public $formHandler = \bizley\podium\api\models\group\GroupForm::class;
+    public $removerConfig = GroupRemover::class;
 
     /**
-     * @var string|array|RemoverInterface group remover handler
-     * Component ID, class, configuration array, or instance of RemoverInterface.
+     * @var string|array|GroupRepositoryInterface
      */
-    public $removerHandler = \bizley\podium\api\models\group\GroupRemover::class;
+    public $repositoryConfig = GroupRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    public function init(): void
+    public function getById(int $id): ?GroupActiveRecord
     {
-        parent::init();
-
-        $this->modelHandler = Instance::ensure($this->modelHandler, ModelInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-    }
-
-    /**
-     * @param int $id
-     * @return ModelInterface|null
-     */
-    public function getById(int $id): ?ModelInterface
-    {
-        $groupClass = $this->modelHandler;
-
-        return $groupClass::findById($id);
-    }
-
-    /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
-     */
-    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        $groupClass = $this->modelHandler;
-
-        return $groupClass::findByFilter($filter, $sort, $pagination);
-    }
-
-    /**
-     * @param int|null $id
-     * @return ModelFormInterface|null
-     */
-    public function getForm(int $id = null): ?ModelFormInterface
-    {
-        $handler = $this->formHandler;
-
-        if ($id === null) {
-            return new $handler;
+        /** @var GroupRepository $group */
+        $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
+        if (!$group->fetchOne($id)) {
+            return null;
         }
 
-        return $handler::findById($id);
+        return $group->getModel();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    {
+        /** @var GroupRepository $group */
+        $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
+        $group->fetchAll($filter, $sort, $pagination);
+
+        return $group->getCollection();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getBuilder(): BuilderInterface
+    {
+        /** @var BuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+
+        return $builder;
     }
 
     /**
      * Creates group.
-     * @param array $data
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
     public function create(array $data): PodiumResponse
     {
-        /* @var $groupForm ModelFormInterface */
-        $groupForm = $this->getForm();
-
-        if (!$groupForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $groupForm->create();
+        return $this->getBuilder()->create($data);
     }
 
     /**
      * Updates group.
-     * @param array $data
-     * @return PodiumResponse
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-
-        if ($id === null) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $groupForm = $this->getForm((int)$id);
-
-        if ($groupForm === null) {
-            throw new ModelNotFoundException('Group of given ID can not be found.');
-        }
-
-        if (!$groupForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $groupForm->edit();
+        return $this->getBuilder()->edit($id, $data);
     }
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getRemover(int $id): ?RemoverInterface
+    public function getRemover(): RemoverInterface
     {
-        $handler = $this->removerHandler;
+        /** @var RemoverInterface $remover */
+        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
 
-        return $handler::findById($id);
+        return $remover;
     }
 
     /**
      * Deletes group.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
-        $groupRemover = $this->getRemover($id);
-
-        if ($groupRemover === null) {
-            throw new ModelNotFoundException('Group of given ID can not be found.');
-        }
-
-        return $groupRemover->remove();
+        return $this->getRemover()->remove($id);
     }
 }

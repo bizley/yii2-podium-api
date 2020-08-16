@@ -32,7 +32,7 @@ So far the components ready are:
 - [x] Poll
 - [ ] Message
 - [ ] Member
-- [ ] Group
+- [x] Group
 - [ ] Forum
 - [ ] Category
 - [ ] Account
