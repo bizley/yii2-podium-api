@@ -6,7 +6,7 @@ namespace bizley\podium\api\services\post;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ModelEvent;
-use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
@@ -21,7 +21,7 @@ use yii\db\Exception;
 use yii\db\Transaction;
 use yii\di\Instance;
 
-final class PostBuilder extends Component implements CategoryBuilderInterface
+final class PostBuilder extends Component implements CategorisedBuilderInterface
 {
     public const EVENT_BEFORE_CREATING = 'podium.post.creating.before';
     public const EVENT_AFTER_CREATING = 'podium.post.creating.after';

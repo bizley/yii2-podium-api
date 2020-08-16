@@ -7,7 +7,7 @@ namespace bizley\podium\api\components;
 use bizley\podium\api\ars\ThreadActiveRecord;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
-use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\LockerInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
@@ -19,13 +19,13 @@ use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
-use bizley\podium\api\services\thread\ThreadArchiver;
+use bizley\podium\api\services\thread\CategoryArchiver;
+use bizley\podium\api\services\thread\CategoryBuilder;
+use bizley\podium\api\services\thread\CategoryRemover;
 use bizley\podium\api\services\thread\ThreadBookmarker;
-use bizley\podium\api\services\thread\ThreadBuilder;
 use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
-use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -37,9 +37,9 @@ use yii\di\Instance;
 final class Thread extends Component implements ThreadInterface
 {
     /**
-     * @var string|array|CategoryBuilderInterface
+     * @var string|array|CategorisedBuilderInterface
      */
-    public $builderConfig = ThreadBuilder::class;
+    public $builderConfig = CategoryBuilder::class;
 
     /**
      * @var string|array|SubscriberInterface
@@ -54,12 +54,12 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @var string|array|RemoverInterface
      */
-    public $removerConfig = ThreadRemover::class;
+    public $removerConfig = CategoryRemover::class;
 
     /**
      * @var string|array|ArchiverInterface
      */
-    public $archiverConfig = ThreadArchiver::class;
+    public $archiverConfig = CategoryArchiver::class;
 
     /**
      * @var string|array|MoverInterface
@@ -111,10 +111,10 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getBuilder(): CategoryBuilderInterface
+    public function getBuilder(): CategorisedBuilderInterface
     {
-        /** @var CategoryBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+        /** @var CategorisedBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
 
         return $builder;
     }

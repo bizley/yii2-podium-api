@@ -86,7 +86,7 @@ class ForumSorter extends ForumRepo implements SorterInterface
     /**
      * @return PodiumResponse
      */
-    public function sort(): PodiumResponse
+    public function replace(): PodiumResponse
     {
         if (!$this->beforeSort()) {
             return PodiumResponse::error();

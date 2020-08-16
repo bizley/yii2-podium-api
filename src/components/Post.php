@@ -6,7 +6,7 @@ namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\PostActiveRecord;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\LikerInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
@@ -30,7 +30,7 @@ use yii\di\Instance;
 final class Post extends Component implements PostInterface
 {
     /**
-     * @var string|array|CategoryBuilderInterface
+     * @var string|array|CategorisedBuilderInterface
      */
     public $builderConfig = PostBuilder::class;
 
@@ -89,10 +89,10 @@ final class Post extends Component implements PostInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getBuilder(): CategoryBuilderInterface
+    public function getBuilder(): CategorisedBuilderInterface
     {
-        /** @var CategoryBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+        /** @var CategorisedBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
 
         return $builder;
     }

@@ -6,9 +6,9 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-interface CategoryBuilderInterface
+interface CategorisedBuilderInterface
 {
-    public function create(array $data, MemberRepositoryInterface $author): PodiumResponse;
+    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $parent): PodiumResponse;
 
     public function edit($id, array $data): PodiumResponse;
 }

@@ -3,6 +3,7 @@
 return [
     'category.already.archived' => 'Category is already archived.',
     'category.not.archived' => 'Category is not archived.',
+    'category.not.exists' => 'Category does not exist.',
     'category.must.be.archived' => 'Category must be archived first.',
     'forum.already.archived' => 'Forum is already archived.',
     'forum.must.be.archived' => 'Forum must be archived first.',

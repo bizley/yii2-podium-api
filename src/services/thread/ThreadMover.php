@@ -85,8 +85,8 @@ final class ThreadMover extends Component implements MoverInterface
                 throw new Exception('Error while updating new forum counters!');
             }
 
-            $transaction->commit();
             $this->afterMove();
+            $transaction->commit();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {

@@ -9,7 +9,7 @@ use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repos\PostRepo;
 use bizley\podium\api\repos\ThreadRepo;
-use bizley\podium\api\services\thread\ThreadRemover;
+use bizley\podium\api\services\thread\CategoryRemover;
 use bizley\podium\tests\DbTestCase;
 use Exception;
 use yii\base\Event;
@@ -91,11 +91,11 @@ class ThreadRemoverTest extends DbTestCase
 
     public function testRemove(): void
     {
-        Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, function () {
-            $this->eventsRaised[ThreadRemover::EVENT_BEFORE_REMOVING] = true;
+        Event::on(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, function () {
+            $this->eventsRaised[CategoryRemover::EVENT_BEFORE_REMOVING] = true;
         });
-        Event::on(ThreadRemover::class, ThreadRemover::EVENT_AFTER_REMOVING, function () {
-            $this->eventsRaised[ThreadRemover::EVENT_AFTER_REMOVING] = true;
+        Event::on(CategoryRemover::class, CategoryRemover::EVENT_AFTER_REMOVING, function () {
+            $this->eventsRaised[CategoryRemover::EVENT_AFTER_REMOVING] = true;
         });
 
         self::assertTrue($this->podium()->thread->remove(1)->getResult());
@@ -103,8 +103,8 @@ class ThreadRemoverTest extends DbTestCase
         self::assertEmpty(ThreadRepo::findOne(1));
         self::assertEmpty(PostRepo::findOne(1));
 
-        self::assertArrayHasKey(ThreadRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
-        self::assertArrayHasKey(ThreadRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryRemover::EVENT_BEFORE_REMOVING, $this->eventsRaised);
+        self::assertArrayHasKey(CategoryRemover::EVENT_AFTER_REMOVING, $this->eventsRaised);
     }
 
     public function testRemoveEventPreventing(): void
@@ -112,14 +112,14 @@ class ThreadRemoverTest extends DbTestCase
         $handler = static function ($event) {
             $event->canRemove = false;
         };
-        Event::on(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
+        Event::on(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
 
         self::assertFalse($this->podium()->thread->remove(1)->getResult());
 
         self::assertNotEmpty(ThreadRepo::findOne(1));
         self::assertNotEmpty(PostRepo::findOne(1));
 
-        Event::off(ThreadRemover::class, ThreadRemover::EVENT_BEFORE_REMOVING, $handler);
+        Event::off(CategoryRemover::class, CategoryRemover::EVENT_BEFORE_REMOVING, $handler);
     }
 
     public function testNonArchived(): void

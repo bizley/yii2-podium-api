@@ -49,4 +49,68 @@ final class CategoryRepository implements CategoryRepositoryInterface
     {
         throw new NotSupportedException('Category has no parent!');
     }
+
+    public function create(array $data, $authorId): bool
+    {
+        /** @var CategoryActiveRecord $category */
+        $category = new $this->activeRecordClass();
+        if (!$category->load($data, '')) {
+            return false;
+        }
+
+        $category->author_id = $authorId;
+
+        if (!$category->validate()) {
+            $this->errors = $category->errors;
+            return false;
+        }
+
+        return $category->save(false);
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->getModel()->archived;
+    }
+
+    public function archive(): bool
+    {
+        $category = $this->getModel();
+        $category->archived = true;
+        if (!$category->validate()) {
+            $this->errors = $category->errors;
+            return false;
+        }
+
+        return $category->save(false);
+    }
+
+    public function revive(): bool
+    {
+        $category = $this->getModel();
+        $category->archived = false;
+        if (!$category->validate()) {
+            $this->errors = $category->errors;
+            return false;
+        }
+
+        return $category->save(false);
+    }
+
+    public function setOrder(int $order): bool
+    {
+        $category = $this->getModel();
+        $category->sort = $order;
+        if (!$category->validate()) {
+            $this->errors = $category->errors;
+            return false;
+        }
+
+        return $category->save(false);
+    }
+
+    public function getOrder(): int
+    {
+        return $this->getModel()->sort;
+    }
 }

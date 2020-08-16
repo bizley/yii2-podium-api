@@ -220,7 +220,7 @@ class Forum extends Component implements ForumInterface
             return PodiumResponse::error();
         }
 
-        return $forumSorter->sort();
+        return $forumSorter->replace();
     }
 
     /**

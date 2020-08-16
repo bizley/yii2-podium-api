@@ -34,7 +34,7 @@ So far the components ready are:
 - [ ] Member
 - [x] Group
 - [ ] Forum
-- [ ] Category
+- [x] Category
 - [ ] Account
 
 When API is ready, I'll start preparing the client.
