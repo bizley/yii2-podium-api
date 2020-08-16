@@ -55,7 +55,7 @@ final class PostMover extends Component implements MoverInterface
     }
 
     /**
-     * Moves the thread to another forum.
+     * Moves the post to another thread.
      */
     public function move($id, RepositoryInterface $thread): PodiumResponse
     {
@@ -74,7 +74,7 @@ final class PostMover extends Component implements MoverInterface
             /** @var ForumRepositoryInterface $threadParent */
             $threadParent = $thread->getParent();
             if (!$post->move($thread->getId(), $threadParent->getId(), $threadParent->getParent()->getId())) {
-                return PodiumResponse::error($thread->getErrors());
+                return PodiumResponse::error($post->getErrors());
             }
 
             /** @var ThreadRepositoryInterface $postParent */

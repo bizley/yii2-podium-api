@@ -17,4 +17,5 @@ interface ThreadRepositoryInterface extends RepositoryInterface
     public function revive(): bool;
     public function getPostsCount(): int;
     public function updateCounters(int $posts): bool;
+    public function hasPoll(): bool;
 }

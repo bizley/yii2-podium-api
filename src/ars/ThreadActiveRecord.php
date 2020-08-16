@@ -31,6 +31,7 @@ use yii\db\ActiveRecord;
  * @property CategoryActiveRecord $category
  * @property ForumActiveRecord    $forum
  * @property MemberActiveRecord   $author
+ * @property PollActiveRecord     $poll
  */
 class ThreadActiveRecord extends ActiveRecord
 {
@@ -83,5 +84,10 @@ class ThreadActiveRecord extends ActiveRecord
     public function getAuthor(): ActiveQuery
     {
         return $this->hasOne(MemberActiveRecord::class, ['id' => 'author_id']);
+    }
+
+    public function getPoll(): ActiveQuery
+    {
+        return $this->hasOne(PollActiveRecord::class, ['thread_id' => 'id']);
     }
 }

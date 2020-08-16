@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\PollActiveRecord;
+use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PollBuilderInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
@@ -13,7 +15,9 @@ use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\interfaces\VoterInterface;
 use bizley\podium\api\repositories\PollRepository;
+use bizley\podium\api\services\poll\PollArchiver;
 use bizley\podium\api\services\poll\PollBuilder;
+use bizley\podium\api\services\poll\PollMover;
 use bizley\podium\api\services\poll\PollRemover;
 use bizley\podium\api\services\poll\PollVoter;
 use yii\base\Component;
@@ -39,6 +43,16 @@ final class Poll extends Component implements PollInterface
      * @var string|array|RemoverInterface
      */
     public $removerConfig = PollRemover::class;
+
+    /**
+     * @var string|array|MoverInterface
+     */
+    public $moverConfig = PollMover::class;
+
+    /**
+     * @var string|array|ArchiverInterface
+     */
+    public $archiverConfig = PollArchiver::class;
 
     /**
      * @var string|array|PollRepositoryInterface
@@ -150,5 +164,57 @@ final class Poll extends Component implements PollInterface
         array $answers
     ): PodiumResponse {
         return $this->getVoter()->vote($member, $poll, $answers);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getMover(): MoverInterface
+    {
+        /** @var MoverInterface $mover */
+        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+
+        return $mover;
+    }
+
+    /**
+     * Moves poll.
+     *
+     * @throws InvalidConfigException
+     */
+    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse
+    {
+        return $this->getMover()->move($id, $thread);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getArchiver(): ArchiverInterface
+    {
+        /** @var ArchiverInterface $archiver */
+        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+
+        return $archiver;
+    }
+
+    /**
+     * Archives poll.
+     *
+     * @throws InvalidConfigException
+     */
+    public function archive($id): PodiumResponse
+    {
+        return $this->getArchiver()->archive($id);
+    }
+
+    /**
+     * Revives poll.
+     *
+     * @throws InvalidConfigException
+     */
+    public function revive($id): PodiumResponse
+    {
+        return $this->getArchiver()->revive($id);
     }
 }

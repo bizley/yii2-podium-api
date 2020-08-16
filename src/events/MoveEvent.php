@@ -7,10 +7,6 @@ namespace bizley\podium\api\events;
 use bizley\podium\api\interfaces\MoverInterface;
 use yii\base\Event;
 
-/**
- * Class MoveEvent
- * @package bizley\podium\api\events
- */
 class MoveEvent extends Event
 {
     /**
@@ -18,8 +14,5 @@ class MoveEvent extends Event
      */
     public bool $canMove = true;
 
-    /**
-     * @var MoverInterface|null
-     */
     public ?MoverInterface $model = null;
 }

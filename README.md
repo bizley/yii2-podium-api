@@ -29,7 +29,7 @@ So far the components ready are:
 - [x] Thread
 - [x] Rank
 - [x] Post
-- [ ] Poll
+- [x] Poll
 - [ ] Message
 - [ ] Member
 - [ ] Group

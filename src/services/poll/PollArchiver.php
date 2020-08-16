@@ -2,45 +2,45 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\services\post;
+namespace bizley\podium\api\services\poll;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\PostRepositoryInterface;
-use bizley\podium\api\repositories\PostRepository;
+use bizley\podium\api\interfaces\PollRepositoryInterface;
+use bizley\podium\api\repositories\PollRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
-final class PostArchiver extends Component implements ArchiverInterface
+final class PollArchiver extends Component implements ArchiverInterface
 {
-    public const EVENT_BEFORE_ARCHIVING = 'podium.post.archiving.before';
-    public const EVENT_AFTER_ARCHIVING = 'podium.post.archiving.after';
-    public const EVENT_BEFORE_REVIVING = 'podium.post.reviving.before';
-    public const EVENT_AFTER_REVIVING = 'podium.post.reviving.after';
+    public const EVENT_BEFORE_ARCHIVING = 'podium.poll.archiving.before';
+    public const EVENT_AFTER_ARCHIVING = 'podium.poll.archiving.after';
+    public const EVENT_BEFORE_REVIVING = 'podium.poll.reviving.before';
+    public const EVENT_AFTER_REVIVING = 'podium.poll.reviving.after';
 
-    private ?PostRepositoryInterface $post = null;
+    private ?PollRepositoryInterface $poll = null;
 
     /**
-     * @var string|array|PostRepositoryInterface
+     * @var string|array|PollRepositoryInterface
      */
-    public $repositoryConfig = PostRepository::class;
+    public $repositoryConfig = PollRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    private function getPost(): PostRepositoryInterface
+    private function getPost(): PollRepositoryInterface
     {
-        if (null === $this->post) {
-            /** @var PostRepositoryInterface $post */
-            $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
-            $this->post = $post;
+        if (null === $this->poll) {
+            /** @var PollRepositoryInterface $poll */
+            $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
+            $this->poll = $poll;
         }
 
-        return $this->post;
+        return $this->poll;
     }
 
     public function beforeArchive(): bool
@@ -52,7 +52,7 @@ final class PostArchiver extends Component implements ArchiverInterface
     }
 
     /**
-     * Archives the post.
+     * Archives the poll.
      */
     public function archive($id): PodiumResponse
     {
@@ -63,7 +63,7 @@ final class PostArchiver extends Component implements ArchiverInterface
         try {
             $post = $this->getPost();
             if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
             }
 
             if (!$post->archive()) {
@@ -74,7 +74,7 @@ final class PostArchiver extends Component implements ArchiverInterface
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while archiving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while archiving poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }
@@ -94,7 +94,7 @@ final class PostArchiver extends Component implements ArchiverInterface
     }
 
     /**
-     * Revives the post.
+     * Revives the poll.
      */
     public function revive($id): PodiumResponse
     {
@@ -103,20 +103,20 @@ final class PostArchiver extends Component implements ArchiverInterface
         }
 
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
+            $poll = $this->getPost();
+            if (!$poll->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
             }
 
-            if (!$post->revive()) {
-                return PodiumResponse::error($post->getErrors());
+            if (!$poll->revive()) {
+                return PodiumResponse::error($poll->getErrors());
             }
 
             $this->afterRevive();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
-            Yii::error(['Exception while reviving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(['Exception while reviving poll', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }

@@ -169,4 +169,9 @@ final class ThreadRepository implements ThreadRepositoryInterface
     {
         return $this->getModel()->updateCounters(['posts_count' => $posts]);
     }
+
+    public function hasPoll(): bool
+    {
+        return $this->getModel()->getPoll()->exists();
+    }
 }

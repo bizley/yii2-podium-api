@@ -32,6 +32,7 @@ return [
     'target.not.ignored' => 'Target is not ignored.',
     'thread.already.archived' => 'Thread is already archived.',
     'thread.already.subscribed' => 'Thread is already subscribed.',
+    'thread.has.poll' => 'Thread already has a poll.',
     'thread.must.be.archived' => 'Thread must be archived first.',
     'thread.not.archived' => 'Thread is not archived.',
     'thread.not.exists' => 'Thread does not exist.',
