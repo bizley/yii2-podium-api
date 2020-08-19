@@ -55,6 +55,25 @@ final class ForumRepository implements ForumRepositoryInterface
         return $this->getModel()->archived;
     }
 
+    public function create(array $data, $authorId, $categoryId): bool
+    {
+        /** @var ForumActiveRecord $forum */
+        $forum = new $this->activeRecordClass();
+        if (!$forum->load($data, '')) {
+            return false;
+        }
+
+        $forum->author_id = $authorId;
+        $forum->category_id = $categoryId;
+
+        if (!$forum->validate()) {
+            $this->errors = $forum->errors;
+            return false;
+        }
+
+        return $forum->save(false);
+    }
+
     public function archive(): bool
     {
         $forum = $this->getModel();
@@ -107,5 +126,10 @@ final class ForumRepository implements ForumRepositoryInterface
     public function getOrder(): int
     {
         return $this->getModel()->sort;
+    }
+
+    public function move($categoryId): bool
+    {
+
     }
 }

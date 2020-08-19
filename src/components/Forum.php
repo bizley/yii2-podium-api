@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\InsufficientDataException;
+use bizley\podium\api\ars\ForumActiveRecord;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
-use bizley\podium\api\interfaces\CategorisedFormInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\ForumInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
@@ -15,15 +14,18 @@ use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SorterInterface;
-use bizley\podium\api\models\forum\ForumMover;
 use bizley\podium\api\repositories\ForumRepository;
 use bizley\podium\api\services\forum\ForumArchiver;
+use bizley\podium\api\services\forum\ForumBuilder;
+use bizley\podium\api\services\forum\ForumMover;
 use bizley\podium\api\services\forum\ForumRemover;
 use bizley\podium\api\services\forum\ForumSorter;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
+use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
 final class Forum extends Component implements ForumInterface
 {
@@ -58,51 +60,64 @@ final class Forum extends Component implements ForumInterface
     public $repositoryConfig = ForumRepository::class;
 
     /**
-     * Creates forum.
+     * @throws InvalidConfigException
+     */
+    public function getById(int $id): ?ForumActiveRecord
+    {
+        /** @var ForumRepository $forum */
+        $forum = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
+        if (!$forum->fetchOne($id)) {
+            return null;
+        }
+
+        return $forum->getModel();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
+     */
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
+    {
+        /** @var ForumRepository $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
+        $thread->fetchAll($filter, $sort, $pagination);
+
+        return $thread->getCollection();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getBuilder(): CategorisedBuilderInterface
+    {
+        /** @var CategorisedBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+
+        return $builder;
+    }
+
+    /**
+     * Creates thread.
+     *
+     * @throws InvalidConfigException
      */
     public function create(
         array $data,
         MemberRepositoryInterface $author,
         CategoryRepositoryInterface $category
     ): PodiumResponse {
-        /* @var $forumForm CategorisedFormInterface */
-        $forumForm = $this->getForm();
-
-        $forumForm->setAuthor($author);
-        $forumForm->setCategory($category);
-
-        if (!$forumForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $forumForm->create();
+        return $this->getBuilder()->create($data, $author, $category);
     }
 
     /**
-     * Updates forum.
+     * Updates thread.
      *
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-
-        if (null === $id) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $forumForm = $this->getForm((int) $id);
-
-        if (null === $forumForm) {
-            throw new ModelNotFoundException('Forum of given ID can not be found.');
-        }
-
-        if (!$forumForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $forumForm->edit();
+        return $this->getBuilder()->edit($id, $data);
     }
 
     /**

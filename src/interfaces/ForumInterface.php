@@ -20,9 +20,9 @@ interface ForumInterface
     /**
      * Updates forum.
      */
-    public function edit(array $data): PodiumResponse;
+    public function edit($id, array $data): PodiumResponse;
 
-    public function remove(int $id): PodiumResponse;
+    public function remove($id): PodiumResponse;
 
     /**
      * Replaces the order of the forums.
@@ -32,9 +32,9 @@ interface ForumInterface
     /**
      * Moves forum to different category.
      */
-    public function move(int $id, CategoryRepositoryInterface $category): PodiumResponse;
+    public function move($id, CategoryRepositoryInterface $category): PodiumResponse;
 
-    public function archive(int $id): PodiumResponse;
+    public function archive($id): PodiumResponse;
 
-    public function revive(int $id): PodiumResponse;
+    public function revive($id): PodiumResponse;
 }

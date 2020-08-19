@@ -10,7 +10,7 @@ interface ThreadRepositoryInterface extends RepositoryInterface
     public function isArchived(): bool;
     public function pin(): bool;
     public function unpin(): bool;
-    public function move($forumId, $categoryId): bool;
+    public function move($forumId): bool;
     public function lock(): bool;
     public function unlock(): bool;
     public function archive(): bool;
