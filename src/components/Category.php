@@ -99,7 +99,7 @@ final class Category extends Component implements CategoryInterface
     public function getSorter(): SorterInterface
     {
         /** @var SorterInterface $sorter */
-        $sorter = Instance::ensure($this->removerConfig, SorterInterface::class);
+        $sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
 
         return $sorter;
     }

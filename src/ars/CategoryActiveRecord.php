@@ -48,7 +48,7 @@ class CategoryActiveRecord extends ActiveRecord
     public function rules(): array
     {
         return [
-            [['name', 'visible', 'sort'], 'required'],
+            [['name', 'visible'], 'required'],
             [['name', 'slug'], 'string', 'max' => 191],
             [['description'], 'string', 'max' => 255],
             [['visible'], 'boolean'],

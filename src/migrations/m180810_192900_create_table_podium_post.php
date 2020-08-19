@@ -20,8 +20,6 @@ class m180810_192900_create_table_podium_post extends Migration
 
         $this->createTable('{{%podium_post}}', [
             'id' => $this->primaryKey(),
-            'category_id' => $this->integer()->notNull(),
-            'forum_id' => $this->integer()->notNull(),
             'thread_id' => $this->integer()->notNull(),
             'old_thread_id' => $this->integer()->notNull(),
             'author_id' => $this->integer()->notNull(),
@@ -45,24 +43,6 @@ class m180810_192900_create_table_podium_post extends Migration
             'CASCADE'
         );
         $this->addForeignKey(
-            'fk-podium_post-category_id',
-            '{{%podium_post}}',
-            'category_id',
-            '{{%podium_category}}',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
-        $this->addForeignKey(
-            'fk-podium_post-forum_id',
-            '{{%podium_post}}',
-            'forum_id',
-            '{{%podium_forum}}',
-            'id',
-            'CASCADE',
-            'CASCADE'
-        );
-        $this->addForeignKey(
             'fk-podium_post-thread_id',
             '{{%podium_post}}',
             'thread_id',
@@ -77,7 +57,7 @@ class m180810_192900_create_table_podium_post extends Migration
             'old_thread_id',
             '{{%podium_thread}}',
             'id',
-            'CASCADE',
+            'NO ACTION',
             'CASCADE'
         );
 

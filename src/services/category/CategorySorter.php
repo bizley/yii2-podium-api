@@ -7,6 +7,7 @@ namespace bizley\podium\api\services\category;
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\SortEvent;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\SorterInterface;
 use bizley\podium\api\repositories\CategoryRepository;
 use Throwable;
@@ -19,8 +20,8 @@ use yii\di\Instance;
 
 final class CategorySorter extends Component implements SorterInterface
 {
-    public const EVENT_BEFORE_SORTING = 'podium.category.sorting.before';
-    public const EVENT_AFTER_SORTING = 'podium.category.sorting.after';
+    public const EVENT_BEFORE_REPLACING = 'podium.category.replacing.before';
+    public const EVENT_AFTER_REPLACING = 'podium.category.replacing.after';
 
     private ?CategoryRepositoryInterface $category = null;
 
@@ -43,10 +44,10 @@ final class CategorySorter extends Component implements SorterInterface
         return $this->category;
     }
 
-    public function beforeSort(): bool
+    public function beforeReplace(): bool
     {
         $event = new SortEvent();
-        $this->trigger(self::EVENT_BEFORE_SORTING, $event);
+        $this->trigger(self::EVENT_BEFORE_REPLACING, $event);
 
         return $event->canSort;
     }
@@ -54,9 +55,9 @@ final class CategorySorter extends Component implements SorterInterface
     /**
      * Replaces the spot of the categories.
      */
-    public function replace($id, CategoryRepositoryInterface $targetCategory): PodiumResponse
+    public function replace($id, RepositoryInterface $targetCategory): PodiumResponse
     {
-        if (!$this->beforeSort()) {
+        if (!$targetCategory instanceof CategoryRepositoryInterface || !$this->beforeReplace()) {
             return PodiumResponse::error();
         }
 
@@ -76,7 +77,7 @@ final class CategorySorter extends Component implements SorterInterface
                 throw new Exception('Error while setting new category order!');
             }
 
-            $this->afterSort();
+            $this->afterReplace();
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -91,8 +92,8 @@ final class CategorySorter extends Component implements SorterInterface
         }
     }
 
-    public function afterSort(): void
+    public function afterReplace(): void
     {
-        $this->trigger(self::EVENT_AFTER_SORTING);
+        $this->trigger(self::EVENT_AFTER_REPLACING);
     }
 }

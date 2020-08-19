@@ -50,6 +50,37 @@ final class ForumRepository implements ForumRepositoryInterface
         return $parent;
     }
 
+    public function isArchived(): bool
+    {
+        return $this->getModel()->archived;
+    }
+
+    public function archive(): bool
+    {
+        $forum = $this->getModel();
+        $forum->archived = true;
+        if (!$forum->validate()) {
+            $this->errors = $forum->errors;
+
+            return false;
+        }
+
+        return $forum->save(false);
+    }
+
+    public function revive(): bool
+    {
+        $forum = $this->getModel();
+        $forum->archived = false;
+        if (!$forum->validate()) {
+            $this->errors = $forum->errors;
+
+            return false;
+        }
+
+        return $forum->save(false);
+    }
+
     public function updateCounters(int $threads, int $posts): bool
     {
         return $this->getModel()->updateCounters(
@@ -58,5 +89,23 @@ final class ForumRepository implements ForumRepositoryInterface
                 'posts_count' => $posts,
             ]
         );
+    }
+
+    public function setOrder(int $order): bool
+    {
+        $forum = $this->getModel();
+        $forum->sort = $order;
+        if (!$forum->validate()) {
+            $this->errors = $forum->errors;
+
+            return false;
+        }
+
+        return $forum->save(false);
+    }
+
+    public function getOrder(): int
+    {
+        return $this->getModel()->sort;
     }
 }

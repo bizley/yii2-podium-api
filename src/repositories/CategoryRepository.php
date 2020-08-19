@@ -10,6 +10,8 @@ use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 use yii\base\NotSupportedException;
 
+use const SORT_DESC;
+
 final class CategoryRepository implements CategoryRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
@@ -58,10 +60,23 @@ final class CategoryRepository implements CategoryRepositoryInterface
             return false;
         }
 
+        if (null === $category->sort) {
+            /** @var CategoryActiveRecord $categoryClass */
+            $categoryClass = $this->activeRecordClass;
+            /** @var CategoryActiveRecord $lastCategory */
+            $lastCategory = $categoryClass::find()->orderBy(['sort' => SORT_DESC])->limit(1)->one();
+            if ($lastCategory) {
+                $category->sort = $lastCategory->sort + 1;
+            } else {
+                $category->sort = 0;
+            }
+        }
+
         $category->author_id = $authorId;
 
         if (!$category->validate()) {
             $this->errors = $category->errors;
+
             return false;
         }
 
@@ -79,6 +94,7 @@ final class CategoryRepository implements CategoryRepositoryInterface
         $category->archived = true;
         if (!$category->validate()) {
             $this->errors = $category->errors;
+
             return false;
         }
 
@@ -91,6 +107,7 @@ final class CategoryRepository implements CategoryRepositoryInterface
         $category->archived = false;
         if (!$category->validate()) {
             $this->errors = $category->errors;
+
             return false;
         }
 
@@ -103,6 +120,7 @@ final class CategoryRepository implements CategoryRepositoryInterface
         $category->sort = $order;
         if (!$category->validate()) {
             $this->errors = $category->errors;
+
             return false;
         }
 

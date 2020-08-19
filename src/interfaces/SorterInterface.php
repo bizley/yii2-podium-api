@@ -9,7 +9,7 @@ use bizley\podium\api\components\PodiumResponse;
 interface SorterInterface
 {
     /**
-     * Sorts models.
+     * Replaces the order of the repositories.
      */
-    public function replace($id, CategoryRepositoryInterface $category): PodiumResponse;
+    public function replace($id, RepositoryInterface $repository): PodiumResponse;
 }

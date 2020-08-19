@@ -19,13 +19,13 @@ use bizley\podium\api\interfaces\SubscriberInterface;
 use bizley\podium\api\interfaces\ThreadInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\ThreadRepository;
-use bizley\podium\api\services\thread\CategoryArchiver;
-use bizley\podium\api\services\thread\CategoryBuilder;
-use bizley\podium\api\services\thread\CategoryRemover;
+use bizley\podium\api\services\thread\ThreadArchiver;
 use bizley\podium\api\services\thread\ThreadBookmarker;
+use bizley\podium\api\services\thread\ThreadBuilder;
 use bizley\podium\api\services\thread\ThreadLocker;
 use bizley\podium\api\services\thread\ThreadMover;
 use bizley\podium\api\services\thread\ThreadPinner;
+use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -39,7 +39,7 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @var string|array|CategorisedBuilderInterface
      */
-    public $builderConfig = CategoryBuilder::class;
+    public $builderConfig = ThreadBuilder::class;
 
     /**
      * @var string|array|SubscriberInterface
@@ -54,12 +54,12 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @var string|array|RemoverInterface
      */
-    public $removerConfig = CategoryRemover::class;
+    public $removerConfig = ThreadRemover::class;
 
     /**
      * @var string|array|ArchiverInterface
      */
-    public $archiverConfig = CategoryArchiver::class;
+    public $archiverConfig = ThreadArchiver::class;
 
     /**
      * @var string|array|MoverInterface
