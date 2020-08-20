@@ -22,6 +22,8 @@ final class ForumSorter extends Component implements SorterInterface
 {
     public const EVENT_BEFORE_REPLACING = 'podium.forum.replacing.before';
     public const EVENT_AFTER_REPLACING = 'podium.forum.replacing.after';
+    public const EVENT_BEFORE_SORTING = 'podium.forum.sorting.before';
+    public const EVENT_AFTER_SORTING = 'podium.forum.sorting.after';
 
     private ?ForumRepositoryInterface $forum = null;
 
@@ -83,10 +85,7 @@ final class ForumSorter extends Component implements SorterInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             $transaction->rollBack();
-            Yii::error(
-                ['Exception while replacing forums order', $exc->getMessage(), $exc->getTraceAsString()],
-                'podium'
-            );
+            Yii::error(['Exception while replacing forums order', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
             return PodiumResponse::error();
         }
@@ -95,5 +94,48 @@ final class ForumSorter extends Component implements SorterInterface
     public function afterReplace(): void
     {
         $this->trigger(self::EVENT_AFTER_REPLACING);
+    }
+
+    public function beforeSort(): bool
+    {
+        $event = new SortEvent();
+        $this->trigger(self::EVENT_BEFORE_SORTING, $event);
+
+        return $event->canSort;
+    }
+
+    /**
+     * Sorts the forums.
+     */
+    public function sort(): PodiumResponse
+    {
+        if (!$this->beforeSort()) {
+            return PodiumResponse::error();
+        }
+
+        /** @var Transaction $transaction */
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $forum = $this->getForum();
+
+            if (!$forum->sort()) {
+                return PodiumResponse::error();
+            }
+
+            $this->afterSort();
+            $transaction->commit();
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            $transaction->rollBack();
+            Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
+            return PodiumResponse::error();
+        }
+    }
+
+    public function afterSort(): void
+    {
+        $this->trigger(self::EVENT_AFTER_SORTING);
     }
 }

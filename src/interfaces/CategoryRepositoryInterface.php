@@ -12,4 +12,5 @@ interface CategoryRepositoryInterface extends RepositoryInterface
     public function revive(): bool;
     public function setOrder(int $order): bool;
     public function getOrder(): int;
+    public function sort(): bool;
 }

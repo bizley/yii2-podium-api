@@ -14,4 +14,5 @@ interface ForumRepositoryInterface extends RepositoryInterface
     public function updateCounters(int $threads, int $posts): bool;
     public function setOrder(int $order): bool;
     public function getOrder(): int;
+    public function sort(): bool;
 }

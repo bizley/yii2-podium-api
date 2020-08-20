@@ -6,10 +6,6 @@ namespace bizley\podium\api\events;
 
 use yii\base\Event;
 
-/**
- * Class SortEvent
- * @package bizley\podium\api\events
- */
 class SortEvent extends Event
 {
     /**

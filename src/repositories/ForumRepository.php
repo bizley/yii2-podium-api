@@ -128,8 +128,38 @@ final class ForumRepository implements ForumRepositoryInterface
         return $this->getModel()->sort;
     }
 
+    public function sort(): bool
+    {
+        /** @var ForumActiveRecord $forumClass */
+        $forumClass = $this->activeRecordClass;
+        $forums = $forumClass::find()
+            ->orderBy(
+                [
+                    'sort' => SORT_ASC,
+                    'name' => SORT_ASC,
+                ]
+            );
+        $sortOrder = 0;
+        /** @var ForumActiveRecord $forum */
+        foreach ($forums->each() as $forum) {
+            $forum->sort = $sortOrder++;
+            if (!$forum->save()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     public function move($categoryId): bool
     {
+        $forum = $this->getModel();
+        $forum->category_id = $categoryId;
+        if (!$forum->validate()) {
+            $this->errors = $forum->errors;
+            return false;
+        }
 
+        return $forum->save(false);
     }
 }

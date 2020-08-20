@@ -10,6 +10,7 @@ use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 use yii\base\NotSupportedException;
 
+use const SORT_ASC;
 use const SORT_DESC;
 
 final class CategoryRepository implements CategoryRepositoryInterface
@@ -130,5 +131,28 @@ final class CategoryRepository implements CategoryRepositoryInterface
     public function getOrder(): int
     {
         return $this->getModel()->sort;
+    }
+
+    public function sort(): bool
+    {
+        /** @var CategoryActiveRecord $categoryClass */
+        $categoryClass = $this->activeRecordClass;
+        $categories = $categoryClass::find()
+            ->orderBy(
+                [
+                    'sort' => SORT_ASC,
+                    'name' => SORT_ASC,
+                ]
+            );
+        $sortOrder = 0;
+        /** @var CategoryActiveRecord $category */
+        foreach ($categories->each() as $category) {
+            $category->sort = $sortOrder++;
+            if (!$category->save()) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

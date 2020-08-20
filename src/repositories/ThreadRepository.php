@@ -104,11 +104,10 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $thread->save(false);
     }
 
-    public function move($forumId, $categoryId): bool
+    public function move($forumId): bool
     {
         $thread = $this->getModel();
         $thread->forum_id = $forumId;
-        $thread->category_id = $categoryId;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
             return false;
