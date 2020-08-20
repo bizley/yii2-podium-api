@@ -26,6 +26,7 @@ class m180106_052800_create_table_podium_acquaintance extends Migration
             'target_id' => $this->integer()->notNull(),
             'type_id' => $typeId,
             'created_at' => $this->integer()->notNull(),
+            'updated_at' => $this->integer()->notNull(),
         ], $tableOptions);
 
         $this->addPrimaryKey('pk-podium_acquaintance', '{{%podium_acquaintance}}', ['member_id', 'target_id']);

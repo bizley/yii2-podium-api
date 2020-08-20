@@ -33,7 +33,7 @@ So far the components ready are:
 - [ ] Message
 - [ ] Member
 - [x] Group
-- [ ] Forum
+- [x] Forum
 - [x] Category
 - [ ] Account
 

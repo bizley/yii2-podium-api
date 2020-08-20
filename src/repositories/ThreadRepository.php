@@ -60,7 +60,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $this->getModel()->posts_count;
     }
 
-    public function create(array $data, $authorId, $forumId, $categoryId): bool
+    public function create(array $data, $authorId, $forumId): bool
     {
         /** @var ThreadActiveRecord $thread */
         $thread = new $this->activeRecordClass();
@@ -70,7 +70,6 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
         $thread->author_id = $authorId;
         $thread->forum_id = $forumId;
-        $thread->category_id = $categoryId;
 
         if (!$thread->validate()) {
             $this->errors = $thread->errors;

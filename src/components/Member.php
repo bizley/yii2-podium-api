@@ -4,385 +4,249 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\InsufficientDataException;
+use bizley\podium\api\ars\MemberActiveRecord;
+use bizley\podium\api\interfaces\AcquaintanceInterface;
 use bizley\podium\api\interfaces\BanisherInterface;
-use bizley\podium\api\interfaces\BefrienderInterface;
 use bizley\podium\api\interfaces\GrouperInterface;
-use bizley\podium\api\interfaces\IgnorerInterface;
+use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\MemberBuilderInterface;
 use bizley\podium\api\interfaces\MemberInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\ModelFormInterface;
-use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\RegistererInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\models\member\MemberBanisher;
+use bizley\podium\api\models\member\MemberGrouper;
+use bizley\podium\api\models\member\MemberRemover;
+use bizley\podium\api\repositories\MemberRepository;
+use bizley\podium\api\services\member\MemberAcquaintance;
+use bizley\podium\api\services\member\MemberBuilder;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\data\DataFilter;
-use yii\data\DataProviderInterface;
-use yii\data\Pagination;
-use yii\data\Sort;
+use yii\base\NotSupportedException;
+use yii\data\ActiveDataFilter;
+use yii\data\ActiveDataProvider;
 use yii\di\Instance;
-use yii\helpers\ArrayHelper;
 
-/**
- * Class Member
- * @package bizley\podium\api\base
- */
-class Member extends Component implements MemberInterface
+final class Member extends Component implements MemberInterface
 {
     /**
-     * @var string|array|MembershipInterface member handler
-     * Component ID, class, configuration array, or instance of MembershipInterface.
+     * @var string|array|MemberBuilderInterface
      */
-    public $modelHandler = \bizley\podium\api\models\member\Member::class;
+    public $builderConfig = MemberBuilder::class;
 
     /**
-     * @var string|array|ModelFormInterface member form handler
-     * Component ID, class, configuration array, or instance of ModelFormInterface.
+     * @var string|array|AcquaintanceInterface
      */
-    public $formHandler = \bizley\podium\api\models\member\MemberForm::class;
+    public $acquaintanceConfig = MemberAcquaintance::class;
 
     /**
-     * @var string|array|RegistererInterface member registerer handler
-     * Component ID, class, configuration array, or instance of RegistererInterface.
+     * @var string|array|GrouperInterface
      */
-    public $registererHandler = \bizley\podium\api\models\member\MemberRegisterer::class;
+    public $grouperConfig = MemberGrouper::class;
 
     /**
-     * @var string|array|BefrienderInterface member befriender handler
-     * Component ID, class, configuration array, or instance of BefrienderInterface.
+     * @var string|array|RemoverInterface
      */
-    public $befrienderHandler = \bizley\podium\api\models\member\MemberBefriender::class;
+    public $removerConfig = MemberRemover::class;
 
     /**
-     * @var string|array|IgnorerInterface member ignorer handler
-     * Component ID, class, configuration array, or instance of IgnorerInterface.
+     * @var string|array|BanisherInterface
      */
-    public $ignorerHandler = \bizley\podium\api\models\member\MemberIgnorer::class;
+    public $banisherConfig = MemberBanisher::class;
 
     /**
-     * @var string|array|GrouperInterface member grouper handler
-     * Component ID, class, configuration array, or instance of GrouperInterface.
+     * @var string|array|MemberRepositoryInterface
      */
-    public $grouperHandler = \bizley\podium\api\models\member\MemberGrouper::class;
-
-    /**
-     * @var string|array|RemoverInterface member remover handler
-     * Component ID, class, configuration array, or instance of RemoverInterface.
-     */
-    public $removerHandler = \bizley\podium\api\models\member\MemberRemover::class;
-
-    /**
-     * @var string|array|BanisherInterface member banisher handler
-     * Component ID, class, configuration array, or instance of BanisherInterface.
-     */
-    public $banisherHandler = \bizley\podium\api\models\member\MemberBanisher::class;
+    public $repositoryConfig = MemberRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    public function init(): void
+    public function getById(int $id): ?MemberActiveRecord
     {
-        parent::init();
+        /** @var MemberRepository $member */
+        $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
+        if (!$member->fetchOne($id)) {
+            return null;
+        }
 
-        $this->modelHandler = Instance::ensure($this->modelHandler, MembershipInterface::class);
-        $this->formHandler = Instance::ensure($this->formHandler, ModelFormInterface::class);
-        $this->registererHandler = Instance::ensure($this->registererHandler, RegistererInterface::class);
-        $this->befrienderHandler = Instance::ensure($this->befrienderHandler, BefrienderInterface::class);
-        $this->ignorerHandler = Instance::ensure($this->ignorerHandler, IgnorerInterface::class);
-        $this->grouperHandler = Instance::ensure($this->grouperHandler, GrouperInterface::class);
-        $this->removerHandler = Instance::ensure($this->removerHandler, RemoverInterface::class);
-        $this->banisherHandler = Instance::ensure($this->banisherHandler, BanisherInterface::class);
+        return $member->getModel();
     }
 
     /**
-     * @return RegistererInterface
+     * @throws InvalidConfigException
+     * @throws NotSupportedException
      */
-    public function getRegisterer(): RegistererInterface
+    public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        return new $this->registererHandler;
+        /** @var MemberRepository $member */
+        $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
+        $member->fetchAll($filter, $sort, $pagination);
+
+        return $member->getCollection();
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getBuilder(): MemberBuilderInterface
+    {
+        /** @var MemberBuilderInterface $builder */
+        $builder = Instance::ensure($this->builderConfig, MemberBuilderInterface::class);
+
+        return $builder;
     }
 
     /**
      * Registers member.
-     * @param array $data
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
     public function register(array $data): PodiumResponse
     {
-        $registration = $this->getRegisterer();
-
-        if (!$registration->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $registration->register();
-    }
-
-    /**
-     * @param int $id
-     * @return MembershipInterface|null
-     */
-    public function getById(int $id): ?MembershipInterface
-    {
-        $membership = $this->modelHandler;
-
-        return $membership::findById($id);
-    }
-
-    /**
-     * @param int|string $id
-     * @return MembershipInterface|null
-     */
-    public function getByUserId($id): ?MembershipInterface
-    {
-        $membership = $this->modelHandler;
-
-        return $membership::findByUserId($id);
-    }
-
-    /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
-     */
-    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface
-    {
-        $membership = $this->modelHandler;
-
-        return $membership::findByFilter($filter, $sort, $pagination);
-    }
-
-    /**
-     * @param int $id
-     * @return ModelFormInterface|null
-     */
-    public function getForm(int $id): ?ModelFormInterface
-    {
-        $handler = $this->formHandler;
-
-        return $handler::findById($id);
+        return $this->getBuilder()->register($data);
     }
 
     /**
      * Updates member.
-     * @param array $data
-     * @return PodiumResponse
-     * @throws InsufficientDataException
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function edit(array $data): PodiumResponse
+    public function edit($id, array $data): PodiumResponse
     {
-        $id = ArrayHelper::remove($data, 'id');
-
-        if ($id === null) {
-            throw new InsufficientDataException('ID key is missing.');
-        }
-
-        $memberForm = $this->getForm((int)$id);
-
-        if ($memberForm === null) {
-            throw new ModelNotFoundException('Member of given ID can not be found.');
-        }
-
-        if (!$memberForm->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $memberForm->edit();
+        return $this->getBuilder()->edit($id, $data);
     }
 
     /**
-     * @return BefrienderInterface
+     * @throws InvalidConfigException
      */
-    public function getBefriender(): BefrienderInterface
+    public function getAcquaintance(): AcquaintanceInterface
     {
-        return new $this->befrienderHandler;
+        /** @var AcquaintanceInterface $acquaintance */
+        $acquaintance = Instance::ensure($this->acquaintanceConfig, AcquaintanceInterface::class);
+
+        return $acquaintance;
     }
 
     /**
-     * Befriends target by a member,
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * Befriends the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function befriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
+    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse
     {
-        $friendship = $this->getBefriender();
-
-        $friendship->setMember($member);
-        $friendship->setTarget($target);
-
-        return $friendship->befriend();
+        return $this->getAcquaintance()->befriend($id, $member);
     }
 
     /**
-     * Unfriends target by a member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * Unfriends the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function unfriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse
+    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse
     {
-        $friendship = $this->getBefriender();
-
-        $friendship->setMember($member);
-        $friendship->setTarget($target);
-
-        return $friendship->unfriend();
+        return $this->getAcquaintance()->unfriend($id, $member);
     }
 
     /**
-     * @return IgnorerInterface
+     * Ignores the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function getIgnorer(): IgnorerInterface
+    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse
     {
-        return new $this->ignorerHandler;
+        return $this->getAcquaintance()->ignore($id, $member);
     }
 
     /**
-     * Ignores target by a member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * Unignores the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function ignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
+    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse
     {
-        $ignoring = $this->getIgnorer();
-
-        $ignoring->setMember($member);
-        $ignoring->setTarget($target);
-
-        return $ignoring->ignore();
+        return $this->getAcquaintance()->unignore($id, $member);
     }
 
     /**
-     * Unignores target by a member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      */
-    public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse
+    public function getBanisher(): BanisherInterface
     {
-        $ignoring = $this->getIgnorer();
+        /** @var BanisherInterface $banisher */
+        $banisher = Instance::ensure($this->banisherConfig, BanisherInterface::class);
 
-        $ignoring->setMember($member);
-        $ignoring->setTarget($target);
-
-        return $ignoring->unignore();
+        return $banisher;
     }
 
     /**
-     * @param int $id
-     * @return BanisherInterface|null
+     * Bans the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function getBanisher(int $id): ?BanisherInterface
+    public function ban($id): PodiumResponse
     {
-        $handler = $this->banisherHandler;
-
-        return $handler::findById($id);
+        return $this->getBanisher()->ban($id);
     }
 
     /**
-     * Bans member.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     * Unbans the member.
+     *
+     * @throws InvalidConfigException
      */
-    public function ban(int $id): PodiumResponse
+    public function unban($id): PodiumResponse
     {
-        $memberBanner = $this->getBanisher($id);
-
-        if ($memberBanner === null) {
-            throw new ModelNotFoundException('Member of given ID can not be found.');
-        }
-
-        return $memberBanner->ban();
+        return $this->getBanisher()->unban($id);
     }
 
     /**
-     * Unbans member.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
-     */
-    public function unban(int $id): PodiumResponse
-    {
-        $memberBanner = $this->getBanisher($id);
-
-        if ($memberBanner === null) {
-            throw new ModelNotFoundException('Member of given ID can not be found.');
-        }
-
-        return $memberBanner->unban();
-    }
-
-    /**
-     * @return GrouperInterface
+     * @throws InvalidConfigException
      */
     public function getGrouper(): GrouperInterface
     {
-        return new $this->grouperHandler;
+        /** @var GrouperInterface $grouper */
+        $grouper = Instance::ensure($this->grouperConfig, GrouperInterface::class);
+
+        return $grouper;
     }
 
     /**
-     * Adds member to a group.
-     * @param MembershipInterface $member
-     * @param ModelInterface $group
-     * @return PodiumResponse
+     * Adds member to the group.
+     *
+     * @throws InvalidConfigException
      */
-    public function join(MembershipInterface $member, ModelInterface $group): PodiumResponse
+    public function join($id, GroupRepositoryInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouper();
-
-        $grouping->setMember($member);
-        $grouping->setGroup($group);
-
-        return $grouping->join();
+        return $this->getGrouper()->join($id, $group);
     }
 
     /**
      * Removes member from a group.
-     * @param MembershipInterface $member
-     * @param ModelInterface $group
-     * @return PodiumResponse
+     *
+     * @throws InvalidConfigException
      */
-    public function leave(MembershipInterface $member, ModelInterface $group): PodiumResponse
+    public function leave($id, GroupRepositoryInterface $group): PodiumResponse
     {
-        $grouping = $this->getGrouper();
-
-        $grouping->setMember($member);
-        $grouping->setGroup($group);
-
-        return $grouping->leave();
+        return $this->getGrouper()->leave($id, $group);
     }
 
     /**
-     * @param int $id
-     * @return RemoverInterface|null
+     * @throws InvalidConfigException
      */
-    public function getRemover(int $id): ?RemoverInterface
+    public function getRemover(): RemoverInterface
     {
-        $handler = $this->removerHandler;
+        /** @var RemoverInterface $remover */
+        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
 
-        return $handler::findById($id);
+        return $remover;
     }
 
     /**
      * Deletes member.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws ModelNotFoundException
+     *
+     * @throws InvalidConfigException
      */
-    public function remove(int $id): PodiumResponse
+    public function remove($id): PodiumResponse
     {
-        $memberRemover = $this->getRemover($id);
-
-        if ($memberRemover === null) {
-            throw new ModelNotFoundException('Member of given ID can not be found.');
-        }
-
-        return $memberRemover->remove();
+        return $this->getRemover()->remove($id);
     }
 }

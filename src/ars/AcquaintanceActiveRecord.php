@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
 /**
  * Acquaintance Active Record.
  *
- * @property int $member_id
- * @property int $target_id
- * @property string $type_id
- * @property int $created_at
- *
+ * @property int                $member_id
+ * @property int                $target_id
+ * @property string             $type_id
+ * @property int                $created_at
+ * @property int                $updated_at
  * @property MemberActiveRecord $member
  * @property MemberActiveRecord $target
  */
@@ -23,6 +24,13 @@ class AcquaintanceActiveRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%podium_acquaintance}}';
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'timestamp' => TimestampBehavior::class,
+        ];
     }
 
     public function getMember(): ActiveQuery

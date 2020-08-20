@@ -5,133 +5,43 @@ declare(strict_types=1);
 namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
-use yii\data\DataFilter;
-use yii\data\DataProviderInterface;
-use yii\data\Pagination;
-use yii\data\Sort;
 
-/**
- * Interface MemberInterface
- * @package bizley\podium\api\interfaces
- */
 interface MemberInterface
 {
     /**
-     * @param int $id
-     * @return MembershipInterface|null
-     */
-    public function getById(int $id): ?MembershipInterface;
-
-    /**
-     * @param int|string $id
-     * @return MembershipInterface|null
-     */
-    public function getByUserId($id): ?MembershipInterface;
-
-    /**
-     * @param null|DataFilter $filter
-     * @param null|bool|array|Sort $sort
-     * @param null|bool|array|Pagination $pagination
-     * @return DataProviderInterface
-     */
-    public function getAll(DataFilter $filter = null, $sort = null, $pagination = null): DataProviderInterface;
-
-    /**
-     * @param int $id
-     * @return ModelFormInterface|null
-     */
-    public function getForm(int $id): ?ModelFormInterface;
-
-    /**
-     * Returns registration handler.
-     * @return RegistererInterface
-     */
-    public function getRegisterer(): RegistererInterface;
-
-    /**
      * Registers account.
-     * @param array $data
-     * @return PodiumResponse
      */
     public function register(array $data): PodiumResponse;
 
-    /**
-     * @param int $id
-     * @return RemoverInterface|null
-     */
-    public function getRemover(int $id): ?RemoverInterface;
+    public function remove($id): PodiumResponse;
+
+    public function edit($id, array $data): PodiumResponse;
 
     /**
-     * @param int $id
-     * @return PodiumResponse
+     * Befriends the member.
      */
-    public function remove(int $id): PodiumResponse;
+    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
-     * @param array $data
-     * @return PodiumResponse
+     * Unfriends the member.
      */
-    public function edit(array $data): PodiumResponse;
+    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
-     * Returns friendship handler.
-     * @return BefrienderInterface
+     * Ignores the member.
      */
-    public function getBefriender(): BefrienderInterface;
+    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
-     * Makes target friend of member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * Unignores the member.
      */
-    public function befriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse;
+    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse;
 
-    /**
-     * Makes target member friend no more.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
-     */
-    public function unfriend(MembershipInterface $member, MembershipInterface $target): PodiumResponse;
+    public function ban($id): PodiumResponse;
 
-    /**
-     * Returns ignoring handler.
-     * @return IgnorerInterface
-     */
-    public function getIgnorer(): IgnorerInterface;
+    public function unban($id): PodiumResponse;
 
-    /**
-     * Sets target as ignored by member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
-     */
-    public function ignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse;
+    public function join($id, GroupRepositoryInterface $group): PodiumResponse;
 
-    /**
-     * Sets target as unignored by member.
-     * @param MembershipInterface $member
-     * @param MembershipInterface $target
-     * @return PodiumResponse
-     */
-    public function unignore(MembershipInterface $member, MembershipInterface $target): PodiumResponse;
-
-    /**
-     * @param int $id
-     * @return BanisherInterface|null
-     */
-    public function getBanisher(int $id): ?BanisherInterface;
-
-    /**
-     * @param int $id
-     * @return PodiumResponse
-     */
-    public function ban(int $id): PodiumResponse;
-
-    /**
-     * @param int $id
-     * @return PodiumResponse
-     */
-    public function unban(int $id): PodiumResponse;
+    public function leave($id, GroupRepositoryInterface $group): PodiumResponse;
 }

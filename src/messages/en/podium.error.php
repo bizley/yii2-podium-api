@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'acquaintance.not.exists' => 'Acquaintance does not exist.',
     'category.already.archived' => 'Category is already archived.',
     'category.not.archived' => 'Category is not archived.',
     'category.not.exists' => 'Category does not exist.',
@@ -14,6 +15,8 @@ return [
     'group.not.joined' => 'Group is not joined.',
     'member.already.active' => 'Member is already active.',
     'member.already.banned' => 'Member is already banned.',
+    'member.befriends.target' => 'Member is befriending the target.',
+    'member.ignores.target' => 'Member is ignoring the target.',
     'message.already.archived' => 'Message is already archived.',
     'message.must.be.archived' => 'Message must be archived first.',
     'message.not.archived' => 'Message is not archived.',
