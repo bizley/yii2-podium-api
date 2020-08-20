@@ -63,11 +63,32 @@ final class ForumRepository implements ForumRepositoryInterface
             return false;
         }
 
+        if (null === $forum->sort) {
+            /** @var ForumActiveRecord $forumClass */
+            $forumClass = $this->activeRecordClass;
+            /** @var ForumActiveRecord $lastForum */
+            $lastForum = $forumClass::find()
+                ->orderBy(
+                    [
+                        'sort' => SORT_DESC,
+                        'name' => SORT_DESC,
+                    ]
+                )
+                ->limit(1)
+                ->one();
+            if ($lastForum) {
+                $forum->sort = $lastForum->sort + 1;
+            } else {
+                $forum->sort = 0;
+            }
+        }
+
         $forum->author_id = $authorId;
         $forum->category_id = $categoryId;
 
         if (!$forum->validate()) {
             $this->errors = $forum->errors;
+
             return false;
         }
 
@@ -157,6 +178,7 @@ final class ForumRepository implements ForumRepositoryInterface
         $forum->category_id = $categoryId;
         if (!$forum->validate()) {
             $this->errors = $forum->errors;
+
             return false;
         }
 

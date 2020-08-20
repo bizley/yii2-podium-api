@@ -65,7 +65,15 @@ final class CategoryRepository implements CategoryRepositoryInterface
             /** @var CategoryActiveRecord $categoryClass */
             $categoryClass = $this->activeRecordClass;
             /** @var CategoryActiveRecord $lastCategory */
-            $lastCategory = $categoryClass::find()->orderBy(['sort' => SORT_DESC])->limit(1)->one();
+            $lastCategory = $categoryClass::find()
+                ->orderBy(
+                    [
+                        'sort' => SORT_DESC,
+                        'name' => SORT_DESC,
+                    ]
+                )
+                ->limit(1)
+                ->one();
             if ($lastCategory) {
                 $category->sort = $lastCategory->sort + 1;
             } else {
