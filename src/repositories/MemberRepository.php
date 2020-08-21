@@ -6,6 +6,7 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\MemberActiveRecord;
 use bizley\podium\api\ars\ThreadActiveRecord;
+use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
@@ -69,5 +70,46 @@ final class MemberRepository implements MemberRepositoryInterface
         }
 
         return $thread->save(false);
+    }
+
+    public function ban(): bool
+    {
+        $member = $this->getModel();
+        $member->status_id = MemberStatus::BANNED;
+        if (!$member->validate()) {
+            $this->errors = $member->errors;
+
+            return false;
+        }
+
+        return $member->save(false);
+    }
+
+    public function unban(): bool
+    {
+        $member = $this->getModel();
+        $member->status_id = MemberStatus::ACTIVE;
+        if (!$member->validate()) {
+            $this->errors = $member->errors;
+
+            return false;
+        }
+
+        return $member->save(false);
+    }
+
+    public function join($groupId): bool
+    {
+        // TODO: Implement join() method.
+    }
+
+    public function leave($groupId): bool
+    {
+        // TODO: Implement leave() method.
+    }
+
+    public function isMemberOfGroup($groupId): bool
+    {
+        // TODO: Implement isMemberOfGroup() method.
     }
 }

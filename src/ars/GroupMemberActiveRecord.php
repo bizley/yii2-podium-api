@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -21,6 +22,16 @@ class GroupMemberActiveRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%podium_group_member}}';
+    }
+
+    public function behaviors(): array
+    {
+        return [
+            'timestamp' => [
+                'class' => TimestampBehavior::class,
+                'updatedAtAttribute' => false,
+            ],
+        ];
     }
 
     public function getGroup(): ActiveQuery

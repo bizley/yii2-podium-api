@@ -17,6 +17,7 @@ return [
     'member.already.banned' => 'Member is already banned.',
     'member.befriends.target' => 'Member is befriending the target.',
     'member.ignores.target' => 'Member is ignoring the target.',
+    'member.not.exists' => 'Member does not exist.',
     'message.already.archived' => 'Message is already archived.',
     'message.must.be.archived' => 'Message must be archived first.',
     'message.not.archived' => 'Message is not archived.',
