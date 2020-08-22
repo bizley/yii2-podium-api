@@ -23,18 +23,19 @@ to implement custom storage (at least I'm trying to make it easy).
 
 There are some rules:
  - only repositories know about the storage,
- - each repository knows how to handle one single storage unit and not more.
+ - each repository knows how to handle one single storage unit and not more,
+ - components operate on repositories, not on identificators.
 
 So far the components ready are:
-- [x] Thread
-- [x] Rank
-- [x] Post
-- [x] Poll
+- [ ] Thread
+- [ ] Rank
+- [ ] Post
+- [ ] Poll
 - [ ] Message
 - [ ] Member
-- [x] Group
-- [x] Forum
-- [x] Category
+- [ ] Group
+- [ ] Forum
+- [ ] Category
 - [ ] Account
 
 When API is ready, I'll start preparing the client.

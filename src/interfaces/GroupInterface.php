@@ -19,4 +19,8 @@ interface GroupInterface
     public function edit($id, array $data): PodiumResponse;
 
     public function remove($id): PodiumResponse;
+
+    public function join($id, MemberRepositoryInterface $member): PodiumResponse;
+
+    public function leave($id, MemberRepositoryInterface $member): PodiumResponse;
 }

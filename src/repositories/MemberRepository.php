@@ -97,19 +97,4 @@ final class MemberRepository implements MemberRepositoryInterface
 
         return $member->save(false);
     }
-
-    public function join($groupId): bool
-    {
-        // TODO: Implement join() method.
-    }
-
-    public function leave($groupId): bool
-    {
-        // TODO: Implement leave() method.
-    }
-
-    public function isMemberOfGroup($groupId): bool
-    {
-        // TODO: Implement isMemberOfGroup() method.
-    }
 }

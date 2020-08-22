@@ -7,8 +7,6 @@ namespace bizley\podium\api\components;
 use bizley\podium\api\ars\MemberActiveRecord;
 use bizley\podium\api\interfaces\AcquaintanceInterface;
 use bizley\podium\api\interfaces\BanisherInterface;
-use bizley\podium\api\interfaces\GrouperInterface;
-use bizley\podium\api\interfaces\GroupRepositoryInterface;
 use bizley\podium\api\interfaces\MemberBuilderInterface;
 use bizley\podium\api\interfaces\MemberInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
@@ -17,7 +15,6 @@ use bizley\podium\api\repositories\MemberRepository;
 use bizley\podium\api\services\member\MemberAcquaintance;
 use bizley\podium\api\services\member\MemberBanisher;
 use bizley\podium\api\services\member\MemberBuilder;
-use bizley\podium\api\services\member\MemberGrouper;
 use bizley\podium\api\services\member\MemberRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -37,11 +34,6 @@ final class Member extends Component implements MemberInterface
      * @var string|array|AcquaintanceInterface
      */
     public $acquaintanceConfig = MemberAcquaintance::class;
-
-    /**
-     * @var string|array|GrouperInterface
-     */
-    public $grouperConfig = MemberGrouper::class;
 
     /**
      * @var string|array|RemoverInterface
@@ -196,37 +188,6 @@ final class Member extends Component implements MemberInterface
     public function unban($id): PodiumResponse
     {
         return $this->getBanisher()->unban($id);
-    }
-
-    /**
-     * @throws InvalidConfigException
-     */
-    public function getGrouper(): GrouperInterface
-    {
-        /** @var GrouperInterface $grouper */
-        $grouper = Instance::ensure($this->grouperConfig, GrouperInterface::class);
-
-        return $grouper;
-    }
-
-    /**
-     * Adds member to the group.
-     *
-     * @throws InvalidConfigException
-     */
-    public function join($id, GroupRepositoryInterface $group): PodiumResponse
-    {
-        return $this->getGrouper()->join($id, $group);
-    }
-
-    /**
-     * Removes member from a group.
-     *
-     * @throws InvalidConfigException
-     */
-    public function leave($id, GroupRepositoryInterface $group): PodiumResponse
-    {
-        return $this->getGrouper()->leave($id, $group);
     }
 
     /**

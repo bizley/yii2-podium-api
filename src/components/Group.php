@@ -8,9 +8,12 @@ use bizley\podium\api\ars\GroupActiveRecord;
 use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\GroupInterface;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\KeeperInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\repositories\GroupRepository;
 use bizley\podium\api\services\group\GroupBuilder;
+use bizley\podium\api\services\group\GroupKeeper;
 use bizley\podium\api\services\group\GroupRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -30,6 +33,11 @@ final class Group extends Component implements GroupInterface
      * @var string|array|RemoverInterface
      */
     public $removerConfig = GroupRemover::class;
+
+    /**
+     * @var string|array|KeeperInterface
+     */
+    public $keeperConfig = GroupKeeper::class;
 
     /**
      * @var string|array|GroupRepositoryInterface
@@ -113,5 +121,36 @@ final class Group extends Component implements GroupInterface
     public function remove($id): PodiumResponse
     {
         return $this->getRemover()->remove($id);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getKeeper(): KeeperInterface
+    {
+        /** @var KeeperInterface $keeper */
+        $keeper = Instance::ensure($this->keeperConfig, KeeperInterface::class);
+
+        return $keeper;
+    }
+
+    /**
+     * Adds member to the group.
+     *
+     * @throws InvalidConfigException
+     */
+    public function join($id, MemberRepositoryInterface $member): PodiumResponse
+    {
+        return $this->getKeeper()->join($id, $member);
+    }
+
+    /**
+     * Removes member from a group.
+     *
+     * @throws InvalidConfigException
+     */
+    public function leave($id, MemberRepositoryInterface $member): PodiumResponse
+    {
+        return $this->getKeeper()->leave($id, $member);
     }
 }

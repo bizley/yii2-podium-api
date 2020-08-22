@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\GroupActiveRecord;
-use bizley\podium\api\ars\PollActiveRecord;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
@@ -33,7 +32,7 @@ final class GroupRepository implements GroupRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?PollActiveRecord $activeRecord): void
+    public function setModel(?GroupActiveRecord $activeRecord): void
     {
         $this->model = $activeRecord;
     }
@@ -66,5 +65,15 @@ final class GroupRepository implements GroupRepositoryInterface
         }
 
         return $group->save(false);
+    }
+
+    public function hasMember($memberId): bool
+    {
+        return $this->getModel()->getGroupMembers()->exists();
+    }
+
+    public function join($memberId): bool
+    {
+        return $this->getModel()->getGroupMembers()->exists();
     }
 }

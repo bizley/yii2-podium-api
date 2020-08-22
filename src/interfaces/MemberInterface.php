@@ -40,8 +40,4 @@ interface MemberInterface
     public function ban($id): PodiumResponse;
 
     public function unban($id): PodiumResponse;
-
-    public function join($id, GroupRepositoryInterface $group): PodiumResponse;
-
-    public function leave($id, GroupRepositoryInterface $group): PodiumResponse;
 }

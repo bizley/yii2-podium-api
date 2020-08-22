@@ -2,46 +2,46 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\api\services\member;
+namespace bizley\podium\api\services\group;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\GroupEvent;
-use bizley\podium\api\interfaces\GrouperInterface;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\KeeperInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
-use bizley\podium\api\repositories\MemberRepository;
+use bizley\podium\api\repositories\GroupRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 
-final class MemberGrouper extends Component implements GrouperInterface
+final class GroupKeeper extends Component implements KeeperInterface
 {
     public const EVENT_BEFORE_JOINING = 'podium.group.joining.before';
     public const EVENT_AFTER_JOINING = 'podium.group.joining.after';
     public const EVENT_BEFORE_LEAVING = 'podium.group.leaving.before';
     public const EVENT_AFTER_LEAVING = 'podium.group.leaving.after';
 
-    private ?MemberRepositoryInterface $member = null;
+    private ?GroupRepositoryInterface $group = null;
 
     /**
-     * @var string|array|MemberRepositoryInterface
+     * @var string|array|GroupRepositoryInterface
      */
-    public $repositoryConfig = MemberRepository::class;
+    public $repositoryConfig = GroupRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    private function getMember(): MemberRepositoryInterface
+    private function getGroup(): GroupRepositoryInterface
     {
-        if (null === $this->member) {
-            /** @var MemberRepositoryInterface $member */
-            $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
-            $this->member = $member;
+        if (null === $this->group) {
+            /** @var GroupRepositoryInterface $group */
+            $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
+            $this->group = $group;
         }
 
-        return $this->member;
+        return $this->group;
     }
 
     public function beforeJoin(): bool
@@ -52,23 +52,25 @@ final class MemberGrouper extends Component implements GrouperInterface
         return $event->canJoin;
     }
 
-    public function join($id, GroupRepositoryInterface $group): PodiumResponse
+    public function join($id, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeJoin()) {
             return PodiumResponse::error();
         }
 
         try {
-            $member = $this->getMember();
-            if (!$member->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
+            $group = $this->getGroup();
+            if (!$group->fetchOne($id)) {
+                return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.exists')]);
             }
-            $groupId = $group->getId();
-            if ($member->isMemberOfGroup($groupId)) {
+
+            $memberId = $member->getId();
+            if ($group->hasMember($memberId)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.already.joined')]);
             }
-            if (!$member->join($groupId)) {
-                return PodiumResponse::error($member->getErrors());
+
+            if (!$group->join($memberId)) {
+                return PodiumResponse::error($group->getErrors());
             }
 
             $this->afterJoin();
@@ -101,7 +103,7 @@ final class MemberGrouper extends Component implements GrouperInterface
         }
 
         try {
-            $member = $this->getMember();
+            $member = $this->getGroup();
             if (!$member->fetchOne($id)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
             }

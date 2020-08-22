@@ -11,6 +11,7 @@ return [
     'forum.not.archived' => 'Forum is not archived.',
     'forum.not.exists' => 'Forum does not exist.',
     'group.already.joined' => 'Group is already joined.',
+    'group.member.not.exists' => 'Group Member does not exist.',
     'group.not.exists' => 'Group does not exist.',
     'group.not.joined' => 'Group is not joined.',
     'member.already.active' => 'Member is already active.',
