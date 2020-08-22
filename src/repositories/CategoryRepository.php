@@ -53,7 +53,7 @@ final class CategoryRepository implements CategoryRepositoryInterface
         throw new NotSupportedException('Category has no parent!');
     }
 
-    public function create(array $data, $authorId): bool
+    public function create($authorId, array $data = []): bool
     {
         /** @var CategoryActiveRecord $category */
         $category = new $this->activeRecordClass();
