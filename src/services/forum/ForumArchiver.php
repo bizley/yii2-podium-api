@@ -8,12 +8,10 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
-use bizley\podium\api\repositories\ForumRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class ForumArchiver extends Component implements ArchiverInterface
 {
@@ -21,27 +19,6 @@ final class ForumArchiver extends Component implements ArchiverInterface
     public const EVENT_AFTER_ARCHIVING = 'podium.forum.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.forum.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.forum.reviving.after';
-
-    private ?ForumRepositoryInterface $forum = null;
-
-    /**
-     * @var string|array|ForumRepositoryInterface
-     */
-    public $repositoryConfig = ForumRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getForum(): ForumRepositoryInterface
-    {
-        if (null === $this->forum) {
-            /** @var ForumRepositoryInterface $forum */
-            $forum = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
-            $this->forum = $forum;
-        }
-
-        return $this->forum;
-    }
 
     public function beforeArchive(): bool
     {
@@ -54,23 +31,18 @@ final class ForumArchiver extends Component implements ArchiverInterface
     /**
      * Archives the forum.
      */
-    public function archive($id): PodiumResponse
+    public function archive(RepositoryInterface $forum): PodiumResponse
     {
-        if (!$this->beforeArchive()) {
+        if (!$forum instanceof ForumRepositoryInterface || !$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $forum = $this->getForum();
-            if (!$forum->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'forum.not.exists')]);
-            }
-
             if (!$forum->archive()) {
                 return PodiumResponse::error($forum->getErrors());
             }
 
-            $this->afterArchive();
+            $this->afterArchive($forum);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -80,9 +52,9 @@ final class ForumArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterArchive(): void
+    public function afterArchive(ForumRepositoryInterface $forum): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $forum]));
     }
 
     public function beforeRevive(): bool
@@ -96,23 +68,18 @@ final class ForumArchiver extends Component implements ArchiverInterface
     /**
      * Revives the forum.
      */
-    public function revive($id): PodiumResponse
+    public function revive(RepositoryInterface $forum): PodiumResponse
     {
-        if (!$this->beforeRevive()) {
+        if (!$forum instanceof ForumRepositoryInterface || !$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $forum = $this->getForum();
-            if (!$forum->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'forum.not.exists')]);
-            }
-
             if (!$forum->revive()) {
                 return PodiumResponse::error($forum->getErrors());
             }
 
-            $this->afterRevive();
+            $this->afterRevive($forum);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -122,8 +89,8 @@ final class ForumArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterRevive(): void
+    public function afterRevive(ForumRepositoryInterface $forum): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $forum]));
     }
 }

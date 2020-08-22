@@ -103,11 +103,11 @@ final class Forum extends Component implements ForumInterface
      * @throws InvalidConfigException
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        CategoryRepositoryInterface $category
+        CategoryRepositoryInterface $category,
+        array $data = []
     ): PodiumResponse {
-        return $this->getBuilder()->create($data, $author, $category);
+        return $this->getBuilder()->create($author, $category, $data);
     }
 
     /**
@@ -115,9 +115,9 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(ForumRepositoryInterface $forum, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($forum, $data);
     }
 
     /**
@@ -136,9 +136,9 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(ForumRepositoryInterface $forum): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($forum);
     }
 
     /**
@@ -157,9 +157,21 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function replace($id, ForumRepositoryInterface $forum): PodiumResponse
+    public function replace(
+        ForumRepositoryInterface $firstForum,
+        ForumRepositoryInterface $secondForum
+    ): PodiumResponse {
+        return $this->getSorter()->replace($firstForum, $secondForum);
+    }
+
+    /**
+     * Sorts the forums.
+     *
+     * @throws InvalidConfigException
+     */
+    public function sort(): PodiumResponse
     {
-        return $this->getSorter()->replace($id, $forum);
+        return $this->getSorter()->sort();
     }
 
     /**
@@ -178,9 +190,9 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function move($id, CategoryRepositoryInterface $category): PodiumResponse
+    public function move(ForumRepositoryInterface $forum, CategoryRepositoryInterface $category): PodiumResponse
     {
-        return $this->getMover()->move($id, $category);
+        return $this->getMover()->move($forum, $category);
     }
 
     /**
@@ -199,9 +211,9 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive($id): PodiumResponse
+    public function archive(ForumRepositoryInterface $forum): PodiumResponse
     {
-        return $this->getArchiver()->archive($id);
+        return $this->getArchiver()->archive($forum);
     }
 
     /**
@@ -209,8 +221,8 @@ final class Forum extends Component implements ForumInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive($id): PodiumResponse
+    public function revive(ForumRepositoryInterface $forum): PodiumResponse
     {
-        return $this->getArchiver()->revive($id);
+        return $this->getArchiver()->revive($forum);
     }
 }

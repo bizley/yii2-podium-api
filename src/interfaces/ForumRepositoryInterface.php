@@ -6,7 +6,7 @@ namespace bizley\podium\api\interfaces;
 
 interface ForumRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data, $authorId, $categoryId): bool;
+    public function create($authorId, $categoryId, array $data = []): bool;
     public function move($categoryId): bool;
     public function isArchived(): bool;
     public function archive(): bool;

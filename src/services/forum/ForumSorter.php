@@ -57,25 +57,24 @@ final class ForumSorter extends Component implements SorterInterface
     /**
      * Replaces the spot of the forums.
      */
-    public function replace($id, RepositoryInterface $targetForum): PodiumResponse
+    public function replace(RepositoryInterface $firstForum, RepositoryInterface $secondForum): PodiumResponse
     {
-        if (!$targetForum instanceof ForumRepositoryInterface || !$this->beforeReplace()) {
+        if (
+            !$firstForum instanceof ForumRepositoryInterface
+            || !$secondForum instanceof ForumRepositoryInterface
+            || !$this->beforeReplace()
+        ) {
             return PodiumResponse::error();
         }
 
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $forum = $this->getForum();
-            if (!$forum->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'forum.not.exists')]);
-            }
-
-            $oldOrder = $forum->getOrder();
-            if (!$forum->setOrder($targetForum->getOrder())) {
+            $oldOrder = $firstForum->getOrder();
+            if (!$firstForum->setOrder($secondForum->getOrder())) {
                 throw new Exception('Error while setting new forum order!');
             }
-            if (!$targetForum->setOrder($oldOrder)) {
+            if (!$secondForum->setOrder($oldOrder)) {
                 throw new Exception('Error while setting new forum order!');
             }
 
@@ -85,7 +84,10 @@ final class ForumSorter extends Component implements SorterInterface
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             $transaction->rollBack();
-            Yii::error(['Exception while replacing forums order', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+            Yii::error(
+                ['Exception while replacing forums order', $exc->getMessage(), $exc->getTraceAsString()],
+                'podium'
+            );
 
             return PodiumResponse::error();
         }
@@ -116,9 +118,7 @@ final class ForumSorter extends Component implements SorterInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $forum = $this->getForum();
-
-            if (!$forum->sort()) {
+            if (!$this->getForum()->sort()) {
                 return PodiumResponse::error();
             }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\forum;
 
 use bizley\podium\api\components\PodiumResponse;
-use bizley\podium\api\events\BuilderEvent;
+use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
@@ -48,7 +48,7 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
 
     public function beforeCreate(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -58,9 +58,9 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
      * Creates new forum.
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        RepositoryInterface $category
+        RepositoryInterface $category,
+        array $data = []
     ): PodiumResponse {
         if (!$category instanceof CategoryRepositoryInterface || !$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -69,11 +69,11 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         try {
             $forum = $this->getForum();
 
-            if (!$forum->create($data, $author->getId(), $category->getId())) {
+            if (!$forum->create($author->getId(), $category->getId(), $data)) {
                 return PodiumResponse::error($forum->getErrors());
             }
 
-            $this->afterCreate();
+            $this->afterCreate($forum);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -83,14 +83,14 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(ForumRepositoryInterface $forum): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $forum]));
     }
 
     public function beforeEdit(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -99,23 +99,18 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
     /**
      * Edits the forum.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RepositoryInterface $forum, array $data = []): PodiumResponse
     {
-        if (!$this->beforeEdit()) {
+        if (!$forum instanceof ForumRepositoryInterface || !$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $forum = $this->getForum();
-            if (!$forum->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'forum.not.exists')]);
-            }
-
             if (!$forum->edit($data)) {
                 return PodiumResponse::error($forum->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($forum);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -125,8 +120,8 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(ForumRepositoryInterface $forum): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $forum]));
     }
 }

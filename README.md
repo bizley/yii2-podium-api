@@ -28,6 +28,7 @@ There are some rules:
 
 So far the components ready are:
 - [x] Category
+- [x] Forum
 - [ ] Thread
 - [ ] Rank
 - [ ] Post
@@ -35,7 +36,6 @@ So far the components ready are:
 - [ ] Message
 - [ ] Member
 - [ ] Group
-- [ ] Forum
 - [ ] Account
 
 When API is ready, I'll start preparing the client.

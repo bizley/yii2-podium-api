@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\poll;
 
 use bizley\podium\api\components\PodiumResponse;
-use bizley\podium\api\events\BuilderEvent;
+use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollBuilderInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
@@ -48,7 +48,7 @@ final class PollBuilder extends Component implements PollBuilderInterface
 
     public function beforeCreate(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -89,12 +89,12 @@ final class PollBuilder extends Component implements PollBuilderInterface
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
     }
 
     public function beforeEdit(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -135,6 +135,6 @@ final class PollBuilder extends Component implements PollBuilderInterface
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\category;
 
 use bizley\podium\api\components\PodiumResponse;
-use bizley\podium\api\events\BuilderEvent;
+use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
@@ -46,7 +46,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
 
     public function beforeCreate(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -80,12 +80,12 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
 
     public function afterCreate(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuilderEvent(['repository' => $category]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $category]));
     }
 
     public function beforeEdit(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -117,6 +117,6 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
 
     public function afterEdit(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuilderEvent(['repository' => $category]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $category]));
     }
 }

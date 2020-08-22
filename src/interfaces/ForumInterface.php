@@ -12,29 +12,34 @@ interface ForumInterface
      * Creates forum.
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        CategoryRepositoryInterface $category
+        CategoryRepositoryInterface $category,
+        array $data = []
     ): PodiumResponse;
 
     /**
      * Updates forum.
      */
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(ForumRepositoryInterface $forum, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(ForumRepositoryInterface $forum): PodiumResponse;
 
     /**
      * Replaces the order of the forums.
      */
-    public function replace($id, ForumRepositoryInterface $forum): PodiumResponse;
+    public function replace(
+        ForumRepositoryInterface $firstForum,
+        ForumRepositoryInterface $secondForum
+    ): PodiumResponse;
+
+    public function sort(): PodiumResponse;
 
     /**
      * Moves forum to different category.
      */
-    public function move($id, CategoryRepositoryInterface $category): PodiumResponse;
+    public function move(ForumRepositoryInterface $forum, CategoryRepositoryInterface $category): PodiumResponse;
 
-    public function archive($id): PodiumResponse;
+    public function archive(ForumRepositoryInterface $forum): PodiumResponse;
 
-    public function revive($id): PodiumResponse;
+    public function revive(ForumRepositoryInterface $forum): PodiumResponse;
 }

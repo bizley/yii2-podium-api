@@ -55,7 +55,7 @@ final class ForumRepository implements ForumRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function create(array $data, $authorId, $categoryId): bool
+    public function create($authorId, $categoryId, array $data = []): bool
     {
         /** @var ForumActiveRecord $forum */
         $forum = new $this->activeRecordClass();

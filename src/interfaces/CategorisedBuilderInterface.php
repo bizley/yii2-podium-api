@@ -8,7 +8,11 @@ use bizley\podium\api\components\PodiumResponse;
 
 interface CategorisedBuilderInterface
 {
-    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $parent): PodiumResponse;
+    public function create(
+        MemberRepositoryInterface $author,
+        RepositoryInterface $parent,
+        array $data = []
+    ): PodiumResponse;
 
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(RepositoryInterface $repository, array $data = []): PodiumResponse;
 }

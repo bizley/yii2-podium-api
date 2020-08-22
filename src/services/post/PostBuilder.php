@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\post;
 
 use bizley\podium\api\components\PodiumResponse;
-use bizley\podium\api\events\BuilderEvent;
+use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
@@ -51,7 +51,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
 
     public function beforeCreate(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -106,12 +106,12 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
 
     public function afterCreate(): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
     }
 
     public function beforeEdit(): bool
     {
-        $event = new BuilderEvent();
+        $event = new BuildEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -148,6 +148,6 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
 
     public function afterEdit(): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuilderEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
     }
 }

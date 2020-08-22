@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\MoverInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
 class MoveEvent extends Event
@@ -14,5 +14,5 @@ class MoveEvent extends Event
      */
     public bool $canMove = true;
 
-    public ?MoverInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

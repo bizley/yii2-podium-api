@@ -9,7 +9,7 @@ use bizley\podium\api\components\PodiumResponse;
 interface MoverInterface
 {
     /**
-     * Moves model.
+     * Moves repository.
      */
-    public function move($id, RepositoryInterface $repository): PodiumResponse;
+    public function move(RepositoryInterface $repository, RepositoryInterface $parentRepository): PodiumResponse;
 }
