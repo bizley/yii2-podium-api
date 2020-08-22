@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\services\category;
 
 use bizley\podium\api\components\PodiumResponse;
-use bizley\podium\api\events\ModelEvent;
+use bizley\podium\api\events\BuilderEvent;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
@@ -46,7 +46,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
 
     public function beforeCreate(): bool
     {
-        $event = new ModelEvent();
+        $event = new BuilderEvent();
         $this->trigger(self::EVENT_BEFORE_CREATING, $event);
 
         return $event->canCreate;
@@ -55,7 +55,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
     /**
      * Creates new category.
      */
-    public function create(array $data, MemberRepositoryInterface $author): PodiumResponse
+    public function create(MemberRepositoryInterface $author, array $data = []): PodiumResponse
     {
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -64,11 +64,11 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         try {
             $category = $this->getCategory();
 
-            if (!$category->create($data, $author->getId())) {
+            if (!$category->create($author->getId(), $data)) {
                 return PodiumResponse::error($category->getErrors());
             }
 
-            $this->afterCreate();
+            $this->afterCreate($category);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -78,14 +78,14 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new ModelEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuilderEvent(['repository' => $category]));
     }
 
     public function beforeEdit(): bool
     {
-        $event = new ModelEvent();
+        $event = new BuilderEvent();
         $this->trigger(self::EVENT_BEFORE_EDITING, $event);
 
         return $event->canEdit;
@@ -94,23 +94,18 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
     /**
      * Edits the category.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(CategoryRepositoryInterface $category, array $data = []): PodiumResponse
     {
         if (!$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $category = $this->getCategory();
-            if (!$category->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'category.not.exists')]);
-            }
-
             if (!$category->edit($data)) {
                 return PodiumResponse::error($category->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($category);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -120,8 +115,8 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new ModelEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuilderEvent(['repository' => $category]));
     }
 }

@@ -8,7 +8,7 @@ use bizley\podium\api\components\PodiumResponse;
 
 interface CategoryBuilderInterface
 {
-    public function create(array $data, MemberRepositoryInterface $author): PodiumResponse;
+    public function create(MemberRepositoryInterface $author, array $data = []): PodiumResponse;
 
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(CategoryRepositoryInterface $category, array $data = []): PodiumResponse;
 }

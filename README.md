@@ -27,6 +27,7 @@ There are some rules:
  - components operate on repositories, not on identificators.
 
 So far the components ready are:
+- [x] Category
 - [ ] Thread
 - [ ] Rank
 - [ ] Post
@@ -35,7 +36,6 @@ So far the components ready are:
 - [ ] Member
 - [ ] Group
 - [ ] Forum
-- [ ] Category
 - [ ] Account
 
 When API is ready, I'll start preparing the client.

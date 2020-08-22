@@ -8,12 +8,10 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
-use bizley\podium\api\repositories\CategoryRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class CategoryArchiver extends Component implements ArchiverInterface
 {
@@ -21,27 +19,6 @@ final class CategoryArchiver extends Component implements ArchiverInterface
     public const EVENT_AFTER_ARCHIVING = 'podium.category.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.category.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.category.reviving.after';
-
-    private ?CategoryRepositoryInterface $category = null;
-
-    /**
-     * @var string|array|CategoryRepositoryInterface
-     */
-    public $repositoryConfig = CategoryRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getCategory(): CategoryRepositoryInterface
-    {
-        if (null === $this->category) {
-            /** @var CategoryRepositoryInterface $category */
-            $category = Instance::ensure($this->repositoryConfig, CategoryRepositoryInterface::class);
-            $this->category = $category;
-        }
-
-        return $this->category;
-    }
 
     public function beforeArchive(): bool
     {
@@ -54,23 +31,18 @@ final class CategoryArchiver extends Component implements ArchiverInterface
     /**
      * Archives the category.
      */
-    public function archive($id): PodiumResponse
+    public function archive(RepositoryInterface $category): PodiumResponse
     {
-        if (!$this->beforeArchive()) {
+        if (!$category instanceof CategoryRepositoryInterface || !$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $category = $this->getCategory();
-            if (!$category->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'category.not.exists')]);
-            }
-
             if (!$category->archive()) {
                 return PodiumResponse::error($category->getErrors());
             }
 
-            $this->afterArchive();
+            $this->afterArchive($category);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -80,9 +52,9 @@ final class CategoryArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterArchive(): void
+    public function afterArchive(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $category]));
     }
 
     public function beforeRevive(): bool
@@ -96,23 +68,18 @@ final class CategoryArchiver extends Component implements ArchiverInterface
     /**
      * Revives the category.
      */
-    public function revive($id): PodiumResponse
+    public function revive(RepositoryInterface $category): PodiumResponse
     {
-        if (!$this->beforeRevive()) {
+        if (!$category instanceof CategoryRepositoryInterface || !$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $category = $this->getCategory();
-            if (!$category->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'category.not.exists')]);
-            }
-
             if (!$category->revive()) {
                 return PodiumResponse::error($category->getErrors());
             }
 
-            $this->afterRevive();
+            $this->afterRevive($category);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -122,8 +89,8 @@ final class CategoryArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterRevive(): void
+    public function afterRevive(CategoryRepositoryInterface $category): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $category]));
     }
 }

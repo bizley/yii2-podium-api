@@ -9,7 +9,7 @@ use bizley\podium\api\components\PodiumResponse;
 interface RemoverInterface
 {
     /**
-     * Removes model.
+     * Removes repository storage entry.
      */
-    public function remove($id): PodiumResponse;
+    public function remove(RepositoryInterface $repository): PodiumResponse;
 }

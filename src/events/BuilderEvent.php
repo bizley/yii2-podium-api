@@ -4,14 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\ModelInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class ModelEvent
- * @package bizley\podium\api\events
- */
-class ModelEvent extends Event
+class BuilderEvent extends Event
 {
     /**
      * @var bool whether model can be created
@@ -23,8 +19,5 @@ class ModelEvent extends Event
      */
     public bool $canEdit = true;
 
-    /**
-     * @var ModelInterface|null
-     */
-    public ?ModelInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

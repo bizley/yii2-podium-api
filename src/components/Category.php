@@ -57,9 +57,9 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function create(array $data, MemberRepositoryInterface $author): PodiumResponse
+    public function create(MemberRepositoryInterface $author, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->create($data, $author);
+        return $this->getBuilder()->create($author, $data);
     }
 
     /**
@@ -67,9 +67,9 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(CategoryRepositoryInterface $category, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($category, $data);
     }
 
     /**
@@ -88,9 +88,9 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(CategoryRepositoryInterface $category): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($category);
     }
 
     /**
@@ -109,9 +109,19 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function replace($id, CategoryRepositoryInterface $category): PodiumResponse
+    public function replace(
+        CategoryRepositoryInterface $firstCategory,
+        CategoryRepositoryInterface $secondCategory
+    ): PodiumResponse {
+        return $this->getSorter()->replace($firstCategory, $secondCategory);
+    }
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function sort(): PodiumResponse
     {
-        return $this->getSorter()->replace($id, $category);
+        return $this->getSorter()->sort();
     }
 
     /**
@@ -130,9 +140,9 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive($id): PodiumResponse
+    public function archive(CategoryRepositoryInterface $category): PodiumResponse
     {
-        return $this->getArchiver()->archive($id);
+        return $this->getArchiver()->archive($category);
     }
 
     /**
@@ -140,8 +150,8 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive($id): PodiumResponse
+    public function revive(CategoryRepositoryInterface $category): PodiumResponse
     {
-        return $this->getArchiver()->revive($id);
+        return $this->getArchiver()->revive($category);
     }
 }

@@ -9,12 +9,12 @@ use bizley\podium\api\components\PodiumResponse;
 interface ArchiverInterface
 {
     /**
-     * Archives model.
+     * Archives the repository.
      */
-    public function archive($id): PodiumResponse;
+    public function archive(RepositoryInterface $repository): PodiumResponse;
 
     /**
-     * Revives model.
+     * Revives the repository.
      */
-    public function revive($id): PodiumResponse;
+    public function revive(RepositoryInterface $repository): PodiumResponse;
 }

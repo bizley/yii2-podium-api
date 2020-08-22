@@ -11,7 +11,10 @@ interface SorterInterface
     /**
      * Replaces the order of two repositories.
      */
-    public function replace($id, RepositoryInterface $repository): PodiumResponse;
+    public function replace(
+        RepositoryInterface $firstRepository,
+        RepositoryInterface $secondRepository
+    ): PodiumResponse;
 
     /**
      * Sorts repositories.

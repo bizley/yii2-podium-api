@@ -6,7 +6,7 @@ namespace bizley\podium\api\interfaces;
 
 interface CategoryRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data, $authorId): bool;
+    public function create($authorId, array $data = []): bool;
     public function isArchived(): bool;
     public function archive(): bool;
     public function revive(): bool;

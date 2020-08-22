@@ -57,25 +57,26 @@ final class CategorySorter extends Component implements SorterInterface
     /**
      * Replaces the spot of the categories.
      */
-    public function replace($id, RepositoryInterface $targetCategory): PodiumResponse
-    {
-        if (!$targetCategory instanceof CategoryRepositoryInterface || !$this->beforeReplace()) {
+    public function replace(
+        RepositoryInterface $firstCategory,
+        RepositoryInterface $secondCategory
+    ): PodiumResponse {
+        if (
+            !$firstCategory instanceof CategoryRepositoryInterface
+            || !$secondCategory instanceof CategoryRepositoryInterface
+            || !$this->beforeReplace()
+        ) {
             return PodiumResponse::error();
         }
 
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $category = $this->getCategory();
-            if (!$category->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'category.not.exists')]);
-            }
-
-            $oldOrder = $category->getOrder();
-            if (!$category->setOrder($targetCategory->getOrder())) {
+            $oldOrder = $firstCategory->getOrder();
+            if (!$firstCategory->setOrder($secondCategory->getOrder())) {
                 throw new Exception('Error while setting new category order!');
             }
-            if (!$targetCategory->setOrder($oldOrder)) {
+            if (!$secondCategory->setOrder($oldOrder)) {
                 throw new Exception('Error while setting new category order!');
             }
 
@@ -119,9 +120,7 @@ final class CategorySorter extends Component implements SorterInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $category = $this->getCategory();
-
-            if (!$category->sort()) {
+            if (!$this->getCategory()->sort()) {
                 return PodiumResponse::error();
             }
 
