@@ -9,12 +9,12 @@ use bizley\podium\api\components\PodiumResponse;
 interface LockerInterface
 {
     /**
-     * Locks model.
+     * Locks the thread.
      */
-    public function lock($id): PodiumResponse;
+    public function lock(ThreadRepositoryInterface $thread): PodiumResponse;
 
     /**
-     * Unlock model.
+     * Unlock the thread.
      */
-    public function unlock($id): PodiumResponse;
+    public function unlock(ThreadRepositoryInterface $thread): PodiumResponse;
 }

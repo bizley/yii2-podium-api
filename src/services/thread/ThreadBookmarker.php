@@ -54,7 +54,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
     /**
      * Bookmarks the thread.
      */
-    public function mark(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function mark(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeMark()) {
             return PodiumResponse::error();
@@ -77,7 +77,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
                 return PodiumResponse::error($bookmark->getErrors());
             }
 
-            $this->afterMark();
+            $this->afterMark($bookmark);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -87,8 +87,8 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
         }
     }
 
-    public function afterMark(): void
+    public function afterMark(BookmarkRepositoryInterface $bookmark): void
     {
-        $this->trigger(self::EVENT_AFTER_MARKING, new BookmarkEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_MARKING, new BookmarkEvent(['repository' => $bookmark]));
     }
 }

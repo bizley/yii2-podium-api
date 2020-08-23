@@ -11,10 +11,10 @@ interface SubscriberInterface
     /**
      * Subscribes the member to the thread.
      */
-    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function subscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
      * Unsubscribes the member from the thread.
      */
-    public function unsubscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function unsubscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse;
 }

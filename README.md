@@ -29,7 +29,7 @@ There are some rules:
 So far the components ready are:
 - [x] Category
 - [x] Forum
-- [ ] Thread
+- [x] Thread
 - [ ] Rank
 - [ ] Post
 - [ ] Poll

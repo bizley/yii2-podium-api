@@ -59,8 +59,11 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
     /**
      * Creates new thread.
      */
-    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $forum): PodiumResponse
-    {
+    public function create(
+        MemberRepositoryInterface $author,
+        RepositoryInterface $forum,
+        array $data = []
+    ): PodiumResponse {
         if (!$forum instanceof ForumRepositoryInterface || !$this->beforeCreate()) {
             return PodiumResponse::error();
         }
@@ -70,7 +73,7 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         try {
             $thread = $this->getThread();
 
-            if (!$thread->create($data, $author->getId(), $forum->getId(), $forum->getParent()->getId())) {
+            if (!$thread->create($author->getId(), $forum->getId(), $data)) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
@@ -78,7 +81,7 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->afterCreate();
+            $this->afterCreate($thread);
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -90,9 +93,9 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(ThreadRepositoryInterface $thread): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $thread]));
     }
 
     public function beforeEdit(): bool
@@ -106,23 +109,18 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
     /**
      * Edits the thread.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RepositoryInterface $thread, array $data = []): PodiumResponse
     {
-        if (!$this->beforeEdit()) {
+        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $thread = $this->getThread();
-            if (!$thread->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-            }
-
             if (!$thread->edit($data)) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($thread);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -132,8 +130,8 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(ThreadRepositoryInterface $thread): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $thread]));
     }
 }

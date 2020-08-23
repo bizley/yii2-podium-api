@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\BookmarkerInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class BookmarkEvent
- * @package bizley\podium\api\events
- */
 class BookmarkEvent extends Event
 {
     /**
@@ -18,8 +14,5 @@ class BookmarkEvent extends Event
      */
     public bool $canMark = true;
 
-    /**
-     * @var BookmarkerInterface|null
-     */
-    public ?BookmarkerInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\LockerInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class LockEvent
- * @package bizley\podium\api\events
- */
 class LockEvent extends Event
 {
     /**
@@ -23,8 +19,5 @@ class LockEvent extends Event
      */
     public bool $canUnlock = true;
 
-    /**
-     * @var LockerInterface|null
-     */
-    public ?LockerInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

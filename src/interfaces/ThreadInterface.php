@@ -12,38 +12,38 @@ interface ThreadInterface
      * Creates thread.
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        ForumRepositoryInterface $forum
+        ForumRepositoryInterface $forum,
+        array $data = []
     ): PodiumResponse;
 
     /**
      * Updates thread.
      */
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(ThreadRepositoryInterface $thread, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(ThreadRepositoryInterface $thread): PodiumResponse;
 
     /**
      * Moves thread to different forum.
      */
-    public function move($id, ForumRepositoryInterface $forum): PodiumResponse;
+    public function move(ThreadRepositoryInterface $thread, ForumRepositoryInterface $forum): PodiumResponse;
 
-    public function pin($id): PodiumResponse;
+    public function pin(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function unpin($id): PodiumResponse;
+    public function unpin(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function lock($id): PodiumResponse;
+    public function lock(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function unlock($id): PodiumResponse;
+    public function unlock(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function archive($id): PodiumResponse;
+    public function archive(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function revive($id): PodiumResponse;
+    public function revive(ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function subscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse;
 
-    public function unsubscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function unsubscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse;
 
-    public function mark(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function mark(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 }

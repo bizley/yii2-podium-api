@@ -7,13 +7,11 @@ namespace bizley\podium\api\services\thread;
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
-use bizley\podium\api\repositories\ThreadRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class ThreadArchiver extends Component implements ArchiverInterface
 {
@@ -21,27 +19,6 @@ final class ThreadArchiver extends Component implements ArchiverInterface
     public const EVENT_AFTER_ARCHIVING = 'podium.thread.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.thread.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
-
-    private ?ThreadRepositoryInterface $thread = null;
-
-    /**
-     * @var string|array|ThreadRepositoryInterface
-     */
-    public $repositoryConfig = ThreadRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getThread(): ThreadRepositoryInterface
-    {
-        if (null === $this->thread) {
-            /** @var ThreadRepositoryInterface $thread */
-            $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
-            $this->thread = $thread;
-        }
-
-        return $this->thread;
-    }
 
     public function beforeArchive(): bool
     {
@@ -54,23 +31,18 @@ final class ThreadArchiver extends Component implements ArchiverInterface
     /**
      * Archives the thread.
      */
-    public function archive($id): PodiumResponse
+    public function archive(RepositoryInterface $thread): PodiumResponse
     {
-        if (!$this->beforeArchive()) {
+        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $thread = $this->getThread();
-            if (!$thread->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-            }
-
             if (!$thread->archive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterArchive();
+            $this->afterArchive($thread);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -80,9 +52,9 @@ final class ThreadArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterArchive(): void
+    public function afterArchive(ThreadRepositoryInterface $thread): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $thread]));
     }
 
     public function beforeRevive(): bool
@@ -96,23 +68,18 @@ final class ThreadArchiver extends Component implements ArchiverInterface
     /**
      * Revives the thread.
      */
-    public function revive($id): PodiumResponse
+    public function revive(RepositoryInterface $thread): PodiumResponse
     {
-        if (!$this->beforeRevive()) {
+        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $thread = $this->getThread();
-            if (!$thread->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.exists')]);
-            }
-
             if (!$thread->revive()) {
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterRevive();
+            $this->afterRevive($thread);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -122,8 +89,8 @@ final class ThreadArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterRevive(): void
+    public function afterRevive(ThreadRepositoryInterface $thread): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $thread]));
     }
 }

@@ -12,5 +12,5 @@ interface RepositoryInterface
     public function fetchAll($filter = null, $sort = null, $pagination = null): void;
     public function getErrors(): array;
     public function delete(): bool;
-    public function edit(array $data): bool;
+    public function edit(array $data = []): bool;
 }

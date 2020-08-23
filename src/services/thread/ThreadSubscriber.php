@@ -53,7 +53,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canSubscribe;
     }
 
-    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function subscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
             return PodiumResponse::error();
@@ -72,7 +72,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
                 return PodiumResponse::error($subscription->getErrors());
             }
 
-            $this->afterSubscribe();
+            $this->afterSubscribe($subscription);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -82,9 +82,9 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         }
     }
 
-    public function afterSubscribe(): void
+    public function afterSubscribe(SubscriptionRepositoryInterface $subscription): void
     {
-        $this->trigger(self::EVENT_AFTER_SUBSCRIBING, new SubscriptionEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_SUBSCRIBING, new SubscriptionEvent(['repository' => $subscription]));
     }
 
     public function beforeUnsubscribe(): bool
@@ -95,7 +95,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canUnsubscribe;
     }
 
-    public function unsubscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): PodiumResponse
+    public function unsubscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
             return PodiumResponse::error();
