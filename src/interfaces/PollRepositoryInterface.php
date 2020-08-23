@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-interface PollRepositoryInterface
+interface PollRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data, array $answers, $authorId, $threadId): bool;
-    public function edit(array $data, array $answers = []): bool;
+    public function create($authorId, $threadId, array $answers, array $data = []): bool;
+    public function edit(array $answers = [], array $data = []): bool;
     public function isArchived(): bool;
     public function move($threadId): bool;
     public function archive(): bool;
@@ -17,10 +17,4 @@ interface PollRepositoryInterface
     public function hasMemberVoted($memberId): bool;
     public function isSingleChoice(): bool;
     public function vote($memberId, array $answers): bool;
-    public function getId();
-    public function getParent(): RepositoryInterface;
-    public function fetchOne($id): bool;
-    public function fetchAll($filter = null, $sort = null, $pagination = null): void;
-    public function getErrors(): array;
-    public function delete(): bool;
 }

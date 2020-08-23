@@ -10,38 +10,14 @@ use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
-use bizley\podium\api\repositories\PollRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class PollMover extends Component implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.poll.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.poll.moving.after';
-
-    private ?PollRepositoryInterface $poll = null;
-
-    /**
-     * @var string|array|PollRepositoryInterface
-     */
-    public $repositoryConfig = PollRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPoll(): PollRepositoryInterface
-    {
-        if (null === $this->poll) {
-            /** @var PollRepositoryInterface $poll */
-            $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
-            $this->poll = $poll;
-        }
-
-        return $this->poll;
-    }
 
     public function beforeMove(): bool
     {
@@ -54,17 +30,17 @@ final class PollMover extends Component implements MoverInterface
     /**
      * Moves the poll to another thread.
      */
-    public function move($id, RepositoryInterface $thread): PodiumResponse
+    public function move(RepositoryInterface $poll, RepositoryInterface $thread): PodiumResponse
     {
-        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeMove()) {
+        if (
+            !$poll instanceof PollRepositoryInterface
+            || !$thread instanceof ThreadRepositoryInterface
+            || !$this->beforeMove()
+        ) {
             return PodiumResponse::error();
         }
 
         try {
-            $poll = $this->getPoll();
-            if (!$poll->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
-            }
             if ($thread->hasPoll()) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.has.poll')]);
             }
@@ -73,7 +49,7 @@ final class PollMover extends Component implements MoverInterface
                 return PodiumResponse::error($thread->getErrors());
             }
 
-            $this->afterMove();
+            $this->afterMove($poll);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -83,8 +59,8 @@ final class PollMover extends Component implements MoverInterface
         }
     }
 
-    public function afterMove(): void
+    public function afterMove(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['repository' => $poll]));
     }
 }

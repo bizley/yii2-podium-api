@@ -15,25 +15,34 @@ interface PollInterface
      * Creates poll post.
      */
     public function create(
-        array $data,
-        array $answers,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $answers,
+        array $data = []
     ): PodiumResponse;
 
     /**
      * Updates poll post.
      */
-    public function edit($id, array $data, array $answers): PodiumResponse;
+    public function edit(PollRepositoryInterface $poll, array $answers, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(PollRepositoryInterface $poll): PodiumResponse;
 
     /**
      * Votes in poll.
      */
     public function vote(
-        MemberRepositoryInterface $member,
         PollRepositoryInterface $poll,
+        MemberRepositoryInterface $member,
         array $answers
     ): PodiumResponse;
+
+    /**
+     * Moves poll to different thread.
+     */
+    public function move(PollRepositoryInterface $poll, ThreadRepositoryInterface $thread): PodiumResponse;
+
+    public function archive(PollRepositoryInterface $poll): PodiumResponse;
+
+    public function revive(PollRepositoryInterface $poll): PodiumResponse;
 }

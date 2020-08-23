@@ -95,7 +95,7 @@ final class PollRepository implements PollRepositoryInterface
     /**
      * @throws Exception
      */
-    public function edit(array $data, array $answers = []): bool
+    public function edit(array $answers = [], array $data = []): bool
     {
         $model = $this->getModel();
         if (!$model->load($data, '')) {

@@ -9,13 +9,10 @@ use bizley\podium\api\events\VoteEvent;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\VoterInterface;
-use bizley\podium\api\repositories\PollRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\db\Transaction;
-use yii\di\Instance;
 
 use function count;
 
@@ -23,27 +20,6 @@ final class PollVoter extends Component implements VoterInterface
 {
     public const EVENT_BEFORE_VOTING = 'podium.poll.voting.before';
     public const EVENT_AFTER_VOTING = 'podium.poll.voting.after';
-
-    private ?PollRepositoryInterface $poll = null;
-
-    /**
-     * @var string|array|PollRepositoryInterface
-     */
-    public $repositoryConfig = PollRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPoll(): PollRepositoryInterface
-    {
-        if (null === $this->poll) {
-            /** @var PollRepositoryInterface $poll */
-            $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
-            $this->poll = $poll;
-        }
-
-        return $this->poll;
-    }
 
     public function beforeVote(): bool
     {
@@ -57,8 +33,8 @@ final class PollVoter extends Component implements VoterInterface
      * Votes in the poll.
      */
     public function vote(
-        MemberRepositoryInterface $member,
         PollRepositoryInterface $poll,
+        MemberRepositoryInterface $member,
         array $answers
     ): PodiumResponse {
         $answersCount = count($answers);
@@ -69,10 +45,6 @@ final class PollVoter extends Component implements VoterInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $poll = $this->getPoll();
-            if (!$poll->fetchOne($poll->getId())) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
-            }
             $memberId = $member->getId();
             if ($poll->hasMemberVoted($memberId)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.already.voted')]);
@@ -84,7 +56,7 @@ final class PollVoter extends Component implements VoterInterface
                 return PodiumResponse::error($poll->getErrors());
             }
 
-            $this->afterVote();
+            $this->afterVote($poll);
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -96,8 +68,8 @@ final class PollVoter extends Component implements VoterInterface
         }
     }
 
-    public function afterVote(): void
+    public function afterVote(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_VOTING, new VoteEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_VOTING, new VoteEvent(['repository' => $poll]));
     }
 }

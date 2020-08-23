@@ -58,10 +58,10 @@ final class PollBuilder extends Component implements PollBuilderInterface
      * Creates new poll.
      */
     public function create(
-        array $data,
-        array $answers,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $answers,
+        array $data = []
     ): PodiumResponse {
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -71,11 +71,11 @@ final class PollBuilder extends Component implements PollBuilderInterface
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $poll = $this->getPoll();
-            if (!$poll->create($data, $answers, $author->getId(), $thread->getId())) {
+            if (!$poll->create($author->getId(), $thread->getId(), $answers, $data)) {
                 return PodiumResponse::error($poll->getErrors());
             }
 
-            $this->afterCreate();
+            $this->afterCreate($poll);
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -87,9 +87,9 @@ final class PollBuilder extends Component implements PollBuilderInterface
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $poll]));
     }
 
     public function beforeEdit(): bool
@@ -103,7 +103,7 @@ final class PollBuilder extends Component implements PollBuilderInterface
     /**
      * Edits the thread.
      */
-    public function edit($id, array $data, array $answers): PodiumResponse
+    public function edit(PollRepositoryInterface $poll, array $answers = [], array $data = []): PodiumResponse
     {
         if (!$this->beforeEdit()) {
             return PodiumResponse::error();
@@ -112,16 +112,11 @@ final class PollBuilder extends Component implements PollBuilderInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $post = $this->getPoll();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
+            if (!$poll->edit($answers, $data)) {
+                return PodiumResponse::error($poll->getErrors());
             }
 
-            if (!$post->edit($data, $answers)) {
-                return PodiumResponse::error($post->getErrors());
-            }
-
-            $this->afterEdit();
+            $this->afterEdit($poll);
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -133,8 +128,8 @@ final class PollBuilder extends Component implements PollBuilderInterface
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $poll]));
     }
 }

@@ -9,8 +9,8 @@ use bizley\podium\api\components\PodiumResponse;
 interface VoterInterface
 {
     public function vote(
-        MemberRepositoryInterface $member,
         PollRepositoryInterface $poll,
+        MemberRepositoryInterface $member,
         array $answers
     ): PodiumResponse;
 }

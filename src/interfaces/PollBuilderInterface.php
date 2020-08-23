@@ -9,11 +9,11 @@ use bizley\podium\api\components\PodiumResponse;
 interface PollBuilderInterface
 {
     public function create(
-        array $data,
-        array $answers,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $answers,
+        array $data = []
     ): PodiumResponse;
 
-    public function edit($id, array $data, array $answers): PodiumResponse;
+    public function edit(PollRepositoryInterface $poll, array $answers = [], array $data = []): PodiumResponse;
 }

@@ -8,12 +8,10 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
-use bizley\podium\api\repositories\PollRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class PollArchiver extends Component implements ArchiverInterface
 {
@@ -21,27 +19,6 @@ final class PollArchiver extends Component implements ArchiverInterface
     public const EVENT_AFTER_ARCHIVING = 'podium.poll.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.poll.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.poll.reviving.after';
-
-    private ?PollRepositoryInterface $poll = null;
-
-    /**
-     * @var string|array|PollRepositoryInterface
-     */
-    public $repositoryConfig = PollRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPost(): PollRepositoryInterface
-    {
-        if (null === $this->poll) {
-            /** @var PollRepositoryInterface $poll */
-            $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
-            $this->poll = $poll;
-        }
-
-        return $this->poll;
-    }
 
     public function beforeArchive(): bool
     {
@@ -54,23 +31,18 @@ final class PollArchiver extends Component implements ArchiverInterface
     /**
      * Archives the poll.
      */
-    public function archive($id): PodiumResponse
+    public function archive(RepositoryInterface $poll): PodiumResponse
     {
-        if (!$this->beforeArchive()) {
+        if (!$poll instanceof PollRepositoryInterface || !$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
+            if (!$poll->archive()) {
+                return PodiumResponse::error($poll->getErrors());
             }
 
-            if (!$post->archive()) {
-                return PodiumResponse::error($post->getErrors());
-            }
-
-            $this->afterArchive();
+            $this->afterArchive($poll);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -80,9 +52,9 @@ final class PollArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterArchive(): void
+    public function afterArchive(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $poll]));
     }
 
     public function beforeRevive(): bool
@@ -96,23 +68,18 @@ final class PollArchiver extends Component implements ArchiverInterface
     /**
      * Revives the poll.
      */
-    public function revive($id): PodiumResponse
+    public function revive(RepositoryInterface $poll): PodiumResponse
     {
-        if (!$this->beforeRevive()) {
+        if (!$poll instanceof PollRepositoryInterface || !$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $poll = $this->getPost();
-            if (!$poll->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
-            }
-
             if (!$poll->revive()) {
                 return PodiumResponse::error($poll->getErrors());
             }
 
-            $this->afterRevive();
+            $this->afterRevive($poll);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -122,8 +89,8 @@ final class PollArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterRevive(): void
+    public function afterRevive(PollRepositoryInterface $poll): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $poll]));
     }
 }

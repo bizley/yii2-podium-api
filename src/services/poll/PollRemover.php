@@ -8,38 +8,15 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repositories\PollRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class PollRemover extends Component implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.poll.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.poll.removing.after';
-
-    private ?PollRepositoryInterface $poll = null;
-
-    /**
-     * @var string|array|PollRepositoryInterface
-     */
-    public $repositoryConfig = PollRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPoll(): PollRepositoryInterface
-    {
-        if (null === $this->poll) {
-            /** @var PollRepositoryInterface $poll */
-            $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
-            $this->poll = $poll;
-        }
-
-        return $this->poll;
-    }
 
     public function beforeRemove(): bool
     {
@@ -50,19 +27,15 @@ final class PollRemover extends Component implements RemoverInterface
     }
 
     /**
-     * Removes the thread.
+     * Removes the poll.
      */
-    public function remove($id): PodiumResponse
+    public function remove(RepositoryInterface $poll): PodiumResponse
     {
-        if (!$this->beforeRemove()) {
+        if (!$poll instanceof PollRepositoryInterface || !$this->beforeRemove()) {
             return PodiumResponse::error();
         }
 
         try {
-            $poll = $this->getPoll();
-            if (!$poll->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.not.exists')]);
-            }
             if (!$poll->isArchived()) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.must.be.archived')]);
             }

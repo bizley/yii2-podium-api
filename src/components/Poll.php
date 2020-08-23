@@ -103,12 +103,12 @@ final class Poll extends Component implements PollInterface
      * @throws InvalidConfigException
      */
     public function create(
-        array $data,
-        array $answers,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $answers,
+        array $data = []
     ): PodiumResponse {
-        return $this->getBuilder()->create($data, $answers, $author, $thread);
+        return $this->getBuilder()->create($author, $thread, $answers, $data);
     }
 
     /**
@@ -116,9 +116,9 @@ final class Poll extends Component implements PollInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data, array $answers): PodiumResponse
+    public function edit(PollRepositoryInterface $poll, array $answers, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data, $answers);
+        return $this->getBuilder()->edit($poll, $answers, $data);
     }
 
     /**
@@ -137,9 +137,9 @@ final class Poll extends Component implements PollInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(PollRepositoryInterface $poll): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($poll);
     }
 
     /**
@@ -159,11 +159,11 @@ final class Poll extends Component implements PollInterface
      * @throws InvalidConfigException
      */
     public function vote(
-        MemberRepositoryInterface $member,
         PollRepositoryInterface $poll,
+        MemberRepositoryInterface $member,
         array $answers
     ): PodiumResponse {
-        return $this->getVoter()->vote($member, $poll, $answers);
+        return $this->getVoter()->vote($poll, $member, $answers);
     }
 
     /**
@@ -182,9 +182,9 @@ final class Poll extends Component implements PollInterface
      *
      * @throws InvalidConfigException
      */
-    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse
+    public function move(PollRepositoryInterface $poll, ThreadRepositoryInterface $thread): PodiumResponse
     {
-        return $this->getMover()->move($id, $thread);
+        return $this->getMover()->move($poll, $thread);
     }
 
     /**
@@ -203,9 +203,9 @@ final class Poll extends Component implements PollInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive($id): PodiumResponse
+    public function archive(PollRepositoryInterface $poll): PodiumResponse
     {
-        return $this->getArchiver()->archive($id);
+        return $this->getArchiver()->archive($poll);
     }
 
     /**
@@ -213,8 +213,8 @@ final class Poll extends Component implements PollInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive($id): PodiumResponse
+    public function revive(PollRepositoryInterface $poll): PodiumResponse
     {
-        return $this->getArchiver()->revive($id);
+        return $this->getArchiver()->revive($poll);
     }
 }

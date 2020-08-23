@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\VoterInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class VoteEvent
- * @package bizley\podium\api\events
- */
 class VoteEvent extends Event
 {
     /**
@@ -18,8 +14,5 @@ class VoteEvent extends Event
      */
     public bool $canVote = true;
 
-    /**
-     * @var VoterInterface|null
-     */
-    public ?VoterInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

@@ -31,8 +31,8 @@ So far the components ready are:
 - [x] Forum
 - [x] Thread
 - [x] Post
+- [x] Poll
 - [ ] Rank
-- [ ] Poll
 - [ ] Message
 - [ ] Member
 - [ ] Group
