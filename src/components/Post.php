@@ -103,11 +103,11 @@ final class Post extends Component implements PostInterface
      * @throws InvalidConfigException
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $data = []
     ): PodiumResponse {
-        return $this->getBuilder()->create($data, $author, $thread);
+        return $this->getBuilder()->create($author, $thread, $data);
     }
 
     /**
@@ -115,9 +115,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(PostRepositoryInterface $post, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($post, $data);
     }
 
     /**
@@ -136,9 +136,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(PostRepositoryInterface $post): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($post);
     }
 
     /**
@@ -157,9 +157,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse
+    public function move(PostRepositoryInterface $post, ThreadRepositoryInterface $thread): PodiumResponse
     {
-        return $this->getMover()->move($id, $thread);
+        return $this->getMover()->move($post, $thread);
     }
 
     /**
@@ -178,9 +178,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function archive($id): PodiumResponse
+    public function archive(PostRepositoryInterface $post): PodiumResponse
     {
-        return $this->getArchiver()->archive($id);
+        return $this->getArchiver()->archive($post);
     }
 
     /**
@@ -188,9 +188,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function revive($id): PodiumResponse
+    public function revive(PostRepositoryInterface $post): PodiumResponse
     {
-        return $this->getArchiver()->revive($id);
+        return $this->getArchiver()->revive($post);
     }
 
     /**
@@ -209,9 +209,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbUp(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getLiker()->thumbUp($member, $post);
+        return $this->getLiker()->thumbUp($post, $member);
     }
 
     /**
@@ -219,9 +219,9 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbDown(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getLiker()->thumbDown($member, $post);
+        return $this->getLiker()->thumbDown($post, $member);
     }
 
     /**
@@ -229,8 +229,8 @@ final class Post extends Component implements PostInterface
      *
      * @throws InvalidConfigException
      */
-    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getLiker()->thumbReset($member, $post);
+        return $this->getLiker()->thumbReset($post, $member);
     }
 }

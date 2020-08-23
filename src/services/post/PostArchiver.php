@@ -8,12 +8,10 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\ArchiveEvent;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
-use bizley\podium\api\repositories\PostRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class PostArchiver extends Component implements ArchiverInterface
 {
@@ -21,27 +19,6 @@ final class PostArchiver extends Component implements ArchiverInterface
     public const EVENT_AFTER_ARCHIVING = 'podium.post.archiving.after';
     public const EVENT_BEFORE_REVIVING = 'podium.post.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.post.reviving.after';
-
-    private ?PostRepositoryInterface $post = null;
-
-    /**
-     * @var string|array|PostRepositoryInterface
-     */
-    public $repositoryConfig = PostRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPost(): PostRepositoryInterface
-    {
-        if (null === $this->post) {
-            /** @var PostRepositoryInterface $post */
-            $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
-            $this->post = $post;
-        }
-
-        return $this->post;
-    }
 
     public function beforeArchive(): bool
     {
@@ -54,23 +31,18 @@ final class PostArchiver extends Component implements ArchiverInterface
     /**
      * Archives the post.
      */
-    public function archive($id): PodiumResponse
+    public function archive(RepositoryInterface $post): PodiumResponse
     {
-        if (!$this->beforeArchive()) {
+        if (!$post instanceof PostRepositoryInterface || !$this->beforeArchive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
-            }
-
             if (!$post->archive()) {
                 return PodiumResponse::error($post->getErrors());
             }
 
-            $this->afterArchive();
+            $this->afterArchive($post);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -80,9 +52,9 @@ final class PostArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterArchive(): void
+    public function afterArchive(PostRepositoryInterface $post): void
     {
-        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $post]));
     }
 
     public function beforeRevive(): bool
@@ -96,23 +68,18 @@ final class PostArchiver extends Component implements ArchiverInterface
     /**
      * Revives the post.
      */
-    public function revive($id): PodiumResponse
+    public function revive(RepositoryInterface $post): PodiumResponse
     {
-        if (!$this->beforeRevive()) {
+        if (!$post instanceof PostRepositoryInterface || !$this->beforeRevive()) {
             return PodiumResponse::error();
         }
 
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
-            }
-
             if (!$post->revive()) {
                 return PodiumResponse::error($post->getErrors());
             }
 
-            $this->afterRevive();
+            $this->afterRevive($post);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -122,8 +89,8 @@ final class PostArchiver extends Component implements ArchiverInterface
         }
     }
 
-    public function afterRevive(): void
+    public function afterRevive(PostRepositoryInterface $post): void
     {
-        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $post]));
     }
 }

@@ -57,7 +57,7 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbUp;
     }
 
-    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbUp(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbUp()) {
             return PodiumResponse::error();
@@ -88,8 +88,8 @@ final class PostLiker extends Component implements LikerInterface
                 throw new Exception('Error while updating post counters!');
             }
 
+            $this->afterThumbUp($thumb);
             $transaction->commit();
-            $this->afterThumbUp();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -100,9 +100,9 @@ final class PostLiker extends Component implements LikerInterface
         }
     }
 
-    public function afterThumbUp(): void
+    public function afterThumbUp(ThumbRepositoryInterface $thumb): void
     {
-        $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent(['repository' => $thumb]));
     }
 
     public function beforeThumbDown(): bool
@@ -113,7 +113,7 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbDown;
     }
 
-    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbDown(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbDown()) {
             return PodiumResponse::error();
@@ -144,8 +144,8 @@ final class PostLiker extends Component implements LikerInterface
                 throw new Exception('Error while updating post counters!');
             }
 
+            $this->afterThumbDown($thumb);
             $transaction->commit();
-            $this->afterThumbDown();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -156,9 +156,9 @@ final class PostLiker extends Component implements LikerInterface
         }
     }
 
-    public function afterThumbDown(): void
+    public function afterThumbDown(ThumbRepositoryInterface $thumb): void
     {
-        $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent(['repository' => $thumb]));
     }
 
     public function beforeThumbReset(): bool
@@ -169,7 +169,7 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbReset;
     }
 
-    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse
+    public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbReset()) {
             return PodiumResponse::error();
@@ -193,8 +193,8 @@ final class PostLiker extends Component implements LikerInterface
                 throw new Exception('Error while updating post counters!');
             }
 
-            $transaction->commit();
             $this->afterThumbReset();
+            $transaction->commit();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {

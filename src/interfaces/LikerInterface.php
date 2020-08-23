@@ -11,15 +11,15 @@ interface LikerInterface
     /**
      * Gives thumb up.
      */
-    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbUp(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
      * Gives thumb down.
      */
-    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbDown(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 
     /**
      * Resets thumb.
      */
-    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 }

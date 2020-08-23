@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\LikerInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class ThumbEvent
- * @package bizley\podium\api\events
- */
 class ThumbEvent extends Event
 {
     /**
@@ -28,8 +24,5 @@ class ThumbEvent extends Event
      */
     public bool $canThumbReset = true;
 
-    /**
-     * @var LikerInterface|null
-     */
-    public ?LikerInterface $model = null;
+    public ?RepositoryInterface $repository = null;
 }

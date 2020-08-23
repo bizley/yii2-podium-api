@@ -60,7 +60,7 @@ final class PostRepository implements PostRepositoryInterface
         return $this->getModel()->created_at;
     }
 
-    public function create(array $data, $authorId, $threadId, $forumId, $categoryId): bool
+    public function create($authorId, $threadId, array $data = []): bool
     {
         /** @var PostActiveRecord $post */
         $post = new $this->activeRecordClass();
@@ -70,8 +70,6 @@ final class PostRepository implements PostRepositoryInterface
 
         $post->author_id = $authorId;
         $post->thread_id = $threadId;
-        $post->forum_id = $forumId;
-        $post->category_id = $categoryId;
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
@@ -81,13 +79,11 @@ final class PostRepository implements PostRepositoryInterface
         return $post->save(false);
     }
 
-    public function move($threadId, $forumId, $categoryId): bool
+    public function move($threadId): bool
     {
         $post = $this->getModel();
 
         $post->thread_id = $threadId;
-        $post->forum_id = $forumId;
-        $post->category_id = $categoryId;
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
@@ -100,7 +96,9 @@ final class PostRepository implements PostRepositoryInterface
     public function archive(): bool
     {
         $post = $this->getModel();
+
         $post->archived = true;
+
         if (!$post->validate()) {
             $this->errors = $post->errors;
             return false;
@@ -112,7 +110,9 @@ final class PostRepository implements PostRepositoryInterface
     public function revive(): bool
     {
         $post = $this->getModel();
+
         $post->archived = false;
+
         if (!$post->validate()) {
             $this->errors = $post->errors;
             return false;

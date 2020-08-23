@@ -11,40 +11,16 @@ use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
-use bizley\podium\api\repositories\PostRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\db\Exception;
 use yii\db\Transaction;
-use yii\di\Instance;
 
 final class PostMover extends Component implements MoverInterface
 {
     public const EVENT_BEFORE_MOVING = 'podium.post.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.post.moving.after';
-
-    private ?PostRepositoryInterface $post = null;
-
-    /**
-     * @var string|array|PostRepositoryInterface
-     */
-    public $repositoryConfig = PostRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPost(): PostRepositoryInterface
-    {
-        if (null === $this->post) {
-            /** @var PostRepositoryInterface $post */
-            $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
-            $this->post = $post;
-        }
-
-        return $this->post;
-    }
 
     public function beforeMove(): bool
     {
@@ -57,23 +33,22 @@ final class PostMover extends Component implements MoverInterface
     /**
      * Moves the post to another thread.
      */
-    public function move($id, RepositoryInterface $thread): PodiumResponse
+    public function move(RepositoryInterface $post, RepositoryInterface $thread): PodiumResponse
     {
-        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeMove()) {
+        if (
+            !$post instanceof PostRepositoryInterface
+            || !$thread instanceof ThreadRepositoryInterface
+            || !$this->beforeMove()
+        ) {
             return PodiumResponse::error();
         }
 
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
-            }
-
             /** @var ForumRepositoryInterface $threadParent */
             $threadParent = $thread->getParent();
-            if (!$post->move($thread->getId(), $threadParent->getId(), $threadParent->getParent()->getId())) {
+            if (!$post->move($thread->getId())) {
                 return PodiumResponse::error($post->getErrors());
             }
 
@@ -94,8 +69,8 @@ final class PostMover extends Component implements MoverInterface
                 throw new Exception('Error while updating new forum counters!');
             }
 
+            $this->afterMove($post);
             $transaction->commit();
-            $this->afterMove();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -106,8 +81,8 @@ final class PostMover extends Component implements MoverInterface
         }
     }
 
-    public function afterMove(): void
+    public function afterMove(PostRepositoryInterface $post): void
     {
-        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['repository' => $post]));
     }
 }

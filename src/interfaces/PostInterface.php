@@ -15,30 +15,30 @@ interface PostInterface
      * Creates post.
      */
     public function create(
-        array $data,
         MemberRepositoryInterface $author,
-        ThreadRepositoryInterface $thread
+        ThreadRepositoryInterface $thread,
+        array $data = []
     ): PodiumResponse;
 
     /**
      * Updates post.
      */
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(PostRepositoryInterface $post, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(PostRepositoryInterface $post): PodiumResponse;
 
     /**
      * Moves post to different thread.
      */
-    public function move($id, ThreadRepositoryInterface $thread): PodiumResponse;
+    public function move(PostRepositoryInterface $post, ThreadRepositoryInterface $thread): PodiumResponse;
 
-    public function archive($id): PodiumResponse;
+    public function archive(PostRepositoryInterface $post): PodiumResponse;
 
-    public function revive($id): PodiumResponse;
+    public function revive(PostRepositoryInterface $post): PodiumResponse;
 
-    public function thumbUp(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbUp(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 
-    public function thumbDown(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbDown(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 
-    public function thumbReset(MemberRepositoryInterface $member, PostRepositoryInterface $post): PodiumResponse;
+    public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse;
 }

@@ -60,7 +60,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
     /**
      * Creates new thread.
      */
-    public function create(array $data, MemberRepositoryInterface $author, RepositoryInterface $thread): PodiumResponse
+    public function create(MemberRepositoryInterface $author, RepositoryInterface $thread, array $data = []): PodiumResponse
     {
         if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -73,15 +73,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
 
             /** @var ForumRepositoryInterface $threadParent */
             $threadParent = $thread->getParent();
-            if (
-                !$post->create(
-                    $data,
-                    $author->getId(),
-                    $thread->getId(),
-                    $threadParent->getId(),
-                    $threadParent->getParent()->getId()
-                )
-            ) {
+            if (!$post->create($author->getId(), $thread->getId(), $data)) {
                 return PodiumResponse::error($post->getErrors());
             }
 
@@ -92,7 +84,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $this->afterCreate();
+            $this->afterCreate($post);
             $transaction->commit();
 
             return PodiumResponse::success();
@@ -104,9 +96,9 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(PostRepositoryInterface $post): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $post]));
     }
 
     public function beforeEdit(): bool
@@ -120,23 +112,18 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
     /**
      * Edits the thread.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RepositoryInterface $post, array $data = []): PodiumResponse
     {
-        if (!$this->beforeEdit()) {
+        if (!$post instanceof PostRepositoryInterface || !$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
-            }
-
             if (!$post->edit($data)) {
                 return PodiumResponse::error($post->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($post);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -146,8 +133,8 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(PostRepositoryInterface $post): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $post]));
     }
 }

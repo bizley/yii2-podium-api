@@ -30,8 +30,8 @@ So far the components ready are:
 - [x] Category
 - [x] Forum
 - [x] Thread
+- [x] Post
 - [ ] Rank
-- [ ] Post
 - [ ] Poll
 - [ ] Message
 - [ ] Member

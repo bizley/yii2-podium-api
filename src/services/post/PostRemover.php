@@ -9,41 +9,18 @@ use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
-use bizley\podium\api\repositories\PostRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
 use yii\db\Exception;
 use yii\db\Transaction;
-use yii\di\Instance;
 
 final class PostRemover extends Component implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.post.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.post.removing.after';
-
-    private ?PostRepositoryInterface $post = null;
-
-    /**
-     * @var string|array|PostRepositoryInterface
-     */
-    public $repositoryConfig = PostRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getPost(): PostRepositoryInterface
-    {
-        if (null === $this->post) {
-            /** @var PostRepositoryInterface $post */
-            $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
-            $this->post = $post;
-        }
-
-        return $this->post;
-    }
 
     public function beforeRemove(): bool
     {
@@ -54,21 +31,17 @@ final class PostRemover extends Component implements RemoverInterface
     }
 
     /**
-     * Removes the thread.
+     * Removes the post.
      */
-    public function remove($id): PodiumResponse
+    public function remove(RepositoryInterface $post): PodiumResponse
     {
-        if (!$this->beforeRemove()) {
+        if (!$post instanceof PostRepositoryInterface || !$this->beforeRemove()) {
             return PodiumResponse::error();
         }
 
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $post = $this->getPost();
-            if (!$post->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.exists')]);
-            }
             if (!$post->isArchived()) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.must.be.archived')]);
             }
