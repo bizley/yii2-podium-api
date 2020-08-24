@@ -62,7 +62,7 @@ final class Forum extends Component implements ForumInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?ForumActiveRecord
+    public function getById($id): ?ForumActiveRecord
     {
         /** @var ForumRepository $forum */
         $forum = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);

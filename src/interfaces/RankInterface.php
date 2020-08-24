@@ -11,12 +11,12 @@ interface RankInterface
     /**
      * Creates rank.
      */
-    public function create(array $data): PodiumResponse;
+    public function create(array $data = []): PodiumResponse;
 
     /**
      * Updates rank.
      */
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(RankRepositoryInterface $rank, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(RankRepositoryInterface $rank): PodiumResponse;
 }

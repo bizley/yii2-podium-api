@@ -50,7 +50,7 @@ final class RankRepository implements RankRepositoryInterface
         throw new NotSupportedException('Rank does not have parent!');
     }
 
-    public function create(array $data): bool
+    public function create(array $data = []): bool
     {
         /** @var RankActiveRecord $rank */
         $rank = new $this->activeRecordClass();

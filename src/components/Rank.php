@@ -39,7 +39,7 @@ final class Rank extends Component implements RankInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?RankActiveRecord
+    public function getById($id): ?RankActiveRecord
     {
         /** @var RankRepository $rank */
         $rank = Instance::ensure($this->repositoryConfig, RankRepositoryInterface::class);
@@ -79,7 +79,7 @@ final class Rank extends Component implements RankInterface
      *
      * @throws InvalidConfigException
      */
-    public function create(array $data): PodiumResponse
+    public function create(array $data = []): PodiumResponse
     {
         return $this->getBuilder()->create($data);
     }
@@ -89,9 +89,9 @@ final class Rank extends Component implements RankInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RankRepositoryInterface $rank, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($rank, $data);
     }
 
     /**
@@ -110,8 +110,8 @@ final class Rank extends Component implements RankInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(RankRepositoryInterface $rank): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($rank);
     }
 }

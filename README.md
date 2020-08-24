@@ -32,7 +32,7 @@ So far the components ready are:
 - [x] Thread
 - [x] Post
 - [x] Poll
-- [ ] Rank
+- [x] Rank
 - [ ] Message
 - [ ] Member
 - [ ] Group

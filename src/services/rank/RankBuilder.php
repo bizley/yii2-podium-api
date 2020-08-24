@@ -8,6 +8,7 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\RankRepositoryInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\repositories\RankRepository;
 use Throwable;
 use Yii;
@@ -54,7 +55,7 @@ final class RankBuilder extends Component implements BuilderInterface
     /**
      * Creates new rank.
      */
-    public function create(array $data): PodiumResponse
+    public function create(array $data = []): PodiumResponse
     {
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -67,7 +68,7 @@ final class RankBuilder extends Component implements BuilderInterface
                 return PodiumResponse::error($rank->getErrors());
             }
 
-            $this->afterCreate();
+            $this->afterCreate($rank);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -77,9 +78,9 @@ final class RankBuilder extends Component implements BuilderInterface
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(RankRepositoryInterface $rank): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $rank]));
     }
 
     public function beforeEdit(): bool
@@ -93,23 +94,18 @@ final class RankBuilder extends Component implements BuilderInterface
     /**
      * Edits the rank.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RepositoryInterface $rank, array $data = []): PodiumResponse
     {
-        if (!$this->beforeEdit()) {
+        if (!$rank instanceof RankRepositoryInterface || !$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $rank = $this->getRank();
-            if (!$rank->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'rank.not.exists')]);
-            }
-
             if (!$rank->edit($data)) {
                 return PodiumResponse::error($rank->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($rank);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -119,8 +115,8 @@ final class RankBuilder extends Component implements BuilderInterface
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(RankRepositoryInterface $rank): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $rank]));
     }
 }

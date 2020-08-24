@@ -8,6 +8,7 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\RankRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\repositories\RankRepository;
 use Throwable;
 use Yii;
@@ -52,17 +53,13 @@ final class RankRemover extends Component implements RemoverInterface
     /**
      * Removes the rank.
      */
-    public function remove($id): PodiumResponse
+    public function remove(RepositoryInterface $rank): PodiumResponse
     {
-        if (!$this->beforeRemove()) {
+        if (!$rank instanceof RankRepositoryInterface || !$this->beforeRemove()) {
             return PodiumResponse::error();
         }
 
         try {
-            $rank = $this->getRank();
-            if (!$rank->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'rank.not.exists')]);
-            }
             if (!$rank->delete()) {
                 return PodiumResponse::error();
             }

@@ -8,7 +8,7 @@ use bizley\podium\api\components\PodiumResponse;
 
 interface BuilderInterface
 {
-    public function create(array $data): PodiumResponse;
+    public function create(array $data = []): PodiumResponse;
 
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(RepositoryInterface $repository, array $data = []): PodiumResponse;
 }

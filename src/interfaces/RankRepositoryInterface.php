@@ -6,5 +6,5 @@ namespace bizley\podium\api\interfaces;
 
 interface RankRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data): bool;
+    public function create(array $data = []): bool;
 }
