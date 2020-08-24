@@ -6,10 +6,11 @@ namespace bizley\podium\api\services\group;
 
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\GroupEvent;
+use bizley\podium\api\interfaces\GroupMemberRepositoryInterface;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
 use bizley\podium\api\interfaces\KeeperInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
-use bizley\podium\api\repositories\GroupRepository;
+use bizley\podium\api\repositories\GroupMemberRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
@@ -23,25 +24,25 @@ final class GroupKeeper extends Component implements KeeperInterface
     public const EVENT_BEFORE_LEAVING = 'podium.group.leaving.before';
     public const EVENT_AFTER_LEAVING = 'podium.group.leaving.after';
 
-    private ?GroupRepositoryInterface $group = null;
+    private ?GroupMemberRepositoryInterface $groupMember = null;
 
     /**
-     * @var string|array|GroupRepositoryInterface
+     * @var string|array|GroupMemberRepositoryInterface
      */
-    public $repositoryConfig = GroupRepository::class;
+    public $repositoryConfig = GroupMemberRepository::class;
 
     /**
      * @throws InvalidConfigException
      */
-    private function getGroup(): GroupRepositoryInterface
+    private function getGroupMember(): GroupMemberRepositoryInterface
     {
-        if (null === $this->group) {
-            /** @var GroupRepositoryInterface $group */
-            $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
-            $this->group = $group;
+        if (null === $this->groupMember) {
+            /** @var GroupMemberRepositoryInterface $groupMember */
+            $groupMember = Instance::ensure($this->repositoryConfig, GroupMemberRepositoryInterface::class);
+            $this->groupMember = $groupMember;
         }
 
-        return $this->group;
+        return $this->groupMember;
     }
 
     public function beforeJoin(): bool
@@ -52,28 +53,26 @@ final class GroupKeeper extends Component implements KeeperInterface
         return $event->canJoin;
     }
 
-    public function join($id, MemberRepositoryInterface $member): PodiumResponse
+    public function join(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeJoin()) {
             return PodiumResponse::error();
         }
 
         try {
-            $group = $this->getGroup();
-            if (!$group->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.exists')]);
-            }
-
+            $groupMember = $this->getGroupMember();
+            $groupId = $group->getId();
             $memberId = $member->getId();
-            if ($group->hasMember($memberId)) {
+
+            if ($groupMember->fetchOne($groupId, $memberId)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.already.joined')]);
             }
 
-            if (!$group->join($memberId)) {
-                return PodiumResponse::error($group->getErrors());
+            if (!$groupMember->create($groupId, $memberId)) {
+                return PodiumResponse::error($groupMember->getErrors());
             }
 
-            $this->afterJoin();
+            $this->afterJoin($groupMember);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -83,9 +82,9 @@ final class GroupKeeper extends Component implements KeeperInterface
         }
     }
 
-    public function afterJoin(): void
+    public function afterJoin(GroupMemberRepositoryInterface $groupMember): void
     {
-        $this->trigger(self::EVENT_AFTER_JOINING, new GroupEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_JOINING, new GroupEvent(['repository' => $groupMember]));
     }
 
     public function beforeLeave(): bool
@@ -96,26 +95,26 @@ final class GroupKeeper extends Component implements KeeperInterface
         return $event->canLeave;
     }
 
-    public function leave($id, GroupRepositoryInterface $group): PodiumResponse
+    public function leave(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeLeave()) {
             return PodiumResponse::error();
         }
 
         try {
-            $member = $this->getGroup();
-            if (!$member->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
-            }
+            $groupMember = $this->getGroupMember();
             $groupId = $group->getId();
-            if (!$member->isMemberOfGroup($groupId)) {
+            $memberId = $member->getId();
+
+            if (!$groupMember->fetchOne($groupId, $memberId)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.joined')]);
             }
-            if (!$member->leave($groupId)) {
-                return PodiumResponse::error($member->getErrors());
+
+            if (!$groupMember->delete()) {
+                return PodiumResponse::error();
             }
 
-            $this->afterJoin();
+            $this->afterLeave();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {

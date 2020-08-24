@@ -43,7 +43,7 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
         throw new NotSupportedException('Group does not have parent!');
     }
 
-    public function create(array $data, $memberId, $groupId): bool
+    public function create($groupId, $memberId, array $data = []): bool
     {
         /** @var GroupMemberActiveRecord $group */
         $group = new $this->activeRecordClass();
@@ -60,19 +60,22 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
         return $group->save(false);
     }
 
-    public function exists($groupId, $memberId): bool
+    public function fetchOne($groupId, $memberId): bool
     {
-        /** @var GroupMemberActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
+        /** @var GroupMemberActiveRecord $modelClass */
+        $model = $modelClass::findOne(
+            [
+                'group_id' => $groupId,
+                'member_id' => $memberId,
+            ]
+        );
+        if (null === $model) {
+            return false;
+        }
+        $this->setModel($model);
 
-        return $modelClass::find()
-            ->where(
-                [
-                    'member_id' => $memberId,
-                    'group_id' => $groupId,
-                ]
-            )
-            ->exists();
+        return true;
     }
 
     public function getErrors(): array

@@ -47,7 +47,7 @@ final class Group extends Component implements GroupInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?GroupActiveRecord
+    public function getById($id): ?GroupActiveRecord
     {
         /** @var GroupRepository $group */
         $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
@@ -87,7 +87,7 @@ final class Group extends Component implements GroupInterface
      *
      * @throws InvalidConfigException
      */
-    public function create(array $data): PodiumResponse
+    public function create(array $data = []): PodiumResponse
     {
         return $this->getBuilder()->create($data);
     }
@@ -97,9 +97,9 @@ final class Group extends Component implements GroupInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(GroupRepositoryInterface $group, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($group, $data);
     }
 
     /**
@@ -118,9 +118,9 @@ final class Group extends Component implements GroupInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(GroupRepositoryInterface $group): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($group);
     }
 
     /**
@@ -139,9 +139,9 @@ final class Group extends Component implements GroupInterface
      *
      * @throws InvalidConfigException
      */
-    public function join($id, MemberRepositoryInterface $member): PodiumResponse
+    public function join(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getKeeper()->join($id, $member);
+        return $this->getKeeper()->join($group, $member);
     }
 
     /**
@@ -149,8 +149,8 @@ final class Group extends Component implements GroupInterface
      *
      * @throws InvalidConfigException
      */
-    public function leave($id, MemberRepositoryInterface $member): PodiumResponse
+    public function leave(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getKeeper()->leave($id, $member);
+        return $this->getKeeper()->leave($group, $member);
     }
 }

@@ -8,6 +8,7 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\BuildEvent;
 use bizley\podium\api\interfaces\BuilderInterface;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\repositories\GroupRepository;
 use Throwable;
 use Yii;
@@ -54,7 +55,7 @@ final class GroupBuilder extends Component implements BuilderInterface
     /**
      * Creates new group.
      */
-    public function create(array $data): PodiumResponse
+    public function create(array $data = []): PodiumResponse
     {
         if (!$this->beforeCreate()) {
             return PodiumResponse::error();
@@ -67,7 +68,7 @@ final class GroupBuilder extends Component implements BuilderInterface
                 return PodiumResponse::error($group->getErrors());
             }
 
-            $this->afterCreate();
+            $this->afterCreate($group);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -77,9 +78,9 @@ final class GroupBuilder extends Component implements BuilderInterface
         }
     }
 
-    public function afterCreate(): void
+    public function afterCreate(GroupRepositoryInterface $group): void
     {
-        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $group]));
     }
 
     public function beforeEdit(): bool
@@ -93,23 +94,18 @@ final class GroupBuilder extends Component implements BuilderInterface
     /**
      * Edits the group.
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(RepositoryInterface $group, array $data = []): PodiumResponse
     {
-        if (!$this->beforeEdit()) {
+        if (!$group instanceof GroupRepositoryInterface || !$this->beforeEdit()) {
             return PodiumResponse::error();
         }
 
         try {
-            $group = $this->getGroup();
-            if (!$group->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.exists')]);
-            }
-
             if (!$group->edit($data)) {
                 return PodiumResponse::error($group->getErrors());
             }
 
-            $this->afterEdit();
+            $this->afterEdit($group);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -119,8 +115,8 @@ final class GroupBuilder extends Component implements BuilderInterface
         }
     }
 
-    public function afterEdit(): void
+    public function afterEdit(GroupRepositoryInterface $group): void
     {
-        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $group]));
     }
 }

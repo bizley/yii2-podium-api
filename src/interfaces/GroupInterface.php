@@ -11,16 +11,16 @@ interface GroupInterface
     /**
      * Creates group.
      */
-    public function create(array $data): PodiumResponse;
+    public function create(array $data = []): PodiumResponse;
 
     /**
      * Updates group.
      */
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(GroupRepositoryInterface $group, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(GroupRepositoryInterface $group): PodiumResponse;
 
-    public function join($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function join(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse;
 
-    public function leave($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function leave(GroupRepositoryInterface $group, MemberRepositoryInterface $member): PodiumResponse;
 }

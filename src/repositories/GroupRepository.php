@@ -50,7 +50,7 @@ final class GroupRepository implements GroupRepositoryInterface
         throw new NotSupportedException('Group does not have parent!');
     }
 
-    public function create(array $data): bool
+    public function create(array $data = []): bool
     {
         /** @var GroupActiveRecord $group */
         $group = new $this->activeRecordClass();
@@ -65,15 +65,5 @@ final class GroupRepository implements GroupRepositoryInterface
         }
 
         return $group->save(false);
-    }
-
-    public function hasMember($memberId): bool
-    {
-        return $this->getModel()->getGroupMembers()->exists();
-    }
-
-    public function join($memberId): bool
-    {
-        return $this->getModel()->getGroupMembers()->exists();
     }
 }

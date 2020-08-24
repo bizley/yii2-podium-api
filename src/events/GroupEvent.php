@@ -4,13 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\KeeperInterface;
+use bizley\podium\api\interfaces\GroupMemberRepositoryInterface;
 use yii\base\Event;
 
-/**
- * Class GroupEvent
- * @package bizley\podium\api\events
- */
 class GroupEvent extends Event
 {
     /**
@@ -23,8 +19,5 @@ class GroupEvent extends Event
      */
     public bool $canLeave = true;
 
-    /**
-     * @var KeeperInterface|null
-     */
-    public ?KeeperInterface $model = null;
+    public ?GroupMemberRepositoryInterface $repository = null;
 }

@@ -6,7 +6,5 @@ namespace bizley\podium\api\interfaces;
 
 interface GroupRepositoryInterface extends RepositoryInterface
 {
-    public function create(array $data): bool;
-
-    public function hasMember($memberId): bool;
+    public function create(array $data = []): bool;
 }

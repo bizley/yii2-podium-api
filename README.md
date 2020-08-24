@@ -33,9 +33,9 @@ So far the components ready are:
 - [x] Post
 - [x] Poll
 - [x] Rank
+- [x] Group
 - [ ] Message
 - [ ] Member
-- [ ] Group
 - [ ] Account
 
 When API is ready, I'll start preparing the client.
