@@ -11,5 +11,7 @@ interface MemberBuilderInterface
     /**
      * Registers new Podium account.
      */
-    public function register(array $data): PodiumResponse;
+    public function register($id, array $data = []): PodiumResponse;
+
+    public function edit(MemberRepositoryInterface $member, array $data = []): PodiumResponse;
 }

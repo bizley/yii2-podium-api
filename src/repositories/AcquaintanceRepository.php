@@ -93,13 +93,26 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
         return $acquaintance->save(false);
     }
 
+    public function ignore(): bool
+    {
+        $acquaintance = $this->getModel();
+        $acquaintance->type_id = AcquaintanceType::IGNORE;
+        if (!$acquaintance->validate()) {
+            $this->errors = $acquaintance->errors;
+
+            return false;
+        }
+
+        return $acquaintance->save(false);
+    }
+
     public function isFriend(): bool
     {
-        return $this->getModel()->type_id === AcquaintanceType::FRIEND;
+        return AcquaintanceType::FRIEND === $this->getModel()->type_id;
     }
 
     public function isIgnoring(): bool
     {
-        return $this->getModel()->type_id === AcquaintanceType::IGNORE;
+        return AcquaintanceType::IGNORE === $this->getModel()->type_id;
     }
 }

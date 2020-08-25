@@ -56,7 +56,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         return $event->canBeFriends;
     }
 
-    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse
+    public function befriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
         if (!$this->beforeBefriend()) {
             return PodiumResponse::error();
@@ -66,14 +66,15 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
             $acquaintance = $this->getAcquaintance();
 
             $memberId = $member->getId();
-            if (!$acquaintance->fetchOne($id, $memberId)) {
-                $acquaintance->prepare($id, $memberId);
+            $targetId = $target->getId();
+            if (!$acquaintance->fetchOne($memberId, $targetId)) {
+                $acquaintance->prepare($memberId, $targetId);
             }
             if (!$acquaintance->befriend()) {
                 return PodiumResponse::error($acquaintance->getErrors());
             }
 
-            $this->afterBefriend();
+            $this->afterBefriend($acquaintance);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -83,9 +84,9 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         }
     }
 
-    public function afterBefriend(): void
+    public function afterBefriend(AcquaintanceRepositoryInterface $acquaintance): void
     {
-        $this->trigger(self::EVENT_AFTER_BEFRIENDING);
+        $this->trigger(self::EVENT_AFTER_BEFRIENDING, new AcquaintanceEvent(['repository' => $acquaintance]));
     }
 
     public function beforeUnfriend(): bool
@@ -96,7 +97,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         return $event->canUnfriend;
     }
 
-    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse
+    public function unfriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
         if (!$this->beforeUnfriend()) {
             return PodiumResponse::error();
@@ -105,8 +106,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            $memberId = $member->getId();
-            if (!$acquaintance->fetchOne($id, $memberId)) {
+            if (!$acquaintance->fetchOne($member->getId(), $target->getId())) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'acquaintance.not.exists')]);
             }
             if ($acquaintance->isIgnoring()) {
@@ -117,7 +117,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
                 return PodiumResponse::error();
             }
 
-            $this->afterBefriend();
+            $this->afterUnfriend();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -140,7 +140,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         return $event->canIgnore;
     }
 
-    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse
+    public function ignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
         if (!$this->beforeIgnore()) {
             return PodiumResponse::error();
@@ -150,14 +150,15 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
             $acquaintance = $this->getAcquaintance();
 
             $memberId = $member->getId();
-            if (!$acquaintance->fetchOne($id, $memberId)) {
-                $acquaintance->prepare($id, $memberId);
+            $targetId = $target->getId();
+            if (!$acquaintance->fetchOne($memberId, $targetId)) {
+                $acquaintance->prepare($memberId, $targetId);
             }
             if (!$acquaintance->ignore()) {
                 return PodiumResponse::error($acquaintance->getErrors());
             }
 
-            $this->afterIgnore();
+            $this->afterIgnore($acquaintance);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -167,9 +168,9 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         }
     }
 
-    public function afterIgnore(): void
+    public function afterIgnore(AcquaintanceRepositoryInterface $acquaintance): void
     {
-        $this->trigger(self::EVENT_AFTER_IGNORING);
+        $this->trigger(self::EVENT_AFTER_IGNORING, new AcquaintanceEvent(['repository' => $acquaintance]));
     }
 
     public function beforeUnignore(): bool
@@ -180,7 +181,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         return $event->canUnfriend;
     }
 
-    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse
+    public function unignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
         if (!$this->beforeUnignore()) {
             return PodiumResponse::error();
@@ -189,8 +190,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            $memberId = $member->getId();
-            if (!$acquaintance->fetchOne($id, $memberId)) {
+            if (!$acquaintance->fetchOne($member->getId(), $target->getId())) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'acquaintance.not.exists')]);
             }
             if ($acquaintance->isFriend()) {

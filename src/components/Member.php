@@ -53,7 +53,7 @@ final class Member extends Component implements MemberInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?MemberActiveRecord
+    public function getById($id): ?MemberActiveRecord
     {
         /** @var MemberRepository $member */
         $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
@@ -93,9 +93,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function register(array $data): PodiumResponse
+    public function register($id, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->register($data);
+        return $this->getBuilder()->register($id, $data);
     }
 
     /**
@@ -103,9 +103,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function edit($id, array $data): PodiumResponse
+    public function edit(MemberRepositoryInterface $member, array $data = []): PodiumResponse
     {
-        return $this->getBuilder()->edit($id, $data);
+        return $this->getBuilder()->edit($member, $data);
     }
 
     /**
@@ -124,9 +124,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse
+    public function befriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
-        return $this->getAcquaintance()->befriend($id, $member);
+        return $this->getAcquaintance()->befriend($member, $target);
     }
 
     /**
@@ -134,9 +134,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse
+    public function unfriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
-        return $this->getAcquaintance()->unfriend($id, $member);
+        return $this->getAcquaintance()->unfriend($member, $target);
     }
 
     /**
@@ -144,9 +144,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse
+    public function ignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
-        return $this->getAcquaintance()->ignore($id, $member);
+        return $this->getAcquaintance()->ignore($member, $target);
     }
 
     /**
@@ -154,9 +154,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse
+    public function unignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse
     {
-        return $this->getAcquaintance()->unignore($id, $member);
+        return $this->getAcquaintance()->unignore($member, $target);
     }
 
     /**
@@ -175,9 +175,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function ban($id): PodiumResponse
+    public function ban(MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getBanisher()->ban($id);
+        return $this->getBanisher()->ban($member);
     }
 
     /**
@@ -185,9 +185,9 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function unban($id): PodiumResponse
+    public function unban(MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getBanisher()->unban($id);
+        return $this->getBanisher()->unban($member);
     }
 
     /**
@@ -206,8 +206,8 @@ final class Member extends Component implements MemberInterface
      *
      * @throws InvalidConfigException
      */
-    public function remove($id): PodiumResponse
+    public function remove(MemberRepositoryInterface $member): PodiumResponse
     {
-        return $this->getRemover()->remove($id);
+        return $this->getRemover()->remove($member);
     }
 }

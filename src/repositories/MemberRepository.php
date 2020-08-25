@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\MemberActiveRecord;
-use bizley\podium\api\ars\ThreadActiveRecord;
 use bizley\podium\api\enums\MemberStatus;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
@@ -52,24 +51,22 @@ final class MemberRepository implements MemberRepositoryInterface
         throw new NotSupportedException('Member does not have parent!');
     }
 
-    public function create(array $data, $authorId, $forumId, $categoryId): bool
+    public function register($id, array $data = []): bool
     {
-        /** @var ThreadActiveRecord $thread */
-        $thread = new $this->activeRecordClass();
-        if (!$thread->load($data, '')) {
+        /** @var MemberActiveRecord $member */
+        $member = new $this->activeRecordClass();
+        if (!$member->load($data, '')) {
             return false;
         }
 
-        $thread->author_id = $authorId;
-        $thread->forum_id = $forumId;
-        $thread->category_id = $categoryId;
+        $member->user_id = $id; // TODO composite id handling
 
-        if (!$thread->validate()) {
-            $this->errors = $thread->errors;
+        if (!$member->validate()) {
+            $this->errors = $member->errors;
             return false;
         }
 
-        return $thread->save(false);
+        return $member->save(false);
     }
 
     public function ban(): bool

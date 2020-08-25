@@ -11,20 +11,20 @@ interface AcquaintanceInterface
     /**
      * Handles befriending process.
      */
-    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function befriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Handles unfriending process.
      */
-    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function unfriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Handles ignoring process.
      */
-    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function ignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Handles unignoring process.
      */
-    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function unignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 }

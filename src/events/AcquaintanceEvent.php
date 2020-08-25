@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\AcquaintanceInterface;
-use bizley\podium\api\interfaces\IgnorerInterface;
+use bizley\podium\api\interfaces\AcquaintanceRepositoryInterface;
 use yii\base\Event;
 
 class AcquaintanceEvent extends Event
@@ -30,8 +29,5 @@ class AcquaintanceEvent extends Event
      */
     public bool $canUnignore = true;
 
-    /**
-     * @var AcquaintanceInterface|IgnorerInterface|null
-     */
-    public $model;
+    public ?AcquaintanceRepositoryInterface $repository = null;
 }

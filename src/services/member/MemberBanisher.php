@@ -8,12 +8,9 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\BanEvent;
 use bizley\podium\api\interfaces\BanisherInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
-use bizley\podium\api\repositories\MemberRepository;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class MemberBanisher extends Component implements BanisherInterface
 {
@@ -21,27 +18,6 @@ final class MemberBanisher extends Component implements BanisherInterface
     public const EVENT_AFTER_BANNING = 'podium.member.banning.after';
     public const EVENT_BEFORE_UNBANNING = 'podium.member.unbanning.before';
     public const EVENT_AFTER_UNBANNING = 'podium.member.unbanning.after';
-
-    private ?MemberRepositoryInterface $member = null;
-
-    /**
-     * @var string|array|MemberRepositoryInterface
-     */
-    public $repositoryConfig = MemberRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getMember(): MemberRepositoryInterface
-    {
-        if (null === $this->member) {
-            /** @var MemberRepositoryInterface $member */
-            $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
-            $this->member = $member;
-        }
-
-        return $this->member;
-    }
 
     public function beforeBan(): bool
     {
@@ -51,22 +27,18 @@ final class MemberBanisher extends Component implements BanisherInterface
         return $event->canBan;
     }
 
-    public function ban($id): PodiumResponse
+    public function ban(MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeBan()) {
             return PodiumResponse::error();
         }
 
         try {
-            $member = $this->getMember();
-            if (!$member->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
-            }
             if (!$member->ban()) {
                 return PodiumResponse::error($member->getErrors());
             }
 
-            $this->afterBan();
+            $this->afterBan($member);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -76,9 +48,9 @@ final class MemberBanisher extends Component implements BanisherInterface
         }
     }
 
-    public function afterBan(): void
+    public function afterBan(MemberRepositoryInterface $member): void
     {
-        $this->trigger(self::EVENT_AFTER_BANNING, new BanEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_BANNING, new BanEvent(['repository' => $member]));
     }
 
     public function beforeUnban(): bool
@@ -89,22 +61,18 @@ final class MemberBanisher extends Component implements BanisherInterface
         return $event->canUnban;
     }
 
-    public function unban($id): PodiumResponse
+    public function unban(MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeUnban()) {
             return PodiumResponse::error();
         }
 
         try {
-            $member = $this->getMember();
-            if (!$member->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
-            }
             if (!$member->unban()) {
                 return PodiumResponse::error($member->getErrors());
             }
 
-            $this->afterUnban();
+            $this->afterUnban($member);
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
@@ -114,8 +82,8 @@ final class MemberBanisher extends Component implements BanisherInterface
         }
     }
 
-    public function afterUnban(): void
+    public function afterUnban(MemberRepositoryInterface $member): void
     {
-        $this->trigger(self::EVENT_AFTER_UNBANNING, new BanEvent(['model' => $this]));
+        $this->trigger(self::EVENT_AFTER_UNBANNING, new BanEvent(['repository' => $member]));
     }
 }

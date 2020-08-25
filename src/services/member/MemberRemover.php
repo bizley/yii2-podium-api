@@ -8,38 +8,15 @@ use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\RemoveEvent;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
-use bizley\podium\api\repositories\MemberRepository;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use Throwable;
 use Yii;
 use yii\base\Component;
-use yii\base\InvalidConfigException;
-use yii\di\Instance;
 
 final class MemberRemover extends Component implements RemoverInterface
 {
     public const EVENT_BEFORE_REMOVING = 'podium.forum.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.forum.removing.after';
-
-    private ?MemberRepositoryInterface $member = null;
-
-    /**
-     * @var string|array|MemberRepositoryInterface
-     */
-    public $repositoryConfig = MemberRepository::class;
-
-    /**
-     * @throws InvalidConfigException
-     */
-    private function getMember(): MemberRepositoryInterface
-    {
-        if (null === $this->member) {
-            /** @var MemberRepositoryInterface $acquaintance */
-            $acquaintance = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
-            $this->member = $acquaintance;
-        }
-
-        return $this->member;
-    }
 
     public function beforeRemove(): bool
     {
@@ -49,17 +26,13 @@ final class MemberRemover extends Component implements RemoverInterface
         return $event->canRemove;
     }
 
-    public function remove($id): PodiumResponse
+    public function remove(RepositoryInterface $member): PodiumResponse
     {
-        if (!$this->beforeRemove()) {
+        if (!$member instanceof MemberRepositoryInterface || !$this->beforeRemove()) {
             return PodiumResponse::error();
         }
 
         try {
-            $member = $this->getMember();
-            if (!$member->fetchOne($id)) {
-                return PodiumResponse::error(['api' => Yii::t('podium.error', 'member.not.exists')]);
-            }
             if (!$member->delete()) {
                 return PodiumResponse::error();
             }

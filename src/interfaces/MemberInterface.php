@@ -11,33 +11,33 @@ interface MemberInterface
     /**
      * Registers account.
      */
-    public function register(array $data): PodiumResponse;
+    public function register($id, array $data = []): PodiumResponse;
 
-    public function remove($id): PodiumResponse;
+    public function remove(MemberRepositoryInterface $member): PodiumResponse;
 
-    public function edit($id, array $data): PodiumResponse;
+    public function edit(MemberRepositoryInterface $member, array $data = []): PodiumResponse;
 
     /**
      * Befriends the member.
      */
-    public function befriend($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function befriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Unfriends the member.
      */
-    public function unfriend($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function unfriend(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Ignores the member.
      */
-    public function ignore($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function ignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
     /**
      * Unignores the member.
      */
-    public function unignore($id, MemberRepositoryInterface $member): PodiumResponse;
+    public function unignore(MemberRepositoryInterface $member, MemberRepositoryInterface $target): PodiumResponse;
 
-    public function ban($id): PodiumResponse;
+    public function ban(MemberRepositoryInterface $member): PodiumResponse;
 
-    public function unban($id): PodiumResponse;
+    public function unban(MemberRepositoryInterface $member): PodiumResponse;
 }

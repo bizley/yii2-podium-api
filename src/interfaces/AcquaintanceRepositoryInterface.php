@@ -11,7 +11,7 @@ interface AcquaintanceRepositoryInterface
     public function getErrors(): array;
     public function delete(): bool;
     public function befriend(): bool;
-    public function unfriend(): bool;
+    public function ignore(): bool;
     public function isFriend(): bool;
     public function isIgnoring(): bool;
 }
