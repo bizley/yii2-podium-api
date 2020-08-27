@@ -11,4 +11,6 @@ interface MemberRepositoryInterface extends RepositoryInterface
     public function unban(): bool;
 
     public function register($id, array $data = []): bool;
+
+    public function activate(): bool;
 }

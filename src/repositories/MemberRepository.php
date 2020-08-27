@@ -60,9 +60,23 @@ final class MemberRepository implements MemberRepositoryInterface
         }
 
         $member->user_id = $id; // TODO composite id handling
+        $member->status_id = MemberStatus::REGISTERED;
 
         if (!$member->validate()) {
             $this->errors = $member->errors;
+            return false;
+        }
+
+        return $member->save(false);
+    }
+
+    public function activate(): bool
+    {
+        $member = $this->getModel();
+        $member->status_id = MemberStatus::ACTIVE;
+        if (!$member->validate()) {
+            $this->errors = $member->errors;
+
             return false;
         }
 

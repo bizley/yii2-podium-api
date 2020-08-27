@@ -14,4 +14,6 @@ interface MemberBuilderInterface
     public function register($id, array $data = []): PodiumResponse;
 
     public function edit(MemberRepositoryInterface $member, array $data = []): PodiumResponse;
+
+    public function activate(MemberRepositoryInterface $member): PodiumResponse;
 }

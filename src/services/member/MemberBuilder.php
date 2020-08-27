@@ -21,6 +21,8 @@ final class MemberBuilder extends Component implements MemberBuilderInterface
     public const EVENT_AFTER_REGISTERING = 'podium.member.creating.after';
     public const EVENT_BEFORE_EDITING = 'podium.member.editing.before';
     public const EVENT_AFTER_EDITING = 'podium.member.editing.after';
+    public const EVENT_BEFORE_ACTIVATING = 'podium.member.activating.before';
+    public const EVENT_AFTER_ACTIVATING = 'podium.member.activating.after';
 
     private ?MemberRepositoryInterface $member = null;
 
@@ -117,5 +119,42 @@ final class MemberBuilder extends Component implements MemberBuilderInterface
     public function afterEdit(MemberRepositoryInterface $member): void
     {
         $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $member]));
+    }
+
+    public function beforeActivate(): bool
+    {
+        $event = new BuildEvent();
+        $this->trigger(self::EVENT_BEFORE_ACTIVATING, $event);
+
+        return $event->canEdit;
+    }
+
+    /**
+     * Activates the member.
+     */
+    public function activate(MemberRepositoryInterface $member): PodiumResponse
+    {
+        if (!$this->beforeActivate()) {
+            return PodiumResponse::error();
+        }
+
+        try {
+            if (!$member->activate()) {
+                return PodiumResponse::error($member->getErrors());
+            }
+
+            $this->afterActivate($member);
+
+            return PodiumResponse::success();
+        } catch (Throwable $exc) {
+            Yii::error(['Exception while activating member', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
+
+            return PodiumResponse::error();
+        }
+    }
+
+    public function afterActivate(MemberRepositoryInterface $member): void
+    {
+        $this->trigger(self::EVENT_AFTER_ACTIVATING, new BuildEvent(['repository' => $member]));
     }
 }
