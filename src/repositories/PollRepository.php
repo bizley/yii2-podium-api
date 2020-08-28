@@ -51,9 +51,9 @@ final class PollRepository implements PollRepositoryInterface
 
     public function getParent(): RepositoryInterface
     {
-        $threadRepository = $this->getModel()->thread;
+        $threadModel = $this->getModel()->thread;
         $parent = new ThreadRepository();
-        $parent->setModel($threadRepository);
+        $parent->setModel($threadModel);
 
         return $parent;
     }

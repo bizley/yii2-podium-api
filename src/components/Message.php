@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
 use bizley\podium\api\interfaces\MessageArchiverInterface;
 use bizley\podium\api\interfaces\MessageInterface;
-use bizley\podium\api\interfaces\MessageParticipantModelInterface;
 use bizley\podium\api\interfaces\MessageRemoverInterface;
+use bizley\podium\api\interfaces\MessageRepositoryInterface;
 use bizley\podium\api\interfaces\MessengerInterface;
 use bizley\podium\api\models\message\MessageArchiver;
 use bizley\podium\api\models\message\MessageMessenger;
@@ -35,33 +34,29 @@ final class Message extends Component implements MessageInterface
      */
     public $archiverConfig = MessageArchiver::class;
 
-
-
+    /**
+     * @throws InvalidConfigException
+     */
     public function getMessenger(): MessengerInterface
     {
-        return new $this->messengerConfig();
+        /** @var MessengerInterface $messenger */
+        $messenger = Instance::ensure($this->messengerConfig, MessengerInterface::class);
+
+        return $messenger;
     }
 
     /**
      * Sends message.
+     *
+     * @throws InvalidConfigException
      */
     public function send(
-        array $data,
-        MembershipInterface $sender,
-        MembershipInterface $receiver,
-        MessageParticipantModelInterface $replyTo = null // TODO: Check if this should be Message instead
+        MemberRepositoryInterface $sender,
+        MemberRepositoryInterface $receiver,
+        MessageRepositoryInterface $replyTo = null,
+        array $data = []
     ): PodiumResponse {
-        $sending = $this->getMessenger();
-
-        $sending->setSender($sender);
-        $sending->setReceiver($receiver);
-        $sending->setReplyTo($replyTo);
-
-        if (!$sending->loadData($data)) {
-            return PodiumResponse::error();
-        }
-
-        return $sending->send();
+        return $this->getMessenger()->send($sender, $receiver, $replyTo, $data);
     }
 
     /**
@@ -77,48 +72,42 @@ final class Message extends Component implements MessageInterface
 
     /**
      * Deletes message copy.
+     *
+     * @throws InvalidConfigException
      */
     public function remove(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse
     {
         return $this->getRemover()->remove($message, $participant);
     }
 
-    public function getArchiver(int $id, MembershipInterface $participant): ?MessageArchiverInterface
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getArchiver(): MessageArchiverInterface
     {
-        $handler = $this->archiverConfig;
+        /** @var MessageArchiverInterface $archiver */
+        $archiver = Instance::ensure($this->archiverConfig, MessageArchiverInterface::class);
 
-        return $handler::findByMessageIdAndParticipant($id, $participant);
+        return $archiver;
     }
 
     /**
      * Archives message copy.
      *
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function archive(int $id, MembershipInterface $participant): PodiumResponse
+    public function archive(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse
     {
-        $messageArchiver = $this->getArchiver($id, $participant);
-
-        if (null === $messageArchiver) {
-            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
-        }
-
-        return $messageArchiver->archive();
+        return $this->getArchiver()->archive($message, $participant);
     }
 
     /**
      * Revives message copy.
      *
-     * @throws ModelNotFoundException
+     * @throws InvalidConfigException
      */
-    public function revive(int $id, MembershipInterface $participant): PodiumResponse
+    public function revive(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse
     {
-        $messageArchiver = $this->getArchiver($id, $participant);
-
-        if (null === $messageArchiver) {
-            throw new ModelNotFoundException('Message copy of given ID and side can not be found.');
-        }
-
-        return $messageArchiver->revive();
+        return $this->getArchiver()->revive($message, $participant);
     }
 }

@@ -10,6 +10,8 @@ use LogicException;
 
 final class MessageRepository implements MessageRepositoryInterface
 {
+    use ActiveRecordRepositoryTrait;
+
     public string $activeRecordClass = MessageActiveRecord::class;
 
     private ?MessageActiveRecord $model = null;
@@ -35,31 +37,15 @@ final class MessageRepository implements MessageRepositoryInterface
 
     public function getParent(): MessageRepositoryInterface
     {
-        // TODO: Implement getParent() method.
+        $message = $this->getModel()->replyTo;
+        $parent = new self();
+        $parent->setModel($message);
+
+        return $parent;
     }
 
-    public function fetchOne($messageId, $participantId): bool
+    public function getId(): int
     {
-        // TODO: Implement fetchOne() method.
-    }
-
-    public function fetchAll($filter = null, $sort = null, $pagination = null): void
-    {
-        // TODO: Implement fetchAll() method.
-    }
-
-    public function getErrors(): array
-    {
-        // TODO: Implement getErrors() method.
-    }
-
-    public function delete(): bool
-    {
-        // TODO: Implement delete() method.
-    }
-
-    public function edit(array $data = []): bool
-    {
-        // TODO: Implement edit() method.
+        return $this->getModel()->id;
     }
 }

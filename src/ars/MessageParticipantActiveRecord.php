@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 
@@ -25,6 +26,11 @@ class MessageParticipantActiveRecord extends ActiveRecord
     public static function tableName(): string
     {
         return '{{%podium_message_participant}}';
+    }
+
+    public function behaviors(): array
+    {
+        return ['timestamp' => TimestampBehavior::class];
     }
 
     public function getMessage(): ActiveQuery
