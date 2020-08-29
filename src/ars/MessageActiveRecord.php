@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\ars;
 
+use bizley\podium\api\enums\MessageSide;
 use Yii;
 use yii\behaviors\TimestampBehavior;
 use yii\db\ActiveQuery;
@@ -12,13 +13,15 @@ use yii\db\ActiveRecord;
 /**
  * Message Active Record.
  *
- * @property int                      $id
- * @property int|null                 $reply_to_id
- * @property string                   $subject
- * @property string                   $content
- * @property int                      $created_at
- * @property int                      $updated_at
- * @property MessageActiveRecord|null $replyTo
+ * @property int                            $id
+ * @property int|null                       $reply_to_id
+ * @property string                         $subject
+ * @property string                         $content
+ * @property int                            $created_at
+ * @property int                            $updated_at
+ * @property MessageActiveRecord|null       $replyTo
+ * @property MessageParticipantActiveRecord $sender
+ * @property MessageParticipantActiveRecord $receiver
  */
 class MessageActiveRecord extends ActiveRecord
 {
@@ -51,5 +54,19 @@ class MessageActiveRecord extends ActiveRecord
     public function getReplyTo(): ActiveQuery
     {
         return $this->hasOne(__CLASS__, ['id' => 'reply_to_id']);
+    }
+
+    public function getSender(): ActiveQuery
+    {
+        return $this
+            ->hasOne(MessageParticipantActiveRecord::class, ['message_id' => 'id'])
+            ->andWhere(['side_id' => MessageSide::SENDER]);
+    }
+
+    public function getReceiver(): ActiveQuery
+    {
+        return $this
+            ->hasOne(MessageParticipantActiveRecord::class, ['message_id' => 'id'])
+            ->andWhere(['side_id' => MessageSide::RECEIVER]);
     }
 }

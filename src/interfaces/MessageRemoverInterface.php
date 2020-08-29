@@ -4,19 +4,9 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-/**
- * Interface MessageRemoverInterface
- * @package bizley\podium\api\interfaces
- */
-interface MessageRemoverInterface extends RemoverInterface
+use bizley\podium\api\components\PodiumResponse;
+
+interface MessageRemoverInterface
 {
-    /**
-     * @param int $messageId
-     * @param MembershipInterface $participant
-     * @return MessageRemoverInterface|null
-     */
-    public static function findByMessageIdAndParticipant(
-        int $messageId,
-        MembershipInterface $participant
-    ): ?MessageRemoverInterface;
+    public function remove(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse;
 }

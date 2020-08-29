@@ -12,4 +12,5 @@ interface MessageParticipantRepositoryInterface
     public function delete(): bool;
     public function edit(array $data = []): bool;
     public function getParent(): MessageRepositoryInterface;
+    public function isArchived(): bool;
 }

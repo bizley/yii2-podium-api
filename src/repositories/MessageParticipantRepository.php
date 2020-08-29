@@ -131,4 +131,9 @@ final class MessageParticipantRepository implements MessageParticipantRepository
 
         return $parent;
     }
+
+    public function isArchived(): bool
+    {
+        return $this->getModel()->archived;
+    }
 }

@@ -4,19 +4,20 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\interfaces;
 
-/**
- * Interface MessageArchiverInterface
- * @package bizley\podium\api\interfaces
- */
-interface MessageArchiverInterface extends ArchiverInterface
+use bizley\podium\api\components\PodiumResponse;
+
+interface MessageArchiverInterface
 {
     /**
-     * @param int $messageId
-     * @param MembershipInterface $participant
-     * @return MessageArchiverInterface|null
+     * Archives the message repository.
      */
-    public static function findByMessageIdAndParticipant(
-        int $messageId,
-        MembershipInterface $participant
-    ): ?MessageArchiverInterface;
+    public function archive(
+        MessageRepositoryInterface $message,
+        MemberRepositoryInterface $participant
+    ): PodiumResponse;
+
+    /**
+     * Revives the message repository.
+     */
+    public function revive(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse;
 }

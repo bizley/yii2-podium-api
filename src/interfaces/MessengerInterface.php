@@ -6,29 +6,12 @@ namespace bizley\podium\api\interfaces;
 
 use bizley\podium\api\components\PodiumResponse;
 
-/**
- * Interface MessengerInterface
- * @package bizley\podium\api\interfaces
- */
-interface MessengerInterface extends ModelFormInterface
+interface MessengerInterface
 {
-    /**
-     * @param MembershipInterface $sender
-     */
-    public function setSender(MembershipInterface $sender): void;
-
-    /**
-     * @param MembershipInterface $receiver
-     */
-    public function setReceiver(MembershipInterface $receiver): void;
-
-    /**
-     * @return PodiumResponse
-     */
-    public function send(): PodiumResponse;
-
-    /**
-     * @param MessageParticipantModelInterface|null $replyTo
-     */
-    public function setReplyTo(?MessageParticipantModelInterface $replyTo): void;
+    public function send(
+        MemberRepositoryInterface $sender,
+        MemberRepositoryInterface $receiver,
+        MessageRepositoryInterface $replyTo = null,
+        array $data = []
+    ): PodiumResponse;
 }
