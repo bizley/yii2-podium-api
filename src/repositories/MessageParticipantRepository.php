@@ -136,4 +136,28 @@ final class MessageParticipantRepository implements MessageParticipantRepository
     {
         return $this->getModel()->archived;
     }
+
+    public function archive(): bool
+    {
+        $messageSide = $this->getModel();
+        $messageSide->archived = true;
+        if (!$messageSide->validate()) {
+            $this->errors = $messageSide->errors;
+            return false;
+        }
+
+        return $messageSide->save(false);
+    }
+
+    public function revive(): bool
+    {
+        $messageSide = $this->getModel();
+        $messageSide->archived = false;
+        if (!$messageSide->validate()) {
+            $this->errors = $messageSide->errors;
+            return false;
+        }
+
+        return $messageSide->save(false);
+    }
 }
