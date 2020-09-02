@@ -5,306 +5,119 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\interfaces\AccountInterface;
-use bizley\podium\api\interfaces\MembershipInterface;
-use bizley\podium\api\interfaces\MessageParticipantModelInterface;
-use bizley\podium\api\interfaces\ModelInterface;
-use bizley\podium\api\interfaces\PollAnswerModelInterface;
-use bizley\podium\api\interfaces\PollModelInterface;
+use bizley\podium\api\interfaces\CategoryRepositoryInterface;
+use bizley\podium\api\interfaces\ForumRepositoryInterface;
+use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\Podium;
+use bizley\podium\api\repositories\MemberRepository;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
 use yii\web\User;
 
-/**
- * Class Account
- * @package bizley\podium\api\base
- *
- * @property MembershipInterface|null $membership
- * @property int|null $id
- */
-class Account extends Component implements AccountInterface
+final class Account extends Component implements AccountInterface
 {
     /**
-     * @var string|array|MembershipInterface membership handler
-     * Component ID, class, configuration array, or instance of MembershipInterface.
+     * @var string|array|MemberRepositoryInterface
      */
-    public $membershipHandler = \bizley\podium\api\models\member\Member::class;
+    public $repositoryConfig = MemberRepository::class;
 
     /**
-     * @var string|array|User user component handler
-     * Component ID, class, configuration array, or instance of User.
+     * @var string|array|User
      */
-    public $userHandler = 'user';
+    public $userConfig = 'user';
+
+    private ?Podium $podium = null;
+
+    public function setPodium(Podium $podium): void
+    {
+        $this->podium = $podium;
+    }
 
     /**
      * @throws InvalidConfigException
      */
-    public function init(): void
-    {
-        parent::init();
-
-        $this->membershipHandler = Instance::ensure($this->membershipHandler, MembershipInterface::class);
-        $this->userHandler = Instance::ensure($this->userHandler, User::class);
-    }
-
-    private $_podium;
-
-    /**
-     * @param Podium $podium
-     */
-    public function setPodium(Podium $podium): void
-    {
-        $this->_podium = $podium;
-    }
-
-    /**
-     * @return Podium
-     */
     public function getPodium(): Podium
     {
-        return $this->_podium;
-    }
-
-    private $_membership;
-
-    /**
-     * @return MembershipInterface|null
-     */
-    public function getMembership(): ?MembershipInterface
-    {
-        if ($this->_membership === null) {
-            /* @var $class MembershipInterface */
-            $class = $this->membershipHandler;
-            $this->_membership = $class::findByUserId($this->userHandler->id);
+        if (null === $this->podium) {
+            throw new InvalidConfigException('Podium module is not set!');
         }
 
-        return $this->_membership;
+        return $this->podium;
     }
 
     /**
-     * @return int|null
-     */
-    public function getId(): ?int
-    {
-        $membership = $this->getMembership();
-
-        if ($membership === null) {
-            return null;
-        }
-
-        return $membership->getId();
-    }
-
-    /**
-     * @return MembershipInterface
+     * TODO: add private vars to store repos for multiple time usage.
+     *
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function ensureMembership(): MembershipInterface
+    public function getMembership(): MemberRepositoryInterface
     {
-        $member = $this->getMembership();
-
-        if ($member === null) {
-            throw new NoMembershipException('Membership data missing.');
+        /** @var User $user */
+        $user = Instance::ensure($this->userConfig, User::class);
+        /** @var MemberRepository $member */
+        $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
+        if (!$member->fetchOne($user->getId())) {
+            throw new NoMembershipException('No Podium Membership found related to given identity!');
         }
 
         return $member;
     }
 
     /**
-     * Befriends target member.
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function befriendMember(MembershipInterface $target): PodiumResponse
+    public function joinGroup(GroupRepositoryInterface $group): PodiumResponse
     {
-        return $this->getPodium()->member->befriend($this->ensureMembership(), $target);
+        return $this->getPodium()->group->join($group, $this->getMembership());
     }
 
     /**
-     * Unfriends target member.
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function unfriendMember(MembershipInterface $target): PodiumResponse
+    public function leaveGroup(GroupRepositoryInterface $group): PodiumResponse
     {
-        return $this->getPodium()->member->unfriend($this->ensureMembership(), $target);
+        return $this->getPodium()->group->leave($group, $this->getMembership());
     }
 
     /**
-     * Ignores target member.
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function ignoreMember(MembershipInterface $target): PodiumResponse
+    public function createCategory(array $data = []): PodiumResponse
     {
-        return $this->getPodium()->member->ignore($this->ensureMembership(), $target);
+        return $this->getPodium()->category->create($this->getMembership(), $data);
     }
 
     /**
-     * Unignores target member.
-     * @param MembershipInterface $target
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function unignoreMember(MembershipInterface $target): PodiumResponse
+    public function createForum(CategoryRepositoryInterface $category, array $data = []): PodiumResponse
     {
-        return $this->getPodium()->member->unignore($this->ensureMembership(), $target);
+        return $this->getPodium()->forum->create($this->getMembership(), $category, $data);
     }
 
     /**
-     * Gives post a thumb up.
-     * @param ModelInterface $post
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function thumbUpPost(ModelInterface $post): PodiumResponse
+    public function createThread(ForumRepositoryInterface $forum, array $data = []): PodiumResponse
     {
-        return $this->getPodium()->post->thumbUp($this->ensureMembership(), $post);
+        return $this->getPodium()->thread->create($this->getMembership(), $forum, $data);
     }
 
     /**
-     * Gives post a thumb down.
-     * @param ModelInterface $post
-     * @return PodiumResponse
+     * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function thumbDownPost(ModelInterface $post): PodiumResponse
+    public function markPost(PostRepositoryInterface $post): PodiumResponse
     {
-        return $this->getPodium()->post->thumbDown($this->ensureMembership(), $post);
-    }
-
-    /**
-     * Resets post given thumb.
-     * @param ModelInterface $post
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function thumbResetPost(ModelInterface $post): PodiumResponse
-    {
-        return $this->getPodium()->post->thumbReset($this->ensureMembership(), $post);
-    }
-
-    /**
-     * Marks last seen post in a thread.
-     * @param ModelInterface $post
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function markPost(ModelInterface $post): PodiumResponse
-    {
-        return $this->getPodium()->thread->mark($this->ensureMembership(), $post);
-    }
-
-    /**
-     * Subscribes to a thread.
-     * @param ModelInterface $thread
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function subscribeThread(ModelInterface $thread): PodiumResponse
-    {
-        return $this->getPodium()->thread->subscribe($this->ensureMembership(), $thread);
-    }
-
-    /**
-     * Unsubscribes from a thread.
-     * @param ModelInterface $thread
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function unsubscribeThread(ModelInterface $thread): PodiumResponse
-    {
-        return $this->getPodium()->thread->unsubscribe($this->ensureMembership(), $thread);
-    }
-
-    /**
-     * Adds member to a group.
-     * @param ModelInterface $group
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function joinGroup(ModelInterface $group): PodiumResponse
-    {
-        return $this->getPodium()->member->join($this->ensureMembership(), $group);
-    }
-
-    /**
-     * Removes member from a group.
-     * @param ModelInterface $group
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function leaveGroup(ModelInterface $group): PodiumResponse
-    {
-        return $this->getPodium()->member->leave($this->ensureMembership(), $group);
-    }
-
-    /**
-     * Votes in poll.
-     * @param PollModelInterface $poll
-     * @param PollAnswerModelInterface[] $answers
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function votePoll(PollModelInterface $poll, array $answers): PodiumResponse
-    {
-        return $this->getPodium()->poll->vote($this->ensureMembership(), $poll, $answers);
-    }
-
-    /**
-     * Sends message.
-     * @param array $data
-     * @param MembershipInterface $receiver
-     * @param MessageParticipantModelInterface|null $replyTo
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     */
-    public function sendMessage(
-        array $data,
-        MembershipInterface $receiver,
-        MessageParticipantModelInterface $replyTo = null
-    ): PodiumResponse
-    {
-        return $this->getPodium()->message->send($data, $this->ensureMembership(), $receiver, $replyTo);
-    }
-
-    /**
-     * Deletes message.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     * @throws ModelNotFoundException
-     */
-    public function removeMessage(int $id): PodiumResponse
-    {
-        return $this->getPodium()->message->remove($id, $this->ensureMembership());
-    }
-
-    /**
-     * Archives message copy.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     * @throws ModelNotFoundException
-     */
-    public function archiveMessage(int $id): PodiumResponse
-    {
-        return $this->getPodium()->message->archive($id, $this->ensureMembership());
-    }
-
-    /**
-     * Revives message copy.
-     * @param int $id
-     * @return PodiumResponse
-     * @throws NoMembershipException
-     * @throws ModelNotFoundException
-     */
-    public function reviveMessage(int $id): PodiumResponse
-    {
-        return $this->getPodium()->message->revive($id, $this->ensureMembership());
+        return $this->getPodium()->thread->mark($post, $this->getMembership());
     }
 }
