@@ -35,7 +35,7 @@ So far the components ready are:
 - [x] Rank
 - [x] Group
 - [x] Member
-- [ ] Message
+- [x] Message
 - [ ] Account
 
 When API is ready, I'll start preparing the client.

@@ -72,7 +72,7 @@ final class MessageArchiver extends Component implements MessageArchiverInterfac
     }
 
     /**
-     * Revives the thread.
+     * Revives the message.
      */
     public function revive(MessageRepositoryInterface $message, MemberRepositoryInterface $participant): PodiumResponse
     {

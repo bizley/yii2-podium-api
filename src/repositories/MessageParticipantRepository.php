@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\MessageParticipantActiveRecord;
+use bizley\podium\api\enums\MessageSide;
+use bizley\podium\api\enums\MessageStatus;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MessageParticipantRepositoryInterface;
 use bizley\podium\api\interfaces\MessageRepositoryInterface;
 use LogicException;
@@ -143,6 +146,7 @@ final class MessageParticipantRepository implements MessageParticipantRepository
         $messageSide->archived = true;
         if (!$messageSide->validate()) {
             $this->errors = $messageSide->errors;
+
             return false;
         }
 
@@ -155,9 +159,37 @@ final class MessageParticipantRepository implements MessageParticipantRepository
         $messageSide->archived = false;
         if (!$messageSide->validate()) {
             $this->errors = $messageSide->errors;
+
             return false;
         }
 
         return $messageSide->save(false);
+    }
+
+    public function copy(
+        MessageRepositoryInterface $message,
+        MemberRepositoryInterface $member,
+        $sideId,
+        array $data = []
+    ): bool {
+        /** @var MessageParticipantActiveRecord $model */
+        $model = new $this->activeRecordClass();
+        if (!$model->load($data, '')) {
+            return false;
+        }
+
+        $model->message_id = $message->getId();
+        $model->member_id = $member->getId();
+        $model->archived = false;
+        $model->side_id = $sideId;
+        $model->status_id = MessageSide::SENDER === $sideId ? MessageStatus::READ : MessageStatus::NEW;
+
+        if (!$model->validate()) {
+            $this->errors = $model->errors;
+
+            return false;
+        }
+
+        return $model->save(false);
     }
 }

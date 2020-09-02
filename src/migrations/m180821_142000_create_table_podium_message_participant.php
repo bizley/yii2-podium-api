@@ -17,7 +17,7 @@ class m180821_142000_create_table_podium_message_participant extends Migration
         $db = $this->db;
         if ($db->driverName === 'mysql') {
             $tableOptions = 'CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci ENGINE=InnoDB';
-            $statusId = 'ENUM("new","read","replied") NOT NULL DEFAULT "new"';
+            $statusId = 'ENUM("new","read") NOT NULL DEFAULT "new"';
             $sideId = 'ENUM("sender","receiver") NOT NULL';
         } else {
             $statusId = $this->string(45)->notNull()->defaultValue(MessageStatus::NEW);

@@ -23,4 +23,11 @@ interface MessageParticipantRepositoryInterface
     public function archive(): bool;
 
     public function revive(): bool;
+
+    public function copy(
+        MessageRepositoryInterface $message,
+        MemberRepositoryInterface $member,
+        $sideId,
+        array $data = []
+    ): bool;
 }

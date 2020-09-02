@@ -58,10 +58,13 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
     }
 
     /**
-     * Creates new thread.
+     * Creates new post.
      */
-    public function create(MemberRepositoryInterface $author, RepositoryInterface $thread, array $data = []): PodiumResponse
-    {
+    public function create(
+        MemberRepositoryInterface $author,
+        RepositoryInterface $thread,
+        array $data = []
+    ): PodiumResponse {
         if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeCreate()) {
             return PodiumResponse::error();
         }

@@ -6,10 +6,6 @@ namespace bizley\podium\api\enums;
 
 use Yii;
 
-/**
- * Class MessageSide
- * @package bizley\podium\api\enums
- */
 final class MessageSide extends BaseEnum
 {
     public const SENDER = 'sender';

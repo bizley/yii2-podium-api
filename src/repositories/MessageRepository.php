@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\MessageActiveRecord;
+use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MessageParticipantRepositoryInterface;
 use bizley\podium\api\interfaces\MessageRepositoryInterface;
@@ -73,6 +74,63 @@ final class MessageRepository implements MessageRepositoryInterface
         $sender = $this->getModel()->sender;
         $receiver = $this->getModel()->receiver;
 
-        return $sender === null && $receiver === null;
+        return null === $sender && null === $receiver;
+    }
+
+    public function send(
+        MemberRepositoryInterface $sender,
+        MemberRepositoryInterface $receiver,
+        MessageRepositoryInterface $replyTo = null,
+        array $data = []
+    ): bool {
+        /** @var MessageActiveRecord $message */
+        $message = new $this->activeRecordClass();
+        if (!$message->load($data, '')) {
+            return false;
+        }
+
+        if ($replyTo) {
+            if (!$replyTo->isProperReply($sender, $receiver)) {
+                return false;
+            }
+            $message->reply_to_id = $replyTo->getId();
+        }
+
+        if (!$message->save()) {
+            $this->errors = $message->errors;
+
+            return false;
+        }
+
+        $this->setModel($message);
+
+        $messageSender = new MessageParticipantRepository();
+        if (!$messageSender->copy($this, $sender, MessageSide::SENDER)) {
+            $this->errors = $messageSender->getErrors();
+
+            return false;
+        }
+
+        $messageReceiver = new MessageParticipantRepository();
+        if (!$messageReceiver->copy($this, $receiver, MessageSide::RECEIVER)) {
+            $this->errors = $messageReceiver->getErrors();
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public function isProperReply(
+        MemberRepositoryInterface $replySender,
+        MemberRepositoryInterface $replyReceiver
+    ): bool {
+        $originalSender = $this->getModel()->sender;
+        $originalReceiver = $this->getModel()->receiver;
+
+        return $originalSender
+            && $originalSender->member_id === $replyReceiver->getId()
+            && $originalReceiver
+            && $originalReceiver->member_id === $replySender->getId();
     }
 }
