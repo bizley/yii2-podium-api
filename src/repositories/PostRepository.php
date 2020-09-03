@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PostActiveRecord;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
 
 final class PostRepository implements PostRepositoryInterface
@@ -60,33 +62,38 @@ final class PostRepository implements PostRepositoryInterface
         return $this->getModel()->created_at;
     }
 
-    public function create($authorId, $threadId, array $data = []): bool
-    {
+    public function create(
+        MemberRepositoryInterface $author,
+        ThreadRepositoryInterface $thread,
+        array $data = []
+    ): bool {
         /** @var PostActiveRecord $post */
         $post = new $this->activeRecordClass();
         if (!$post->load($data, '')) {
             return false;
         }
 
-        $post->author_id = $authorId;
-        $post->thread_id = $threadId;
+        $post->author_id = $author->getId();
+        $post->thread_id = $thread->getId();
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
+
             return false;
         }
 
         return $post->save(false);
     }
 
-    public function move($threadId): bool
+    public function move(ThreadRepositoryInterface $thread): bool
     {
         $post = $this->getModel();
 
-        $post->thread_id = $threadId;
+        $post->thread_id = $thread->getId();
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
+
             return false;
         }
 
@@ -101,6 +108,7 @@ final class PostRepository implements PostRepositoryInterface
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
+
             return false;
         }
 
@@ -115,6 +123,7 @@ final class PostRepository implements PostRepositoryInterface
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
+
             return false;
         }
 

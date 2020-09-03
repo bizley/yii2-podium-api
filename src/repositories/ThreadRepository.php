@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
+use bizley\podium\api\interfaces\ForumRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
@@ -60,7 +62,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $this->getModel()->posts_count;
     }
 
-    public function create($authorId, $forumId, array $data = []): bool
+    public function create(MemberRepositoryInterface $author, ForumRepositoryInterface $forum, array $data = []): bool
     {
         /** @var ThreadActiveRecord $thread */
         $thread = new $this->activeRecordClass();
@@ -68,8 +70,8 @@ final class ThreadRepository implements ThreadRepositoryInterface
             return false;
         }
 
-        $thread->author_id = $authorId;
-        $thread->forum_id = $forumId;
+        $thread->author_id = $author->getId();
+        $thread->forum_id = $forum->getId();
 
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
@@ -103,10 +105,10 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $thread->save(false);
     }
 
-    public function move($forumId): bool
+    public function move(ForumRepositoryInterface $forum): bool
     {
         $thread = $this->getModel();
-        $thread->forum_id = $forumId;
+        $thread->forum_id = $forum->getId();
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
             return false;

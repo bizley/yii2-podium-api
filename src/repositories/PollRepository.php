@@ -63,7 +63,7 @@ final class PollRepository implements PollRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function create(array $data, array $answers, $authorId, $threadId): bool
+    public function create($authorId, $threadId, array $data, array $answers = []): bool
     {
         /** @var PollActiveRecord $poll */
         $poll = new $this->activeRecordClass();

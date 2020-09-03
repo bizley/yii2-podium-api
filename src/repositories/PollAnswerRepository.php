@@ -5,17 +5,46 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollAnswerActiveRecord;
+use bizley\podium\api\ars\PollVoteActiveRecord;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
+use bizley\podium\api\interfaces\PollRepositoryInterface;
+use LogicException;
 
 final class PollAnswerRepository implements PollAnswerRepositoryInterface
 {
     public string $activeRecordClass = PollAnswerActiveRecord::class;
 
-    private $pollId;
+    private ?PollAnswerActiveRecord $model = null;
+    private PollRepositoryInterface $poll;
+    private array $errors = [];
 
-    public function __construct($pollId)
+    public function __construct(PollRepositoryInterface $poll)
     {
-        $this->pollId = $pollId;
+        $this->poll = $poll;
+    }
+
+    public function getModel(): PollAnswerActiveRecord
+    {
+        if (null === $this->model) {
+            throw new LogicException('You need to call fetchOne() or setModel() first!');
+        }
+
+        return $this->model;
+    }
+
+    public function setModel(?PollVoteActiveRecord $activeRecord): void
+    {
+        $this->model = $activeRecord;
+    }
+
+    public function getErrors(): array
+    {
+        return $this->errors;
+    }
+
+    public function getId(): int
+    {
+        return $this->getModel()->id;
     }
 
     public function isAnswer($id): bool
@@ -26,7 +55,7 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
             ->where(
                 [
                     'id' => $id,
-                    'poll_id' => $this->pollId,
+                    'poll_id' => $this->poll->getId(),
                 ]
             )
             ->exists();
@@ -37,7 +66,7 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         /** @var PollAnswerActiveRecord $model */
         $model = new $this->activeRecordClass();
 
-        $model->poll_id = $this->pollId;
+        $model->poll_id = $this->poll->getId();
         $model->answer = $answer;
 
         return $model->save();
@@ -49,7 +78,7 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         $model = $this->activeRecordClass;
         $model::deleteAll(
             [
-                'poll_id' => $this->pollId,
+                'poll_id' => $this->poll->getId(),
                 'id' => $id,
             ]
         );
@@ -64,12 +93,12 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         $model = $modelClass::find()
             ->where(
                 [
-                    'poll_id' => $this->pollId,
+                    'poll_id' => $this->poll->getId(),
                     'id' => $id,
                 ]
             )
             ->one();
-        if ($model === null) {
+        if (null === $model) {
             return false;
         }
 

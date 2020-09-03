@@ -15,6 +15,7 @@ use bizley\podium\api\repos\MessageRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\base\NotSupportedException;
+
 use function array_merge;
 
 /**

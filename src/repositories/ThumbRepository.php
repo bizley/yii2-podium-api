@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThumbActiveRecord;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\ThumbRepositoryInterface;
 use LogicException;
 use Throwable;
@@ -31,19 +33,19 @@ final class ThumbRepository implements ThumbRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function prepare($memberId, $postId): void
+    public function prepare(MemberRepositoryInterface $member, PostRepositoryInterface $post): void
     {
         /** @var ThumbActiveRecord $thumb */
         $thumb = new $this->activeRecordClass();
 
-        $thumb->member_id = $memberId;
-        $thumb->post_id = $postId;
+        $thumb->member_id = $member->getId();
+        $thumb->post_id = $post->getId();
         $thumb->thumb = 0;
 
         $this->model = $thumb;
     }
 
-    public function fetchOne($memberId, $postId): bool
+    public function fetchOne(MemberRepositoryInterface $member, PostRepositoryInterface $post): bool
     {
         /** @var ThumbActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
@@ -51,8 +53,8 @@ final class ThumbRepository implements ThumbRepositoryInterface
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'post_id' => $postId,
+                    'member_id' => $member->getId(),
+                    'post_id' => $post->getId(),
                 ]
             )
             ->one();
@@ -94,6 +96,7 @@ final class ThumbRepository implements ThumbRepositoryInterface
         $thumb->thumb = 1;
         if (!$thumb->validate()) {
             $this->errors = $thumb->errors;
+
             return false;
         }
 

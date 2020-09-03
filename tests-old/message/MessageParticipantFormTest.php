@@ -10,7 +10,6 @@ use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\models\message\MessageForm;
 use bizley\podium\api\repos\MessageParticipantRepo;
 use bizley\podium\tests\DbTestCase;
-use yii\base\NotSupportedException;
 
 /**
  * Class MessageParticipantFormTest

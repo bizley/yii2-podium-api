@@ -92,7 +92,7 @@ trait ActiveRecordRepositoryTrait
         return is_int($this->getModel()->delete());
     }
 
-    public function edit(array $data): bool
+    public function edit(array $data = []): bool
     {
         $model = $this->getModel();
         if (!$model->load($data, '')) {

@@ -6,9 +6,13 @@ namespace bizley\podium\api\interfaces;
 
 interface SubscriptionRepositoryInterface
 {
-    public function isMemberSubscribed($memberId, $threadId): bool;
-    public function subscribe($memberId, $threadId): bool;
-    public function fetchOne($memberId, $threadId): bool;
+    public function isMemberSubscribed(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool;
+
+    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool;
+
+    public function fetchOne(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool;
+
     public function getErrors(): array;
+
     public function delete(): bool;
 }

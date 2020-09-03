@@ -10,6 +10,7 @@ use bizley\podium\api\repos\MemberRepo;
 use bizley\podium\tests\DbTestCase;
 use yii\base\Event;
 use yii\helpers\ArrayHelper;
+
 use function array_merge;
 use function time;
 

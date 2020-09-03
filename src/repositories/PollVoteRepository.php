@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollVoteActiveRecord;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
+use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\PollVoteRepositoryInterface;
 use LogicException;
 
@@ -13,12 +16,12 @@ final class PollVoteRepository implements PollVoteRepositoryInterface
     public string $activeRecordClass = PollVoteActiveRecord::class;
 
     private ?PollVoteActiveRecord $model = null;
-    private $pollId;
+    private PollRepositoryInterface $poll;
     private array $errors = [];
 
-    public function __construct($pollId)
+    public function __construct(PollRepositoryInterface $poll)
     {
-        $this->pollId = $pollId;
+        $this->poll = $poll;
     }
 
     public function getModel(): PollVoteActiveRecord
@@ -40,31 +43,33 @@ final class PollVoteRepository implements PollVoteRepositoryInterface
         return $this->errors;
     }
 
-    public function hasMemberVoted($memberId): bool
+    public function hasMemberVoted(MemberRepositoryInterface $member): bool
     {
         /** @var PollVoteActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
+
         return $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'poll_id' => $this->pollId,
+                    'member_id' => $member->getId(),
+                    'poll_id' => $this->poll->getId(),
                 ]
             )
             ->exists();
     }
 
-    public function register($memberId, $answerId): bool
+    public function register(MemberRepositoryInterface $member, PollAnswerRepositoryInterface $answer): bool
     {
         /** @var PollVoteActiveRecord $vote */
         $vote = new $this->activeRecordClass();
 
-        $vote->member_id = $memberId;
-        $vote->answer_id = $answerId;
-        $vote->poll_id = $this->pollId;
+        $vote->member_id = $member->getId();
+        $vote->answer_id = $answer->getId();
+        $vote->poll_id = $this->poll->getId();
 
         if (!$vote->validate()) {
             $this->errors = $vote->errors;
+
             return false;
         }
 

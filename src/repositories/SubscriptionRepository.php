@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\SubscriptionActiveRecord;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -31,26 +33,26 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function isMemberSubscribed($memberId, $threadId): bool
+    public function isMemberSubscribed(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
         $modelClass = $this->activeRecordClass;
         /* @var SubscriptionActiveRecord $modelClass */
         return $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'thread_id' => $threadId,
+                    'member_id' => $member->getId(),
+                    'thread_id' => $thread->getId(),
                 ]
             )
             ->exists();
     }
 
-    public function subscribe($memberId, $threadId): bool
+    public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
         /** @var SubscriptionActiveRecord $model */
         $model = new $this->activeRecordClass();
-        $model->member_id = $memberId;
-        $model->thread_id = $threadId;
+        $model->member_id = $member->getId();
+        $model->thread_id = $thread->getId();
 
         if (!$model->validate()) {
             $this->errors = $model->errors;
@@ -60,7 +62,7 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         return $model->save(false);
     }
 
-    public function fetchOne($memberId, $threadId): bool
+    public function fetchOne(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
         /** @var SubscriptionActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
@@ -68,8 +70,8 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'thread_id' => $threadId,
+                    'member_id' => $member->getId(),
+                    'thread_id' => $thread->getId(),
                 ]
             )
             ->one();

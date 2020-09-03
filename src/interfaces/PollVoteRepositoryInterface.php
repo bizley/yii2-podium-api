@@ -6,9 +6,9 @@ namespace bizley\podium\api\interfaces;
 
 interface PollVoteRepositoryInterface
 {
-    public function hasMemberVoted($memberId): bool;
+    public function hasMemberVoted(MemberRepositoryInterface $member): bool;
 
     public function getErrors(): array;
 
-    public function register($memberId, $answerId): bool;
+    public function register(MemberRepositoryInterface $member, PollAnswerRepositoryInterface $answer): bool;
 }

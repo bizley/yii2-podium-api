@@ -78,15 +78,18 @@ final class Category extends Component implements CategoryInterface
         return $thread->getCollection();
     }
 
+    private ?CategoryBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): CategoryBuilderInterface
     {
-        /** @var CategoryBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+        if (null === $this->builder) {
+            $this->builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -109,15 +112,18 @@ final class Category extends Component implements CategoryInterface
         return $this->getBuilder()->edit($category, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            $this->remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -130,15 +136,18 @@ final class Category extends Component implements CategoryInterface
         return $this->getRemover()->remove($category);
     }
 
+    private ?SorterInterface $sorter = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getSorter(): SorterInterface
     {
-        /** @var SorterInterface $sorter */
-        $sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+        if (null === $this->sorter) {
+            $this->sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+        }
 
-        return $sorter;
+        return $this->sorter;
     }
 
     /**
@@ -161,15 +170,18 @@ final class Category extends Component implements CategoryInterface
         return $this->getSorter()->sort();
     }
 
+    private ?ArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): ArchiverInterface
     {
-        /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        if (null === $this->archiver) {
+            $this->archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**

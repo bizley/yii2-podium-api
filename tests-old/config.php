@@ -1,5 +1,4 @@
 <?php
-
 /**
  * You can override configuration values by creating a `config.local.php` file
  * and manipulate the `$config` variable.
@@ -12,8 +11,7 @@ $config = [
         'charset' => 'utf8mb4',
     ],
 ];
-if (is_file(__DIR__.'/config.local.php')) {
-    include __DIR__.'/config.local.php';
+if (is_file(__DIR__ . '/config.local.php')) {
+    include __DIR__ . '/config.local.php';
 }
-
 return $config;

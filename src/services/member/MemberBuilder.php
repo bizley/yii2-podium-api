@@ -55,6 +55,8 @@ final class MemberBuilder extends Component implements MemberBuilderInterface
 
     /**
      * Registers a member.
+     *
+     * @param int|string|array $id
      */
     public function register($id, array $data = []): PodiumResponse
     {

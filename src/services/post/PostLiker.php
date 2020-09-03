@@ -124,10 +124,8 @@ final class PostLiker extends Component implements LikerInterface
         try {
             $thumb = $this->getThumb();
             $rated = true;
-            $memberId = $member->getId();
-            $postId = $post->getId();
-            if (!$thumb->fetchOne($memberId, $postId)) {
-                $thumb->prepare($memberId, $postId);
+            if (!$thumb->fetchOne($member, $post)) {
+                $thumb->prepare($member, $post);
                 $rated = false;
             }
             if ($thumb->isDown()) {
