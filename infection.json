@@ -1,0 +1,14 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "logs": {
+        "text": "tests\/infection.log"
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 56
+}

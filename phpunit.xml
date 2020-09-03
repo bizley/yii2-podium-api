@@ -10,13 +10,13 @@
             <directory>./tests</directory>
         </testsuite>
     </testsuites>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
+    <coverage processUncoveredFiles="true">
+        <include>
             <directory suffix=".php">./src</directory>
-            <exclude>
-                <directory suffix=".php">./src/messages</directory>
-                <directory suffix=".php">./src/migrations</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+        </include>
+        <exclude>
+            <directory suffix=".php">./src/messages</directory>
+            <directory suffix=".php">./src/migrations</directory>
+        </exclude>
+    </coverage>
 </phpunit>
