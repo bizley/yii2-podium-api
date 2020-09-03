@@ -26,16 +26,8 @@ There are some rules:
  - each repository knows how to handle one single storage unit and not more,
  - components operate on repositories, not on identificators.
 
-So far the components ready are:
-- [x] Category
-- [x] Forum
-- [x] Thread
-- [x] Post
-- [x] Poll
-- [x] Rank
-- [x] Group
-- [x] Member
-- [x] Message
-- [ ] Account
+TODOs:
+ - [x] Components
+ - [ ] Tests
 
 When API is ready, I'll start preparing the client.
