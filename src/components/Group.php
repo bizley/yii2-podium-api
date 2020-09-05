@@ -20,6 +20,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Group extends Component implements GroupInterface
@@ -47,7 +49,7 @@ final class Group extends Component implements GroupInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById($id): ?GroupActiveRecord
+    public function getById(int $id): ?GroupActiveRecord
     {
         /** @var GroupRepository $group */
         $group = Instance::ensure($this->repositoryConfig, GroupRepositoryInterface::class);
@@ -59,6 +61,9 @@ final class Group extends Component implements GroupInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -71,15 +76,20 @@ final class Group extends Component implements GroupInterface
         return $group->getCollection();
     }
 
+    private ?BuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): BuilderInterface
     {
-        /** @var BuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var BuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -102,15 +112,20 @@ final class Group extends Component implements GroupInterface
         return $this->getBuilder()->edit($group, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -123,15 +138,20 @@ final class Group extends Component implements GroupInterface
         return $this->getRemover()->remove($group);
     }
 
+    private ?KeeperInterface $keeper = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getKeeper(): KeeperInterface
     {
-        /** @var KeeperInterface $keeper */
-        $keeper = Instance::ensure($this->keeperConfig, KeeperInterface::class);
+        if (null === $this->keeper) {
+            /** @var KeeperInterface $keeper */
+            $keeper = Instance::ensure($this->keeperConfig, KeeperInterface::class);
+            $this->keeper = $keeper;
+        }
 
-        return $keeper;
+        return $this->keeper;
     }
 
     /**

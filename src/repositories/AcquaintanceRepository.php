@@ -7,6 +7,7 @@ namespace bizley\podium\api\repositories;
 use bizley\podium\api\ars\AcquaintanceActiveRecord;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\interfaces\AcquaintanceRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -34,7 +35,7 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function fetchOne($memberId, $targetId): bool
+    public function fetchOne(MemberRepositoryInterface $member, MemberRepositoryInterface $target): bool
     {
         /** @var AcquaintanceActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
@@ -42,8 +43,8 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'target_id' => $targetId,
+                    'member_id' => $member->getId(),
+                    'target_id' => $target->getId(),
                 ]
             )
             ->one();
@@ -55,13 +56,13 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
         return true;
     }
 
-    public function prepare($memberId, $targetId): void
+    public function prepare(MemberRepositoryInterface $member, MemberRepositoryInterface $target): void
     {
         /** @var AcquaintanceActiveRecord $acquaintance */
         $acquaintance = new $this->activeRecordClass();
 
-        $acquaintance->member_id = $memberId;
-        $acquaintance->target_id = $targetId;
+        $acquaintance->member_id = $member->getId();
+        $acquaintance->target_id = $target->getId();
 
         $this->model = $acquaintance;
     }

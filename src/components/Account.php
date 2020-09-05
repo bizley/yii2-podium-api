@@ -15,10 +15,14 @@ use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\Podium;
 use bizley\podium\api\repositories\MemberRepository;
+use DomainException;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
 use yii\di\Instance;
+use yii\helpers\Json;
 use yii\web\User;
+
+use function is_string;
 
 final class Account extends Component implements AccountInterface
 {
@@ -51,23 +55,31 @@ final class Account extends Component implements AccountInterface
         return $this->podium;
     }
 
+    private ?MemberRepositoryInterface $member = null;
+
     /**
-     * TODO: add private vars to store repos for multiple time usage.
-     *
      * @throws InvalidConfigException
      * @throws NoMembershipException
      */
-    public function getMembership(): MemberRepositoryInterface
+    public function getMembership(bool $renew = false): MemberRepositoryInterface
     {
-        /** @var User $user */
-        $user = Instance::ensure($this->userConfig, User::class);
-        /** @var MemberRepository $member */
-        $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
-        if (!$member->fetchOne($user->getId())) {
-            throw new NoMembershipException('No Podium Membership found related to given identity!');
+        if (null === $this->member || $renew) {
+            /** @var User $user */
+            $user = Instance::ensure($this->userConfig, User::class);
+            $userId = Json::encode($user->getId());
+            if (!is_string($userId)) {
+                throw new DomainException('Invalid user ID!');
+            }
+
+            /** @var MemberRepository $member */
+            $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
+            if (!$member->fetchOne(['user_id' => $userId])) {
+                throw new NoMembershipException('No Podium Membership found related to given identity!');
+            }
+            $this->member = $member;
         }
 
-        return $member;
+        return $this->member;
     }
 
     /**

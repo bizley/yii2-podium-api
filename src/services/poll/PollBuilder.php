@@ -71,7 +71,7 @@ final class PollBuilder extends Component implements PollBuilderInterface
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $poll = $this->getPoll();
-            if (!$poll->create($author->getId(), $thread->getId(), $answers, $data)) {
+            if (!$poll->create($author, $thread, $answers, $data)) {
                 return PodiumResponse::error($poll->getErrors());
             }
 

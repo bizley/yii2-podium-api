@@ -10,6 +10,7 @@ use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 use yii\base\NotSupportedException;
+use yii\helpers\Json;
 
 final class MemberRepository implements MemberRepositoryInterface
 {
@@ -51,6 +52,9 @@ final class MemberRepository implements MemberRepositoryInterface
         throw new NotSupportedException('Member does not have parent!');
     }
 
+    /**
+     * @param int|string|array $id
+     */
     public function register($id, array $data = []): bool
     {
         /** @var MemberActiveRecord $member */
@@ -59,7 +63,7 @@ final class MemberRepository implements MemberRepositoryInterface
             return false;
         }
 
-        $member->user_id = $id; // TODO composite id handling
+        $member->user_id = Json::encode($id);
         $member->status_id = MemberStatus::REGISTERED;
 
         if (!$member->validate()) {

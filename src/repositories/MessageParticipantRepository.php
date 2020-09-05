@@ -10,14 +10,18 @@ use bizley\podium\api\enums\MessageStatus;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MessageParticipantRepositoryInterface;
 use bizley\podium\api\interfaces\MessageRepositoryInterface;
+use DomainException;
 use LogicException;
 use Throwable;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataProvider;
 use yii\data\DataFilter;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\db\StaleObjectException;
 
 use function is_int;
+use function is_string;
 
 final class MessageParticipantRepository implements MessageParticipantRepositoryInterface
 {
@@ -51,14 +55,14 @@ final class MessageParticipantRepository implements MessageParticipantRepository
         $this->collection = $collection;
     }
 
-    public function fetchOne($messageId, $memberId): bool
+    public function fetchOne(MessageRepositoryInterface $message, MemberRepositoryInterface $member): bool
     {
         $modelClass = $this->activeRecordClass;
         /** @var MessageParticipantActiveRecord $modelClass */
         $model = $modelClass::findOne(
             [
-                'message_id' => $messageId,
-                'member_id' => $memberId,
+                'message_id' => $message->getId(),
+                'member_id' => $member->getId(),
             ]
         );
         if (null === $model) {
@@ -70,6 +74,10 @@ final class MessageParticipantRepository implements MessageParticipantRepository
     }
 
     /**
+     * @param DataFilter|null            $filter
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws NotSupportedException
      */
     public function fetchAll($filter = null, $sort = null, $pagination = null): void
@@ -166,20 +174,35 @@ final class MessageParticipantRepository implements MessageParticipantRepository
         return $messageSide->save(false);
     }
 
+    /**
+     * @param string $sideId
+     */
     public function copy(
         MessageRepositoryInterface $message,
         MemberRepositoryInterface $member,
         $sideId,
         array $data = []
     ): bool {
+        $messageId = $message->getId();
+        if (!is_int($messageId)) {
+            throw new DomainException('Invalid message ID!');
+        }
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        if (!is_string($sideId)) {
+            throw new DomainException('Invalid side ID!');
+        }
+
         /** @var MessageParticipantActiveRecord $model */
         $model = new $this->activeRecordClass();
         if (!$model->load($data, '')) {
             return false;
         }
 
-        $model->message_id = $message->getId();
-        $model->member_id = $member->getId();
+        $model->message_id = $messageId;
+        $model->member_id = $memberId;
         $model->archived = false;
         $model->side_id = $sideId;
         $model->status_id = MessageSide::SENDER === $sideId ? MessageStatus::READ : MessageStatus::NEW;

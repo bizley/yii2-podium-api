@@ -73,7 +73,7 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         try {
             $thread = $this->getThread();
 
-            if (!$thread->create($author->getId(), $forum->getId(), $data)) {
+            if (!$thread->create($author, $forum, $data)) {
                 return PodiumResponse::error($thread->getErrors());
             }
 

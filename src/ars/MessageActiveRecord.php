@@ -13,15 +13,15 @@ use yii\db\ActiveRecord;
 /**
  * Message Active Record.
  *
- * @property int                            $id
- * @property int|null                       $reply_to_id
- * @property string                         $subject
- * @property string                         $content
- * @property int                            $created_at
- * @property int                            $updated_at
- * @property MessageActiveRecord|null       $replyTo
- * @property MessageParticipantActiveRecord $sender
- * @property MessageParticipantActiveRecord $receiver
+ * @property int                                 $id
+ * @property int|null                            $reply_to_id
+ * @property string                              $subject
+ * @property string                              $content
+ * @property int                                 $created_at
+ * @property int                                 $updated_at
+ * @property MessageActiveRecord|null            $replyTo
+ * @property MessageParticipantActiveRecord|null $sender
+ * @property MessageParticipantActiveRecord|null $receiver
  */
 class MessageActiveRecord extends ActiveRecord
 {

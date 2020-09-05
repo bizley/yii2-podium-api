@@ -25,6 +25,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Forum extends Component implements ForumInterface
@@ -62,7 +64,7 @@ final class Forum extends Component implements ForumInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById($id): ?ForumActiveRecord
+    public function getById(int $id): ?ForumActiveRecord
     {
         /** @var ForumRepository $forum */
         $forum = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
@@ -74,6 +76,9 @@ final class Forum extends Component implements ForumInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -86,15 +91,20 @@ final class Forum extends Component implements ForumInterface
         return $thread->getCollection();
     }
 
+    private ?CategorisedBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): CategorisedBuilderInterface
     {
-        /** @var CategorisedBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var CategorisedBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -120,15 +130,20 @@ final class Forum extends Component implements ForumInterface
         return $this->getBuilder()->edit($forum, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -141,15 +156,20 @@ final class Forum extends Component implements ForumInterface
         return $this->getRemover()->remove($forum);
     }
 
+    private ?SorterInterface $sorter = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getSorter(): SorterInterface
     {
-        /** @var SorterInterface $sorter */
-        $sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+        if (null === $this->sorter) {
+            /** @var SorterInterface $sorter */
+            $sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+            $this->sorter = $sorter;
+        }
 
-        return $sorter;
+        return $this->sorter;
     }
 
     /**
@@ -174,15 +194,20 @@ final class Forum extends Component implements ForumInterface
         return $this->getSorter()->sort();
     }
 
+    private ?MoverInterface $mover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getMover(): MoverInterface
     {
-        /** @var MoverInterface $mover */
-        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+        if (null === $this->mover) {
+            /** @var MoverInterface $mover */
+            $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+            $this->mover = $mover;
+        }
 
-        return $mover;
+        return $this->mover;
     }
 
     /**
@@ -195,15 +220,20 @@ final class Forum extends Component implements ForumInterface
         return $this->getMover()->move($forum, $category);
     }
 
+    private ?ArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): ArchiverInterface
     {
-        /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        if (null === $this->archiver) {
+            /** @var ArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            $this->archiver = $archiver;
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**

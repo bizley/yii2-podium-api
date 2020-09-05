@@ -34,15 +34,20 @@ final class Message extends Component implements MessageInterface
      */
     public $archiverConfig = MessageArchiver::class;
 
+    private ?MessengerInterface $messenger = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getMessenger(): MessengerInterface
     {
-        /** @var MessengerInterface $messenger */
-        $messenger = Instance::ensure($this->messengerConfig, MessengerInterface::class);
+        if (null === $this->messenger) {
+            /** @var MessengerInterface $messenger */
+            $messenger = Instance::ensure($this->messengerConfig, MessengerInterface::class);
+            $this->messenger = $messenger;
+        }
 
-        return $messenger;
+        return $this->messenger;
     }
 
     /**
@@ -59,15 +64,20 @@ final class Message extends Component implements MessageInterface
         return $this->getMessenger()->send($sender, $receiver, $replyTo, $data);
     }
 
+    private ?MessageRemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): MessageRemoverInterface
     {
-        /** @var MessageRemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, MessageRemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var MessageRemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, MessageRemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -80,15 +90,20 @@ final class Message extends Component implements MessageInterface
         return $this->getRemover()->remove($message, $participant);
     }
 
+    private ?MessageArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): MessageArchiverInterface
     {
-        /** @var MessageArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, MessageArchiverInterface::class);
+        if (null === $this->archiver) {
+            /** @var MessageArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, MessageArchiverInterface::class);
+            $this->archiver = $archiver;
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**

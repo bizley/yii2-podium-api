@@ -76,7 +76,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
 
             /** @var ForumRepositoryInterface $threadParent */
             $threadParent = $thread->getParent();
-            if (!$post->create($author->getId(), $thread->getId(), $data)) {
+            if (!$post->create($author, $thread, $data)) {
                 return PodiumResponse::error($post->getErrors());
             }
 

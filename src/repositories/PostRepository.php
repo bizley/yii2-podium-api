@@ -9,7 +9,10 @@ use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class PostRepository implements PostRepositoryInterface
 {
@@ -67,14 +70,23 @@ final class PostRepository implements PostRepositoryInterface
         ThreadRepositoryInterface $thread,
         array $data = []
     ): bool {
+        $authorId = $author->getId();
+        if (!is_int($authorId)) {
+            throw new DomainException('Invalid author ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var PostActiveRecord $post */
         $post = new $this->activeRecordClass();
         if (!$post->load($data, '')) {
             return false;
         }
 
-        $post->author_id = $author->getId();
-        $post->thread_id = $thread->getId();
+        $post->author_id = $authorId;
+        $post->thread_id = $threadId;
 
         if (!$post->validate()) {
             $this->errors = $post->errors;
@@ -87,9 +99,14 @@ final class PostRepository implements PostRepositoryInterface
 
     public function move(ThreadRepositoryInterface $thread): bool
     {
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         $post = $this->getModel();
 
-        $post->thread_id = $thread->getId();
+        $post->thread_id = $threadId;
 
         if (!$post->validate()) {
             $this->errors = $post->errors;

@@ -10,6 +10,8 @@ interface MemberBuilderInterface
 {
     /**
      * Registers new Podium account.
+     *
+     * @param int|string|array $id
      */
     public function register($id, array $data = []): PodiumResponse;
 

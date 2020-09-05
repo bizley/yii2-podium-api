@@ -17,6 +17,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Rank extends Component implements RankInterface
@@ -39,7 +41,7 @@ final class Rank extends Component implements RankInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById($id): ?RankActiveRecord
+    public function getById(int $id): ?RankActiveRecord
     {
         /** @var RankRepository $rank */
         $rank = Instance::ensure($this->repositoryConfig, RankRepositoryInterface::class);
@@ -51,6 +53,9 @@ final class Rank extends Component implements RankInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -63,15 +68,20 @@ final class Rank extends Component implements RankInterface
         return $rank->getCollection();
     }
 
+    private ?BuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): BuilderInterface
     {
-        /** @var BuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var BuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, BuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -94,15 +104,20 @@ final class Rank extends Component implements RankInterface
         return $this->getBuilder()->edit($rank, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**

@@ -25,6 +25,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Post extends Component implements PostInterface
@@ -74,6 +76,9 @@ final class Post extends Component implements PostInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -86,15 +91,20 @@ final class Post extends Component implements PostInterface
         return $poll->getCollection();
     }
 
+    private ?CategorisedBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): CategorisedBuilderInterface
     {
-        /** @var CategorisedBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var CategorisedBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -120,15 +130,20 @@ final class Post extends Component implements PostInterface
         return $this->getBuilder()->edit($post, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -141,15 +156,20 @@ final class Post extends Component implements PostInterface
         return $this->getRemover()->remove($post);
     }
 
+    private ?MoverInterface $mover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getMover(): MoverInterface
     {
-        /** @var MoverInterface $mover */
-        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+        if (null === $this->mover) {
+            /** @var MoverInterface $mover */
+            $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+            $this->mover = $mover;
+        }
 
-        return $mover;
+        return $this->mover;
     }
 
     /**
@@ -162,15 +182,20 @@ final class Post extends Component implements PostInterface
         return $this->getMover()->move($post, $thread);
     }
 
+    private ?ArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): ArchiverInterface
     {
-        /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        if (null === $this->archiver) {
+            /** @var ArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            $this->archiver = $archiver;
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**
@@ -193,15 +218,20 @@ final class Post extends Component implements PostInterface
         return $this->getArchiver()->revive($post);
     }
 
+    private ?LikerInterface $liker = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getLiker(): LikerInterface
     {
-        /** @var LikerInterface $liker */
-        $liker = Instance::ensure($this->likerConfig, LikerInterface::class);
+        if (null === $this->liker) {
+            /** @var LikerInterface $liker */
+            $liker = Instance::ensure($this->likerConfig, LikerInterface::class);
+            $this->liker = $liker;
+        }
 
-        return $liker;
+        return $this->liker;
     }
 
     /**

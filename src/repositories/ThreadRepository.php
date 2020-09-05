@@ -9,7 +9,10 @@ use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class ThreadRepository implements ThreadRepositoryInterface
 {
@@ -64,17 +67,27 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
     public function create(MemberRepositoryInterface $author, ForumRepositoryInterface $forum, array $data = []): bool
     {
+        $authorId = $author->getId();
+        if (!is_int($authorId)) {
+            throw new DomainException('Invalid author ID!');
+        }
+        $forumId = $forum->getId();
+        if (!is_int($forumId)) {
+            throw new DomainException('Invalid forum ID!');
+        }
+
         /** @var ThreadActiveRecord $thread */
         $thread = new $this->activeRecordClass();
         if (!$thread->load($data, '')) {
             return false;
         }
 
-        $thread->author_id = $author->getId();
-        $thread->forum_id = $forum->getId();
+        $thread->author_id = $authorId;
+        $thread->forum_id = $forumId;
 
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -87,6 +100,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->pinned = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -99,6 +113,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->pinned = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -107,10 +122,16 @@ final class ThreadRepository implements ThreadRepositoryInterface
 
     public function move(ForumRepositoryInterface $forum): bool
     {
+        $forumId = $forum->getId();
+        if (!is_int($forumId)) {
+            throw new DomainException('Invalid forum ID!');
+        }
+
         $thread = $this->getModel();
-        $thread->forum_id = $forum->getId();
+        $thread->forum_id = $forumId;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -123,6 +144,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->locked = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -135,6 +157,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->locked = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -147,6 +170,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->archived = true;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 
@@ -159,6 +183,7 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->archived = false;
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
+
             return false;
         }
 

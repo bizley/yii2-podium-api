@@ -32,6 +32,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Thread extends Component implements ThreadInterface
@@ -96,6 +98,9 @@ final class Thread extends Component implements ThreadInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -108,15 +113,20 @@ final class Thread extends Component implements ThreadInterface
         return $thread->getCollection();
     }
 
+    private ?CategorisedBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): CategorisedBuilderInterface
     {
-        /** @var CategorisedBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var CategorisedBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, CategorisedBuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -142,15 +152,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getBuilder()->edit($thread, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -163,15 +178,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getRemover()->remove($thread);
     }
 
+    private ?MoverInterface $mover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getMover(): MoverInterface
     {
-        /** @var MoverInterface $mover */
-        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+        if (null === $this->mover) {
+            /** @var MoverInterface $mover */
+            $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+            $this->mover = $mover;
+        }
 
-        return $mover;
+        return $this->mover;
     }
 
     /**
@@ -184,15 +204,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getMover()->move($thread, $forum);
     }
 
+    private ?PinnerInterface $pinner = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getPinner(): PinnerInterface
     {
-        /** @var PinnerInterface $pinner */
-        $pinner = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
+        if (null === $this->pinner) {
+            /** @var PinnerInterface $pinner */
+            $pinner = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
+            $this->pinner = $pinner;
+        }
 
-        return $pinner;
+        return $this->pinner;
     }
 
     /**
@@ -215,15 +240,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getPinner()->unpin($thread);
     }
 
+    private ?LockerInterface $locker = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getLocker(): LockerInterface
     {
-        /** @var LockerInterface $locker */
-        $locker = Instance::ensure($this->lockerConfig, LockerInterface::class);
+        if (null === $this->locker) {
+            /** @var LockerInterface $locker */
+            $locker = Instance::ensure($this->lockerConfig, LockerInterface::class);
+            $this->locker = $locker;
+        }
 
-        return $locker;
+        return $this->locker;
     }
 
     /**
@@ -246,15 +276,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getLocker()->unlock($thread);
     }
 
+    private ?ArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): ArchiverInterface
     {
-        /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        if (null === $this->archiver) {
+            /** @var ArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            $this->archiver = $archiver;
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**
@@ -277,15 +312,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getArchiver()->revive($thread);
     }
 
+    private ?SubscriberInterface $subscriber = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getSubscriber(): SubscriberInterface
     {
-        /** @var SubscriberInterface $subscriber */
-        $subscriber = Instance::ensure($this->subscriberConfig, SubscriberInterface::class);
+        if (null === $this->subscriber) {
+            /** @var SubscriberInterface $subscriber */
+            $subscriber = Instance::ensure($this->subscriberConfig, SubscriberInterface::class);
+            $this->subscriber = $subscriber;
+        }
 
-        return $subscriber;
+        return $this->subscriber;
     }
 
     /**
@@ -308,15 +348,20 @@ final class Thread extends Component implements ThreadInterface
         return $this->getSubscriber()->unsubscribe($thread, $member);
     }
 
+    private ?BookmarkerInterface $bookmarker = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBookmarker(): BookmarkerInterface
     {
-        /** @var BookmarkerInterface $bookmarker */
-        $bookmarker = Instance::ensure($this->bookmarkerConfig, BookmarkerInterface::class);
+        if (null === $this->bookmarker) {
+            /** @var BookmarkerInterface $bookmarker */
+            $bookmarker = Instance::ensure($this->bookmarkerConfig, BookmarkerInterface::class);
+            $this->bookmarker = $bookmarker;
+        }
 
-        return $bookmarker;
+        return $this->bookmarker;
     }
 
     /**

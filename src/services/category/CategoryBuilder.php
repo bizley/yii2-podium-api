@@ -64,7 +64,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         try {
             $category = $this->getCategory();
 
-            if (!$category->create($author->getId(), $data)) {
+            if (!$category->create($author, $data)) {
                 return PodiumResponse::error($category->getErrors());
             }
 

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\repositories;
 
+use LogicException;
 use Throwable;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataProvider;
@@ -24,8 +25,12 @@ trait ActiveRecordRepositoryTrait
 
     abstract public function setModel(ActiveRecord $model): void;
 
-    public function getCollection(): ?ActiveDataProvider
+    public function getCollection(): ActiveDataProvider
     {
+        if ($this->collection === null) {
+            throw new LogicException('You need to call fetchAll() first!');
+        }
+
         return $this->collection;
     }
 
@@ -39,6 +44,9 @@ trait ActiveRecordRepositoryTrait
         return $this->errors;
     }
 
+    /**
+     * @param int|string|array $id
+     */
     public function fetchOne($id): bool
     {
         $modelClass = $this->getActiveRecordClass();

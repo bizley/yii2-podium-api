@@ -28,6 +28,9 @@ There are some rules:
 
 TODOs:
  - [x] Components
- - [ ] Tests
+ - [x] PHPStan
+ - [ ] Unit tests
+ - [ ] Functional tests
+ - [ ] Infection
 
 When API is ready, I'll start preparing the client.

@@ -6,6 +6,8 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\BookmarkActiveRecord;
 use bizley\podium\api\interfaces\BookmarkRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use LogicException;
 
 final class BookmarkRepository implements BookmarkRepositoryInterface
@@ -29,7 +31,7 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         $this->model = $activeRecord;
     }
 
-    public function fetchOne($memberId, $threadId): bool
+    public function fetchOne(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
         /** @var BookmarkActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
@@ -37,8 +39,8 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $memberId,
-                    'thread_id' => $threadId,
+                    'member_id' => $member->getId(),
+                    'thread_id' => $thread->getId(),
                 ]
             )
             ->one();
@@ -55,13 +57,13 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         return $this->errors;
     }
 
-    public function prepare($memberId, $threadId): void
+    public function prepare(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): void
     {
         /** @var BookmarkActiveRecord $model */
         $model = new $this->activeRecordClass();
 
-        $model->member_id = $memberId;
-        $model->thread_id = $threadId;
+        $model->member_id = $member->getId();
+        $model->thread_id = $thread->getId();
 
         $this->model = $model;
     }

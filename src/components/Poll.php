@@ -25,6 +25,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Poll extends Component implements PollInterface
@@ -74,6 +76,9 @@ final class Poll extends Component implements PollInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -86,15 +91,20 @@ final class Poll extends Component implements PollInterface
         return $poll->getCollection();
     }
 
+    private ?PollBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): PollBuilderInterface
     {
-        /** @var PollBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, PollBuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var PollBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, PollBuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -121,15 +131,20 @@ final class Poll extends Component implements PollInterface
         return $this->getBuilder()->edit($poll, $answers, $data);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**
@@ -142,15 +157,20 @@ final class Poll extends Component implements PollInterface
         return $this->getRemover()->remove($poll);
     }
 
+    private ?VoterInterface $voter = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getVoter(): VoterInterface
     {
-        /** @var VoterInterface $voter */
-        $voter = Instance::ensure($this->voterConfig, VoterInterface::class);
+        if (null === $this->voter) {
+            /** @var VoterInterface $voter */
+            $voter = Instance::ensure($this->voterConfig, VoterInterface::class);
+            $this->voter = $voter;
+        }
 
-        return $voter;
+        return $this->voter;
     }
 
     /**
@@ -166,15 +186,20 @@ final class Poll extends Component implements PollInterface
         return $this->getVoter()->vote($poll, $member, $answers);
     }
 
+    private ?MoverInterface $mover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getMover(): MoverInterface
     {
-        /** @var MoverInterface $mover */
-        $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+        if (null === $this->mover) {
+            /** @var MoverInterface $mover */
+            $mover = Instance::ensure($this->moverConfig, MoverInterface::class);
+            $this->mover = $mover;
+        }
 
-        return $mover;
+        return $this->mover;
     }
 
     /**
@@ -187,15 +212,20 @@ final class Poll extends Component implements PollInterface
         return $this->getMover()->move($poll, $thread);
     }
 
+    private ?ArchiverInterface $archiver = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getArchiver(): ArchiverInterface
     {
-        /** @var ArchiverInterface $archiver */
-        $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+        if (null === $this->archiver) {
+            /** @var ArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            $this->archiver = $archiver;
+        }
 
-        return $archiver;
+        return $this->archiver;
     }
 
     /**

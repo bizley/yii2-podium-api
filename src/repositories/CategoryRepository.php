@@ -6,9 +6,13 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\CategoryActiveRecord;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use DomainException;
 use LogicException;
 use yii\base\NotSupportedException;
+
+use function is_int;
 
 use const SORT_ASC;
 use const SORT_DESC;
@@ -53,8 +57,13 @@ final class CategoryRepository implements CategoryRepositoryInterface
         throw new NotSupportedException('Category has no parent!');
     }
 
-    public function create($authorId, array $data = []): bool
+    public function create(MemberRepositoryInterface $author, array $data = []): bool
     {
+        $authorId = $author->getId();
+        if (!is_int($authorId)) {
+            throw new DomainException('Invalid author ID!');
+        }
+
         /** @var CategoryActiveRecord $category */
         $category = new $this->activeRecordClass();
         if (!$category->load($data, '')) {
@@ -64,7 +73,7 @@ final class CategoryRepository implements CategoryRepositoryInterface
         if (null === $category->sort) {
             /** @var CategoryActiveRecord $categoryClass */
             $categoryClass = $this->activeRecordClass;
-            /** @var CategoryActiveRecord $lastCategory */
+            /** @var CategoryActiveRecord|null $lastCategory */
             $lastCategory = $categoryClass::find()
                 ->orderBy(
                     [

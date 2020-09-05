@@ -22,6 +22,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Category extends Component implements CategoryInterface
@@ -54,7 +56,7 @@ final class Category extends Component implements CategoryInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById($id): ?CategoryActiveRecord
+    public function getById(int $id): ?CategoryActiveRecord
     {
         /** @var CategoryRepository $category */
         $category = Instance::ensure($this->repositoryConfig, CategoryRepositoryInterface::class);
@@ -66,6 +68,9 @@ final class Category extends Component implements CategoryInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -86,7 +91,9 @@ final class Category extends Component implements CategoryInterface
     public function getBuilder(): CategoryBuilderInterface
     {
         if (null === $this->builder) {
-            $this->builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+            /** @var CategoryBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, CategoryBuilderInterface::class);
+            $this->builder = $builder;
         }
 
         return $this->builder;
@@ -120,7 +127,9 @@ final class Category extends Component implements CategoryInterface
     public function getRemover(): RemoverInterface
     {
         if (null === $this->remover) {
-            $this->remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
         }
 
         return $this->remover;
@@ -144,7 +153,9 @@ final class Category extends Component implements CategoryInterface
     public function getSorter(): SorterInterface
     {
         if (null === $this->sorter) {
-            $this->sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+            /** @var SorterInterface $sorter */
+            $sorter = Instance::ensure($this->sorterConfig, SorterInterface::class);
+            $this->sorter = $sorter;
         }
 
         return $this->sorter;
@@ -178,7 +189,9 @@ final class Category extends Component implements CategoryInterface
     public function getArchiver(): ArchiverInterface
     {
         if (null === $this->archiver) {
-            $this->archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            /** @var ArchiverInterface $archiver */
+            $archiver = Instance::ensure($this->archiverConfig, ArchiverInterface::class);
+            $this->archiver = $archiver;
         }
 
         return $this->archiver;

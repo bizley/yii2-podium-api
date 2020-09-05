@@ -7,14 +7,17 @@ namespace bizley\podium\api\repositories;
 use bizley\podium\api\ars\PollActiveRecord;
 use bizley\podium\api\enums\PollAnswerAction;
 use bizley\podium\api\enums\PollChoice;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\PollVoteRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use DomainException;
 use Exception;
 use LogicException;
-use yii\helpers\ArrayHelper;
 
+use function is_int;
 use function is_string;
 
 final class PollRepository implements PollRepositoryInterface
@@ -63,8 +66,21 @@ final class PollRepository implements PollRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function create($authorId, $threadId, array $data, array $answers = []): bool
-    {
+    public function create(
+        MemberRepositoryInterface $author,
+        ThreadRepositoryInterface $thread,
+        array $data,
+        array $answers = []
+    ): bool {
+        $authorId = $author->getId();
+        if (!is_int($authorId)) {
+            throw new DomainException('Invalid author ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var PollActiveRecord $poll */
         $poll = new $this->activeRecordClass();
         if (!$poll->load($data, '')) {
@@ -115,9 +131,9 @@ final class PollRepository implements PollRepositoryInterface
                 $text = $answer;
                 $action = PollAnswerAction::ADD;
             } else {
-                $text = ArrayHelper::getValue($answer, 0);
-                $action = ArrayHelper::getValue($answer, 'action', PollAnswerAction::ADD);
-                $id = ArrayHelper::getValue($answer, 'id');
+                $text = $answer[0] ?? null;
+                $action = $answer['action'] ?? PollAnswerAction::ADD;
+                $id = $answer['id'] ?? null;
             }
 
             switch ($action) {
@@ -142,10 +158,17 @@ final class PollRepository implements PollRepositoryInterface
         return true;
     }
 
-    public function move($threadId): bool
+    public function move(ThreadRepositoryInterface $thread): bool
     {
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         $poll = $this->getModel();
+
         $poll->thread_id = $threadId;
+
         if (!$poll->validate()) {
             $this->errors = $poll->errors;
 
@@ -186,7 +209,7 @@ final class PollRepository implements PollRepositoryInterface
     public function getAnswerRepository(): PollAnswerRepositoryInterface
     {
         if (null === $this->pollAnswerRepository) {
-            $this->pollAnswerRepository = new PollAnswerRepository($this->getId());
+            $this->pollAnswerRepository = new PollAnswerRepository($this);
         }
 
         return $this->pollAnswerRepository;
@@ -197,15 +220,15 @@ final class PollRepository implements PollRepositoryInterface
     public function getVoteRepository(): PollVoteRepositoryInterface
     {
         if (null === $this->pollVoteRepository) {
-            $this->pollVoteRepository = new PollVoteRepository($this->getId());
+            $this->pollVoteRepository = new PollVoteRepository($this);
         }
 
         return $this->pollVoteRepository;
     }
 
-    public function hasMemberVoted($memberId): bool
+    public function hasMemberVoted(MemberRepositoryInterface $member): bool
     {
-        return $this->getVoteRepository()->hasMemberVoted($memberId);
+        return $this->getVoteRepository()->hasMemberVoted($member);
     }
 
     public function isSingleChoice(): bool
@@ -213,7 +236,7 @@ final class PollRepository implements PollRepositoryInterface
         return PollChoice::SINGLE === $this->getModel()->choice_id;
     }
 
-    public function vote($memberId, array $answers): bool
+    public function vote(MemberRepositoryInterface $member, array $answers): bool
     {
         foreach ($answers as $answerId) {
             if (!$this->getAnswerRepository()->isAnswer($answerId)) {
@@ -221,7 +244,7 @@ final class PollRepository implements PollRepositoryInterface
             }
 
             $pollVoteRepository = $this->getVoteRepository();
-            if (!$pollVoteRepository->register($memberId, $answerId)) {
+            if (!$pollVoteRepository->register($member, $answerId)) {
                 $this->errors = $pollVoteRepository->getErrors();
 
                 return false;

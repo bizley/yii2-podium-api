@@ -69,7 +69,7 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         try {
             $forum = $this->getForum();
 
-            if (!$forum->create($author->getId(), $category->getId(), $data)) {
+            if (!$forum->create($author, $category, $data)) {
                 return PodiumResponse::error($forum->getErrors());
             }
 

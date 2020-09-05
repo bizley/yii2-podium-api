@@ -5,9 +5,14 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ForumActiveRecord;
+use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class ForumRepository implements ForumRepositoryInterface
 {
@@ -55,8 +60,20 @@ final class ForumRepository implements ForumRepositoryInterface
         return $this->getModel()->archived;
     }
 
-    public function create($authorId, $categoryId, array $data = []): bool
-    {
+    public function create(
+        MemberRepositoryInterface $author,
+        CategoryRepositoryInterface $category,
+        array $data = []
+    ): bool {
+        $authorId = $author->getId();
+        if (!is_int($authorId)) {
+            throw new DomainException('Invalid author ID!');
+        }
+        $categoryId = $category->getId();
+        if (!is_int($categoryId)) {
+            throw new DomainException('Invalid category ID!');
+        }
+
         /** @var ForumActiveRecord $forum */
         $forum = new $this->activeRecordClass();
         if (!$forum->load($data, '')) {
@@ -66,7 +83,7 @@ final class ForumRepository implements ForumRepositoryInterface
         if (null === $forum->sort) {
             /** @var ForumActiveRecord $forumClass */
             $forumClass = $this->activeRecordClass;
-            /** @var ForumActiveRecord $lastForum */
+            /** @var ForumActiveRecord|null $lastForum */
             $lastForum = $forumClass::find()
                 ->orderBy(
                     [
@@ -172,10 +189,17 @@ final class ForumRepository implements ForumRepositoryInterface
         return true;
     }
 
-    public function move($categoryId): bool
+    public function move(CategoryRepositoryInterface $category): bool
     {
+        $categoryId = $category->getId();
+        if (!is_int($categoryId)) {
+            throw new DomainException('Invalid category ID!');
+        }
+
         $forum = $this->getModel();
+
         $forum->category_id = $categoryId;
+
         if (!$forum->validate()) {
             $this->errors = $forum->errors;
 

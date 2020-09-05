@@ -6,6 +6,8 @@ namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\GroupMemberActiveRecord;
 use bizley\podium\api\interfaces\GroupMemberRepositoryInterface;
+use bizley\podium\api\interfaces\GroupRepositoryInterface;
+use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use LogicException;
 use Throwable;
@@ -43,31 +45,34 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
         throw new NotSupportedException('Group does not have parent!');
     }
 
-    public function create($groupId, $memberId, array $data = []): bool
+    public function create(GroupRepositoryInterface $group, MemberRepositoryInterface $member, array $data = []): bool
     {
-        /** @var GroupMemberActiveRecord $group */
-        $group = new $this->activeRecordClass();
-        if (!$group->load($data, '')) {
+        /** @var GroupMemberActiveRecord $groupMember */
+        $groupMember = new $this->activeRecordClass();
+        if (!$groupMember->load($data, '')) {
             return false;
         }
 
-        if (!$group->validate()) {
-            $this->errors = $group->errors;
+        $groupMember->group_id = $group->getId();
+        $groupMember->member_id = $member->getId();
+
+        if (!$groupMember->validate()) {
+            $this->errors = $groupMember->errors;
 
             return false;
         }
 
-        return $group->save(false);
+        return $groupMember->save(false);
     }
 
-    public function fetchOne($groupId, $memberId): bool
+    public function fetchOne(GroupRepositoryInterface $group, MemberRepositoryInterface $member): bool
     {
         $modelClass = $this->activeRecordClass;
         /** @var GroupMemberActiveRecord $modelClass */
         $model = $modelClass::findOne(
             [
-                'group_id' => $groupId,
-                'member_id' => $memberId,
+                'group_id' => $group->getId(),
+                'member_id' => $member->getId(),
             ]
         );
         if (null === $model) {

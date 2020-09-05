@@ -9,7 +9,10 @@ use bizley\podium\api\enums\MessageSide;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MessageParticipantRepositoryInterface;
 use bizley\podium\api\interfaces\MessageRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class MessageRepository implements MessageRepositoryInterface
 {
@@ -90,10 +93,14 @@ final class MessageRepository implements MessageRepositoryInterface
         }
 
         if ($replyTo) {
+            $replyToId = $replyTo->getId();
+            if (!is_int($replyToId)) {
+                throw new DomainException('Invalid reply ID!');
+            }
             if (!$replyTo->isProperReply($sender, $receiver)) {
                 return false;
             }
-            $message->reply_to_id = $replyTo->getId();
+            $message->reply_to_id = $replyToId;
         }
 
         if (!$message->save()) {

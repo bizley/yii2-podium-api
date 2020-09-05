@@ -21,6 +21,8 @@ use yii\base\InvalidConfigException;
 use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
+use yii\data\Pagination;
+use yii\data\Sort;
 use yii\di\Instance;
 
 final class Member extends Component implements MemberInterface
@@ -53,7 +55,7 @@ final class Member extends Component implements MemberInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById($id): ?MemberActiveRecord
+    public function getById(int $id): ?MemberActiveRecord
     {
         /** @var MemberRepository $member */
         $member = Instance::ensure($this->repositoryConfig, MemberRepositoryInterface::class);
@@ -65,6 +67,9 @@ final class Member extends Component implements MemberInterface
     }
 
     /**
+     * @param bool|array|Sort|null       $sort
+     * @param bool|array|Pagination|null $pagination
+     *
      * @throws InvalidConfigException
      * @throws NotSupportedException
      */
@@ -77,15 +82,20 @@ final class Member extends Component implements MemberInterface
         return $member->getCollection();
     }
 
+    private ?MemberBuilderInterface $builder = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBuilder(): MemberBuilderInterface
     {
-        /** @var MemberBuilderInterface $builder */
-        $builder = Instance::ensure($this->builderConfig, MemberBuilderInterface::class);
+        if (null === $this->builder) {
+            /** @var MemberBuilderInterface $builder */
+            $builder = Instance::ensure($this->builderConfig, MemberBuilderInterface::class);
+            $this->builder = $builder;
+        }
 
-        return $builder;
+        return $this->builder;
     }
 
     /**
@@ -118,15 +128,20 @@ final class Member extends Component implements MemberInterface
         return $this->getBuilder()->activate($member);
     }
 
+    private ?AcquaintanceInterface $acquaintance = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getAcquaintance(): AcquaintanceInterface
     {
-        /** @var AcquaintanceInterface $acquaintance */
-        $acquaintance = Instance::ensure($this->acquaintanceConfig, AcquaintanceInterface::class);
+        if (null === $this->acquaintance) {
+            /** @var AcquaintanceInterface $acquaintance */
+            $acquaintance = Instance::ensure($this->acquaintanceConfig, AcquaintanceInterface::class);
+            $this->acquaintance = $acquaintance;
+        }
 
-        return $acquaintance;
+        return $this->acquaintance;
     }
 
     /**
@@ -169,15 +184,20 @@ final class Member extends Component implements MemberInterface
         return $this->getAcquaintance()->unignore($member, $target);
     }
 
+    private ?BanisherInterface $banisher = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getBanisher(): BanisherInterface
     {
-        /** @var BanisherInterface $banisher */
-        $banisher = Instance::ensure($this->banisherConfig, BanisherInterface::class);
+        if (null === $this->banisher) {
+            /** @var BanisherInterface $banisher */
+            $banisher = Instance::ensure($this->banisherConfig, BanisherInterface::class);
+            $this->banisher = $banisher;
+        }
 
-        return $banisher;
+        return $this->banisher;
     }
 
     /**
@@ -200,15 +220,20 @@ final class Member extends Component implements MemberInterface
         return $this->getBanisher()->unban($member);
     }
 
+    private ?RemoverInterface $remover = null;
+
     /**
      * @throws InvalidConfigException
      */
     public function getRemover(): RemoverInterface
     {
-        /** @var RemoverInterface $remover */
-        $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+        if (null === $this->remover) {
+            /** @var RemoverInterface $remover */
+            $remover = Instance::ensure($this->removerConfig, RemoverInterface::class);
+            $this->remover = $remover;
+        }
 
-        return $remover;
+        return $this->remover;
     }
 
     /**

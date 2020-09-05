@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PollAnswerActiveRecord;
-use bizley\podium\api\ars\PollVoteActiveRecord;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use LogicException;
@@ -15,7 +14,9 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
     public string $activeRecordClass = PollAnswerActiveRecord::class;
 
     private ?PollAnswerActiveRecord $model = null;
+
     private PollRepositoryInterface $poll;
+
     private array $errors = [];
 
     public function __construct(PollRepositoryInterface $poll)
@@ -32,7 +33,7 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?PollVoteActiveRecord $activeRecord): void
+    public function setModel(?PollAnswerActiveRecord $activeRecord): void
     {
         $this->model = $activeRecord;
     }
@@ -47,6 +48,9 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         return $this->getModel()->id;
     }
 
+    /**
+     * @param int $id
+     */
     public function isAnswer($id): bool
     {
         $modelClass = $this->activeRecordClass;
@@ -72,6 +76,9 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         return $model->save();
     }
 
+    /**
+     * @param int $id
+     */
     public function remove($id): bool
     {
         /** @var PollAnswerActiveRecord $model */
@@ -86,10 +93,14 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         return true;
     }
 
+    /**
+     * @param int $id
+     */
     public function edit($id, string $answer): bool
     {
         /** @var PollAnswerActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
+        /** @var PollAnswerActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
