@@ -61,14 +61,12 @@ final class GroupKeeper extends Component implements KeeperInterface
 
         try {
             $groupMember = $this->getGroupMember();
-            $groupId = $group->getId();
-            $memberId = $member->getId();
 
-            if ($groupMember->fetchOne($groupId, $memberId)) {
+            if ($groupMember->fetchOne($group, $member)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.already.joined')]);
             }
 
-            if (!$groupMember->create($groupId, $memberId)) {
+            if (!$groupMember->create($group, $member)) {
                 return PodiumResponse::error($groupMember->getErrors());
             }
 
@@ -103,10 +101,8 @@ final class GroupKeeper extends Component implements KeeperInterface
 
         try {
             $groupMember = $this->getGroupMember();
-            $groupId = $group->getId();
-            $memberId = $member->getId();
 
-            if (!$groupMember->fetchOne($groupId, $memberId)) {
+            if (!$groupMember->fetchOne($group, $member)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'group.not.joined')]);
             }
 

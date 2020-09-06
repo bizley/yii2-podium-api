@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\CategoryActiveRecord;
-use bizley\podium\api\interfaces\CategoryRepositoryInterface;
+use bizley\podium\api\interfaces\ARCategoryRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use DomainException;
@@ -17,7 +17,7 @@ use function is_int;
 use const SORT_ASC;
 use const SORT_DESC;
 
-final class CategoryRepository implements CategoryRepositoryInterface
+final class CategoryRepository implements ARCategoryRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 

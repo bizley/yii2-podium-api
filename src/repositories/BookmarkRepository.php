@@ -8,7 +8,10 @@ use bizley\podium\api\ars\BookmarkActiveRecord;
 use bizley\podium\api\interfaces\BookmarkRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class BookmarkRepository implements BookmarkRepositoryInterface
 {
@@ -33,14 +36,23 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
 
     public function fetchOne(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var BookmarkActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
         /** @var BookmarkActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'thread_id' => $thread->getId(),
+                    'member_id' => $memberId,
+                    'thread_id' => $threadId,
                 ]
             )
             ->one();
@@ -59,11 +71,20 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
 
     public function prepare(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): void
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var BookmarkActiveRecord $model */
         $model = new $this->activeRecordClass();
 
-        $model->member_id = $member->getId();
-        $model->thread_id = $thread->getId();
+        $model->member_id = $memberId;
+        $model->thread_id = $threadId;
 
         $this->model = $model;
     }
@@ -80,6 +101,7 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
 
         if (!$bookmark->validate()) {
             $this->errors = $bookmark->errors;
+
             return false;
         }
 

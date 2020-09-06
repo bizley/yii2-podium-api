@@ -9,6 +9,7 @@ use bizley\podium\api\interfaces\GroupMemberRepositoryInterface;
 use bizley\podium\api\interfaces\GroupRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
+use DomainException;
 use LogicException;
 use Throwable;
 use yii\base\NotSupportedException;
@@ -47,14 +48,23 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
 
     public function create(GroupRepositoryInterface $group, MemberRepositoryInterface $member, array $data = []): bool
     {
+        $groupId = $group->getId();
+        if (!is_int($groupId)) {
+            throw new DomainException('Invalid group ID!');
+        }
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+
         /** @var GroupMemberActiveRecord $groupMember */
         $groupMember = new $this->activeRecordClass();
         if (!$groupMember->load($data, '')) {
             return false;
         }
 
-        $groupMember->group_id = $group->getId();
-        $groupMember->member_id = $member->getId();
+        $groupMember->group_id = $groupId;
+        $groupMember->member_id = $memberId;
 
         if (!$groupMember->validate()) {
             $this->errors = $groupMember->errors;
@@ -67,12 +77,21 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
 
     public function fetchOne(GroupRepositoryInterface $group, MemberRepositoryInterface $member): bool
     {
+        $groupId = $group->getId();
+        if (!is_int($groupId)) {
+            throw new DomainException('Invalid group ID!');
+        }
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+
         $modelClass = $this->activeRecordClass;
         /** @var GroupMemberActiveRecord $modelClass */
         $model = $modelClass::findOne(
             [
-                'group_id' => $group->getId(),
-                'member_id' => $member->getId(),
+                'group_id' => $groupId,
+                'member_id' => $memberId,
             ]
         );
         if (null === $model) {

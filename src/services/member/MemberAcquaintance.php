@@ -65,10 +65,8 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            $memberId = $member->getId();
-            $targetId = $target->getId();
-            if (!$acquaintance->fetchOne($memberId, $targetId)) {
-                $acquaintance->prepare($memberId, $targetId);
+            if (!$acquaintance->fetchOne($member, $target)) {
+                $acquaintance->prepare($member, $target);
             }
             if (!$acquaintance->befriend()) {
                 return PodiumResponse::error($acquaintance->getErrors());
@@ -106,7 +104,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            if (!$acquaintance->fetchOne($member->getId(), $target->getId())) {
+            if (!$acquaintance->fetchOne($member, $target)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'acquaintance.not.exists')]);
             }
             if ($acquaintance->isIgnoring()) {
@@ -149,10 +147,8 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            $memberId = $member->getId();
-            $targetId = $target->getId();
-            if (!$acquaintance->fetchOne($memberId, $targetId)) {
-                $acquaintance->prepare($memberId, $targetId);
+            if (!$acquaintance->fetchOne($member, $target)) {
+                $acquaintance->prepare($member, $target);
             }
             if (!$acquaintance->ignore()) {
                 return PodiumResponse::error($acquaintance->getErrors());
@@ -190,7 +186,7 @@ final class MemberAcquaintance extends Component implements AcquaintanceInterfac
         try {
             $acquaintance = $this->getAcquaintance();
 
-            if (!$acquaintance->fetchOne($member->getId(), $target->getId())) {
+            if (!$acquaintance->fetchOne($member, $target)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'acquaintance.not.exists')]);
             }
             if ($acquaintance->isFriend()) {

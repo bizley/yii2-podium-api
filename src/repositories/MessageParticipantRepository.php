@@ -57,12 +57,21 @@ final class MessageParticipantRepository implements MessageParticipantRepository
 
     public function fetchOne(MessageRepositoryInterface $message, MemberRepositoryInterface $member): bool
     {
+        $messageId = $message->getId();
+        if (!is_int($messageId)) {
+            throw new DomainException('Invalid message ID!');
+        }
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+
         $modelClass = $this->activeRecordClass;
         /** @var MessageParticipantActiveRecord $modelClass */
         $model = $modelClass::findOne(
             [
-                'message_id' => $message->getId(),
-                'member_id' => $member->getId(),
+                'message_id' => $messageId,
+                'member_id' => $memberId,
             ]
         );
         if (null === $model) {

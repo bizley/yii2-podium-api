@@ -45,14 +45,13 @@ final class PollVoter extends Component implements VoterInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            $memberId = $member->getId();
-            if ($poll->hasMemberVoted($memberId)) {
+            if ($poll->hasMemberVoted($member)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.already.voted')]);
             }
             if ($answersCount > 1 && $poll->isSingleChoice()) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'poll.one.vote.allowed')]);
             }
-            if (!$poll->vote($memberId, $answers)) {
+            if (!$poll->vote($member, $answers)) {
                 return PodiumResponse::error($poll->getErrors());
             }
 

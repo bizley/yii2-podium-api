@@ -48,7 +48,7 @@ final class PostMover extends Component implements MoverInterface
         try {
             /** @var ForumRepositoryInterface $threadParent */
             $threadParent = $thread->getParent();
-            if (!$post->move($thread->getId())) {
+            if (!$post->move($thread)) {
                 return PodiumResponse::error($post->getErrors());
             }
 

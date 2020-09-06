@@ -41,7 +41,7 @@ final class ForumMover extends Component implements MoverInterface
         }
 
         try {
-            if (!$forum->move($category->getId())) {
+            if (!$forum->move($category)) {
                 return PodiumResponse::error($forum->getErrors());
             }
 

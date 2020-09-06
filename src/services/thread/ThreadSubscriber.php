@@ -60,15 +60,12 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         }
 
         try {
-            $memberId = $member->getId();
-            $threadId = $thread->getId();
-
             $subscription = $this->getSubscription();
-            if ($subscription->isMemberSubscribed($memberId, $threadId)) {
+            if ($subscription->isMemberSubscribed($member, $thread)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.already.subscribed')]);
             }
 
-            if (!$subscription->subscribe($memberId, $threadId)) {
+            if (!$subscription->subscribe($member, $thread)) {
                 return PodiumResponse::error($subscription->getErrors());
             }
 
@@ -103,7 +100,7 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
 
         try {
             $subscription = $this->getSubscription();
-            if (!$subscription->fetchOne($member->getId(), $thread->getId())) {
+            if (!$subscription->fetchOne($member, $thread)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.not.subscribed')]);
             }
 

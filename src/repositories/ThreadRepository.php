@@ -128,7 +128,9 @@ final class ThreadRepository implements ThreadRepositoryInterface
         }
 
         $thread = $this->getModel();
+
         $thread->forum_id = $forumId;
+
         if (!$thread->validate()) {
             $this->errors = $thread->errors;
 

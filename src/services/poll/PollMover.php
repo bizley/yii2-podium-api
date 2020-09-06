@@ -45,7 +45,7 @@ final class PollMover extends Component implements MoverInterface
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'thread.has.poll')]);
             }
 
-            if (!$poll->move($thread->getId())) {
+            if (!$poll->move($thread)) {
                 return PodiumResponse::error($thread->getErrors());
             }
 

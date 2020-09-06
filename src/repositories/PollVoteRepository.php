@@ -9,7 +9,10 @@ use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
 use bizley\podium\api\interfaces\PollVoteRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class PollVoteRepository implements PollVoteRepositoryInterface
 {
@@ -45,14 +48,23 @@ final class PollVoteRepository implements PollVoteRepositoryInterface
 
     public function hasMemberVoted(MemberRepositoryInterface $member): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         /** @var PollVoteActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
 
         return $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'poll_id' => $this->poll->getId(),
+                    'member_id' => $memberId,
+                    'poll_id' => $pollId,
                 ]
             )
             ->exists();
@@ -60,12 +72,25 @@ final class PollVoteRepository implements PollVoteRepositoryInterface
 
     public function register(MemberRepositoryInterface $member, PollAnswerRepositoryInterface $answer): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $answerId = $answer->getId();
+        if (!is_int($answerId)) {
+            throw new DomainException('Invalid answer ID!');
+        }
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         /** @var PollVoteActiveRecord $vote */
         $vote = new $this->activeRecordClass();
 
-        $vote->member_id = $member->getId();
-        $vote->answer_id = $answer->getId();
-        $vote->poll_id = $this->poll->getId();
+        $vote->member_id = $memberId;
+        $vote->answer_id = $answerId;
+        $vote->poll_id = $pollId;
 
         if (!$vote->validate()) {
             $this->errors = $vote->errors;

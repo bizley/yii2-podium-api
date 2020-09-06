@@ -68,10 +68,8 @@ final class PostLiker extends Component implements LikerInterface
         try {
             $thumb = $this->getThumb();
             $rated = true;
-            $memberId = $member->getId();
-            $postId = $post->getId();
-            if (!$thumb->fetchOne($memberId, $postId)) {
-                $thumb->prepare($memberId, $postId);
+            if (!$thumb->fetchOne($member, $post)) {
+                $thumb->prepare($member, $post);
                 $rated = false;
             }
             if ($thumb->isUp()) {
@@ -177,7 +175,7 @@ final class PostLiker extends Component implements LikerInterface
         $transaction = Yii::$app->db->beginTransaction();
         try {
             $thumb = $this->getThumb();
-            if (!$thumb->fetchOne($member->getId(), $post->getId())) {
+            if (!$thumb->fetchOne($member, $post)) {
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.rated')]);
             }
 

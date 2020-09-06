@@ -8,6 +8,7 @@ use bizley\podium\api\ars\AcquaintanceActiveRecord;
 use bizley\podium\api\enums\AcquaintanceType;
 use bizley\podium\api\interfaces\AcquaintanceRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use DomainException;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
@@ -37,14 +38,23 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
 
     public function fetchOne(MemberRepositoryInterface $member, MemberRepositoryInterface $target): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $targetId = $target->getId();
+        if (!is_int($targetId)) {
+            throw new DomainException('Invalid target ID!');
+        }
+
         /** @var AcquaintanceActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
         /** @var AcquaintanceActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'target_id' => $target->getId(),
+                    'member_id' => $memberId,
+                    'target_id' => $targetId,
                 ]
             )
             ->one();
@@ -58,11 +68,20 @@ final class AcquaintanceRepository implements AcquaintanceRepositoryInterface
 
     public function prepare(MemberRepositoryInterface $member, MemberRepositoryInterface $target): void
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $targetId = $target->getId();
+        if (!is_int($targetId)) {
+            throw new DomainException('Invalid target ID!');
+        }
+
         /** @var AcquaintanceActiveRecord $acquaintance */
         $acquaintance = new $this->activeRecordClass();
 
-        $acquaintance->member_id = $member->getId();
-        $acquaintance->target_id = $target->getId();
+        $acquaintance->member_id = $memberId;
+        $acquaintance->target_id = $targetId;
 
         $this->model = $acquaintance;
     }

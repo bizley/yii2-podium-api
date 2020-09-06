@@ -45,7 +45,7 @@ final class ThreadMover extends Component implements MoverInterface
         /** @var Transaction $transaction */
         $transaction = Yii::$app->db->beginTransaction();
         try {
-            if (!$thread->move($forum->getId())) {
+            if (!$thread->move($forum)) {
                 return PodiumResponse::error($thread->getErrors());
             }
 

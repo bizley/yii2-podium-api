@@ -8,9 +8,12 @@ use bizley\podium\api\ars\ThumbActiveRecord;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\ThumbRepositoryInterface;
+use DomainException;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
+
+use function is_int;
 
 final class ThumbRepository implements ThumbRepositoryInterface
 {
@@ -35,11 +38,20 @@ final class ThumbRepository implements ThumbRepositoryInterface
 
     public function prepare(MemberRepositoryInterface $member, PostRepositoryInterface $post): void
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $postId = $post->getId();
+        if (!is_int($postId)) {
+            throw new DomainException('Invalid post ID!');
+        }
+
         /** @var ThumbActiveRecord $thumb */
         $thumb = new $this->activeRecordClass();
 
-        $thumb->member_id = $member->getId();
-        $thumb->post_id = $post->getId();
+        $thumb->member_id = $memberId;
+        $thumb->post_id = $postId;
         $thumb->thumb = 0;
 
         $this->model = $thumb;
@@ -47,14 +59,23 @@ final class ThumbRepository implements ThumbRepositoryInterface
 
     public function fetchOne(MemberRepositoryInterface $member, PostRepositoryInterface $post): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $postId = $post->getId();
+        if (!is_int($postId)) {
+            throw new DomainException('Invalid post ID!');
+        }
+
         /** @var ThumbActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
         /** @var ThumbActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'post_id' => $post->getId(),
+                    'member_id' => $memberId,
+                    'post_id' => $postId,
                 ]
             )
             ->one();

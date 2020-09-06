@@ -10,6 +10,7 @@ use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\BookmarkRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
+use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\repositories\BookmarkRepository;
 use Throwable;
 use Yii;
@@ -62,10 +63,10 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
 
         try {
             $bookmark = $this->getBookmark();
-            $memberId = $member->getId();
-            $threadId = $post->getParent()->getId();
-            if (!$bookmark->fetchOne($memberId, $threadId)) {
-                $bookmark->prepare($memberId, $threadId);
+            /** @var ThreadRepositoryInterface $thread */
+            $thread = $post->getParent();
+            if (!$bookmark->fetchOne($member, $thread)) {
+                $bookmark->prepare($member, $thread);
             }
 
             $postCreatedTime = $post->getCreatedAt();

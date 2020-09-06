@@ -8,9 +8,12 @@ use bizley\podium\api\ars\SubscriptionActiveRecord;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
+use DomainException;
 use LogicException;
 use Throwable;
 use yii\db\StaleObjectException;
+
+use function is_int;
 
 final class SubscriptionRepository implements SubscriptionRepositoryInterface
 {
@@ -35,13 +38,22 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
 
     public function isMemberSubscribed(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         $modelClass = $this->activeRecordClass;
         /* @var SubscriptionActiveRecord $modelClass */
         return $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'thread_id' => $thread->getId(),
+                    'member_id' => $memberId,
+                    'thread_id' => $threadId,
                 ]
             )
             ->exists();
@@ -49,13 +61,24 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
 
     public function subscribe(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var SubscriptionActiveRecord $model */
         $model = new $this->activeRecordClass();
-        $model->member_id = $member->getId();
-        $model->thread_id = $thread->getId();
+
+        $model->member_id = $memberId;
+        $model->thread_id = $threadId;
 
         if (!$model->validate()) {
             $this->errors = $model->errors;
+
             return false;
         }
 
@@ -64,14 +87,23 @@ final class SubscriptionRepository implements SubscriptionRepositoryInterface
 
     public function fetchOne(MemberRepositoryInterface $member, ThreadRepositoryInterface $thread): bool
     {
+        $memberId = $member->getId();
+        if (!is_int($memberId)) {
+            throw new DomainException('Invalid member ID!');
+        }
+        $threadId = $thread->getId();
+        if (!is_int($threadId)) {
+            throw new DomainException('Invalid thread ID!');
+        }
+
         /** @var SubscriptionActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
         /** @var SubscriptionActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
-                    'member_id' => $member->getId(),
-                    'thread_id' => $thread->getId(),
+                    'member_id' => $memberId,
+                    'thread_id' => $threadId,
                 ]
             )
             ->one();

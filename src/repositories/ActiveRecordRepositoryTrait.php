@@ -17,6 +17,7 @@ use function is_int;
 trait ActiveRecordRepositoryTrait
 {
     private array $errors = [];
+
     private ?ActiveDataProvider $collection = null;
 
     abstract public function getActiveRecordClass(): string;
@@ -27,14 +28,14 @@ trait ActiveRecordRepositoryTrait
 
     public function getCollection(): ActiveDataProvider
     {
-        if ($this->collection === null) {
+        if (null === $this->collection) {
             throw new LogicException('You need to call fetchAll() first!');
         }
 
         return $this->collection;
     }
 
-    public function setCollection(?ActiveDataProvider $collection): void
+    public function setCollection(ActiveDataProvider $collection): void
     {
         $this->collection = $collection;
     }

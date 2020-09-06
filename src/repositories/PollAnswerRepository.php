@@ -7,7 +7,10 @@ namespace bizley\podium\api\repositories;
 use bizley\podium\api\ars\PollAnswerActiveRecord;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
+use DomainException;
 use LogicException;
+
+use function is_int;
 
 final class PollAnswerRepository implements PollAnswerRepositoryInterface
 {
@@ -53,13 +56,21 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
      */
     public function isAnswer($id): bool
     {
+        if (!is_int($id)) {
+            throw new DomainException('Invalid answer ID!');
+        }
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         $modelClass = $this->activeRecordClass;
         /* @var PollAnswerActiveRecord $modelClass */
         return $modelClass::find()
             ->where(
                 [
                     'id' => $id,
-                    'poll_id' => $this->poll->getId(),
+                    'poll_id' => $pollId,
                 ]
             )
             ->exists();
@@ -67,10 +78,15 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
 
     public function create(string $answer): bool
     {
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         /** @var PollAnswerActiveRecord $model */
         $model = new $this->activeRecordClass();
 
-        $model->poll_id = $this->poll->getId();
+        $model->poll_id = $pollId;
         $model->answer = $answer;
 
         return $model->save();
@@ -81,11 +97,19 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
      */
     public function remove($id): bool
     {
+        if (!is_int($id)) {
+            throw new DomainException('Invalid answer ID!');
+        }
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         /** @var PollAnswerActiveRecord $model */
         $model = $this->activeRecordClass;
         $model::deleteAll(
             [
-                'poll_id' => $this->poll->getId(),
+                'poll_id' => $pollId,
                 'id' => $id,
             ]
         );
@@ -98,13 +122,21 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
      */
     public function edit($id, string $answer): bool
     {
+        if (!is_int($id)) {
+            throw new DomainException('Invalid answer ID!');
+        }
+        $pollId = $this->poll->getId();
+        if (!is_int($pollId)) {
+            throw new DomainException('Invalid poll ID!');
+        }
+
         /** @var PollAnswerActiveRecord $modelClass */
         $modelClass = $this->activeRecordClass;
         /** @var PollAnswerActiveRecord|null $model */
         $model = $modelClass::find()
             ->where(
                 [
-                    'poll_id' => $this->poll->getId(),
+                    'poll_id' => $pollId,
                     'id' => $id,
                 ]
             )
