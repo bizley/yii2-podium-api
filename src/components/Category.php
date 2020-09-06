@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace bizley\podium\api\components;
 
 use bizley\podium\api\ars\CategoryActiveRecord;
+use bizley\podium\api\interfaces\ARCategoryRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
@@ -19,7 +20,6 @@ use bizley\podium\api\services\category\CategoryRemover;
 use bizley\podium\api\services\category\CategorySorter;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
@@ -58,8 +58,8 @@ final class Category extends Component implements CategoryInterface
      */
     public function getById(int $id): ?CategoryActiveRecord
     {
-        /** @var CategoryRepository $category */
-        $category = Instance::ensure($this->repositoryConfig, CategoryRepositoryInterface::class);
+        /** @var ARCategoryRepositoryInterface $category */
+        $category = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
         if (!$category->fetchOne($id)) {
             return null;
         }
@@ -72,12 +72,11 @@ final class Category extends Component implements CategoryInterface
      * @param bool|array|Pagination|null $pagination
      *
      * @throws InvalidConfigException
-     * @throws NotSupportedException
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var CategoryRepository $thread */
-        $thread = Instance::ensure($this->repositoryConfig, CategoryRepositoryInterface::class);
+        /** @var ARCategoryRepositoryInterface $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
         $thread->fetchAll($filter, $sort, $pagination);
 
         return $thread->getCollection();
