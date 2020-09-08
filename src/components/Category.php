@@ -54,6 +54,8 @@ final class Category extends Component implements CategoryInterface
     public $repositoryConfig = CategoryRepository::class;
 
     /**
+     * Returns category's active record.
+     *
      * @throws InvalidConfigException
      */
     public function getById(int $id): ?CategoryActiveRecord
@@ -68,6 +70,8 @@ final class Category extends Component implements CategoryInterface
     }
 
     /**
+     * Returns category's active data provider.
+     *
      * @param bool|array|Sort|null       $sort
      * @param bool|array|Pagination|null $pagination
      *
@@ -75,11 +79,11 @@ final class Category extends Component implements CategoryInterface
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ARCategoryRepositoryInterface $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
-        $thread->fetchAll($filter, $sort, $pagination);
+        /** @var ARCategoryRepositoryInterface $category */
+        $category = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
+        $category->fetchAll($filter, $sort, $pagination);
 
-        return $thread->getCollection();
+        return $category->getCollection();
     }
 
     private ?CategoryBuilderInterface $builder = null;
@@ -135,7 +139,7 @@ final class Category extends Component implements CategoryInterface
     }
 
     /**
-     * Deletes the category.
+     * Removes the category.
      *
      * @throws InvalidConfigException
      */
@@ -173,6 +177,8 @@ final class Category extends Component implements CategoryInterface
     }
 
     /**
+     * Normalizes the sort order of all categories.
+     *
      * @throws InvalidConfigException
      */
     public function sort(): PodiumResponse
