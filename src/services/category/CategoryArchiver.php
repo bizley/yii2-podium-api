@@ -20,6 +20,9 @@ final class CategoryArchiver extends Component implements ArchiverInterface
     public const EVENT_BEFORE_REVIVING = 'podium.category.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.category.reviving.after';
 
+    /**
+     * Calls before archiving the category.
+     */
     public function beforeArchive(): bool
     {
         $event = new ArchiveEvent();
@@ -48,15 +51,21 @@ final class CategoryArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while archiving category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after successful archiving the category.
+     */
     public function afterArchive(CategoryRepositoryInterface $category): void
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $category]));
     }
 
+    /**
+     * Calls before reviving the category.
+     */
     public function beforeRevive(): bool
     {
         $event = new ArchiveEvent();
@@ -85,10 +94,13 @@ final class CategoryArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while reviving category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after successful reviving the category.
+     */
     public function afterRevive(CategoryRepositoryInterface $category): void
     {
         $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $category]));
