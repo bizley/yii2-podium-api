@@ -18,6 +18,9 @@ final class CategoryRemover extends Component implements RemoverInterface
     public const EVENT_BEFORE_REMOVING = 'podium.category.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.category.removing.after';
 
+    /**
+     * Calls before removing the category.
+     */
     public function beforeRemove(): bool
     {
         $event = new RemoveEvent();
@@ -50,10 +53,13 @@ final class CategoryRemover extends Component implements RemoverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while deleting category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after removing the category.
+     */
     public function afterRemove(): void
     {
         $this->trigger(self::EVENT_AFTER_REMOVING);
