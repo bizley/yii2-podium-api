@@ -22,7 +22,7 @@ class CategoryArchiverTest extends TestCase
         $this->eventsRaised = [];
     }
 
-    public function testArchiveShouldTriggerBeforeAndAfterEventsWhenArchiveIsDone(): void
+    public function testArchiveShouldTriggerBeforeAndAfterEventsWhenArchivingIsDone(): void
     {
         $beforeHandler = function ($event) {
             $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_ARCHIVING] = $event instanceof ArchiveEvent;
@@ -46,7 +46,7 @@ class CategoryArchiverTest extends TestCase
         Event::off(CategoryArchiver::class, CategoryArchiver::EVENT_AFTER_ARCHIVING, $afterHandler);
     }
 
-    public function testArchiveShouldOnlyTriggerBeforeEventWhenArchiveErrored(): void
+    public function testArchiveShouldOnlyTriggerBeforeEventWhenArchivingErrored(): void
     {
         $beforeHandler = function () {
             $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_ARCHIVING] = true;
@@ -82,7 +82,7 @@ class CategoryArchiverTest extends TestCase
         Event::off(CategoryArchiver::class, CategoryArchiver::EVENT_BEFORE_ARCHIVING, $handler);
     }
 
-    public function testReviveShouldTriggerBeforeAndAfterEventsWhenReviveIsDone(): void
+    public function testReviveShouldTriggerBeforeAndAfterEventsWhenRevivingIsDone(): void
     {
         $beforeHandler = function ($event) {
             $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_REVIVING] = $event instanceof ArchiveEvent;
@@ -106,7 +106,7 @@ class CategoryArchiverTest extends TestCase
         Event::off(CategoryArchiver::class, CategoryArchiver::EVENT_AFTER_REVIVING, $afterHandler);
     }
 
-    public function testReviveShouldOnlyTriggerBeforeEventWhenReviveErrored(): void
+    public function testReviveShouldOnlyTriggerBeforeEventWhenRevivingErrored(): void
     {
         $beforeHandler = function () {
             $this->eventsRaised[CategoryArchiver::EVENT_BEFORE_REVIVING] = true;

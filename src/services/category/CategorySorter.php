@@ -46,21 +46,22 @@ final class CategorySorter extends Component implements SorterInterface
         return $this->category;
     }
 
+    /**
+     * Calls before replacing the order of categories.
+     */
     public function beforeReplace(): bool
     {
         $event = new SortEvent();
         $this->trigger(self::EVENT_BEFORE_REPLACING, $event);
 
-        return $event->canSort;
+        return $event->canReplace;
     }
 
     /**
      * Replaces the spot of the categories.
      */
-    public function replace(
-        RepositoryInterface $firstCategory,
-        RepositoryInterface $secondCategory
-    ): PodiumResponse {
+    public function replace(RepositoryInterface $firstCategory, RepositoryInterface $secondCategory): PodiumResponse
+    {
         if (
             !$firstCategory instanceof CategoryRepositoryInterface
             || !$secondCategory instanceof CategoryRepositoryInterface
@@ -91,15 +92,21 @@ final class CategorySorter extends Component implements SorterInterface
                 'podium'
             );
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after successful replacing the order of categories.
+     */
     public function afterReplace(): void
     {
         $this->trigger(self::EVENT_AFTER_REPLACING);
     }
 
+    /**
+     * Calls before sorting categories.
+     */
     public function beforeSort(): bool
     {
         $event = new SortEvent();
@@ -135,10 +142,13 @@ final class CategorySorter extends Component implements SorterInterface
                 'podium'
             );
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after successful sorting of categories.
+     */
     public function afterSort(): void
     {
         $this->trigger(self::EVENT_AFTER_SORTING);
