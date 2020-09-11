@@ -66,12 +66,15 @@ final class MemberRepository implements MemberRepositoryInterface
         $member->user_id = Json::encode($id);
         $member->status_id = MemberStatus::REGISTERED;
 
-        if (!$member->validate()) {
+        if (!$member->save()) {
             $this->errors = $member->errors;
+
             return false;
         }
 
-        return $member->save(false);
+        $this->setModel($member);
+
+        return true;
     }
 
     public function activate(): bool

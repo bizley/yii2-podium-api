@@ -58,11 +58,14 @@ final class RankRepository implements RankRepositoryInterface
             return false;
         }
 
-        if (!$rank->validate()) {
+        if (!$rank->save()) {
             $this->errors = $rank->errors;
+
             return false;
         }
 
-        return $rank->save(false);
+        $this->setModel($rank);
+
+        return true;
     }
 }

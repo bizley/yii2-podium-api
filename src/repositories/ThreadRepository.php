@@ -85,13 +85,15 @@ final class ThreadRepository implements ThreadRepositoryInterface
         $thread->author_id = $authorId;
         $thread->forum_id = $forumId;
 
-        if (!$thread->validate()) {
+        if (!$thread->save()) {
             $this->errors = $thread->errors;
 
             return false;
         }
 
-        return $thread->save(false);
+        $this->setModel($thread);
+
+        return true;
     }
 
     public function pin(): bool

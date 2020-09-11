@@ -88,13 +88,15 @@ final class PostRepository implements PostRepositoryInterface
         $post->author_id = $authorId;
         $post->thread_id = $threadId;
 
-        if (!$post->validate()) {
+        if (!$post->save()) {
             $this->errors = $post->errors;
 
             return false;
         }
 
-        return $post->save(false);
+        $this->setModel($post);
+
+        return true;
     }
 
     public function move(ThreadRepositoryInterface $thread): bool

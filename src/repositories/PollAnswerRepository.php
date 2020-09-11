@@ -89,7 +89,19 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
         $model->poll_id = $pollId;
         $model->answer = $answer;
 
-        return $model->save();
+        if (!$model->validate()) {
+            $this->errors = $model->errors;
+
+            return false;
+        }
+
+        if (!$model->save(false)) {
+            return false;
+        }
+
+        $this->setModel($model);
+
+        return true;
     }
 
     /**
@@ -145,6 +157,16 @@ final class PollAnswerRepository implements PollAnswerRepositoryInterface
             return false;
         }
 
-        return $model->save();
+        $model->answer = $answer;
+
+        if (!$model->save()) {
+            $this->errors = $model->errors;
+
+            return false;
+        }
+
+        $this->setModel($model);
+
+        return true;
     }
 }

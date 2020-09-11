@@ -216,12 +216,14 @@ final class MessageParticipantRepository implements MessageParticipantRepository
         $model->side_id = $sideId;
         $model->status_id = MessageSide::SENDER === $sideId ? MessageStatus::READ : MessageStatus::NEW;
 
-        if (!$model->validate()) {
+        if (!$model->save()) {
             $this->errors = $model->errors;
 
             return false;
         }
 
-        return $model->save(false);
+        $this->setModel($model);
+
+        return true;
     }
 }

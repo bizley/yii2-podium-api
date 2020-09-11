@@ -92,13 +92,15 @@ final class CategoryRepository implements ARCategoryRepositoryInterface
 
         $category->author_id = $authorId;
 
-        if (!$category->validate()) {
+        if (!$category->save()) {
             $this->errors = $category->errors;
 
             return false;
         }
 
-        return $category->save(false);
+        $this->setModel($category);
+
+        return true;
     }
 
     public function isArchived(): bool

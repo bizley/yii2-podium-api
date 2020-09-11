@@ -103,13 +103,15 @@ final class ForumRepository implements ForumRepositoryInterface
         $forum->author_id = $authorId;
         $forum->category_id = $categoryId;
 
-        if (!$forum->validate()) {
+        if (!$forum->save()) {
             $this->errors = $forum->errors;
 
             return false;
         }
 
-        return $forum->save(false);
+        $this->setModel($forum);
+
+        return true;
     }
 
     public function archive(): bool

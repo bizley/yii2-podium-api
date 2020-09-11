@@ -99,12 +99,14 @@ final class BookmarkRepository implements BookmarkRepositoryInterface
         $bookmark = $this->getModel();
         $bookmark->last_seen = $timeMark;
 
-        if (!$bookmark->validate()) {
+        if (!$bookmark->save()) {
             $this->errors = $bookmark->errors;
 
             return false;
         }
 
-        return $bookmark->save(false);
+        $this->setModel($bookmark);
+
+        return true;
     }
 }

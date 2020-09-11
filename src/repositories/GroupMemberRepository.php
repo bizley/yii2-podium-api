@@ -66,13 +66,15 @@ final class GroupMemberRepository implements GroupMemberRepositoryInterface
         $groupMember->group_id = $groupId;
         $groupMember->member_id = $memberId;
 
-        if (!$groupMember->validate()) {
+        if (!$groupMember->save()) {
             $this->errors = $groupMember->errors;
 
             return false;
         }
 
-        return $groupMember->save(false);
+        $this->setModel($groupMember);
+
+        return true;
     }
 
     public function fetchOne(GroupRepositoryInterface $group, MemberRepositoryInterface $member): bool

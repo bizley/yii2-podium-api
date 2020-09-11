@@ -58,12 +58,14 @@ final class GroupRepository implements GroupRepositoryInterface
             return false;
         }
 
-        if (!$group->validate()) {
+        if (!$group->save()) {
             $this->errors = $group->errors;
 
             return false;
         }
 
-        return $group->save(false);
+        $this->setModel($group);
+
+        return true;
     }
 }

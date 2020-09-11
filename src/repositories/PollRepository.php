@@ -96,7 +96,7 @@ final class PollRepository implements PollRepositoryInterface
             return false;
         }
 
-        $this->model = $poll;
+        $this->setModel($poll);
 
         $answerRepository = $this->getAnswerRepository();
         foreach ($answers as $answer) {
