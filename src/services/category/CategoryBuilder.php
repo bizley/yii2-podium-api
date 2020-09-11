@@ -74,7 +74,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         } catch (Throwable $exc) {
             Yii::error(['Exception while creating category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
@@ -111,7 +111,7 @@ final class CategoryBuilder extends Component implements CategoryBuilderInterfac
         } catch (Throwable $exc) {
             Yii::error(['Exception while editing category', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
