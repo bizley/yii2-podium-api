@@ -17,7 +17,7 @@ use bizley\podium\api\interfaces\SorterInterface;
 use PHPUnit\Framework\TestCase;
 use yii\base\InvalidConfigException;
 
-class CategoryTest extends TestCase
+class CategoryComponentTest extends TestCase
 {
     private Category $component;
 

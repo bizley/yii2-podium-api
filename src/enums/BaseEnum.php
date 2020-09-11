@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\enums;
 
-/**
- * Class BaseEnum
- * @package bizley\podium\api\enums
- */
+use function array_key_exists;
+use function array_keys;
+use function array_values;
+
 abstract class BaseEnum
 {
     /**
      * Source of ENUM.
      * Returns array with keys being the ENUMs and values being the ENUMs description.
-     * @return array
+     *
      * @codeCoverageIgnore
      */
     public static function data(): array
@@ -23,7 +23,6 @@ abstract class BaseEnum
 
     /**
      * Returns ENUMs description.
-     * @return array
      */
     public static function values(): array
     {
@@ -32,7 +31,6 @@ abstract class BaseEnum
 
     /**
      * Returns ENUMs.
-     * @return array
      */
     public static function keys(): array
     {
@@ -41,8 +39,10 @@ abstract class BaseEnum
 
     /**
      * Returns ENUM description.
-     * @param string $enum ENUM value
-     * @param mixed $default what to return in case ENUM has not been found
+     *
+     * @param string $enum    ENUM value
+     * @param mixed  $default what to return in case ENUM has not been found
+     *
      * @return mixed
      */
     public static function get(string $enum, $default = null)
@@ -52,8 +52,8 @@ abstract class BaseEnum
 
     /**
      * Checks if ENUM is defined.
+     *
      * @param string $enum ENUM value
-     * @return bool
      */
     public static function exists(string $enum): bool
     {
