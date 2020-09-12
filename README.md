@@ -1,5 +1,7 @@
 # Yii 2 Podium API
 
+![Build](https://github.com/bizley/yii2-podium-api/workflows/Tests/badge.svg)
+
 **[Work In Progress]**
 
 Sorry for neglecting this project for so long.
