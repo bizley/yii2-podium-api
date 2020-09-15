@@ -48,7 +48,7 @@ final class ForumArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while archiving forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
@@ -85,7 +85,7 @@ final class ForumArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while reviving forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

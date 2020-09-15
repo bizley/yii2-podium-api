@@ -79,7 +79,7 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         } catch (Throwable $exc) {
             Yii::error(['Exception while creating forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
@@ -116,7 +116,7 @@ final class ForumBuilder extends Component implements CategorisedBuilderInterfac
         } catch (Throwable $exc) {
             Yii::error(['Exception while editing forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

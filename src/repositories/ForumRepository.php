@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ForumActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use DomainException;
 use LogicException;
+use yii\db\ActiveRecord;
 
 use function is_int;
 
-final class ForumRepository implements ForumRepositoryInterface
+final class ForumRepository implements ForumRepositoryInterface, ActiveRecordRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -36,9 +38,13 @@ final class ForumRepository implements ForumRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?ForumActiveRecord $activeRecord): void
+    public function setModel(ActiveRecord $forumActiveRecord): void
     {
-        $this->model = $activeRecord;
+        if (!$forumActiveRecord instanceof ForumActiveRecord) {
+            throw new LogicException('You need to pass bizley\podium\api\ars\ForumActiveRecord!');
+        }
+
+        $this->model = $forumActiveRecord;
     }
 
     public function getId(): int

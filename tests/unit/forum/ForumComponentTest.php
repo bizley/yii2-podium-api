@@ -2,28 +2,30 @@
 
 declare(strict_types=1);
 
-namespace bizley\podium\tests\unit\category;
+namespace bizley\podium\tests\unit\forum;
 
-use bizley\podium\api\ars\CategoryActiveRecord;
-use bizley\podium\api\components\Category;
+use bizley\podium\api\ars\ForumActiveRecord;
+use bizley\podium\api\components\Forum;
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
-use bizley\podium\api\interfaces\CategoryBuilderInterface;
+use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
+use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
+use bizley\podium\api\interfaces\MoverInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
 use bizley\podium\api\interfaces\SorterInterface;
 use PHPUnit\Framework\TestCase;
 use yii\base\InvalidConfigException;
 
-class CategoryComponentTest extends TestCase
+class ForumComponentTest extends TestCase
 {
-    private Category $component;
+    private Forum $component;
 
     protected function setUp(): void
     {
-        $this->component = new Category();
+        $this->component = new Forum();
     }
 
     public function testGetByIdShouldThrowExceptionWhenRepositoryIsMisconfigured(): void
@@ -37,24 +39,24 @@ class CategoryComponentTest extends TestCase
 
     public function testGetByIdShouldReturnNullWhenModelDoesntExist(): void
     {
-        $categoryRepository = $this->createMock(ActiveRecordRepositoryInterface::class);
-        $categoryRepository->method('fetchOne')->willReturn(false);
-        $categoryRepository->method('getModel')->willReturn(new CategoryActiveRecord());
+        $forumRepository = $this->createMock(ActiveRecordRepositoryInterface::class);
+        $forumRepository->method('fetchOne')->willReturn(false);
+        $forumRepository->method('getModel')->willReturn(new ForumActiveRecord());
 
-        $this->component->repositoryConfig = $categoryRepository;
+        $this->component->repositoryConfig = $forumRepository;
 
         self::assertNull($this->component->getById(1));
     }
 
-    public function testGetByIdShouldReturnCategoryARWhenModelExists(): void
+    public function testGetByIdShouldReturnForumARWhenModelExists(): void
     {
-        $categoryRepository = $this->createMock(ActiveRecordRepositoryInterface::class);
-        $categoryRepository->method('fetchOne')->willReturn(true);
-        $categoryRepository->method('getModel')->willReturn(new CategoryActiveRecord());
+        $forumRepository = $this->createMock(ActiveRecordRepositoryInterface::class);
+        $forumRepository->method('fetchOne')->willReturn(true);
+        $forumRepository->method('getModel')->willReturn(new ForumActiveRecord());
 
-        $this->component->repositoryConfig = $categoryRepository;
+        $this->component->repositoryConfig = $forumRepository;
 
-        self::assertInstanceOf(CategoryActiveRecord::class, $this->component->getById(1));
+        self::assertInstanceOf(ForumActiveRecord::class, $this->component->getById(1));
     }
 
     public function testGetAllShouldThrowExceptionWhenRepositoryIsMisconfigured(): void
@@ -77,20 +79,23 @@ class CategoryComponentTest extends TestCase
 
     public function testCreateShouldRunBuildersCreate(): void
     {
-        $builder = $this->createMock(CategoryBuilderInterface::class);
+        $builder = $this->createMock(CategorisedBuilderInterface::class);
         $builder->expects(self::once())->method('create')->willReturn(PodiumResponse::success());
         $this->component->builderConfig = $builder;
 
-        $this->component->create($this->createMock(MemberRepositoryInterface::class));
+        $this->component->create(
+            $this->createMock(MemberRepositoryInterface::class),
+            $this->createMock(CategoryRepositoryInterface::class)
+        );
     }
 
     public function testEditShouldRunBuildersEdit(): void
     {
-        $builder = $this->createMock(CategoryBuilderInterface::class);
+        $builder = $this->createMock(CategorisedBuilderInterface::class);
         $builder->expects(self::once())->method('edit')->willReturn(PodiumResponse::success());
         $this->component->builderConfig = $builder;
 
-        $this->component->edit($this->createMock(CategoryRepositoryInterface::class));
+        $this->component->edit($this->createMock(ForumRepositoryInterface::class));
     }
 
     public function testGetRemoverShouldThrowExceptionWhenRemoverIsMisconfigured(): void
@@ -108,7 +113,7 @@ class CategoryComponentTest extends TestCase
         $remover->expects(self::once())->method('remove')->willReturn(PodiumResponse::success());
         $this->component->removerConfig = $remover;
 
-        $this->component->remove($this->createMock(CategoryRepositoryInterface::class));
+        $this->component->remove($this->createMock(ForumRepositoryInterface::class));
     }
 
     public function testGetSorterShouldThrowExceptionWhenSorterIsMisconfigured(): void
@@ -126,7 +131,7 @@ class CategoryComponentTest extends TestCase
         $sorter->expects(self::once())->method('replace')->willReturn(PodiumResponse::success());
         $this->component->sorterConfig = $sorter;
 
-        $category = $this->createMock(CategoryRepositoryInterface::class);
+        $category = $this->createMock(ForumRepositoryInterface::class);
         $this->component->replace($category, $category);
     }
 
@@ -154,7 +159,7 @@ class CategoryComponentTest extends TestCase
         $archiver->expects(self::once())->method('archive')->willReturn(PodiumResponse::success());
         $this->component->archiverConfig = $archiver;
 
-        $this->component->archive($this->createMock(CategoryRepositoryInterface::class));
+        $this->component->archive($this->createMock(ForumRepositoryInterface::class));
     }
 
     public function testReviveShouldRunArchiversRevive(): void
@@ -163,6 +168,27 @@ class CategoryComponentTest extends TestCase
         $archiver->expects(self::once())->method('revive')->willReturn(PodiumResponse::success());
         $this->component->archiverConfig = $archiver;
 
-        $this->component->revive($this->createMock(CategoryRepositoryInterface::class));
+        $this->component->revive($this->createMock(ForumRepositoryInterface::class));
+    }
+
+    public function testGetMoverShouldThrowExceptionWhenMoverIsMisconfigured(): void
+    {
+        $this->expectException(InvalidConfigException::class);
+
+        $this->component->moverConfig = '';
+
+        $this->component->getMover();
+    }
+
+    public function testMoveShouldRunMoversMove(): void
+    {
+        $mover = $this->createMock(MoverInterface::class);
+        $mover->expects(self::once())->method('move')->willReturn(PodiumResponse::success());
+        $this->component->moverConfig = $mover;
+
+        $this->component->move(
+            $this->createMock(ForumRepositoryInterface::class),
+            $this->createMock(CategoryRepositoryInterface::class)
+        );
     }
 }

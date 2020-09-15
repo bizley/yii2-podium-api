@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\ars\ForumActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\CategoryRepositoryInterface;
@@ -27,6 +27,7 @@ use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveRecord;
 use yii\di\Instance;
 
 final class Forum extends Component implements ForumInterface
@@ -64,10 +65,10 @@ final class Forum extends Component implements ForumInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?ForumActiveRecord
+    public function getById(int $id): ?ActiveRecord
     {
-        /** @var ForumRepository $forum */
-        $forum = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $forum */
+        $forum = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         if (!$forum->fetchOne($id)) {
             return null;
         }
@@ -84,8 +85,8 @@ final class Forum extends Component implements ForumInterface
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ForumRepository $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ForumRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         $thread->fetchAll($filter, $sort, $pagination);
 
         return $thread->getCollection();

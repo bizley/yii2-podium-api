@@ -50,7 +50,7 @@ final class ForumRemover extends Component implements RemoverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while deleting forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

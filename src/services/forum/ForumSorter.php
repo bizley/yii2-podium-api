@@ -51,7 +51,7 @@ final class ForumSorter extends Component implements SorterInterface
         $event = new SortEvent();
         $this->trigger(self::EVENT_BEFORE_REPLACING, $event);
 
-        return $event->canSort;
+        return $event->canReplace;
     }
 
     /**
@@ -89,7 +89,7 @@ final class ForumSorter extends Component implements SorterInterface
                 'podium'
             );
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
@@ -130,7 +130,7 @@ final class ForumSorter extends Component implements SorterInterface
             $transaction->rollBack();
             Yii::error(['Exception while sorting forums', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

@@ -51,7 +51,7 @@ final class ForumMover extends Component implements MoverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while moving forum', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

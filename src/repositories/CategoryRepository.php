@@ -5,19 +5,21 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\CategoryActiveRecord;
-use bizley\podium\api\interfaces\ARCategoryRepositoryInterface;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
+use bizley\podium\api\interfaces\CategoryRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use DomainException;
 use LogicException;
 use yii\base\NotSupportedException;
+use yii\db\ActiveRecord;
 
 use function is_int;
 
 use const SORT_ASC;
 use const SORT_DESC;
 
-final class CategoryRepository implements ARCategoryRepositoryInterface
+final class CategoryRepository implements CategoryRepositoryInterface, ActiveRecordRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -39,9 +41,13 @@ final class CategoryRepository implements ARCategoryRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?CategoryActiveRecord $activeRecord): void
+    public function setModel(ActiveRecord $categoryActiveRecord): void
     {
-        $this->model = $activeRecord;
+        if (!$categoryActiveRecord instanceof CategoryActiveRecord) {
+            throw new LogicException('You need to pass bizley\podium\api\ars\CategoryActiveRecord!');
+        }
+
+        $this->model = $categoryActiveRecord;
     }
 
     public function getId(): int

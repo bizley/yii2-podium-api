@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\ars\CategoryActiveRecord;
-use bizley\podium\api\interfaces\ARCategoryRepositoryInterface;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategoryBuilderInterface;
 use bizley\podium\api\interfaces\CategoryInterface;
@@ -24,6 +23,7 @@ use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveRecord;
 use yii\di\Instance;
 
 final class Category extends Component implements CategoryInterface
@@ -58,10 +58,10 @@ final class Category extends Component implements CategoryInterface
      *
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?CategoryActiveRecord
+    public function getById(int $id): ?ActiveRecord
     {
-        /** @var ARCategoryRepositoryInterface $category */
-        $category = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $category */
+        $category = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         if (!$category->fetchOne($id)) {
             return null;
         }
@@ -79,8 +79,8 @@ final class Category extends Component implements CategoryInterface
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ARCategoryRepositoryInterface $category */
-        $category = Instance::ensure($this->repositoryConfig, ARCategoryRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $category */
+        $category = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         $category->fetchAll($filter, $sort, $pagination);
 
         return $category->getCollection();
