@@ -43,20 +43,20 @@ use function is_array;
  * For Podium API documentation go to
  * https://github.com/bizley/yii2-podium-api/wiki
  *
- * @property Account $account
+ * @property Account  $account
  * @property Category $category
- * @property Forum $forum
- * @property Group $group
- * @property Member $member
- * @property Message $message
- * @property Poll $poll
- * @property Post $post
- * @property Rank $rank
- * @property Thread $thread
+ * @property Forum    $forum
+ * @property Group    $group
+ * @property Member   $member
+ * @property Message  $message
+ * @property Poll     $poll
+ * @property Post     $post
+ * @property Rank     $rank
+ * @property Thread   $thread
  */
 class Podium extends ServiceLocator
 {
-    private string $version = '1.0.0';
+    private string $version = '0.1.0';
 
     public function getVersion(): string
     {
@@ -235,7 +235,7 @@ class Podium extends ServiceLocator
             'class' => PhpMessageSource::class,
             'sourceLanguage' => 'en',
             'forceTranslation' => true,
-            'basePath' => __DIR__ . '/messages',
+            'basePath' => __DIR__.'/messages',
         ];
     }
 
