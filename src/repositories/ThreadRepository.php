@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\ThreadActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ForumRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use DomainException;
 use LogicException;
+use yii\db\ActiveRecord;
 
 use function is_int;
 
-final class ThreadRepository implements ThreadRepositoryInterface
+final class ThreadRepository implements ThreadRepositoryInterface, ActiveRecordRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -36,9 +38,13 @@ final class ThreadRepository implements ThreadRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?ThreadActiveRecord $activeRecord): void
+    public function setModel(ActiveRecord $threadActiveRecord): void
     {
-        $this->model = $activeRecord;
+        if (!$threadActiveRecord instanceof ThreadActiveRecord) {
+            throw new LogicException('You need to pass bizley\podium\api\ars\ThreadActiveRecord!');
+        }
+
+        $this->model = $threadActiveRecord;
     }
 
     public function getId(): int

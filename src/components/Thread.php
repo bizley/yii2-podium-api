@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\ars\ThreadActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\BookmarkerInterface;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
@@ -29,11 +29,11 @@ use bizley\podium\api\services\thread\ThreadRemover;
 use bizley\podium\api\services\thread\ThreadSubscriber;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveRecord;
 use yii\di\Instance;
 
 final class Thread extends Component implements ThreadInterface
@@ -86,10 +86,10 @@ final class Thread extends Component implements ThreadInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?ThreadActiveRecord
+    public function getById(int $id): ?ActiveRecord
     {
-        /** @var ThreadRepository $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         if (!$thread->fetchOne($id)) {
             return null;
         }
@@ -102,12 +102,11 @@ final class Thread extends Component implements ThreadInterface
      * @param bool|array|Pagination|null $pagination
      *
      * @throws InvalidConfigException
-     * @throws NotSupportedException
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
-        /** @var ThreadRepository $thread */
-        $thread = Instance::ensure($this->repositoryConfig, ThreadRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $thread */
+        $thread = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         $thread->fetchAll($filter, $sort, $pagination);
 
         return $thread->getCollection();

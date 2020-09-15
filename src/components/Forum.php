@@ -22,7 +22,6 @@ use bizley\podium\api\services\forum\ForumRemover;
 use bizley\podium\api\services\forum\ForumSorter;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
-use yii\base\NotSupportedException;
 use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
@@ -81,7 +80,6 @@ final class Forum extends Component implements ForumInterface
      * @param bool|array|Pagination|null $pagination
      *
      * @throws InvalidConfigException
-     * @throws NotSupportedException
      */
     public function getAll(ActiveDataFilter $filter = null, $sort = null, $pagination = null): ActiveDataProvider
     {
