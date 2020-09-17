@@ -45,6 +45,9 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $this->subscription;
     }
 
+    /**
+     * Calls before subscribing to the thread.
+     */
     public function beforeSubscribe(): bool
     {
         $event = new SubscriptionEvent();
@@ -53,6 +56,9 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canSubscribe;
     }
 
+    /**
+     * Subscribes to the thread.
+     */
     public function subscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeSubscribe()) {
@@ -75,15 +81,21 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while subscribing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after subscribing to the thread.
+     */
     public function afterSubscribe(SubscriptionRepositoryInterface $subscription): void
     {
         $this->trigger(self::EVENT_AFTER_SUBSCRIBING, new SubscriptionEvent(['repository' => $subscription]));
     }
 
+    /**
+     * Calls before unsubscribing from the thread.
+     */
     public function beforeUnsubscribe(): bool
     {
         $event = new SubscriptionEvent();
@@ -92,6 +104,9 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
         return $event->canUnsubscribe;
     }
 
+    /**
+     * Unsubscribes from the thread.
+     */
     public function unsubscribe(ThreadRepositoryInterface $thread, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeUnsubscribe()) {
@@ -111,16 +126,19 @@ final class ThreadSubscriber extends Component implements SubscriberInterface
             $this->afterUnsubscribe();
 
             return PodiumResponse::success();
-        } catch (Throwable $exception) {
+        } catch (Throwable $exc) {
             Yii::error(
-                ['Exception while unsubscribing thread', $exception->getMessage(), $exception->getTraceAsString()],
+                ['Exception while unsubscribing thread', $exc->getMessage(), $exc->getTraceAsString()],
                 'podium'
             );
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after unsubscribing from the thread successfully.
+     */
     public function afterUnsubscribe(): void
     {
         $this->trigger(self::EVENT_AFTER_UNSUBSCRIBING);

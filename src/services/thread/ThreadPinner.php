@@ -19,6 +19,9 @@ final class ThreadPinner extends Component implements PinnerInterface
     public const EVENT_BEFORE_UNPINNING = 'podium.thread.unpinning.before';
     public const EVENT_AFTER_UNPINNING = 'podium.thread.unpinning.after';
 
+    /**
+     * Calls before pinning the thread.
+     */
     public function beforePin(): bool
     {
         $event = new PinEvent();
@@ -27,6 +30,9 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canPin;
     }
 
+    /**
+     * Pins the thread.
+     */
     public function pin(ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforePin()) {
@@ -44,15 +50,21 @@ final class ThreadPinner extends Component implements PinnerInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while pinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after pinning the thread successfully.
+     */
     public function afterPin(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_PINNING, new PinEvent(['repository' => $thread]));
     }
 
+    /**
+     * Calls before unpinning the thread.
+     */
     public function beforeUnpin(): bool
     {
         $event = new PinEvent();
@@ -61,6 +73,9 @@ final class ThreadPinner extends Component implements PinnerInterface
         return $event->canUnpin;
     }
 
+    /**
+     * Unpins the thread.
+     */
     public function unpin(ThreadRepositoryInterface $thread): PodiumResponse
     {
         if (!$this->beforeUnpin()) {
@@ -78,10 +93,13 @@ final class ThreadPinner extends Component implements PinnerInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while unpinning thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after unpinning the thread successfully.
+     */
     public function afterUnpin(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_UNPINNING, new PinEvent(['repository' => $thread]));

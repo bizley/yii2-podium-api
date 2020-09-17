@@ -46,6 +46,9 @@ final class ForumSorter extends Component implements SorterInterface
         return $this->forum;
     }
 
+    /**
+     * Calls before replacing the order of forums.
+     */
     public function beforeReplace(): bool
     {
         $event = new SortEvent();
@@ -93,11 +96,17 @@ final class ForumSorter extends Component implements SorterInterface
         }
     }
 
+    /**
+     * Calls after replacing the forums order successfully.
+     */
     public function afterReplace(): void
     {
         $this->trigger(self::EVENT_AFTER_REPLACING);
     }
 
+    /**
+     * Calls before sorting the forums.
+     */
     public function beforeSort(): bool
     {
         $event = new SortEvent();
@@ -134,6 +143,9 @@ final class ForumSorter extends Component implements SorterInterface
         }
     }
 
+    /**
+     * Calls after sorting forums successfully.
+     */
     public function afterSort(): void
     {
         $this->trigger(self::EVENT_AFTER_SORTING);

@@ -20,6 +20,9 @@ final class ThreadArchiver extends Component implements ArchiverInterface
     public const EVENT_BEFORE_REVIVING = 'podium.thread.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.thread.reviving.after';
 
+    /**
+     * Calls before archiving the thread.
+     */
     public function beforeArchive(): bool
     {
         $event = new ArchiveEvent();
@@ -52,11 +55,17 @@ final class ThreadArchiver extends Component implements ArchiverInterface
         }
     }
 
+    /**
+     * Calls after archiving the thread successfully.
+     */
     public function afterArchive(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $thread]));
     }
 
+    /**
+     * Calls before reviving the thread.
+     */
     public function beforeRevive(): bool
     {
         $event = new ArchiveEvent();
@@ -89,6 +98,9 @@ final class ThreadArchiver extends Component implements ArchiverInterface
         }
     }
 
+    /**
+     * Calls after reviving the thread successfully.
+     */
     public function afterRevive(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $thread]));

@@ -21,6 +21,9 @@ final class ThreadRemover extends Component implements RemoverInterface
     public const EVENT_BEFORE_REMOVING = 'podium.thread.removing.before';
     public const EVENT_AFTER_REMOVING = 'podium.thread.removing.after';
 
+    /**
+     * Calls before removing the thread.
+     */
     public function beforeRemove(): bool
     {
         $event = new RemoveEvent();
@@ -67,6 +70,9 @@ final class ThreadRemover extends Component implements RemoverInterface
         }
     }
 
+    /**
+     * Calls after removing the thread successfully.
+     */
     public function afterRemove(): void
     {
         $this->trigger(self::EVENT_AFTER_REMOVING);

@@ -19,6 +19,9 @@ final class ForumMover extends Component implements MoverInterface
     public const EVENT_BEFORE_MOVING = 'podium.forum.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.forum.moving.after';
 
+    /**
+     * Calls before moving the forum.
+     */
     public function beforeMove(): bool
     {
         $event = new MoveEvent();
@@ -55,6 +58,9 @@ final class ForumMover extends Component implements MoverInterface
         }
     }
 
+    /**
+     * Calls after moving the forum successfully.
+     */
     public function afterMove(ForumRepositoryInterface $forum): void
     {
         $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['repository' => $forum]));

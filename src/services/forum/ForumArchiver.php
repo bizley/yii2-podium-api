@@ -20,6 +20,9 @@ final class ForumArchiver extends Component implements ArchiverInterface
     public const EVENT_BEFORE_REVIVING = 'podium.forum.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.forum.reviving.after';
 
+    /**
+     * Calls before archiving the forum.
+     */
     public function beforeArchive(): bool
     {
         $event = new ArchiveEvent();
@@ -52,11 +55,17 @@ final class ForumArchiver extends Component implements ArchiverInterface
         }
     }
 
+    /**
+     * Calls after archiving the forum successfully.
+     */
     public function afterArchive(ForumRepositoryInterface $forum): void
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $forum]));
     }
 
+    /**
+     * Calls before reviving the forum.
+     */
     public function beforeRevive(): bool
     {
         $event = new ArchiveEvent();
@@ -89,6 +98,9 @@ final class ForumArchiver extends Component implements ArchiverInterface
         }
     }
 
+    /**
+     * Calls after reviving the forum successfully.
+     */
     public function afterRevive(ForumRepositoryInterface $forum): void
     {
         $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $forum]));

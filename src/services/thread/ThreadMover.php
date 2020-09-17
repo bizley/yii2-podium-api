@@ -21,6 +21,9 @@ final class ThreadMover extends Component implements MoverInterface
     public const EVENT_BEFORE_MOVING = 'podium.thread.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.thread.moving.after';
 
+    /**
+     * Calls before moving the thread.
+     */
     public function beforeMove(): bool
     {
         $event = new MoveEvent();
@@ -72,6 +75,9 @@ final class ThreadMover extends Component implements MoverInterface
         }
     }
 
+    /**
+     * Calls after moving the thread successfully.
+     */
     public function afterMove(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['repository' => $thread]));

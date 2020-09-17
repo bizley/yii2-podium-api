@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\RepositoryInterface;
+use bizley\podium\api\interfaces\SubscriptionRepositoryInterface;
 use yii\base\Event;
 
 class SubscriptionEvent extends Event
@@ -19,5 +19,5 @@ class SubscriptionEvent extends Event
      */
     public bool $canUnsubscribe = true;
 
-    public ?RepositoryInterface $repository = null;
+    public ?SubscriptionRepositoryInterface $repository = null;
 }

@@ -68,7 +68,7 @@ class ForumRemoverTest extends TestCase
         Event::off(ForumRemover::class, ForumRemover::EVENT_AFTER_REMOVING, $afterHandler);
     }
 
-    public function testRemoveShouldOnlyTriggerBeforeEventWhenCategoryIsNotArchived(): void
+    public function testRemoveShouldOnlyTriggerBeforeEventWhenForumIsNotArchived(): void
     {
         $beforeHandler = function () {
             $this->eventsRaised[ForumRemover::EVENT_BEFORE_REMOVING] = true;

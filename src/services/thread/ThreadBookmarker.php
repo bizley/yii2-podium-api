@@ -44,6 +44,9 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
         return $this->bookmark;
     }
 
+    /**
+     * Calls before marking the thread.
+     */
     public function beforeMark(): bool
     {
         $event = new BookmarkEvent();
@@ -70,11 +73,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
             }
 
             $postCreatedTime = $post->getCreatedAt();
-            if ($bookmark->getLastSeen() >= $postCreatedTime) {
-                return PodiumResponse::success();
-            }
-
-            if (!$bookmark->mark($postCreatedTime)) {
+            if ($bookmark->getLastSeen() < $postCreatedTime && !$bookmark->mark($postCreatedTime)) {
                 return PodiumResponse::error($bookmark->getErrors());
             }
 
@@ -88,6 +87,9 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
         }
     }
 
+    /**
+     * Calls after marking the thread successfully.
+     */
     public function afterMark(BookmarkRepositoryInterface $bookmark): void
     {
         $this->trigger(self::EVENT_AFTER_MARKING, new BookmarkEvent(['repository' => $bookmark]));

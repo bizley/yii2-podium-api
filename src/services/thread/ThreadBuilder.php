@@ -48,6 +48,9 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         return $this->thread;
     }
 
+    /**
+     * Calls before creating the thread.
+     */
     public function beforeCreate(): bool
     {
         $event = new BuildEvent();
@@ -93,11 +96,17 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         }
     }
 
+    /**
+     * Calls after creating the thread successfully.
+     */
     public function afterCreate(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $thread]));
     }
 
+    /**
+     * Calls before editing the thread.
+     */
     public function beforeEdit(): bool
     {
         $event = new BuildEvent();
@@ -130,6 +139,9 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         }
     }
 
+    /**
+     * Calls after editing the thread successfully.
+     */
     public function afterEdit(ThreadRepositoryInterface $thread): void
     {
         $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $thread]));
