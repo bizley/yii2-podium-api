@@ -89,7 +89,7 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
             $transaction->rollBack();
             Yii::error(['Exception while creating thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
@@ -126,7 +126,7 @@ final class ThreadBuilder extends Component implements CategorisedBuilderInterfa
         } catch (Throwable $exc) {
             Yii::error(['Exception while editing thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

@@ -7,6 +7,7 @@ namespace bizley\podium\tests;
 use PHPUnit\Framework\TestCase;
 use Yii;
 use yii\console\Application;
+use yii\i18n\PhpMessageSource;
 
 class AppTestCase extends TestCase
 {
@@ -17,6 +18,15 @@ class AppTestCase extends TestCase
                 'id' => 'PodiumAPITest',
                 'basePath' => __DIR__,
                 'vendorPath' => __DIR__ . '/../vendor/',
+                'components' => [
+                    'i18n' => [
+                        'translations' => [
+                            'podium.*' => [
+                                'class' => PhpMessageSource::class,
+                            ],
+                        ],
+                    ],
+                ],
             ]
         );
     }

@@ -55,15 +55,15 @@ final class ThreadRemover extends Component implements RemoverInterface
                 throw new Exception('Error while updating forum counters!');
             }
 
-            $transaction->commit();
             $this->afterRemove();
+            $transaction->commit();
 
             return PodiumResponse::success();
         } catch (Throwable $exc) {
             $transaction->rollBack();
             Yii::error(['Exception while deleting thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

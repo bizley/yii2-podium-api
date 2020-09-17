@@ -43,7 +43,7 @@ class ForumRemoverTest extends TestCase
         self::assertEmpty($result->getErrors());
     }
 
-    public function testRemoveShouldReturnErrorWhenCategoryIsNotArchived(): void
+    public function testRemoveShouldReturnErrorWhenForumIsNotArchived(): void
     {
         $forum = $this->createMock(ForumRepositoryInterface::class);
         $forum->method('isArchived')->willReturn(false);

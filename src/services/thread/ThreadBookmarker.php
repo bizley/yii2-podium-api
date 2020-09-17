@@ -84,7 +84,7 @@ final class ThreadBookmarker extends Component implements BookmarkerInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while bookmarking thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 

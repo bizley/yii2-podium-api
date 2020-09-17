@@ -68,7 +68,7 @@ final class ThreadMover extends Component implements MoverInterface
             $transaction->rollBack();
             Yii::error(['Exception while moving thread', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
