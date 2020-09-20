@@ -23,4 +23,8 @@ interface PostRepositoryInterface extends RepositoryInterface
     public function revive(): bool;
 
     public function updateCounters(int $likes, int $dislikes): bool;
+
+    public function pin(): bool;
+
+    public function unpin(): bool;
 }

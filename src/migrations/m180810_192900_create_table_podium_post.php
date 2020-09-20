@@ -25,6 +25,7 @@ class m180810_192900_create_table_podium_post extends Migration
             'author_id' => $this->integer()->notNull(),
             'content' => $this->text()->notNull(),
             'edited' => $this->boolean()->notNull()->defaultValue(false),
+            'pinned' => $this->boolean()->notNull()->defaultValue(false),
             'likes' => $this->integer()->notNull()->defaultValue(0),
             'dislikes' => $this->integer()->notNull()->defaultValue(0),
             'created_at' => $this->integer()->notNull(),

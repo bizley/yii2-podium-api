@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\ars\PostActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\CategorisedBuilderInterface;
 use bizley\podium\api\interfaces\LikerInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
+use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\PostInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RemoverInterface;
@@ -19,6 +20,7 @@ use bizley\podium\api\services\post\PostArchiver;
 use bizley\podium\api\services\post\PostBuilder;
 use bizley\podium\api\services\post\PostLiker;
 use bizley\podium\api\services\post\PostMover;
+use bizley\podium\api\services\post\PostPinner;
 use bizley\podium\api\services\post\PostRemover;
 use yii\base\Component;
 use yii\base\InvalidConfigException;
@@ -27,6 +29,7 @@ use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveRecord;
 use yii\di\Instance;
 
 final class Post extends Component implements PostInterface
@@ -57,6 +60,11 @@ final class Post extends Component implements PostInterface
     public $moverConfig = PostMover::class;
 
     /**
+     * @var string|array|PinnerInterface
+     */
+    public $pinnerConfig = PostPinner::class;
+
+    /**
      * @var string|array|PostRepositoryInterface
      */
     public $repositoryConfig = PostRepository::class;
@@ -64,10 +72,10 @@ final class Post extends Component implements PostInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?PostActiveRecord
+    public function getById(int $id): ?ActiveRecord
     {
-        /** @var PostRepository $post */
-        $post = Instance::ensure($this->repositoryConfig, PostRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $post */
+        $post = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         if (!$post->fetchOne($id)) {
             return null;
         }
@@ -262,5 +270,41 @@ final class Post extends Component implements PostInterface
     public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         return $this->getLiker()->thumbReset($post, $member);
+    }
+
+    private ?PinnerInterface $pinner = null;
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getPinner(): PinnerInterface
+    {
+        if (null === $this->pinner) {
+            /** @var PinnerInterface $pinner */
+            $pinner = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
+            $this->pinner = $pinner;
+        }
+
+        return $this->pinner;
+    }
+
+    /**
+     * Pins post.
+     *
+     * @throws InvalidConfigException
+     */
+    public function pin(PostRepositoryInterface $post): PodiumResponse
+    {
+        return $this->getPinner()->pin($post);
+    }
+
+    /**
+     * Unpins post.
+     *
+     * @throws InvalidConfigException
+     */
+    public function unpin(PostRepositoryInterface $post): PodiumResponse
+    {
+        return $this->getPinner()->unpin($post);
     }
 }

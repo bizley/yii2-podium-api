@@ -49,6 +49,9 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
         return $this->post;
     }
 
+    /**
+     * Calls before creating the post.
+     */
     public function beforeCreate(): bool
     {
         $event = new BuildEvent();
@@ -95,15 +98,21 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
             $transaction->rollBack();
             Yii::error(['Exception while creating post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after creating the post successfully.
+     */
     public function afterCreate(PostRepositoryInterface $post): void
     {
         $this->trigger(self::EVENT_AFTER_CREATING, new BuildEvent(['repository' => $post]));
     }
 
+    /**
+     * Calls before editing the post.
+     */
     public function beforeEdit(): bool
     {
         $event = new BuildEvent();
@@ -113,7 +122,7 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
     }
 
     /**
-     * Edits the thread.
+     * Edits the post.
      */
     public function edit(RepositoryInterface $post, array $data = []): PodiumResponse
     {
@@ -132,10 +141,13 @@ final class PostBuilder extends Component implements CategorisedBuilderInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while editing post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after editing the post successfully.
+     */
     public function afterEdit(PostRepositoryInterface $post): void
     {
         $this->trigger(self::EVENT_AFTER_EDITING, new BuildEvent(['repository' => $post]));

@@ -5,16 +5,18 @@ declare(strict_types=1);
 namespace bizley\podium\api\repositories;
 
 use bizley\podium\api\ars\PostActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PostRepositoryInterface;
 use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use DomainException;
 use LogicException;
+use yii\db\ActiveRecord;
 
 use function is_int;
 
-final class PostRepository implements PostRepositoryInterface
+final class PostRepository implements PostRepositoryInterface, ActiveRecordRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -36,9 +38,13 @@ final class PostRepository implements PostRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?PostActiveRecord $activeRecord): void
+    public function setModel(ActiveRecord $postActiveRecord): void
     {
-        $this->model = $activeRecord;
+        if (!$postActiveRecord instanceof PostActiveRecord) {
+            throw new LogicException('You need to pass bizley\podium\api\ars\PostActiveRecord!');
+        }
+
+        $this->model = $postActiveRecord;
     }
 
     public function getId(): int
@@ -157,5 +163,31 @@ final class PostRepository implements PostRepositoryInterface
                 'dislikes' => $dislikes,
             ]
         );
+    }
+
+    public function pin(): bool
+    {
+        $post = $this->getModel();
+        $post->pinned = true;
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+
+            return false;
+        }
+
+        return $post->save(false);
+    }
+
+    public function unpin(): bool
+    {
+        $post = $this->getModel();
+        $post->pinned = false;
+        if (!$post->validate()) {
+            $this->errors = $post->errors;
+
+            return false;
+        }
+
+        return $post->save(false);
     }
 }

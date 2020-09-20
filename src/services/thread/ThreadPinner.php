@@ -7,6 +7,7 @@ namespace bizley\podium\api\services\thread;
 use bizley\podium\api\components\PodiumResponse;
 use bizley\podium\api\events\PinEvent;
 use bizley\podium\api\interfaces\PinnerInterface;
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use Throwable;
 use Yii;
@@ -33,9 +34,9 @@ final class ThreadPinner extends Component implements PinnerInterface
     /**
      * Pins the thread.
      */
-    public function pin(ThreadRepositoryInterface $thread): PodiumResponse
+    public function pin(RepositoryInterface $thread): PodiumResponse
     {
-        if (!$this->beforePin()) {
+        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforePin()) {
             return PodiumResponse::error();
         }
 
@@ -76,9 +77,9 @@ final class ThreadPinner extends Component implements PinnerInterface
     /**
      * Unpins the thread.
      */
-    public function unpin(ThreadRepositoryInterface $thread): PodiumResponse
+    public function unpin(RepositoryInterface $thread): PodiumResponse
     {
-        if (!$this->beforeUnpin()) {
+        if (!$thread instanceof ThreadRepositoryInterface || !$this->beforeUnpin()) {
             return PodiumResponse::error();
         }
 

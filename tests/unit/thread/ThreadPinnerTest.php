@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\tests\unit\thread;
 
+use bizley\podium\api\interfaces\RepositoryInterface;
 use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use bizley\podium\api\services\thread\ThreadPinner;
 use Exception;
@@ -21,6 +22,14 @@ class ThreadPinnerTest extends TestCase
     public function testBeforePinShouldReturnTrue(): void
     {
         self::assertTrue($this->service->beforePin());
+    }
+
+    public function testPinShouldReturnErrorWhenThreadRepositoryIsWrong(): void
+    {
+        $result = $this->service->pin($this->createMock(RepositoryInterface::class));
+
+        self::assertFalse($result->getResult());
+        self::assertEmpty($result->getErrors());
     }
 
     public function testPinShouldReturnErrorWhenPinningErrored(): void
@@ -56,6 +65,14 @@ class ThreadPinnerTest extends TestCase
     public function testBeforeUnpinShouldReturnTrue(): void
     {
         self::assertTrue($this->service->beforeUnpin());
+    }
+
+    public function testUnpinShouldReturnErrorWhenThreadRepositoryIsWrong(): void
+    {
+        $result = $this->service->unpin($this->createMock(RepositoryInterface::class));
+
+        self::assertFalse($result->getResult());
+        self::assertEmpty($result->getErrors());
     }
 
     public function testUnpinShouldReturnErrorWhenUnpinningErrored(): void

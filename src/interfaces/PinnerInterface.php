@@ -11,10 +11,10 @@ interface PinnerInterface
     /**
      * Pins model.
      */
-    public function pin(ThreadRepositoryInterface $thread): PodiumResponse;
+    public function pin(RepositoryInterface $thread): PodiumResponse;
 
     /**
      * Unpins model.
      */
-    public function unpin(ThreadRepositoryInterface $thread): PodiumResponse;
+    public function unpin(RepositoryInterface $thread): PodiumResponse;
 }

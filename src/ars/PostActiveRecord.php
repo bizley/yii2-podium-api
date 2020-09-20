@@ -16,6 +16,7 @@ use yii\db\ActiveRecord;
  * @property int|null           $old_thread_id
  * @property string             $content
  * @property bool               $edited
+ * @property bool               $pinned
  * @property int                $likes
  * @property int                $dislikes
  * @property int                $created_at

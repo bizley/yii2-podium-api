@@ -20,6 +20,9 @@ final class PostArchiver extends Component implements ArchiverInterface
     public const EVENT_BEFORE_REVIVING = 'podium.post.reviving.before';
     public const EVENT_AFTER_REVIVING = 'podium.post.reviving.after';
 
+    /**
+     * Calls before archiving the post.
+     */
     public function beforeArchive(): bool
     {
         $event = new ArchiveEvent();
@@ -48,15 +51,21 @@ final class PostArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while archiving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after archiving post successfully.
+     */
     public function afterArchive(PostRepositoryInterface $post): void
     {
         $this->trigger(self::EVENT_AFTER_ARCHIVING, new ArchiveEvent(['repository' => $post]));
     }
 
+    /**
+     * Calls before reviving the post.
+     */
     public function beforeRevive(): bool
     {
         $event = new ArchiveEvent();
@@ -85,10 +94,13 @@ final class PostArchiver extends Component implements ArchiverInterface
         } catch (Throwable $exc) {
             Yii::error(['Exception while reviving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after reviving the post successfully.
+     */
     public function afterRevive(PostRepositoryInterface $post): void
     {
         $this->trigger(self::EVENT_AFTER_REVIVING, new ArchiveEvent(['repository' => $post]));

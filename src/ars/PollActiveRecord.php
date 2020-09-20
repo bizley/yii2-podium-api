@@ -20,6 +20,7 @@ use function time;
  * @property int                $author_id
  * @property string             $question
  * @property bool               $revealed
+ * @property bool               $pinned
  * @property string             $choice_id
  * @property int                $created_at
  * @property int                $updated_at
