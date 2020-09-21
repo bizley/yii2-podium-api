@@ -213,7 +213,7 @@ class PostComponentTest extends TestCase
         );
     }
 
-    public function testThumbDownShouldRunLikersThumbUp(): void
+    public function testThumbDownShouldRunLikersThumbDown(): void
     {
         $liker = $this->createMock(LikerInterface::class);
         $liker->expects(self::once())->method('thumbDown')->willReturn(PodiumResponse::success());
@@ -225,7 +225,7 @@ class PostComponentTest extends TestCase
         );
     }
 
-    public function testThumbResetShouldRunLikersThumbUp(): void
+    public function testThumbResetShouldRunLikersThumbReset(): void
     {
         $liker = $this->createMock(LikerInterface::class);
         $liker->expects(self::once())->method('thumbReset')->willReturn(PodiumResponse::success());

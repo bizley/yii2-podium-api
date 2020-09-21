@@ -22,6 +22,9 @@ final class PostMover extends Component implements MoverInterface
     public const EVENT_BEFORE_MOVING = 'podium.post.moving.before';
     public const EVENT_AFTER_MOVING = 'podium.post.moving.after';
 
+    /**
+     * Calls before moving the post.
+     */
     public function beforeMove(): bool
     {
         $event = new MoveEvent();
@@ -60,10 +63,10 @@ final class PostMover extends Component implements MoverInterface
             /** @var ForumRepositoryInterface $postGrandParent */
             $postGrandParent = $postParent->getParent();
             if (!$postGrandParent->updateCounters(0, -1)) {
-                throw new Exception('Error while updating old thread counters!');
+                throw new Exception('Error while updating old forum counters!');
             }
             if (!$thread->updateCounters(1)) {
-                throw new Exception('Error while updating new forum counters!');
+                throw new Exception('Error while updating new thread counters!');
             }
             if (!$threadParent->updateCounters(0, 1)) {
                 throw new Exception('Error while updating new forum counters!');
@@ -77,10 +80,13 @@ final class PostMover extends Component implements MoverInterface
             $transaction->rollBack();
             Yii::error(['Exception while moving post', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after moving the post successfully.
+     */
     public function afterMove(PostRepositoryInterface $post): void
     {
         $this->trigger(self::EVENT_AFTER_MOVING, new MoveEvent(['repository' => $post]));

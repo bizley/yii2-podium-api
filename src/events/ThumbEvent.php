@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\events;
 
-use bizley\podium\api\interfaces\RepositoryInterface;
+use bizley\podium\api\interfaces\ThumbRepositoryInterface;
 use yii\base\Event;
 
 class ThumbEvent extends Event
@@ -24,5 +24,5 @@ class ThumbEvent extends Event
      */
     public bool $canThumbReset = true;
 
-    public ?RepositoryInterface $repository = null;
+    public ?ThumbRepositoryInterface $repository = null;
 }

@@ -49,6 +49,9 @@ final class PostLiker extends Component implements LikerInterface
         return $this->thumb;
     }
 
+    /**
+     * Calls before giving thumb up.
+     */
     public function beforeThumbUp(): bool
     {
         $event = new ThumbEvent();
@@ -57,6 +60,9 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbUp;
     }
 
+    /**
+     * Gives thumb up to the post.
+     */
     public function thumbUp(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbUp()) {
@@ -94,15 +100,21 @@ final class PostLiker extends Component implements LikerInterface
             $transaction->rollBack();
             Yii::error(['Exception while giving thumb up', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after giving thumb up successfully.
+     */
     public function afterThumbUp(ThumbRepositoryInterface $thumb): void
     {
         $this->trigger(self::EVENT_AFTER_THUMB_UP, new ThumbEvent(['repository' => $thumb]));
     }
 
+    /**
+     * Calls before giving thumb down.
+     */
     public function beforeThumbDown(): bool
     {
         $event = new ThumbEvent();
@@ -111,6 +123,9 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbDown;
     }
 
+    /**
+     * Gives thumb down to the post.
+     */
     public function thumbDown(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbDown()) {
@@ -148,15 +163,21 @@ final class PostLiker extends Component implements LikerInterface
             $transaction->rollBack();
             Yii::error(['Exception while giving thumb down', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after giving thumb down to the post.
+     */
     public function afterThumbDown(ThumbRepositoryInterface $thumb): void
     {
         $this->trigger(self::EVENT_AFTER_THUMB_DOWN, new ThumbEvent(['repository' => $thumb]));
     }
 
+    /**
+     * Calls before resetting thumb.
+     */
     public function beforeThumbReset(): bool
     {
         $event = new ThumbEvent();
@@ -165,6 +186,9 @@ final class PostLiker extends Component implements LikerInterface
         return $event->canThumbReset;
     }
 
+    /**
+     * Resets thumb for the post.
+     */
     public function thumbReset(PostRepositoryInterface $post, MemberRepositoryInterface $member): PodiumResponse
     {
         if (!$this->beforeThumbReset()) {
@@ -179,13 +203,15 @@ final class PostLiker extends Component implements LikerInterface
                 return PodiumResponse::error(['api' => Yii::t('podium.error', 'post.not.rated')]);
             }
 
+            $isUp = $thumb->isUp();
+
             if (!$thumb->reset()) {
                 return PodiumResponse::error();
             }
-            if ($thumb->isUp() && !$post->updateCounters(-1, 0)) {
+            if ($isUp && !$post->updateCounters(-1, 0)) {
                 throw new Exception('Error while updating post counters!');
             }
-            if ($thumb->isDown() && !$post->updateCounters(0, -1)) {
+            if (!$isUp && !$post->updateCounters(0, -1)) {
                 throw new Exception('Error while updating post counters!');
             }
 
@@ -197,10 +223,13 @@ final class PostLiker extends Component implements LikerInterface
             $transaction->rollBack();
             Yii::error(['Exception while resetting thumb', $exc->getMessage(), $exc->getTraceAsString()], 'podium');
 
-            return PodiumResponse::error();
+            return PodiumResponse::error(['exception' => $exc]);
         }
     }
 
+    /**
+     * Calls after resetting thumb for the post successfully.
+     */
     public function afterThumbReset(): void
     {
         $this->trigger(self::EVENT_AFTER_THUMB_RESET);
