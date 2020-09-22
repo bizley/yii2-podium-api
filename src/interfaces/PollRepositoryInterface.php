@@ -32,4 +32,8 @@ interface PollRepositoryInterface extends RepositoryInterface
     public function isSingleChoice(): bool;
 
     public function vote(MemberRepositoryInterface $member, array $answers): bool;
+
+    public function pin(): bool;
+
+    public function unpin(): bool;
 }

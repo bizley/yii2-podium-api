@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace bizley\podium\api\components;
 
-use bizley\podium\api\ars\PollActiveRecord;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\ArchiverInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\MoverInterface;
+use bizley\podium\api\interfaces\PinnerInterface;
 use bizley\podium\api\interfaces\PollBuilderInterface;
 use bizley\podium\api\interfaces\PollInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
@@ -18,6 +19,7 @@ use bizley\podium\api\repositories\PollRepository;
 use bizley\podium\api\services\poll\PollArchiver;
 use bizley\podium\api\services\poll\PollBuilder;
 use bizley\podium\api\services\poll\PollMover;
+use bizley\podium\api\services\poll\PollPinner;
 use bizley\podium\api\services\poll\PollRemover;
 use bizley\podium\api\services\poll\PollVoter;
 use yii\base\Component;
@@ -27,6 +29,7 @@ use yii\data\ActiveDataFilter;
 use yii\data\ActiveDataProvider;
 use yii\data\Pagination;
 use yii\data\Sort;
+use yii\db\ActiveRecord;
 use yii\di\Instance;
 
 final class Poll extends Component implements PollInterface
@@ -57,6 +60,11 @@ final class Poll extends Component implements PollInterface
     public $archiverConfig = PollArchiver::class;
 
     /**
+     * @var string|array|PinnerInterface
+     */
+    public $pinnerConfig = PollPinner::class;
+
+    /**
      * @var string|array|PollRepositoryInterface
      */
     public $repositoryConfig = PollRepository::class;
@@ -64,10 +72,10 @@ final class Poll extends Component implements PollInterface
     /**
      * @throws InvalidConfigException
      */
-    public function getById(int $id): ?PollActiveRecord
+    public function getById(int $id): ?ActiveRecord
     {
-        /** @var PollRepository $poll */
-        $poll = Instance::ensure($this->repositoryConfig, PollRepositoryInterface::class);
+        /** @var ActiveRecordRepositoryInterface $poll */
+        $poll = Instance::ensure($this->repositoryConfig, ActiveRecordRepositoryInterface::class);
         if (!$poll->fetchOne($id)) {
             return null;
         }
@@ -246,5 +254,41 @@ final class Poll extends Component implements PollInterface
     public function revive(PollRepositoryInterface $poll): PodiumResponse
     {
         return $this->getArchiver()->revive($poll);
+    }
+
+    private ?PinnerInterface $pinner = null;
+
+    /**
+     * @throws InvalidConfigException
+     */
+    public function getPinner(): PinnerInterface
+    {
+        if (null === $this->pinner) {
+            /** @var PinnerInterface $pinner */
+            $pinner = Instance::ensure($this->pinnerConfig, PinnerInterface::class);
+            $this->pinner = $pinner;
+        }
+
+        return $this->pinner;
+    }
+
+    /**
+     * Pins poll.
+     *
+     * @throws InvalidConfigException
+     */
+    public function pin(PollRepositoryInterface $poll): PodiumResponse
+    {
+        return $this->getPinner()->pin($poll);
+    }
+
+    /**
+     * Unpins poll.
+     *
+     * @throws InvalidConfigException
+     */
+    public function unpin(PollRepositoryInterface $poll): PodiumResponse
+    {
+        return $this->getPinner()->unpin($poll);
     }
 }

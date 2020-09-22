@@ -7,6 +7,7 @@ namespace bizley\podium\api\repositories;
 use bizley\podium\api\ars\PollActiveRecord;
 use bizley\podium\api\enums\PollAnswerAction;
 use bizley\podium\api\enums\PollChoice;
+use bizley\podium\api\interfaces\ActiveRecordRepositoryInterface;
 use bizley\podium\api\interfaces\MemberRepositoryInterface;
 use bizley\podium\api\interfaces\PollAnswerRepositoryInterface;
 use bizley\podium\api\interfaces\PollRepositoryInterface;
@@ -16,11 +17,12 @@ use bizley\podium\api\interfaces\ThreadRepositoryInterface;
 use DomainException;
 use Exception;
 use LogicException;
+use yii\db\ActiveRecord;
 
 use function is_int;
 use function is_string;
 
-final class PollRepository implements PollRepositoryInterface
+final class PollRepository implements PollRepositoryInterface, ActiveRecordRepositoryInterface
 {
     use ActiveRecordRepositoryTrait;
 
@@ -42,9 +44,13 @@ final class PollRepository implements PollRepositoryInterface
         return $this->model;
     }
 
-    public function setModel(?PollActiveRecord $activeRecord): void
+    public function setModel(ActiveRecord $pollActiveRecord): void
     {
-        $this->model = $activeRecord;
+        if (!$pollActiveRecord instanceof PollActiveRecord) {
+            throw new LogicException('You need to pass bizley\podium\api\ars\PollActiveRecord!');
+        }
+
+        $this->model = $pollActiveRecord;
     }
 
     public function getId(): int
@@ -252,5 +258,31 @@ final class PollRepository implements PollRepositoryInterface
         }
 
         return true;
+    }
+
+    public function pin(): bool
+    {
+        $poll = $this->getModel();
+        $poll->pinned = true;
+        if (!$poll->validate()) {
+            $this->errors = $poll->errors;
+
+            return false;
+        }
+
+        return $poll->save(false);
+    }
+
+    public function unpin(): bool
+    {
+        $poll = $this->getModel();
+        $poll->pinned = false;
+        if (!$poll->validate()) {
+            $this->errors = $poll->errors;
+
+            return false;
+        }
+
+        return $poll->save(false);
     }
 }
